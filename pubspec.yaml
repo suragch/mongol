@@ -1,8 +1,8 @@
 name: mongol
 description: Widgets for vertical Mongolian
 version: 0.0.1
-author:
-homepage:
+author: Suragch <studymongolian@gmail.com>
+homepage: https://github.com/suragch
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
