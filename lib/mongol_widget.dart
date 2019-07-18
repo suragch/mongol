@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol_text_painter.dart';
 
-class VerticalText extends LeafRenderObjectWidget {
+class MongolText extends LeafRenderObjectWidget {
   /// Creates a single line of vertical text
   ///
   /// The [text] argument must not be null.
-  const VerticalText({
+  const MongolText({
     Key key,
     this.text,
   })  : assert(text != null),
@@ -15,28 +15,28 @@ class VerticalText extends LeafRenderObjectWidget {
   final TextSpan text;
 
   @override
-  RenderVerticalText createRenderObject(BuildContext context) {
+  RenderMongolText createRenderObject(BuildContext context) {
     print('creating render object');
-    return RenderVerticalText(text);
+    return RenderMongolText(text);
   }
 
   @override
   void updateRenderObject(
-      BuildContext context, RenderVerticalText renderObject) {
+      BuildContext context, RenderMongolText renderObject) {
     print('updating render object');
     renderObject.text = text;
   }
 }
 
-class RenderVerticalText extends RenderBox {
+class RenderMongolText extends RenderBox {
   /// Creates a vertical text render object.
   ///
   /// The [text] argument must not be null.
-  RenderVerticalText(TextSpan text)
+  RenderMongolText(TextSpan text)
       : assert(text != null),
-        _textPainter = VerticalTextPainter(text: text);
+        _textPainter = MongolTextPainter(text: text);
 
-  final VerticalTextPainter _textPainter;
+  final MongolTextPainter _textPainter;
 
   /// The text to display
   TextSpan get text => _textPainter.text;

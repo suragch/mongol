@@ -4,9 +4,9 @@ import 'package:flutter/painting.dart';
 import 'package:mongol/mongol_paragraph.dart';
 
 
-class VerticalTextPainter {
+class MongolTextPainter {
 
-  VerticalTextPainter({
+  MongolTextPainter({
     TextSpan text,
   }) :  assert(text == null || text.debugAssertIsValid()),
         _text = text;
