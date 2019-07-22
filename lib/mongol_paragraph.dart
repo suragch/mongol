@@ -34,7 +34,7 @@ class MongolParagraph {
     _calculateLineBreaks(height);
     _calculateWidth();
     _height = height;
-    _calculateIntrinsicSize();
+    _calculateIntrinsicHeight();
   }
 
   List<TextRun> _runs = [];
@@ -133,13 +133,13 @@ class MongolParagraph {
   // Internally this translates a horizontal run width to the vertical name
   // that it is known as externally.
   // FIXME: This does not handle newline characters.
-  void _calculateIntrinsicSize() {
+  void _calculateIntrinsicHeight() {
     assert(_runs != null);
 
     double sum = 0;
     double minRunWidth = double.infinity;
     for (TextRun run in _runs) {
-      final width = run.paragraph.width;
+      final width = run.paragraph.longestLine;
       minRunWidth = math.min(width, minRunWidth);
       sum += width;
     }
