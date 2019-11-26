@@ -76,7 +76,6 @@ class MongolTextPainter {
     if (_paragraph == null) {
       final MongolParagraphBuilder builder = MongolParagraphBuilder(_createParagraphStyle());
       _addStyleToText(builder, _text);
-      //_text.build(builder);
       _paragraph = builder.build();
     }
     _lastMinHeight = minHeight;
@@ -90,10 +89,8 @@ class MongolTextPainter {
   }
 
   void _addStyleToText(MongolParagraphBuilder builder, TextSpan textSpan) {
-    print('adding text style');
     final style = textSpan.style;
     final text = textSpan.text;
-    print('text: $text');
     final children = textSpan.children;
     final bool hasStyle = style != null;
     if (hasStyle)
@@ -104,7 +101,6 @@ class MongolTextPainter {
       for (TextSpan child in children) {
         assert(child != null);
         _addStyleToText(builder, child);
-        //child.build(builder, textScaleFactor: textScaleFactor);
       }
     }
     if (hasStyle)
@@ -112,8 +108,6 @@ class MongolTextPainter {
   }
 
   void paint(Canvas canvas, Offset offset) {
-    //canvas.drawParagraph(_paragraph, offset);
-    print('printing text');
     _paragraph.draw(canvas, offset);
   }
 

@@ -15,24 +15,22 @@ class MongolRichText extends LeafRenderObjectWidget {
   final TextSpan text;
 
   @override
-  RenderMongolParagraph createRenderObject(BuildContext context) {
-    print('creating render object');
-    return RenderMongolParagraph(text);
+  MongolRenderParagraph createRenderObject(BuildContext context) {
+    return MongolRenderParagraph(text);
   }
 
   @override
   void updateRenderObject(
-      BuildContext context, RenderMongolParagraph renderObject) {
-    print('updating render object');
+      BuildContext context, MongolRenderParagraph renderObject) {
     renderObject.text = text;
   }
 }
 
-class RenderMongolParagraph extends RenderBox {
+class MongolRenderParagraph extends RenderBox {
   /// Creates a vertical text render object.
   ///
   /// The [text] argument must not be null.
-  RenderMongolParagraph(TextSpan text)
+  MongolRenderParagraph(TextSpan text)
       : assert(text != null),
         _textPainter = MongolTextPainter(text: text);
 
