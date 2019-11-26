@@ -139,7 +139,7 @@ class MongolParagraph {
     double sum = 0;
     double minRunWidth = double.infinity;
     for (TextRun run in _runs) {
-      final width = run.paragraph.longestLine;
+      final width = run.paragraph.maxIntrinsicWidth;
       minRunWidth = math.min(width, minRunWidth);
       sum += width;
     }

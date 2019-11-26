@@ -13,20 +13,10 @@ class DemoApp extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(title: Text('mongol Library Demo')),
-        body: BodyWidget(),
+        body: MongolText(myString),
       ),
     );
   }
 }
 
 const String myString = 'A string that should not wrap';
-
-class BodyWidget extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      child: Center(child: MongolText(myString)),
-    );
-  }
-}
