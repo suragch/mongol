@@ -49,4 +49,23 @@ void main() {
     expect(baseSize.width, equals(60.0)); // two lines
     expect(baseSize.height, equals(500.0));
   });
+
+  testWidgets('MongolRichText wraps text for new line character',
+      (WidgetTester tester) async {
+    // set the height of the surface so that the text will wrap
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const String myString = 'A string that\nshould wrap';
+    await tester.pumpWidget(
+      Center(child: MongolText(myString)),
+    );
+
+    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    expect(text, isNotNull);
+
+    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    expect(baseSize.width, equals(30.0)); // two lines
+    expect(baseSize.height, equals(750.0));
+  });
 }
