@@ -280,7 +280,7 @@ class LineBreaker {
   List<int> get breaks => _breaks;
 
   bool isBreakChar(String codeUnit) {
-    return codeUnit == ' ';
+    return codeUnit == ' ' || codeUnit == '\n';
   }
 }
 

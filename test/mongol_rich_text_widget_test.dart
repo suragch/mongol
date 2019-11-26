@@ -33,7 +33,7 @@ void main() {
 
   testWidgets('MongolRichText should not wrap when less than height constraint',
       (WidgetTester tester) async {
-    // set the height of the surface so that the text will wrap
+
     await binding.setSurfaceSize(Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
@@ -47,7 +47,6 @@ void main() {
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(30.0));
-    //expect(baseSize.height, equals(750.0));
   });
 
   testWidgets('MongolRichText wraps text when taller than height constraint',
@@ -71,7 +70,7 @@ void main() {
 
   testWidgets('MongolRichText wraps text for new line character',
       (WidgetTester tester) async {
-    // set the height of the surface so that the text will wrap
+
     await binding.setSurfaceSize(Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
@@ -84,8 +83,9 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(30.0));
+    expect(baseSize.width, equals(60.0));
     expect(baseSize.height, equals(750.0));
+
 
   });
 }

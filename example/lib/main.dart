@@ -19,4 +19,4 @@ class DemoApp extends StatelessWidget {
   }
 }
 
-const String myString = 'A string that should not wrap';
+const String myString = 'A string that\nshould wrap';
