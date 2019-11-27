@@ -1,3 +1,7 @@
+## [0.2.0] - 2019.11.26
+
+* Added support for new line characters.
+
 ## [0.1.0] - 2019.11.24
 
 * Refactored into MongolText and MongolRichText widgets to more closely match Text and RichText.
