@@ -15,13 +15,11 @@ class DemoApp extends StatelessWidget {
         appBar: AppBar(title: Text('mongol Library Demo')),
         body: Center(
           child: Container(
-            color: Colors.red,
-            child: MongolText(myString),
+            color: Colors.blue,
+            child: MongolText('ᠮᠣᠩᠭᠣᠯ'),
           ),
         ),
       ),
     );
   }
 }
-
-const String myString = 'A string';

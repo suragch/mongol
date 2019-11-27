@@ -1,16 +1,38 @@
-# mongol_demo_app
+# mongol
 
-A demo app for mongol library.
+You can create vertical text with the MongolText widget.
 
-## Getting Started
+```dart
+MongolText('ᠮᠣᠩᠭᠣᠯ')
+```
 
-This project is a starting point for a Flutter application.
+Here is a full example:
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+```dart
+import 'package:flutter/material.dart';
+import 'package:mongol/mongol_text.dart';
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+void main() => runApp(DemoApp());
+
+class DemoApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'mongol',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Scaffold(
+        appBar: AppBar(title: Text('mongol Library Demo')),
+        body: Center(
+          child: Container(
+            color: Colors.blue,
+            child: MongolText('ᠮᠣᠩᠭᠣᠯ'),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
