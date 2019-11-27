@@ -7,6 +7,8 @@ class MongolParagraph {
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
   MongolParagraph._(this._paragraphStyle, this._textStyle, this._text);
 
+  static const newLineCodeUnit = 10;
+
   ui.ParagraphStyle _paragraphStyle;
   ui.TextStyle _textStyle;
   String _text;
@@ -63,7 +65,7 @@ class MongolParagraph {
   }
 
   void _addRun(int start, int end) {
-    final endIgnoringNewLineChar = _isNewLineChar(_text.codeUnitAt(end - 1))
+    final endIgnoringNewLineChar = _isNewLineCharAt(end - 1)
         ? end - 1
         : end;
     final builder = ui.ParagraphBuilder(_paragraphStyle)
@@ -76,8 +78,8 @@ class MongolParagraph {
     _runs.add(run);
   }
 
-  bool _isNewLineChar(int codeUnit) {
-    return codeUnit == 10;
+  bool _isNewLineCharAt(int index) {
+    return _text.codeUnitAt(index) == newLineCodeUnit;
   }
 
   List<LineInfo> _lines = [];
@@ -103,8 +105,16 @@ class MongolParagraph {
       final run = _runs[i];
       final runWidth = run.paragraph.maxIntrinsicWidth;
       final runHeight = run.paragraph.height;
-      // TODO: handle single run longer than maxLineLength
-      if (lineWidth + runWidth > maxLineLength) {
+
+      if (_runEndsWithNewLine(run)) {
+        end = i + 1;
+        lineWidth += runWidth;
+        lineHeight = math.max(lineHeight, run.paragraph.height);
+        _addLine(start, end, lineWidth, lineHeight);
+        lineWidth = 0;
+        lineHeight = 0;
+        start = end;
+      } else if (lineWidth + runWidth > maxLineLength) {
         _addLine(start, end, lineWidth, lineHeight);
         start = end;
         lineWidth = runWidth;
@@ -119,6 +129,10 @@ class MongolParagraph {
     if (start < end) {
       _addLine(start, end, lineWidth, lineHeight);
     }
+  }
+
+  bool _runEndsWithNewLine(TextRun run) {
+    return _isNewLineCharAt(run.end - 1);
   }
 
   void _addLine(int start, int end, double width, double height) {
@@ -144,14 +158,19 @@ class MongolParagraph {
     assert(_runs != null);
 
     double sum = 0;
-    double minRunWidth = double.infinity;
-    for (TextRun run in _runs) {
-      final width = run.paragraph.maxIntrinsicWidth;
-      minRunWidth = math.min(width, minRunWidth);
-      sum += width;
+    double maxRunWidth = 0;
+    double maxLineLength = 0;
+    for (LineInfo line in _lines) {
+      for (int i = line.textRunStart; i < line.textRunEnd; i++) {
+        final width = _runs[i].paragraph.maxIntrinsicWidth;
+        maxRunWidth = math.max(width, maxRunWidth);
+        sum += width;
+      }
+      maxLineLength = math.max(maxLineLength, sum);
+      sum = 0;
     }
-    _minIntrinsicHeight = minRunWidth;
-    _maxIntrinsicHeight = sum;
+    _minIntrinsicHeight = maxRunWidth;
+    _maxIntrinsicHeight = maxLineLength;
   }
 
   void draw(Canvas canvas, Offset offset) {
@@ -182,6 +201,8 @@ class MongolParagraph {
 
     canvas.restore();
   }
+
+
 }
 
 class MongolParagraphConstraints {

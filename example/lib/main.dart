@@ -13,10 +13,15 @@ class DemoApp extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(title: Text('mongol Library Demo')),
-        body: MongolText(myString),
+        body: Center(
+          child: Container(
+            color: Colors.red,
+            child: MongolText(myString),
+          ),
+        ),
       ),
     );
   }
 }
 
-const String myString = 'A string that\nshould wrap';
+const String myString = 'A string';
