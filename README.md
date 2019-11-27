@@ -4,7 +4,12 @@ Widgets for vertical Mongolian
 
 ## Contents
 
-Currently this project only contains a widget called `MongolText`. Use it the same as you would use a standard Flutter `Text` widget.
+Currently this project contains the following widgets:
+
+- `MongolText`: A vertical version of Text.
+- `MongolRichText`: A vertical version of RichText.
+
+Left-to-right line wrapping is supported.
 
 <img src="example/supplemental/mongol_demo.png" width="200">
 
