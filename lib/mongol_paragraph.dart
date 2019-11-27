@@ -63,14 +63,21 @@ class MongolParagraph {
   }
 
   void _addRun(int start, int end) {
+    final endIgnoringNewLineChar = _isNewLineChar(_text.codeUnitAt(end - 1))
+        ? end - 1
+        : end;
     final builder = ui.ParagraphBuilder(_paragraphStyle)
       ..pushStyle(_textStyle)
-      ..addText(_text.substring(start, end));
+      ..addText(_text.substring(start, endIgnoringNewLineChar));
     final paragraph = builder.build();
     paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
 
     final run = TextRun(start, end, paragraph);
     _runs.add(run);
+  }
+
+  bool _isNewLineChar(int codeUnit) {
+    return codeUnit == 10;
   }
 
   List<LineInfo> _lines = [];
