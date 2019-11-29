@@ -10,7 +10,7 @@ Currently this project contains the following widget:
 
 Left-to-right line wrapping is supported.
 
-<img src="https://github.com/suragch/mongol/tree/master/example/supplemental" width="200">
+<img src="https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_demo.png" width="200">
 
 ## TODO
 
