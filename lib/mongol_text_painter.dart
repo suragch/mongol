@@ -1,14 +1,13 @@
 import 'dart:ui' as ui show ParagraphStyle;
 
 import 'package:flutter/painting.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol_paragraph.dart';
 
-
 class MongolTextPainter {
-
   MongolTextPainter({
     TextSpan text,
-  }) :  assert(text == null || text.debugAssertIsValid()),
+  })  : assert(text == null || text.debugAssertIsValid()),
         _text = text;
 
   MongolParagraph _paragraph;
@@ -16,10 +15,10 @@ class MongolTextPainter {
 
   TextSpan get text => _text;
   TextSpan _text;
+
   set text(TextSpan value) {
     assert(value == null || value.debugAssertIsValid());
-    if (_text == value)
-      return;
+    if (_text == value) return;
     _text = value;
     _paragraph = null;
     _needsLayout = true;
@@ -34,7 +33,6 @@ class MongolTextPainter {
       locale: null,
     );
   }
-
 
   double _applyFloatingPointHack(double layoutValue) {
     return layoutValue.ceilToDouble();
@@ -68,13 +66,15 @@ class MongolTextPainter {
   double _lastMinHeight;
   double _lastMaxHeight;
 
-  void layout({ double minHeight = 0.0, double maxHeight = double.infinity }) {
+  void layout({double minHeight = 0.0, double maxHeight = double.infinity}) {
     assert(text != null);
-    if (!_needsLayout && minHeight == _lastMinHeight && maxHeight == _lastMaxHeight)
-      return;
+    if (!_needsLayout &&
+        minHeight == _lastMinHeight &&
+        maxHeight == _lastMaxHeight) return;
     _needsLayout = false;
     if (_paragraph == null) {
-      final MongolParagraphBuilder builder = MongolParagraphBuilder(_createParagraphStyle());
+      final MongolParagraphBuilder builder =
+          MongolParagraphBuilder(_createParagraphStyle());
       _addStyleToText(builder, _text);
       _paragraph = builder.build();
     }
@@ -93,22 +93,18 @@ class MongolTextPainter {
     final text = textSpan.text;
     final children = textSpan.children;
     final bool hasStyle = style != null;
-    if (hasStyle)
-      builder.pushStyle(style);
-    if (text != null)
-      builder.addText(text);
+    if (hasStyle) builder.pushStyle(style);
+    if (text != null) builder.addText(text);
     if (children != null) {
       for (TextSpan child in children) {
         assert(child != null);
         _addStyleToText(builder, child);
       }
     }
-    if (hasStyle)
-      builder.pop();
+    if (hasStyle) builder.pop();
   }
 
   void paint(Canvas canvas, Offset offset) {
     _paragraph.draw(canvas, offset);
   }
-
 }

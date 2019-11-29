@@ -19,17 +19,20 @@ class DemoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'mongol',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
       home: Scaffold(
-        appBar: AppBar(title: Text('mongol Library Demo')),
-        body: Center(
-          child: Container(
-            color: Colors.blue,
-            child: MongolText('ᠮᠣᠩᠭᠣᠯ'),
-          ),
+        appBar: AppBar(title: Text('mongol package demo')),
+        body: Stack(
+          children: <Widget>[
+            Center(
+              child: Container(
+                color: Colors.blue[100],
+                child: MongolText(
+                  'ᠮᠣᠩᠭᠣᠯ\nᠪᠢᠴᠢᠭ',
+                  style: TextStyle(fontSize: 100),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

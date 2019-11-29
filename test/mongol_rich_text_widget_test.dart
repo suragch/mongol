@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mongol/mongol.dart';
+import 'package:mongol/mongol_rich_text.dart';
 
 void main() {
   final TestWidgetsFlutterBinding binding =
@@ -27,8 +28,8 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(30.0));
-    expect(baseSize.height, equals(150.0));
+    expect(baseSize.width, equals(24.0));
+    expect(baseSize.height, equals(120.0));
   });
 
   testWidgets('MongolRichText should not wrap when less than height constraint',
@@ -45,7 +46,7 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(30.0));
+    expect(baseSize.width, equals(24.0));
   });
 
   testWidgets('MongolRichText wraps text when taller than height constraint',
@@ -63,8 +64,8 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(60.0)); // two lines
-    expect(baseSize.height, equals(500.0));
+    expect(baseSize.width, equals(48.0)); // two lines
+    expect(baseSize.height, equals(336.0));
   });
 
   testWidgets('MongolRichText wraps text for new line character',
@@ -81,8 +82,8 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(60.0));
-    expect(baseSize.height, equals(390.0));
+    expect(baseSize.width, equals(48.0));
+    expect(baseSize.height, equals(312.0));
   });
 
   testWidgets('MongolRichText has correct instrinsic width',

@@ -1,3 +1,8 @@
+## [0.3.0] - 2019.11.29
+
+* Added a default Mongolian font.
+* Hiding `MongolRichText` for now since TextSpans are not yet supported.
+
 ## [0.2.0] - 2019.11.26
 
 * Added support for new line characters.

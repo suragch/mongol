@@ -7,7 +7,7 @@ class MongolParagraph {
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
   MongolParagraph._(this._paragraphStyle, this._textStyle, this._text);
 
-  static const newLineCodeUnit = 10;
+  static const _newLineCodeUnit = 10;
 
   ui.ParagraphStyle _paragraphStyle;
   ui.TextStyle _textStyle;
@@ -79,7 +79,7 @@ class MongolParagraph {
   }
 
   bool _isNewLineCharAt(int index) {
-    return _text.codeUnitAt(index) == newLineCodeUnit;
+    return _text.codeUnitAt(index) == _newLineCodeUnit;
   }
 
   List<LineInfo> _lines = [];
@@ -240,6 +240,7 @@ class MongolParagraphBuilder {
     textAlign: TextAlign.start,
     textDirection: TextDirection.ltr,
     fontSize: 30,
+    //fontFamily: MongolFont.qagan,
   );
   static final  _defaultTextStyle = ui.TextStyle(
     color: Color(0xFF000000),
@@ -271,6 +272,7 @@ class MongolParagraphBuilder {
     if (_textStyle == null) {
       _textStyle = _defaultTextStyle;
     }
+
     return MongolParagraph._(_paragraphStyle, _textStyle, _text);
   }
 }
