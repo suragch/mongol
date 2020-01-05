@@ -15,3 +15,7 @@ Left-to-right line wrapping is supported.
 ## TODO
 
 - Add text styling and expose `MongolRichText`.
+
+## Related
+
+- Check out the [mongol_code](https://pub.dev/packages/mongol_code) package for Unicode conversion in Dart.

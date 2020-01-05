@@ -1,3 +1,7 @@
+## [0.3.1] - 2020.1.5
+
+- Minor changes. Was going to include mongol_code as a part of this package but released it as a separate Dart package instead.
+
 ## [0.3.0] - 2019.11.29
 
 * Added a default Mongolian font.
