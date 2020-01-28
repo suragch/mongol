@@ -1,3 +1,7 @@
+## [0.3.2] - 2020.1.28
+
+- Fixed bug: Spaces after a newline character caused newline char to be inserted in ParagraphBuilder.
+
 ## [0.3.1] - 2020.1.5
 
 - Minor changes. Was going to include mongol_code as a part of this package but released it as a separate Dart package instead.

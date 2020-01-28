@@ -13,7 +13,6 @@ class MongolParagraph {
   ui.TextStyle _textStyle;
   String _text;
 
-
   double _width;
   double _height;
   double _minIntrinsicHeight;
@@ -65,9 +64,11 @@ class MongolParagraph {
   }
 
   void _addRun(int start, int end) {
-    final endIgnoringNewLineChar = _isNewLineCharAt(end - 1)
-        ? end - 1
-        : end;
+    final endIgnoringNewLineChar = _isNewLineCharAt(end - 1) ? end - 1 : end;
+    assert(
+        !_text.substring(start, endIgnoringNewLineChar).contains('\n'),
+        'Runs must not contain newline characters. This indicates a bug in the '
+        'mongol plugin.');
     final builder = ui.ParagraphBuilder(_paragraphStyle)
       ..pushStyle(_textStyle)
       ..addText(_text.substring(start, endIgnoringNewLineChar));
@@ -177,7 +178,6 @@ class MongolParagraph {
     assert(_lines != null);
     assert(_runs != null);
 
-
     // translate for the offset
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
@@ -187,7 +187,6 @@ class MongolParagraph {
 
     // loop through every line
     for (LineInfo line in _lines) {
-
       // translate for the line height
       canvas.translate(0, -line.bounds.height);
 
@@ -201,8 +200,6 @@ class MongolParagraph {
 
     canvas.restore();
   }
-
-
 }
 
 class MongolParagraphConstraints {
@@ -227,7 +224,6 @@ class MongolParagraphConstraints {
 }
 
 class MongolParagraphBuilder {
-
   MongolParagraphBuilder(ui.ParagraphStyle style) {
     _paragraphStyle = style;
   }
@@ -242,7 +238,7 @@ class MongolParagraphBuilder {
     fontSize: 30,
     //fontFamily: MongolFont.qagan,
   );
-  static final  _defaultTextStyle = ui.TextStyle(
+  static final _defaultTextStyle = ui.TextStyle(
     color: Color(0xFF000000),
     textBaseline: TextBaseline.alphabetic,
     fontSize: 30,
@@ -256,7 +252,7 @@ class MongolParagraphBuilder {
 
   // The current implementation does nothing.
   // TODO: remove the last style from a stack of styles.
-  void pop() { }
+  void pop() {}
 
   // The current implementation does appends the text.
   // TODO: associate the added text with a style.
@@ -299,7 +295,9 @@ class LineBreaker {
     _breaks = [];
 
     for (int i = 1; i < _text.length; i++) {
-      if (isBreakChar(_text[i - 1]) && !isBreakChar(_text[i])) {
+      if (_text[i - 1] == '\n') {
+        _breaks.add(i);
+      } else if (isBreakChar(_text[i - 1]) && !isBreakChar(_text[i])) {
         _breaks.add(i);
       }
     }
@@ -310,7 +308,7 @@ class LineBreaker {
   List<int> get breaks => _breaks;
 
   bool isBreakChar(String codeUnit) {
-    return codeUnit == ' ' || codeUnit == '\n';
+    return codeUnit == ' ';
   }
 }
 
@@ -329,4 +327,3 @@ class LineInfo {
   int textRunEnd;
   Rect bounds;
 }
-
