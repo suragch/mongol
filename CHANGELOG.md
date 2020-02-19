@@ -1,3 +1,7 @@
+## [0.4.0] - 2020.1.28
+
+- Added `MongolAlertDialog`.
+
 ## [0.3.2] - 2020.1.28
 
 - Fixed bug: Spaces after a newline character caused newline char to be inserted in ParagraphBuilder.

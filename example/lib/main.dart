@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mongol_demo_app/text_demo.dart';
+import 'package:mongol_demo_app/alert_dialog_demo.dart';
 
 void main() => runApp(DemoApp());
 
@@ -30,6 +31,15 @@ class HomeScreen extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => TextDemo()),
+            );
+          },
+        ),
+        ListTile(
+          title: Text('MongolAlertDialog'),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => AlertDialogDemo()),
             );
           },
         ),
