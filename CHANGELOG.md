@@ -1,4 +1,8 @@
-## [0.4.0] - 2020.1.28
+## [0.4.1] - 2020.2.21
+
+- Change unsupported 2018 text theme items to 2014 version in MongolAlertDialog
+
+## [0.4.0] - 2020.2.19
 
 - Added `MongolAlertDialog`.
 

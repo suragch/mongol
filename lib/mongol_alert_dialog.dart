@@ -109,7 +109,7 @@ class MongolAlertDialog extends StatelessWidget {
         child: DefaultTextStyle(
           style: titleTextStyle ??
               dialogTheme.titleTextStyle ??
-              theme.textTheme.headline6,
+              theme.textTheme.title,
           child: Semantics(
             child: title,
             namesRoute: true,
@@ -124,7 +124,7 @@ class MongolAlertDialog extends StatelessWidget {
         child: DefaultTextStyle(
           style: contentTextStyle ??
               dialogTheme.contentTextStyle ??
-              theme.textTheme.subtitle1,
+              theme.textTheme.subhead,
           child: content,
         ),
       );
