@@ -24,6 +24,7 @@ This alert dialog works mostly the same as the Flutter `AlertDialog`.
 ## TODO
 
 - Add text styling and expose `MongolRichText`.
+- Rotate CJK and emoji characters to proper orientation
 
 ## Related
 
