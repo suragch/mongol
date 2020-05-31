@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol_text_painter.dart';
 
@@ -7,32 +9,66 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// The [text] argument must not be null.
   const MongolRichText({
     Key key,
-    this.text,
+    @required this.text,
+    this.textScaleFactor = 1.0,
   })  : assert(text != null),
+        assert(textScaleFactor != null),
         super(key: key);
 
   /// The text to display in this widget.
   final TextSpan text;
 
+  /// Font pixels per logical pixel
+  final double textScaleFactor;
+
   @override
   MongolRenderParagraph createRenderObject(BuildContext context) {
-    return MongolRenderParagraph(text);
+    return MongolRenderParagraph(
+      text,
+      textScaleFactor: textScaleFactor,
+    );
   }
 
   @override
   void updateRenderObject(
       BuildContext context, MongolRenderParagraph renderObject) {
-    renderObject.text = text;
+    renderObject
+      ..text = text
+      ..textScaleFactor = textScaleFactor;
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(StringProperty('text', text.toPlainText()));
+    properties.add(
+        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
   }
 }
 
-class MongolRenderParagraph extends RenderBox {
+class MongolRenderParagraph extends RenderBox
+    with
+        ContainerRenderObjectMixin<RenderBox, TextParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, TextParentData>,
+        RelayoutWhenSystemFontsChangeMixin {
   /// Creates a vertical text render object.
   ///
   /// The [text] argument must not be null.
-  MongolRenderParagraph(TextSpan text)
-      : assert(text != null),
-        _textPainter = MongolTextPainter(text: text);
+  MongolRenderParagraph(
+    TextSpan text, {
+    double textScaleFactor = 1.0,
+  })  : assert(text != null),
+        assert(textScaleFactor != null),
+        _textPainter = MongolTextPainter(
+          text: text,
+          textScaleFactor: textScaleFactor,
+        );
+
+  @override
+  void setupParentData(RenderBox child) {
+    if (child.parentData is! TextParentData)
+      child.parentData = TextParentData();
+  }
 
   final MongolTextPainter _textPainter;
 
@@ -53,6 +89,15 @@ class MongolRenderParagraph extends RenderBox {
         markNeedsLayout();
         break;
     }
+  }
+
+  double get textScaleFactor => _textPainter.textScaleFactor;
+
+  set textScaleFactor(double value) {
+    assert(value != null);
+    if (_textPainter.textScaleFactor == value) return;
+    _textPainter.textScaleFactor = value;
+    markNeedsLayout();
   }
 
   void _layoutText({
@@ -112,6 +157,22 @@ class MongolRenderParagraph extends RenderBox {
   }
 
   @override
+  bool hitTestSelf(Offset position) => true;
+
+  @override
+  void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
+    assert(debugHandleEvent(event, entry));
+    if (event is! PointerDownEvent) return;
+    _layoutTextWithConstraints(constraints);
+    // final Offset offset = entry.localPosition;
+    // final TextPosition position = _textPainter.getPositionForOffset(offset);
+    // TODO: When supporting multiple spans, need to get span from painter.
+    final TextPosition position = TextPosition(offset: 0);
+    final TextSpan span = _textPainter.text.getSpanForPosition(position);
+    span?.recognizer?.addPointer(event);
+  }
+
+  @override
   void performLayout() {
     _layoutTextWithConstraints(constraints);
     final Size textSize = _textPainter.size;
@@ -121,6 +182,30 @@ class MongolRenderParagraph extends RenderBox {
   @override
   void paint(PaintingContext context, Offset offset) {
     _layoutTextWithConstraints(constraints);
-    _textPainter.paint(context.canvas, offset);
+    final Canvas canvas = context.canvas;
+    assert(() {
+      if (debugRepaintTextRainbowEnabled) {
+        final Paint paint = Paint()..color = debugCurrentRepaintColor.toColor();
+        canvas.drawRect(offset & size, paint);
+      }
+      return true;
+    }());
+
+    _textPainter.paint(canvas, offset);
+  }
+
+  @override
+  List<DiagnosticsNode> debugDescribeChildren() {
+    return <DiagnosticsNode>[
+      text.toDiagnosticsNode(
+          name: 'text', style: DiagnosticsTreeStyle.transition)
+    ];
+  }
+
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(
+        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
   }
 }

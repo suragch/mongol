@@ -7,8 +7,11 @@ import 'package:mongol/mongol_paragraph.dart';
 class MongolTextPainter {
   MongolTextPainter({
     TextSpan text,
+    double textScaleFactor = 1.0,
   })  : assert(text == null || text.debugAssertIsValid()),
-        _text = text;
+        assert(textScaleFactor != null),
+        _text = text,
+        _textScaleFactor = textScaleFactor;
 
   MongolParagraph _paragraph;
   bool _needsLayout = true;
@@ -24,14 +27,34 @@ class MongolTextPainter {
     _needsLayout = true;
   }
 
+  double get textScaleFactor => _textScaleFactor;
+  double _textScaleFactor;
+
+  set textScaleFactor(double value) {
+    assert(value != null);
+    if (_textScaleFactor == value) return;
+    _textScaleFactor = value;
+    _paragraph = null;
+    _needsLayout = true;
+  }
+
   ui.ParagraphStyle _createParagraphStyle() {
-    return ui.ParagraphStyle(
-      textAlign: TextAlign.start,
-      textDirection: TextDirection.ltr,
-      maxLines: null,
-      ellipsis: null,
-      locale: null,
-    );
+    return _text.style?.getParagraphStyle(
+          textAlign: TextAlign.start,
+          textDirection: TextDirection.ltr,
+          textScaleFactor: textScaleFactor,
+          maxLines: null,
+          ellipsis: null,
+          locale: null,
+          strutStyle: null,
+        ) ??
+        ui.ParagraphStyle(
+          textAlign: TextAlign.start,
+          textDirection: TextDirection.ltr,
+          maxLines: null,
+          ellipsis: null,
+          locale: null,
+        );
   }
 
   double _applyFloatingPointHack(double layoutValue) {
@@ -105,6 +128,14 @@ class MongolTextPainter {
   }
 
   void paint(Canvas canvas, Offset offset) {
+    assert(() {
+      if (_needsLayout) {
+        throw FlutterError(
+            'TextPainter.paint called when text geometry was not yet calculated.\n'
+            'Please call layout() before paint() to position the text before painting it.');
+      }
+      return true;
+    }());
     _paragraph.draw(canvas, offset);
   }
 }

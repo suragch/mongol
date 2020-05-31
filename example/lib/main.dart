@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mongol_demo_app/text_demo.dart';
-import 'package:mongol_demo_app/alert_dialog_demo.dart';
+
+import 'demos/alert_dialog_demo.dart';
+import 'demos/gesture_detector_demo.dart';
+import 'demos/text_demo.dart';
 
 void main() => runApp(DemoApp());
 
@@ -25,25 +27,43 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        ListTile(
-          title: Text('MongolText'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => TextDemo()),
-            );
-          },
+        DemoTile(
+          title: 'MongolText',
+          destination: TextDemo(),
         ),
-        ListTile(
-          title: Text('MongolAlertDialog'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => AlertDialogDemo()),
-            );
-          },
+        DemoTile(
+          title: 'MongolText with GestureDetector',
+          destination: GestureDetectorDemo(),
+        ),
+        DemoTile(
+          title: 'MongolAlertDialog',
+          destination: AlertDialogDemo(),
         ),
       ],
+    );
+  }
+}
+
+class DemoTile extends StatelessWidget {
+  const DemoTile({
+    Key key,
+    @required this.title,
+    @required this.destination,
+  }) : super(key: key);
+
+  final String title;
+  final Widget destination;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      title: Text(title),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => destination),
+        );
+      },
     );
   }
 }

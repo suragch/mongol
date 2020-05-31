@@ -1,3 +1,9 @@
+## [0.5.0] - 2020.5.31
+
+- Added hit testing to MongolText and its associated classes so that a GestureDetector can be applied to it.
+- Added the textScaleFactor parameter to MongolText.
+- Added debugFillProperties() to various MongolText related classes.
+
 ## [0.4.1] - 2020.2.21
 
 - Change unsupported 2018 text theme items to 2014 version in MongolAlertDialog
