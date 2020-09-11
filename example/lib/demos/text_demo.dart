@@ -9,11 +9,13 @@ class TextDemo extends StatelessWidget {
         child: Container(
           color: Colors.blue[100],
           child: MongolText(
-            'ᠮᠣᠩᠭᠣᠯ\nᠪᠢᠴᠢᠭ',
-            style: TextStyle(fontSize: 100),
+            text,
+            style: TextStyle(fontSize: 50),
           ),
         ),
       ),
     );
   }
 }
+
+const text = 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ';

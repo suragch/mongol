@@ -13,13 +13,25 @@ Currently this project contains the following widgets:
 
 This is a vertical text version of Flutter's `Text` widget. Left-to-right line wrapping is supported.
 
-<img src="https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_demo.png" width="200">
+<img src="https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text.png" width="200">
 
 ### MongolAlertDialog
 
 This alert dialog works mostly the same as the Flutter `AlertDialog`.
 
 <img src="https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_alert_dialog.png" width="200">
+
+### Keyboard
+
+This is not part of the mongol library yet, but you can see an example of how to make a custom in-app keyboard in the example app that is included with this library.
+
+<img src="https://github.com/suragch/mongol/blob/master/example/supplemental/keyboard.png" width="200">
+
+### Vertical TextField
+
+This also isn't in the library yet, but the example app shows how you can do it.
+
+<img src="https://github.com/suragch/mongol/blob/master/example/supplemental/textfield.png" width="200">
 
 ## TODO
 
