@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  mongol_code: ^0.2.0
   mongol:
     path: ../
 

@@ -39,11 +39,11 @@ class SearchBody extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: europeanCountries.length,
+              itemCount: sampleText.length,
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: MongolText(europeanCountries[index]),
+                  child: MongolText(sampleText[index]),
                 );
               },
             ),
@@ -54,7 +54,7 @@ class SearchBody extends StatelessWidget {
   }
 }
 
-final europeanCountries = [
+final sampleText = [
   'ᠨᠢᠭᠡ',
   'ᠬᠣᠶᠠᠷ',
   'ᠭᠤᠷᠪᠠ',
