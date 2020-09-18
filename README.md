@@ -35,6 +35,7 @@ This also isn't in the library yet, but the example app shows how you can do it.
 
 ## TODO
 
+- Mirror entire Flutter `Text` widget stack.
 - Add text styling and expose `MongolRichText`.
 - Rotate CJK and emoji characters to proper orientation
 - Test textScaleFactor
