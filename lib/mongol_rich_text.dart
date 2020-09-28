@@ -1,8 +1,17 @@
+// Copyright 2014 The Flutter Authors.
+// Copyright 2020 Suragch.
+// All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol_text_painter.dart';
 
+
+// Based on RichText of Flutter version 1.5. After that RichText became a 
+// MultiChildRenderObjectWidget in order to support InlineSpans.
 class MongolRichText extends LeafRenderObjectWidget {
   /// Creates a single line of vertical text
   ///

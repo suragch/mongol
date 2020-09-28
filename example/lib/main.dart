@@ -5,6 +5,7 @@ import 'demos/gesture_detector_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/keyboard_demo.dart';
 import 'demos/text_field_demo.dart';
+import 'demos/text_span_demo.dart';
 
 void main() => runApp(DemoApp());
 
@@ -32,6 +33,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'MongolText',
           destination: TextDemo(),
+        ),
+        DemoTile(
+          title: 'MongolText with spans',
+          destination: TextSpanDemo(),
         ),
         DemoTile(
           title: 'MongolText with GestureDetector',

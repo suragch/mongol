@@ -1,3 +1,10 @@
+// Copyright 2014 The Flutter Authors.
+// Copyright 2020 Suragch.
+// All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'dart:collection';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -5,13 +12,15 @@ import 'package:flutter/painting.dart';
 
 class MongolParagraph {
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
-  MongolParagraph._(this._paragraphStyle, this._textStyle, this._text);
+  MongolParagraph._(this._runs);
+  //MongolParagraph._(this._paragraphStyle, this._textStyle, this._text);
 
   static const _newLineCodeUnit = 10;
 
-  ui.ParagraphStyle _paragraphStyle;
-  ui.TextStyle _textStyle;
-  String _text;
+  //ui.ParagraphStyle _paragraphStyle;
+  //ui.TextStyle _textStyle;
+  //String _text;
+  List<TextRun> _runs;
 
   double _width;
   double _height;
@@ -31,56 +40,11 @@ class MongolParagraph {
 
   void _layout(double height) {
     if (height == _height) return;
-    _calculateRuns();
+    //_calculateRuns();
     _calculateLineBreaks(height);
     _calculateWidth();
     _height = height;
     _calculateIntrinsicHeight();
-  }
-
-  List<TextRun> _runs = [];
-
-  void _calculateRuns() {
-    if (_runs.isNotEmpty) return;
-
-    // go through text find break location
-    final breaker = LineBreaker();
-    breaker.text = _text;
-    final int breakCount = breaker.computeBreaks();
-    final breaks = breaker.breaks;
-
-    // build paragraph for each run
-    int start = 0;
-    int end;
-    for (int i = 0; i < breakCount; i++) {
-      end = breaks[i];
-      _addRun(start, end);
-      start = end;
-    }
-    end = _text.length;
-    if (start < end) {
-      _addRun(start, end);
-    }
-  }
-
-  void _addRun(int start, int end) {
-    final endIgnoringNewLineChar = _isNewLineCharAt(end - 1) ? end - 1 : end;
-    assert(
-        !_text.substring(start, endIgnoringNewLineChar).contains('\n'),
-        'Runs must not contain newline characters. This indicates a bug in the '
-        'mongol plugin.');
-    final builder = ui.ParagraphBuilder(_paragraphStyle)
-      ..pushStyle(_textStyle)
-      ..addText(_text.substring(start, endIgnoringNewLineChar));
-    final paragraph = builder.build();
-    paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
-
-    final run = TextRun(start, end, paragraph);
-    _runs.add(run);
-  }
-
-  bool _isNewLineCharAt(int index) {
-    return _text.codeUnitAt(index) == _newLineCodeUnit;
   }
 
   List<LineInfo> _lines = [];
@@ -107,15 +71,16 @@ class MongolParagraph {
       final runWidth = run.paragraph.maxIntrinsicWidth;
       final runHeight = run.paragraph.height;
 
-      if (_runEndsWithNewLine(run)) {
-        end = i + 1;
-        lineWidth += runWidth;
-        lineHeight = math.max(lineHeight, run.paragraph.height);
-        _addLine(start, end, lineWidth, lineHeight);
-        lineWidth = 0;
-        lineHeight = 0;
-        start = end;
-      } else if (lineWidth + runWidth > maxLineLength) {
+      // if (_runEndsWithNewLine(run)) {
+      //   end = i + 1;
+      //   lineWidth += runWidth;
+      //   lineHeight = math.max(lineHeight, run.paragraph.height);
+      //   _addLine(start, end, lineWidth, lineHeight);
+      //   lineWidth = 0;
+      //   lineHeight = 0;
+      //   start = end;
+      // } else
+      if (lineWidth + runWidth > maxLineLength) {
         _addLine(start, end, lineWidth, lineHeight);
         start = end;
         lineWidth = runWidth;
@@ -132,9 +97,13 @@ class MongolParagraph {
     }
   }
 
-  bool _runEndsWithNewLine(TextRun run) {
-    return _isNewLineCharAt(run.end - 1);
-  }
+  // bool _runEndsWithNewLine(TextRun run) {
+  //   return _isNewLineCharAt(run.end - 1);
+  // }
+
+  // bool _isNewLineCharAt(int index) {
+  //   return _text.codeUnitAt(index) == _newLineCodeUnit;
+  // }
 
   void _addLine(int start, int end, double width, double height) {
     final bounds = Rect.fromLTRB(0, 0, width, height);
@@ -223,20 +192,20 @@ class MongolParagraphConstraints {
   String toString() => '$runtimeType(height: $height)';
 }
 
+// TODO: make sure that the measuring isn't done again if only the color changes.
 class MongolParagraphBuilder {
-  MongolParagraphBuilder(ui.ParagraphStyle style) {
-    _paragraphStyle = style;
-  }
+  MongolParagraphBuilder(ui.ParagraphStyle style) : _paragraphStyle = style;
 
   ui.ParagraphStyle _paragraphStyle;
-  ui.TextStyle _textStyle;
-  String _text = '';
+  //ui.TextStyle _textStyle;
+  //String _text = '';
+  final _styleStack = Stack<TextStyle>();
+  final _rawStyledTextRuns = <_RawStyledTextRun>[];
 
   static final _defaultParagraphStyle = ui.ParagraphStyle(
     textAlign: TextAlign.start,
     textDirection: TextDirection.ltr,
     fontSize: 30,
-    //fontFamily: MongolFont.qagan,
   );
   static final _defaultTextStyle = ui.TextStyle(
     color: Color(0xFF000000),
@@ -244,74 +213,125 @@ class MongolParagraphBuilder {
     fontSize: 30,
   );
 
-  // The current implementation replaces the old style.
-  // TODO: create a stack of styles to push and pop
   void pushStyle(TextStyle style) {
-    _textStyle = style.getTextStyle();
+    print('push style');
+    if (_styleStack.isEmpty) {
+      _styleStack.push(style);
+      return;
+    }
+    final lastStyle = _styleStack.top;
+    _styleStack.push(lastStyle.merge(style));
   }
 
-  // The current implementation does nothing.
-  // TODO: remove the last style from a stack of styles.
-  void pop() {}
+  void pop() {
+    _styleStack.pop();
+    print('pop style');
+  }
 
-  // The current implementation does appends the text.
-  // TODO: associate the added text with a style.
   void addText(String text) {
-    _text += text;
+    final style = _styleStack.top;
+    final breakSegments = BreakSegments(text);
+    for (final segment in breakSegments) {
+      _rawStyledTextRuns.add(_RawStyledTextRun(style, segment));
+      print(segment);
+    }
+  }
+
+  bool _startsWithBreak(String run) {
+    return run.startsWith(LineBreaker.breakChar);
   }
 
   MongolParagraph build() {
-    assert(_text != null);
-    if (_paragraphStyle == null) {
-      _paragraphStyle = _defaultParagraphStyle;
-    }
-    if (_textStyle == null) {
-      _textStyle = _defaultTextStyle;
-    }
+    print('buildingParagraph');
+    _paragraphStyle ??= _defaultParagraphStyle;
+    final runs = <TextRun>[];
 
-    return MongolParagraph._(_paragraphStyle, _textStyle, _text);
-  }
-}
+    final length = _rawStyledTextRuns.length;
+    var startIndex = 0;
+    var endIndex = 0;
+    ui.ParagraphBuilder _builder;
+    for (var i = 0; i < length; i++) {
+      
+      final style = _uiStyleForRun(i);
+      final text = _rawStyledTextRuns[i].text;
+      endIndex += text.length;
+      _builder ??= ui.ParagraphBuilder(_paragraphStyle);
+      _builder.pushStyle(style);
+      _builder.addText(text);
+      _builder.pop();
 
-class LineBreaker {
-  String _text;
-  List<int> _breaks;
-
-  set text(String text) {
-    if (text == _text) {
-      return;
-    }
-    _text = text;
-    _breaks = null;
-  }
-
-  // returns the number of breaks
-  int computeBreaks() {
-    assert(_text != null);
-
-    if (_breaks != null) {
-      return _breaks.length;
-    }
-    _breaks = [];
-
-    for (int i = 1; i < _text.length; i++) {
-      if (_text[i - 1] == '\n') {
-        _breaks.add(i);
-      } else if (isBreakChar(_text[i - 1]) && !isBreakChar(_text[i])) {
-        _breaks.add(i);
+      if (i < length - 1) {
+        final nextText = _rawStyledTextRuns[i + 1].text;
+        if (!_startsWithBreak(nextText)) {
+          continue;
+        }
       }
+      
+      final paragraph = _builder.build();
+      paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
+      final run = TextRun(startIndex, endIndex, paragraph);
+      runs.add(run);
+      _builder = null;
+      startIndex = endIndex;
     }
 
-    return _breaks.length;
+    return MongolParagraph._(runs);
   }
 
-  List<int> get breaks => _breaks;
-
-  bool isBreakChar(String codeUnit) {
-    return codeUnit == ' ';
+  ui.TextStyle _uiStyleForRun(int index) {
+    final style = _rawStyledTextRuns[index].style;
+    return style?.getTextStyle() ?? _defaultTextStyle;
   }
 }
 
+class BreakSegments extends Iterable<String> {
+  BreakSegments(this.text);
+  final String text;
+
+  @override
+  Iterator<String> get iterator => LineBreaker(text);
+}
+
+class LineBreaker implements Iterator<String> {
+  LineBreaker(this.text);
+  final String text;
+
+  String _currentTextRun;
+  int _startIndex = 0;
+  int _endIndex = 0;
+
+  static final breakChar = RegExp(' ');
+
+  @override
+  String get current => _currentTextRun;
+
+  @override
+  bool moveNext() {
+    _startIndex = _endIndex;
+    if (_startIndex == text.length) {
+      _currentTextRun = null;
+      return false;
+    }
+    final next = text.indexOf(breakChar, _startIndex);
+    _endIndex = (next != -1) ? next + 1 : text.length;
+    _currentTextRun = text.substring(_startIndex, _endIndex);
+    return true;
+  }
+}
+
+
+class _RawStyledTextRun {
+  _RawStyledTextRun(this.style, this.text);
+  final TextStyle style;
+  final String text;
+}
+
+/// A [TextRun] describes the smallest unit of text that is printed on the
+/// canvas. It may be a word, CJK character, emoji or particular style.
+///
+/// The [start] and [end] values are the indexes of the text range that
+/// forms the run. The [paragraph] is the precomputed Paragraph object that
+/// contains the text run.
 class TextRun {
   TextRun(this.start, this.end, this.paragraph);
 
@@ -326,4 +346,20 @@ class LineInfo {
   int textRunStart;
   int textRunEnd;
   Rect bounds;
+}
+
+class Stack<T> {
+  final _stack = Queue();
+
+  void push(T element) {
+    _stack.addLast(element);
+  }
+
+  void pop() {
+    _stack.removeLast();
+  }
+
+  bool get isEmpty => _stack.isEmpty;
+
+  T get top => _stack.last;
 }
