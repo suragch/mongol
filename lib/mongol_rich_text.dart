@@ -71,12 +71,13 @@ class MongolRichText extends LeafRenderObjectWidget {
   }
 }
 
+/// A render object that displays a paragraph of vertical Mongolian text.
 class MongolRenderParagraph extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, TextParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, TextParentData>,
         RelayoutWhenSystemFontsChangeMixin {
-  /// Creates a vertical text render object.
+  /// Creates a vertical paragraph render object.
   ///
   /// The [text] argument must not be null.
   MongolRenderParagraph(
@@ -99,7 +100,6 @@ class MongolRenderParagraph extends RenderBox
 
   /// The text to display
   TextSpan get text => _textPainter.text;
-
   set text(TextSpan value) {
     switch (_textPainter.text.compareTo(value)) {
       case RenderComparison.identical:
@@ -116,8 +116,11 @@ class MongolRenderParagraph extends RenderBox
     }
   }
 
+  /// The number of font pixels for each logical pixel.
+  ///
+  /// For example, if the text scale factor is 1.5, text will be 50% larger than
+  /// the specified font size.
   double get textScaleFactor => _textPainter.textScaleFactor;
-
   set textScaleFactor(double value) {
     assert(value != null);
     if (_textPainter.textScaleFactor == value) return;
