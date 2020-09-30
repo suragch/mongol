@@ -10,7 +10,11 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/painting.dart';
 
+/// A paragraph of vertical Mongolian layout text.
 class MongolParagraph {
+  /// This class is created by the library, and should not be instantiated
+  /// or extended directly.
+  ///
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
   MongolParagraph._(this._runs, this._text);
   String _text;
@@ -21,14 +25,32 @@ class MongolParagraph {
   double _minIntrinsicHeight;
   double _maxIntrinsicHeight;
 
+  /// The amount of horizontal space this paragraph occupies.
+  ///
+  /// Valid only after [layout] has been called.
   double get width => _width;
 
+  /// The amount of vertical space this paragraph occupies.
+  ///
+  /// Valid only after [layout] has been called.
   double get height => _height;
 
+  /// The minimum height that this paragraph could be without failing to paint
+  /// its contents within itself.
+  ///
+  /// Valid only after [layout] has been called.
   double get minIntrinsicHeight => _minIntrinsicHeight;
 
+  /// Returns the smallest height beyond which increasing the height never
+  /// decreases the width.
+  ///
+  /// Valid only after [layout] has been called.
   double get maxIntrinsicHeight => _maxIntrinsicHeight;
 
+  /// Computes the size and position of each glyph in the paragraph.
+  ///
+  /// The [MongolParagraphConstraints] control how tall the text is allowed 
+  /// to be.
   void layout(MongolParagraphConstraints constraints) =>
       _layout(constraints.height);
 
@@ -131,6 +153,8 @@ class MongolParagraph {
     _maxIntrinsicHeight = maxLineLength;
   }
 
+  /// Draws the precomputed text on a [canvas] one line at a time in vertical
+  /// lines that wrap from left to right.
   void draw(Canvas canvas, Offset offset) {
     assert(_lines != null);
     assert(_runs != null);
@@ -159,11 +183,17 @@ class MongolParagraph {
   }
 }
 
+/// Layout constraints for [MongolParagraph] objects.
+///
+/// Instances of this class are typically used with [MongolParagraph.layout].
+///
+/// The only constraint that can be specified is the [height].
 class MongolParagraphConstraints {
   const MongolParagraphConstraints({
     this.height,
   }) : assert(height != null);
 
+  /// The height the paragraph should use when computing the positions of glyphs.
   final double height;
 
   @override
@@ -180,6 +210,20 @@ class MongolParagraphConstraints {
   String toString() => '$runtimeType(height: $height)';
 }
 
+/// Builds a [MongolParagraph] containing text with the given styling 
+/// information.
+///
+/// To set the paragraph's style, pass an appropriately-configured 
+/// [ParagraphStyle] object to the [MongolParagraphBuilder] constructor.
+///
+/// Then, call combinations of [pushStyle], [addText], and [pop] to add styled
+/// text to the object.
+///
+/// Finally, call [build] to obtain the constructed [MongolParagraph] object. 
+/// After this point, the builder is no longer usable.
+///
+/// After constructing a [MongolParagraph], call [MongolParagraph.layout] on 
+/// it and then paint it with [MongolParagraph.draw].
 class MongolParagraphBuilder {
   MongolParagraphBuilder(
     ui.ParagraphStyle style, {
@@ -189,7 +233,7 @@ class MongolParagraphBuilder {
 
   ui.ParagraphStyle _paragraphStyle;
   final double _textScaleFactor;
-  final _styleStack = Stack<TextStyle>();
+  final _styleStack = _Stack<TextStyle>();
   final _rawStyledTextRuns = <_RawStyledTextRun>[];
 
   static final _defaultParagraphStyle = ui.ParagraphStyle(
@@ -204,6 +248,9 @@ class MongolParagraphBuilder {
     fontSize: 30,
   );
 
+  /// Applies the given style to the added text until [pop] is called.
+  ///
+  /// See [pop] for details.
   void pushStyle(TextStyle style) {
     if (_styleStack.isEmpty) {
       _styleStack.push(style);
@@ -213,14 +260,23 @@ class MongolParagraphBuilder {
     _styleStack.push(lastStyle.merge(style));
   }
 
+  /// Ends the effect of the most recent call to [pushStyle].
+  ///
+  /// Internally, the paragraph builder maintains a stack of text styles. Text
+  /// added to the paragraph is affected by all the styles in the stack. Calling
+  /// [pop] removes the topmost style in the stack, leaving the remaining styles
+  /// in effect.
   void pop() {
     _styleStack.pop();
   }
 
-  final _unstyledText = StringBuffer();
+  final _plainText = StringBuffer();
 
+  /// Adds the given text to the paragraph.
+  ///
+  /// The text will be styled according to the current stack of text styles.
   void addText(String text) {
-    _unstyledText.write(text);
+    _plainText.write(text);
     final style = _styleStack.top;
     final breakSegments = BreakSegments(text);
     for (final segment in breakSegments) {
@@ -228,15 +284,11 @@ class MongolParagraphBuilder {
     }
   }
 
-  bool _startsWithBreak(String run) {
-    return run.startsWith(LineBreaker.breakChar);
-  }
-
-  bool _endsWithBreak(String run) {
-    if (run.isEmpty) return false;
-    return (run[run.length - 1].contains(LineBreaker.breakChar));
-  }
-
+  /// Applies the given paragraph style and returns a [MongolParagraph] 
+  /// containing the added text and associated styling.
+  ///
+  /// After calling this function, the paragraph builder object is invalid and
+  /// cannot be used further.
   MongolParagraph build() {
     _paragraphStyle ??= _defaultParagraphStyle;
     final runs = <TextRun>[];
@@ -269,7 +321,16 @@ class MongolParagraphBuilder {
       startIndex = endIndex;
     }
 
-    return MongolParagraph._(runs, _unstyledText.toString());
+    return MongolParagraph._(runs, _plainText.toString());
+  }
+
+  bool _startsWithBreak(String run) {
+    return run.startsWith(LineBreaker.breakChar);
+  }
+
+  bool _endsWithBreak(String run) {
+    if (run.isEmpty) return false;
+    return (run[run.length - 1].contains(LineBreaker.breakChar));
   }
 
   ui.TextStyle _uiStyleForRun(int index) {
@@ -283,6 +344,8 @@ class MongolParagraphBuilder {
   }
 }
 
+/// An iterable that iterates over the substrings of [text] between locations
+/// that line breaks are allowed.
 class BreakSegments extends Iterable<String> {
   BreakSegments(this.text);
   final String text;
@@ -291,6 +354,9 @@ class BreakSegments extends Iterable<String> {
   Iterator<String> get iterator => LineBreaker(text);
 }
 
+/// Finds all the locations in a string of text where line breaks are allowed.
+/// 
+/// LineBreaker gives the strings between the breaks upon iteration.
 class LineBreaker implements Iterator<String> {
   LineBreaker(this.text);
   final String text;
@@ -319,6 +385,7 @@ class LineBreaker implements Iterator<String> {
   }
 }
 
+// A data object to associate a text run with its style
 class _RawStyledTextRun {
   _RawStyledTextRun(this.style, this.text);
   final TextStyle style;
@@ -339,6 +406,12 @@ class TextRun {
   ui.Paragraph paragraph;
 }
 
+/// LineInfo stores information about each line in the paragraph.
+/// 
+/// [textRunStart] is the index of the first text run in the line (out of all the
+/// text runs in the paragraph). [textRunEnd] is the index of the last run.
+/// 
+/// The [bounds] is the location of the text line in the paragraph.
 class LineInfo {
   LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
 
@@ -347,7 +420,8 @@ class LineInfo {
   Rect bounds;
 }
 
-class Stack<T> {
+// This is for keeping track of the text style stack.
+class _Stack<T> {
   final _stack = Queue();
 
   void push(T element) {
