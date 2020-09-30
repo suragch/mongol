@@ -29,7 +29,7 @@ class Example1 extends StatelessWidget {
 }
 
 const text = TextSpan(
-  //style: TextStyle(fontSize: 30, color: Colors.black),
+  style: TextStyle(fontSize: 30, color: Colors.black),
   children: [
     TextSpan(text: 'ᠨᠢᠭᠡ\n', style: TextStyle(fontSize: 40)),
     TextSpan(text: 'ᠬᠣᠶᠠᠷ', style: TextStyle(backgroundColor: Colors.yellow)),
@@ -47,7 +47,7 @@ const text = TextSpan(
     TextSpan(text: 'ᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤ', style: TextStyle(color: Colors.blue)),
     TextSpan(text: 'ᠭ᠎ᠠ ᠨᠠᠢᠮᠠ '),
     TextSpan(text: 'ᠶᠢᠰᠦ ', style: TextStyle(fontSize: 20)),
-    TextSpan(text: 'ᠠᠷᠪᠠ'),
+    TextSpan(text: 'ᠠᠷᠪᠠ', style: TextStyle(fontFamily: 'MenksoftAmuguleng', color: Colors.purple)),
   ],
 );
 //const text = 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ';

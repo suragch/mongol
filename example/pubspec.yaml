@@ -23,3 +23,6 @@ flutter:
     - family: MenksoftQagan
       fonts:
         - asset: assets/fonts/MQG8F02.ttf
+    - family: MenksoftAmuguleng
+      fonts:
+        - asset: assets/fonts/MAM8102.ttf

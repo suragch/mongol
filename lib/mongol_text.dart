@@ -29,8 +29,10 @@ class MongolText extends StatelessWidget {
   /// Font pixels per logical pixel
   final double textScaleFactor;
 
-  static TextStyle _defaultMongolTextStyle =
-      TextStyle(fontFamily: MongolFont.defaultFont, fontSize: 17.0);
+  static TextStyle _defaultMongolTextStyle = TextStyle(
+    fontFamily: MongolFont.defaultFont,
+    fontSize: MongolFont.defaultFontSize,
+  );
 
   @override
   Widget build(BuildContext context) {

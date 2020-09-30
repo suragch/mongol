@@ -25,27 +25,17 @@ class MongolRichText extends LeafRenderObjectWidget {
         assert(textScaleFactor != null),
         super(key: key);
 
-  // static TextStyle _defaultMongolTextStyle =
-  //     TextStyle(fontFamily: MongolFont.defaultFont, fontSize: 17.0);
-
   /// The text to display in this widget.
   final TextSpan text;
-  //TextSpan _textWithMongolFont;
 
   /// Font pixels per logical pixel
   final double textScaleFactor;
 
   @override
   MongolRenderParagraph createRenderObject(BuildContext context) {
-    TextSpan _textWithMongolFont;
-    if (text.style.fontFamily == null && MongolFont.defaultFont != null) {
-      _textWithMongolFont = TextSpan(
-        style: _defaultMongolTextStyle,
-        children: [text],
-      );
-    }
+    
     return MongolRenderParagraph(
-      _textWithMongolFont ?? text,
+      _textWithMongolFont(),
       textScaleFactor: textScaleFactor,
     );
   }
@@ -54,8 +44,18 @@ class MongolRichText extends LeafRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, MongolRenderParagraph renderObject) {
     renderObject
-      ..text = _textWithMongolFont ?? text
+      ..text = _textWithMongolFont()
       ..textScaleFactor = textScaleFactor;
+  }
+
+  TextSpan _textWithMongolFont() {
+    if (text.style == null || text.style.fontFamily == null) {
+      return TextSpan(
+        style: TextStyle(fontFamily: MongolFont.defaultFont),
+        children: [text],
+      );
+    }
+    return text;
   }
 
   @override

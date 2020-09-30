@@ -181,7 +181,6 @@ class MongolParagraphConstraints {
   String toString() => '$runtimeType(height: $height)';
 }
 
-// TODO: make sure that the measuring isn't done again if only the color changes.
 class MongolParagraphBuilder {
   MongolParagraphBuilder(ui.ParagraphStyle style) : _paragraphStyle = style;
 
