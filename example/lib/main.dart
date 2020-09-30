@@ -39,8 +39,8 @@ class HomeScreen extends StatelessWidget {
           destination: TextDemo(),
         ),
         DemoTile(
-          title: 'MongolText with spans',
-          destination: TextSpanDemo(),
+          title: 'MongolRichText',
+          destination: RichTextDemo(),
         ),
         DemoTile(
           title: 'MongolText with GestureDetector',

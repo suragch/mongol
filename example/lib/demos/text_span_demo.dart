@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
-import 'package:mongol/mongol_font.dart';
 
-class TextSpanDemo extends StatelessWidget {
+class RichTextDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: Example1(),
+        child: ExampleWidget(),
       ),
     );
   }
 }
 
-class Example1 extends StatelessWidget {
+class ExampleWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(

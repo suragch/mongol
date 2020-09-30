@@ -27,24 +27,31 @@ class _BodyWidgetState extends State<BodyWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.all(50.0),
-          child: TextField(
-            controller: _textEditingController,
-            textAlignVertical: TextAlignVertical.top,
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(3),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: RotatedBox(
+              quarterTurns: 1,
+              child: TextField(
+                controller: _textEditingController,
+                autofocus: true,
+                textAlignVertical: TextAlignVertical.top,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    hintText: 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
+                style: TextStyle(
+                  fontFamily: MongolFont.defaultFont,
+                  fontSize: 24,
                 ),
-                hintText: 'Enter Unicode text'),
-            style: TextStyle(
-              fontFamily: MongolFont.defaultFont,
-              fontSize: 24,
+                showCursor: true,
+                readOnly: true,
+              ),
             ),
-            showCursor: true,
-            readOnly: true,
           ),
         ),
         Align(
@@ -79,7 +86,6 @@ class _BodyWidgetState extends State<BodyWidget> {
     String text = _textEditingController.text;
     TextSelection textSelection = _textEditingController.selection;
     final selectionLength = textSelection.end - textSelection.start;
-    print(selectionLength);
 
     // There is a selection.
     if (selectionLength > 0) {
@@ -91,7 +97,7 @@ class _BodyWidgetState extends State<BodyWidget> {
         extentOffset: textSelection.start,
       );
       return;
-    }  
+    }
 
     // The cursor is at the beginning.
     if (textSelection.start == 0) {
@@ -137,6 +143,7 @@ class MongolKeyboard extends StatelessWidget {
           buildRowTwo(),
           buildRowThree(),
           buildRowFour(),
+          buildRowFive(),
         ],
       ),
     );
@@ -147,11 +154,7 @@ class MongolKeyboard extends StatelessWidget {
       child: Row(
         children: [
           MongolKeyboardKey(
-            text: 'ᠴ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠣ',
+            text: 'ᠠ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
@@ -159,23 +162,15 @@ class MongolKeyboard extends StatelessWidget {
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠷ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠲ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠶ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠦ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
             text: 'ᠢ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠣ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠤ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
@@ -183,7 +178,11 @@ class MongolKeyboard extends StatelessWidget {
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠫ',
+            text: 'ᠦ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠧ',
             onTextInput: textInputHandler,
           ),
         ],
@@ -196,19 +195,23 @@ class MongolKeyboard extends StatelessWidget {
       child: Row(
         children: [
           MongolKeyboardKey(
-            text: 'ᠠ',
+            text: 'ᠨ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠰ',
+            text: 'ᠩ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠳ',
+            text: 'ᠪ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠹ',
+            text: 'ᠫ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠬ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
@@ -216,15 +219,7 @@ class MongolKeyboard extends StatelessWidget {
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠬ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠵ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠬ',
+            text: 'ᠮ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
@@ -241,7 +236,7 @@ class MongolKeyboard extends StatelessWidget {
       child: Row(
         children: [
           MongolKeyboardKey(
-            text: 'ᠽ',
+            text: 'ᠰ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
@@ -249,23 +244,27 @@ class MongolKeyboard extends StatelessWidget {
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠼ',
+            text: 'ᠲ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠤ',
+            text: 'ᠳ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠪ',
+            text: 'ᠴ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠨ',
+            text: 'ᠵ',
             onTextInput: textInputHandler,
           ),
           MongolKeyboardKey(
-            text: 'ᠮ',
+            text: 'ᠶ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠷ',
             onTextInput: textInputHandler,
           ),
         ],
@@ -278,8 +277,57 @@ class MongolKeyboard extends StatelessWidget {
       child: Row(
         children: [
           MongolKeyboardKey(
+            text: 'ᠸ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠹ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠻ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠼ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠽ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠾ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᠿ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᡀ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᡁ',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: 'ᡂ',
+            onTextInput: textInputHandler,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Expanded buildRowFive() {
+    return Expanded(
+      child: Row(
+        children: [
+          MongolKeyboardKey(
             text: ' ',
-            flex: 2,
+            flex: 4,
             onTextInput: textInputHandler,
           ),
           BackspaceKey(
