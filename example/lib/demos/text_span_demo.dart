@@ -23,14 +23,13 @@ class Example1 extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(),
       ),
-      child: MongolRichText(text: text, textScaleFactor: 2,),
+      child: MongolRichText(text: text),
     );
   }
 }
 
 const text = TextSpan(
-  style: TextStyle(
-      fontFamily: MongolFont.qagan, fontSize: 30, color: Colors.black),
+  //style: TextStyle(fontSize: 30, color: Colors.black),
   children: [
     TextSpan(text: 'ᠨᠢᠭᠡ\n', style: TextStyle(fontSize: 40)),
     TextSpan(text: 'ᠬᠣᠶᠠᠷ', style: TextStyle(backgroundColor: Colors.yellow)),

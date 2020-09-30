@@ -15,8 +15,8 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
-  fonts:
-    - family: MenksoftQagan
-      fonts:
-        - asset: lib/fonts/MQG8F02.ttf
+  # fonts:
+  #   - family: MenksoftQagan
+  #     fonts:
+  #       - asset: lib/fonts/MQG8F02.ttf
 

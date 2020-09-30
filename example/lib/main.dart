@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mongol/mongol.dart';
 
 import 'demos/alert_dialog_demo.dart';
 import 'demos/gesture_detector_demo.dart';
@@ -7,7 +8,10 @@ import 'demos/keyboard_demo.dart';
 import 'demos/text_field_demo.dart';
 import 'demos/text_span_demo.dart';
 
-void main() => runApp(DemoApp());
+void main() {
+  MongolFont.defaultFont = 'MenksoftQagan';
+  runApp(DemoApp());
+}
 
 class DemoApp extends StatelessWidget {
   @override

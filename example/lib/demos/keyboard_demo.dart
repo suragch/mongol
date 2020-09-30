@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:mongol/mongol_font.dart';
-import 'package:mongol/mongol_text.dart';
+import 'package:mongol/mongol.dart';
 
 class KeyboardDemo extends StatelessWidget {
   @override
@@ -41,7 +40,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                 ),
                 hintText: 'Enter Unicode text'),
             style: TextStyle(
-              fontFamily: MongolFont.qagan,
+              fontFamily: MongolFont.defaultFont,
               fontSize: 24,
             ),
             showCursor: true,

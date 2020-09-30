@@ -7,10 +7,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:mongol/mongol_text_painter.dart';
 
+import 'mongol_text_painter.dart';
+import 'mongol_font.dart';
 
-// Based on RichText of Flutter version 1.5. After that RichText became a 
+// Based on RichText of Flutter version 1.5. After that RichText became a
 // MultiChildRenderObjectWidget in order to support InlineSpans.
 class MongolRichText extends LeafRenderObjectWidget {
   /// Creates a single line of vertical text
@@ -24,16 +25,27 @@ class MongolRichText extends LeafRenderObjectWidget {
         assert(textScaleFactor != null),
         super(key: key);
 
+  // static TextStyle _defaultMongolTextStyle =
+  //     TextStyle(fontFamily: MongolFont.defaultFont, fontSize: 17.0);
+
   /// The text to display in this widget.
   final TextSpan text;
+  //TextSpan _textWithMongolFont;
 
   /// Font pixels per logical pixel
   final double textScaleFactor;
 
   @override
   MongolRenderParagraph createRenderObject(BuildContext context) {
+    TextSpan _textWithMongolFont;
+    if (text.style.fontFamily == null && MongolFont.defaultFont != null) {
+      _textWithMongolFont = TextSpan(
+        style: _defaultMongolTextStyle,
+        children: [text],
+      );
+    }
     return MongolRenderParagraph(
-      text,
+      _textWithMongolFont ?? text,
       textScaleFactor: textScaleFactor,
     );
   }
@@ -42,7 +54,7 @@ class MongolRichText extends LeafRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, MongolRenderParagraph renderObject) {
     renderObject
-      ..text = text
+      ..text = _textWithMongolFont ?? text
       ..textScaleFactor = textScaleFactor;
   }
 
