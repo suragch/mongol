@@ -11,7 +11,7 @@ class TextDemo extends StatelessWidget {
           color: Colors.blue[100],
           child: MongolText(
             text,
-            style: TextStyle(fontSize: 50),
+            style: TextStyle(fontSize: 30),
           ),
         ),
       ),
