@@ -8,26 +8,47 @@ class TextSpanDemo extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: Container(
-          color: Colors.blue[100],
-          child: MongolRichText(
-            text: text,
-          ),
-        ),
+        child: Example1(),
       ),
     );
   }
 }
 
+class Example1 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.all(5),
+      padding: const EdgeInsets.all(5),
+      decoration: BoxDecoration(
+        border: Border.all(),
+      ),
+      child: MongolRichText(text: text, textScaleFactor: 2,),
+    );
+  }
+}
+
 const text = TextSpan(
-  style: TextStyle(fontFamily: MongolFont.qagan),
+  style: TextStyle(
+      fontFamily: MongolFont.qagan, fontSize: 30, color: Colors.black),
   children: [
-    // TextSpan(text: 'a'),
-    TextSpan(text: 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ\nᠭᠤᠷᠪᠠ '),
-    TextSpan(text: 'ᠳᠦᠷᠪᠡ '),
-    TextSpan(text: 'ᠲᠠ'),
-    TextSpan(text: 'ᠪᠤ', style: TextStyle(color: Colors.blue)),
-    TextSpan(text: 'ᠳᠤᠭᠠᠷ'),
+    TextSpan(text: 'ᠨᠢᠭᠡ\n', style: TextStyle(fontSize: 40)),
+    TextSpan(text: 'ᠬᠣᠶᠠᠷ', style: TextStyle(backgroundColor: Colors.yellow)),
+    TextSpan(
+      text: ' ᠭᠤᠷᠪᠠ ',
+      style: TextStyle(shadows: [
+        Shadow(
+          blurRadius: 3.0,
+          color: Colors.lightGreen,
+          offset: Offset(3.0, -3.0),
+        ),
+      ]),
+    ),
+    TextSpan(text: 'ᠳᠦᠷ'),
+    TextSpan(text: 'ᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤ', style: TextStyle(color: Colors.blue)),
+    TextSpan(text: 'ᠭ᠎ᠠ ᠨᠠᠢᠮᠠ '),
+    TextSpan(text: 'ᠶᠢᠰᠦ ', style: TextStyle(fontSize: 20)),
+    TextSpan(text: 'ᠠᠷᠪᠠ'),
   ],
 );
 //const text = 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ';
