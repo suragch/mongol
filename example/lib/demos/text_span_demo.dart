@@ -23,7 +23,7 @@ class Example1 extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(),
       ),
-      child: MongolRichText(text: text),
+      child: MongolRichText(text: text, textScaleFactor: 2.5,),
     );
   }
 }

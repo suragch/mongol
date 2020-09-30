@@ -19,6 +19,17 @@ class MongolTextPainter {
         _text = text,
         _textScaleFactor = textScaleFactor;
 
+  /// Marks this text painter's layout information as dirty and removes cached
+  /// information.
+  ///
+  /// Uses this method to notify text painter to relayout in the case of
+  /// layout changes in engine. In most cases, updating text painter properties
+  /// in framework will automatically invoke this method.
+  void markNeedsLayout() {
+    _paragraph = null;
+    _needsLayout = true;
+  }
+
   MongolParagraph _paragraph;
   bool _needsLayout = true;
 
@@ -33,15 +44,19 @@ class MongolTextPainter {
     _needsLayout = true;
   }
 
+  /// The number of font pixels for each logical pixel.
+  ///
+  /// For example, if the text scale factor is 1.5, text will be 50% larger than
+  /// the specified font size.
+  ///
+  /// After this is set, you must call [layout] before the next call to [paint].
   double get textScaleFactor => _textScaleFactor;
   double _textScaleFactor;
-
   set textScaleFactor(double value) {
     assert(value != null);
     if (_textScaleFactor == value) return;
     _textScaleFactor = value;
-    _paragraph = null;
-    _needsLayout = true;
+    markNeedsLayout();
   }
 
   ui.ParagraphStyle _createParagraphStyle() {
@@ -102,8 +117,10 @@ class MongolTextPainter {
         maxHeight == _lastMaxHeight) return;
     _needsLayout = false;
     if (_paragraph == null) {
-      final MongolParagraphBuilder builder =
-          MongolParagraphBuilder(_createParagraphStyle());
+      final MongolParagraphBuilder builder = MongolParagraphBuilder(
+        _createParagraphStyle(),
+        textScaleFactor: _textScaleFactor,
+      );
       _addStyleToText(builder, _text);
       _paragraph = builder.build();
     }
@@ -117,7 +134,10 @@ class MongolTextPainter {
     }
   }
 
-  void _addStyleToText(MongolParagraphBuilder builder, TextSpan textSpan) {
+  void _addStyleToText(
+    MongolParagraphBuilder builder,
+    TextSpan textSpan,
+  ) {
     final style = textSpan.style;
     final text = textSpan.text;
     final children = textSpan.children;

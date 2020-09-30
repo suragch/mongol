@@ -64,7 +64,6 @@ class MongolParagraph {
       final runWidth = run.paragraph.maxIntrinsicWidth;
       final runHeight = run.paragraph.height;
 
-      
       if (lineWidth + runWidth > maxLineLength) {
         _addLine(start, end, lineWidth, lineHeight);
         lineWidth = runWidth;
@@ -81,7 +80,7 @@ class MongolParagraph {
         lineWidth = 0;
         lineHeight = 0;
         start = end;
-      } 
+      }
     }
 
     end = _runs.length;
@@ -182,9 +181,14 @@ class MongolParagraphConstraints {
 }
 
 class MongolParagraphBuilder {
-  MongolParagraphBuilder(ui.ParagraphStyle style) : _paragraphStyle = style;
+  MongolParagraphBuilder(
+    ui.ParagraphStyle style, {
+    double textScaleFactor = 1.0,
+  })  : _paragraphStyle = style,
+        _textScaleFactor = textScaleFactor;
 
   ui.ParagraphStyle _paragraphStyle;
+  final double _textScaleFactor;
   final _styleStack = Stack<TextStyle>();
   final _rawStyledTextRuns = <_RawStyledTextRun>[];
 
@@ -242,7 +246,6 @@ class MongolParagraphBuilder {
     var endIndex = 0;
     ui.ParagraphBuilder _builder;
     for (var i = 0; i < length; i++) {
-      
       final style = _uiStyleForRun(i);
       final text = _rawStyledTextRuns[i].text;
       endIndex += text.length;
@@ -257,7 +260,7 @@ class MongolParagraphBuilder {
           continue;
         }
       }
-      
+
       final paragraph = _builder.build();
       paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
       final run = TextRun(startIndex, endIndex, paragraph);
@@ -271,13 +274,12 @@ class MongolParagraphBuilder {
 
   ui.TextStyle _uiStyleForRun(int index) {
     final style = _rawStyledTextRuns[index].style;
-    return style?.getTextStyle() ?? _defaultTextStyle;
+    return style?.getTextStyle(textScaleFactor: _textScaleFactor) ?? _defaultTextStyle;
   }
 
   String _stripNewLineChar(String text) {
     if (!text.endsWith('\n')) return text;
     return text.replaceAll('\n', '');
-
   }
 }
 
@@ -316,7 +318,6 @@ class LineBreaker implements Iterator<String> {
     return true;
   }
 }
-
 
 class _RawStyledTextRun {
   _RawStyledTextRun(this.style, this.text);

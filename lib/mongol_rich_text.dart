@@ -14,7 +14,8 @@ import 'mongol_font.dart';
 // Based on RichText of Flutter version 1.5. After that RichText became a
 // MultiChildRenderObjectWidget in order to support InlineSpans.
 class MongolRichText extends LeafRenderObjectWidget {
-  /// Creates a single line of vertical text
+  /// Creates a paragraph of rich text in vertical orientation for traditional
+  /// Mongolian.
   ///
   /// The [text] argument must not be null.
   const MongolRichText({
@@ -28,7 +29,10 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// The text to display in this widget.
   final TextSpan text;
 
-  /// Font pixels per logical pixel
+  /// The number of font pixels for each logical pixel.
+  ///
+  /// For example, if the text scale factor is 1.5, text will be 50% larger than
+  /// the specified font size.
   final double textScaleFactor;
 
   @override
