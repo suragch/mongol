@@ -28,8 +28,8 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(24.0));
-    expect(baseSize.height, equals(120.0));
+    expect(baseSize.width, equals(14.0));
+    expect(baseSize.height, equals(70.0));
   });
 
   testWidgets('MongolRichText should not wrap when less than height constraint',
@@ -46,7 +46,7 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(24.0));
+    expect(baseSize.width, equals(14.0));
   });
 
   testWidgets('MongolRichText wraps text when taller than height constraint',
@@ -55,7 +55,7 @@ void main() {
     await binding.setSurfaceSize(Size(1000, 500));
     addTearDown(() => binding.setSurfaceSize(null));
 
-    const String myString = 'A string that should wrap';
+    const String myString = 'A long long long string that should wrap';
     await tester.pumpWidget(
       Center(child: MongolText(myString)),
     );
@@ -64,8 +64,8 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(48.0)); // two lines
-    expect(baseSize.height, equals(336.0));
+    expect(baseSize.width, equals(28.0)); // two lines
+    expect(baseSize.height, equals(406.0));
   });
 
   testWidgets('MongolRichText wraps text for new line character',
@@ -82,8 +82,8 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(48.0));
-    expect(baseSize.height, equals(312.0));
+    expect(baseSize.width, equals(28.0));
+    expect(baseSize.height, equals(182.0));
   });
 
   testWidgets('MongolRichText wraps text for new line character before space',
@@ -100,8 +100,8 @@ void main() {
     expect(text, isNotNull);
 
     final Size baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(48.0));
-    expect(baseSize.height, equals(312.0));
+    expect(baseSize.width, equals(28.0));
+    expect(baseSize.height, equals(182.0));
   });
 
   testWidgets('MongolRichText has correct instrinsic width',

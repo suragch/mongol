@@ -45,7 +45,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                     ),
                     hintText: 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
                 style: TextStyle(
-                  fontFamily: MongolFont.defaultFont,
+                  //fontFamily: MongolFont.defaultFont,
                   fontSize: 24,
                 ),
                 showCursor: true,

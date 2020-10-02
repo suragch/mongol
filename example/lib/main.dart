@@ -9,7 +9,7 @@ import 'demos/text_field_demo.dart';
 import 'demos/text_span_demo.dart';
 
 void main() {
-  MongolFont.defaultFont = 'MenksoftQagan';
+  //MongolFont.defaultFont = 'MenksoftQagan';
   runApp(DemoApp());
 }
 
@@ -20,6 +20,7 @@ class DemoApp extends StatelessWidget {
       title: 'mongol',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        fontFamily: 'MenksoftQagan'
       ),
       home: Scaffold(
         appBar: AppBar(title: Text('Mongol package demo')),

@@ -1,11 +1,13 @@
-## [0.6.0] - 2020.9.30
+## [0.6.0] - 2020.10.2
 
 - Added `MongolRichText` with support for `TextSpan` and its substring text styles.
+- Added `MongolText.rich` constructor to support using a default font theme.
 - Implemented `textScaleFactor`. It existed before but didn't do anything.
-- Removed the default Menksoft font that was included with the library. This creates a bit more setup but makes the library smaller and allows developers to use any Mongolian font.
+- Removed the default Menksoft font that was included with the library. This creates a bit more setup but makes the library smaller and allows developers to use any Mongolian font. Also removed MongolFont class.
 - Added documentation modified from the standard Flutter docs.
 - Changed the license to be in alignment with the Flutter BSD-3 license.
 - Updated the demos to include a keyboard and vertical `TextField`. These are not in the library yet, but should be fairly easy to reproduce by studying the demos.
+- Added more tests.
 
 ## [0.5.0] - 2020.5.31
 

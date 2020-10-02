@@ -11,7 +11,7 @@ Here is a full example:
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:mongol/mongol_text.dart';
+import 'package:mongol/mongol.dart';
 
 void main() => runApp(DemoApp());
 

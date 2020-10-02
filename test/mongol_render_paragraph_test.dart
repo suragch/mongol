@@ -1,10 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mongol/mongol_rich_text.dart';
+import 'package:mongol/mongol.dart';
 
 void main() {
   testWidgets('MongolRichText has correct instrinsic width',
       (WidgetTester tester) async {
+    final a = 1;
     MongolRenderParagraph paragraph =
         MongolRenderParagraph(TextSpan(text: 'A string'));
 

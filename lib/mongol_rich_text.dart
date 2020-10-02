@@ -9,7 +9,6 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'mongol_text_painter.dart';
-import 'mongol_font.dart';
 
 // Based on RichText of Flutter version 1.5. After that RichText became a
 // MultiChildRenderObjectWidget in order to support InlineSpans.
@@ -39,7 +38,7 @@ class MongolRichText extends LeafRenderObjectWidget {
   MongolRenderParagraph createRenderObject(BuildContext context) {
     
     return MongolRenderParagraph(
-      _textWithMongolFont(),
+      text,
       textScaleFactor: textScaleFactor,
     );
   }
@@ -48,18 +47,8 @@ class MongolRichText extends LeafRenderObjectWidget {
   void updateRenderObject(
       BuildContext context, MongolRenderParagraph renderObject) {
     renderObject
-      ..text = _textWithMongolFont()
+      ..text = text
       ..textScaleFactor = textScaleFactor;
-  }
-
-  TextSpan _textWithMongolFont() {
-    if (text.style == null || text.style.fontFamily == null) {
-      return TextSpan(
-        style: TextStyle(fontFamily: MongolFont.defaultFont),
-        children: [text],
-      );
-    }
-    return text;
   }
 
   @override

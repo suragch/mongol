@@ -43,13 +43,14 @@ You can call the family name whatever you want, but this string is what you will
 
 #### 3. Set the default Mongolian font for your app
 
-Set the value of the global variable `MongolFont.defaultFont` to the font family name before the UI gets laid out. You can do that in your app's main function before runApp like this:
+In your `main.dart` file, set the `fontFamily` for the app theme.
 
 ```dart
-void main() {
-  MongolFont.defaultFont = 'MenksoftQagan';
-  runApp(DemoApp());
-}
+MaterialApp(
+  title: 'My App',
+  theme: ThemeData(fontFamily: 'MenksoftQagan'),
+  home: MyHomePage(),
+);
 ```
 
 Now you won't have to manually set the font for every Mongolian text widget. If you want to use a different font for some widgets, though, you can still set the `fontFamily` as you normally would inside `TextStyle`.
@@ -67,6 +68,8 @@ This is a vertical text version of Flutter's `Text` widget. Left-to-right line w
 The `MongolRichText` widget takes a `TextSpan` widget just like a `RichText` widget does. (However, `WidgetSpan`s are not supported at this time.) Because of this you can style text using `TextStyle` as usual. The following image shows a few of the main options:
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_rich_text.png)
+
+You should use `MongolText.rich` in order to use the app's default Mongol font as described in the Setup section above. `MongolText.rich` creates a `MongolRichText` widget using the theme's default style. If you use `MongolRichText` directly, then you must specify a Mongolian font in the `TextSpan`'s `TextStyle`.
 
 ### MongolAlertDialog
 
@@ -86,4 +89,3 @@ The text field is just a standard `TextField` rotated by 90 degrees. For that re
 
 - Mirror entire Flutter `Text` widget stack.
 - Rotate CJK and emoji characters to proper orientation
-- Add more widget testing and maybe Golden tests

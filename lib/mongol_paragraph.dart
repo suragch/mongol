@@ -277,7 +277,7 @@ class MongolParagraphBuilder {
   /// The text will be styled according to the current stack of text styles.
   void addText(String text) {
     _plainText.write(text);
-    final style = _styleStack.top;
+    final style = _styleStack.isEmpty ? null : _styleStack.top;
     final breakSegments = BreakSegments(text);
     for (final segment in breakSegments) {
       _rawStyledTextRuns.add(_RawStyledTextRun(style, segment));
