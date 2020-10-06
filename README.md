@@ -22,6 +22,7 @@ You can find a font from the following companies:
 
 - [Menksoft](http://www.menksoft.com/site/alias__menkcms/2805/Default.aspx)
 - [Delehi](http://www.delehi.com/cn/2693.html)
+- [One BolorSoft font](https://www.mngl.net/downloads/fonts/MongolianScript.ttf)
 
 [This one](http://www.menksoft.com/Portals/_MenkCms/Products/Fonts/MenksoftOpenType1.02/MQG8F02.ttf) from Menksoft is the one that used to be included in the library.
 
