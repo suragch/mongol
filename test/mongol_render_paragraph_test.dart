@@ -1,21 +1,28 @@
-import 'package:flutter/cupertino.dart';
+// Copyright 2014 The Flutter Authors.
+// Copyright 2020 Suragch.
+// All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/mongol.dart';
 
 void main() {
-  testWidgets('MongolRichText has correct instrinsic width',
+  testWidgets('MongolRenderParagraph has correct instrinsic width',
       (WidgetTester tester) async {
-    final a = 1;
-    MongolRenderParagraph paragraph =
+    
+    final paragraph =
         MongolRenderParagraph(TextSpan(text: 'A string'));
 
-    final double textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
-    final double oneLineTextWidth =
+    final textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
+    final oneLineTextWidth =
         paragraph.getMinIntrinsicWidth(double.infinity);
-    final double constrainedHeight = textHeight * 0.9;
-    final double wrappedTextHeight =
+    final constrainedHeight = textHeight * 0.9;
+    final wrappedTextHeight =
         paragraph.getMinIntrinsicHeight(double.infinity);
-    final double twoLinesTextWidth =
+    final twoLinesTextWidth =
         paragraph.getMinIntrinsicWidth(constrainedHeight);
 
     expect(wrappedTextHeight, greaterThan(0.0));

@@ -13,8 +13,8 @@ import 'package:mongol/mongol.dart';
 
 void main() {
   testWidgets('DefaultTextStyle changes propagate to MongolRichText', (WidgetTester tester) async {
-    const MongolText textWidget = MongolText('Hello');
-    const TextStyle s1 = TextStyle(
+    const textWidget = MongolText('Hello');
+    const s1 = TextStyle(
       fontSize: 10.0,
       fontWeight: FontWeight.w900,
       height: 123.0,
@@ -25,19 +25,19 @@ void main() {
       child: textWidget,
     ));
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    final text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.text.style, s1);
   });
 
   testWidgets('AnimatedDefaultTextStyle changes propagate to MongolText', (WidgetTester tester) async {
-    const MongolText textWidget = MongolText('Hello');
-    const TextStyle s1 = TextStyle(
+    const textWidget = MongolText('Hello');
+    const s1 = TextStyle(
       fontSize: 10.0,
       fontWeight: FontWeight.w800,
       height: 123.0,
     );
-    const TextStyle s2 = TextStyle(
+    const s2 = TextStyle(
       fontSize: 20.0,
       fontWeight: FontWeight.w200,
       height: 1.0,
@@ -49,7 +49,7 @@ void main() {
       duration: Duration(milliseconds: 1000),
     ));
 
-    final MongolRichText text1 = tester.firstWidget(find.byType(MongolRichText));
+    final text1 = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text1, isNotNull);
     expect(text1.text.style, s1);
     // expect(text1.textAlign, TextAlign.start);
@@ -71,7 +71,7 @@ void main() {
       duration: Duration(milliseconds: 1000),
     ));
 
-    final MongolRichText text2 = tester.firstWidget(find.byType(MongolRichText));
+    final text2 = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text2, isNotNull);
     expect(text2.text.style, s1); // animation hasn't started yet
     // expect(text2.textAlign, TextAlign.justify);
@@ -83,7 +83,7 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 1000));
 
-    final MongolRichText text3 = tester.firstWidget(find.byType(MongolRichText));
+    final text3 = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text3, isNotNull);
     expect(text3.text.style, s2); // animation has now finished
     // expect(text3.textAlign, TextAlign.justify);

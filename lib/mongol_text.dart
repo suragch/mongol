@@ -116,15 +116,16 @@ class MongolText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DefaultTextStyle defaultTextStyle = DefaultTextStyle.of(context);
-    TextStyle effectiveTextStyle = style;
+    final defaultTextStyle = DefaultTextStyle.of(context);
+    var effectiveTextStyle = style;
     if (style == null || style.inherit) {
       //effectiveTextStyle = _defaultMongolTextStyle.merge(style);
       effectiveTextStyle = defaultTextStyle.style.merge(effectiveTextStyle);
     }
-    if (MediaQuery.boldTextOverride(context))
+    if (MediaQuery.boldTextOverride(context)) {
       effectiveTextStyle = effectiveTextStyle
           .merge(const TextStyle(fontWeight: FontWeight.bold));
+    }
     Widget result = MongolRichText(
       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
       text: TextSpan(

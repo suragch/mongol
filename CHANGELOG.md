@@ -1,3 +1,10 @@
+## [0.6.1] - 2020.10.10
+
+- Added static analysis options.
+- Fixed warnings and errors from the static analysis.
+- Implemented `MongolTextPainter.getPositionForOffset` with tests
+- Close MongolDialog on button click in demo app
+
 ## [0.6.0] - 2020.10.2
 
 - Added `MongolRichText` with support for `TextSpan` and its substring text styles.

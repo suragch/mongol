@@ -22,7 +22,9 @@ showAlertDialog(BuildContext context) {
   // set up the buttons
   Widget actionButton = FlatButton(
     child: MongolText("ᠮᠡᠳᠡᠭᠰᠡᠨ"),
-    onPressed: () {},
+    onPressed: () {
+      Navigator.pop(context);
+    },
   );
 
   // set up the AlertDialog

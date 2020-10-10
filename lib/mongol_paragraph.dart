@@ -8,6 +8,7 @@ import 'dart:collection';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:meta/meta.dart';
 import 'package:flutter/painting.dart';
 
 /// A paragraph of vertical Mongolian layout text.
@@ -17,8 +18,8 @@ class MongolParagraph {
   ///
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
   MongolParagraph._(this._runs, this._text);
-  String _text;
-  List<TextRun> _runs;
+  final String _text;
+  final List<_TextRun> _runs;
 
   double _width;
   double _height;
@@ -49,7 +50,7 @@ class MongolParagraph {
 
   /// Computes the size and position of each glyph in the paragraph.
   ///
-  /// The [MongolParagraphConstraints] control how tall the text is allowed 
+  /// The [MongolParagraphConstraints] control how tall the text is allowed
   /// to be.
   void layout(MongolParagraphConstraints constraints) =>
       _layout(constraints.height);
@@ -62,7 +63,7 @@ class MongolParagraph {
     _calculateIntrinsicHeight();
   }
 
-  List<LineInfo> _lines = [];
+  final List<_LineInfo> _lines = [];
 
   // Internally this method uses "width" and "height" naming with regard
   // to a horizontal line of text. Rotation doesn't happen until drawing.
@@ -76,11 +77,11 @@ class MongolParagraph {
     }
 
     // add run lengths until exceeds length
-    int start = 0;
-    int end = 0;
-    double lineWidth = 0;
-    double lineHeight = 0;
-    for (int i = 0; i < _runs.length; i++) {
+    var start = 0;
+    var end = 0;
+    var lineWidth = 0.0;
+    var lineHeight = 0.0;
+    for (var i = 0; i < _runs.length; i++) {
       end = i;
       final run = _runs[i];
       final runWidth = run.paragraph.maxIntrinsicWidth;
@@ -111,22 +112,22 @@ class MongolParagraph {
     }
   }
 
-  bool _runEndsWithNewLine(TextRun run) {
+  bool _runEndsWithNewLine(_TextRun run) {
     final index = run.end - 1;
     return _text[index] == '\n';
   }
 
   void _addLine(int start, int end, double width, double height) {
     final bounds = Rect.fromLTRB(0, 0, width, height);
-    final LineInfo lineInfo = LineInfo(start, end, bounds);
+    final lineInfo = _LineInfo(start, end, bounds);
     _lines.add(lineInfo);
   }
 
   void _calculateWidth() {
     assert(_lines != null);
     assert(_runs != null);
-    double sum = 0;
-    for (LineInfo line in _lines) {
+    var sum = 0.0;
+    for (final line in _lines) {
       sum += line.bounds.height;
     }
     _width = sum;
@@ -137,11 +138,11 @@ class MongolParagraph {
   void _calculateIntrinsicHeight() {
     assert(_runs != null);
 
-    double sum = 0;
-    double maxRunWidth = 0;
-    double maxLineLength = 0;
-    for (LineInfo line in _lines) {
-      for (int i = line.textRunStart; i < line.textRunEnd; i++) {
+    var sum = 0.0;
+    var maxRunWidth = 0.0;
+    var maxLineLength = 0.0;
+    for (final line in _lines) {
+      for (var i = line.textRunStart; i < line.textRunEnd; i++) {
         final width = _runs[i].paragraph.maxIntrinsicWidth;
         maxRunWidth = math.max(width, maxRunWidth);
         sum += width;
@@ -151,6 +152,67 @@ class MongolParagraph {
     }
     _minIntrinsicHeight = maxRunWidth;
     _maxIntrinsicHeight = maxLineLength;
+  }
+
+  /// Returns the text position closest to the given offset.
+  TextPosition getPositionForOffset(Offset offset) {
+    final encoded = _getPositionForOffset(offset.dx, offset.dy);
+    return TextPosition(
+        offset: encoded[0], affinity: TextAffinity.values[encoded[1]]);
+  }
+
+  // Both the line info and the text run are in horizontal orientation,
+  // but the [dx] and [dy] offsets are in vertical orientation.
+  List<int> _getPositionForOffset(double dx, double dy) {
+    assert(_lines != null);
+    assert(_runs != null);
+
+    // find the line
+    _LineInfo matchedLine;
+    var rightEdgeAfterRotation = 0.0;
+    var rotatedRunDx = 0.0;
+    var rotatedRunDy = 0.0;
+    for (var line in _lines) {
+      rightEdgeAfterRotation += line.bounds.bottom;
+      rotatedRunDx = line.bounds.top;
+      if (dx <= rightEdgeAfterRotation) {
+        matchedLine = line;
+        break;
+      }
+    }
+    matchedLine ??= _lines.last;
+
+    // find the run in the line
+    _TextRun matchedRun;
+    var bottomEdgeAfterRotating = 0.0;
+    for (var i = matchedLine.textRunStart; i < matchedLine.textRunEnd; i++) {
+      final run = _runs[i];
+      rotatedRunDy = bottomEdgeAfterRotating;
+      bottomEdgeAfterRotating += run.paragraph.maxIntrinsicWidth;
+      if (dy <= bottomEdgeAfterRotating) {
+        matchedRun = run;
+        break;
+      }
+    }
+    matchedRun ??= _runs[matchedLine.textRunEnd - 1];
+
+    // find the offset
+    final paragraphDx = dy - rotatedRunDy;
+    final paragrpahDy = dx - rotatedRunDx;
+    final offset = Offset(paragraphDx, paragrpahDy);
+    final runPosition = matchedRun.paragraph.getPositionForOffset(offset);
+    final textOffset = matchedRun.start + runPosition.offset;
+
+    // find the afinity
+    const upstream = 0;
+    const downstream = 1;
+    final isFirstLine = matchedLine.textRunStart == 0;
+    final isFirstRunInLine = matchedRun == _runs[matchedLine.textRunStart];
+    final isFirstPositionInRun = runPosition.offset == 0;
+    final textAfinity = (!isFirstLine && isFirstRunInLine && isFirstPositionInRun)
+        ? downstream
+        : upstream;
+    return [textOffset, textAfinity];
   }
 
   /// Draws the precomputed text on a [canvas] one line at a time in vertical
@@ -167,13 +229,13 @@ class MongolParagraph {
     canvas.rotate(math.pi / 2);
 
     // loop through every line
-    for (LineInfo line in _lines) {
+    for (final line in _lines) {
       // translate for the line height
       canvas.translate(0, -line.bounds.height);
 
       // draw each run in the current line
-      double dx = 0;
-      for (int i = line.textRunStart; i < line.textRunEnd; i++) {
+      var dx = 0.0;
+      for (var i = line.textRunStart; i < line.textRunEnd; i++) {
         canvas.drawParagraph(_runs[i].paragraph, Offset(dx, 0));
         dx += _runs[i].paragraph.longestLine;
       }
@@ -190,7 +252,7 @@ class MongolParagraph {
 /// The only constraint that can be specified is the [height].
 class MongolParagraphConstraints {
   const MongolParagraphConstraints({
-    this.height,
+    @required this.height,
   }) : assert(height != null);
 
   /// The height the paragraph should use when computing the positions of glyphs.
@@ -199,8 +261,7 @@ class MongolParagraphConstraints {
   @override
   bool operator ==(dynamic other) {
     if (other.runtimeType != runtimeType) return false;
-    final MongolParagraphConstraints typedOther = other;
-    return typedOther.height == height;
+    return other is MongolParagraphConstraints && other.height == height;
   }
 
   @override
@@ -210,19 +271,19 @@ class MongolParagraphConstraints {
   String toString() => '$runtimeType(height: $height)';
 }
 
-/// Builds a [MongolParagraph] containing text with the given styling 
+/// Builds a [MongolParagraph] containing text with the given styling
 /// information.
 ///
-/// To set the paragraph's style, pass an appropriately-configured 
+/// To set the paragraph's style, pass an appropriately-configured
 /// [ParagraphStyle] object to the [MongolParagraphBuilder] constructor.
 ///
 /// Then, call combinations of [pushStyle], [addText], and [pop] to add styled
 /// text to the object.
 ///
-/// Finally, call [build] to obtain the constructed [MongolParagraph] object. 
+/// Finally, call [build] to obtain the constructed [MongolParagraph] object.
 /// After this point, the builder is no longer usable.
 ///
-/// After constructing a [MongolParagraph], call [MongolParagraph.layout] on 
+/// After constructing a [MongolParagraph], call [MongolParagraph.layout] on
 /// it and then paint it with [MongolParagraph.draw].
 class MongolParagraphBuilder {
   MongolParagraphBuilder(
@@ -239,13 +300,11 @@ class MongolParagraphBuilder {
   static final _defaultParagraphStyle = ui.ParagraphStyle(
     textAlign: TextAlign.start,
     textDirection: TextDirection.ltr,
-    fontSize: 30,
   );
 
   static final _defaultTextStyle = ui.TextStyle(
-    color: Color(0xFF000000),
+    color: Color(0xFFFFFFFF),
     textBaseline: TextBaseline.alphabetic,
-    fontSize: 30,
   );
 
   /// Applies the given style to the added text until [pop] is called.
@@ -284,14 +343,14 @@ class MongolParagraphBuilder {
     }
   }
 
-  /// Applies the given paragraph style and returns a [MongolParagraph] 
+  /// Applies the given paragraph style and returns a [MongolParagraph]
   /// containing the added text and associated styling.
   ///
   /// After calling this function, the paragraph builder object is invalid and
   /// cannot be used further.
   MongolParagraph build() {
     _paragraphStyle ??= _defaultParagraphStyle;
-    final runs = <TextRun>[];
+    final runs = <_TextRun>[];
 
     final length = _rawStyledTextRuns.length;
     var startIndex = 0;
@@ -315,7 +374,7 @@ class MongolParagraphBuilder {
 
       final paragraph = _builder.build();
       paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
-      final run = TextRun(startIndex, endIndex, paragraph);
+      final run = _TextRun(startIndex, endIndex, paragraph);
       runs.add(run);
       _builder = null;
       startIndex = endIndex;
@@ -335,7 +394,8 @@ class MongolParagraphBuilder {
 
   ui.TextStyle _uiStyleForRun(int index) {
     final style = _rawStyledTextRuns[index].style;
-    return style?.getTextStyle(textScaleFactor: _textScaleFactor) ?? _defaultTextStyle;
+    return style?.getTextStyle(textScaleFactor: _textScaleFactor) ??
+        _defaultTextStyle;
   }
 
   String _stripNewLineChar(String text) {
@@ -355,7 +415,7 @@ class BreakSegments extends Iterable<String> {
 }
 
 /// Finds all the locations in a string of text where line breaks are allowed.
-/// 
+///
 /// LineBreaker gives the strings between the breaks upon iteration.
 class LineBreaker implements Iterator<String> {
   LineBreaker(this.text);
@@ -392,14 +452,14 @@ class _RawStyledTextRun {
   final String text;
 }
 
-/// A [TextRun] describes the smallest unit of text that is printed on the
+/// A [_TextRun] describes the smallest unit of text that is printed on the
 /// canvas. It may be a word, CJK character, emoji or particular style.
 ///
 /// The [start] and [end] values are the indexes of the text range that
 /// forms the run. The [paragraph] is the precomputed Paragraph object that
 /// contains the text run.
-class TextRun {
-  TextRun(this.start, this.end, this.paragraph);
+class _TextRun {
+  _TextRun(this.start, this.end, this.paragraph);
 
   int start;
   int end;
@@ -407,13 +467,13 @@ class TextRun {
 }
 
 /// LineInfo stores information about each line in the paragraph.
-/// 
+///
 /// [textRunStart] is the index of the first text run in the line (out of all the
 /// text runs in the paragraph). [textRunEnd] is the index of the last run.
-/// 
-/// The [bounds] is the location of the text line in the paragraph.
-class LineInfo {
-  LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
+///
+/// The [bounds] is the size of the unrotated text line.
+class _LineInfo {
+  _LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
 
   int textRunStart;
   int textRunEnd;
@@ -422,7 +482,7 @@ class LineInfo {
 
 // This is for keeping track of the text style stack.
 class _Stack<T> {
-  final _stack = Queue();
+  final _stack = Queue<T>();
 
   void push(T element) {
     _stack.addLast(element);

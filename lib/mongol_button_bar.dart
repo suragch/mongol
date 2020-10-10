@@ -53,10 +53,10 @@ class MongolButtonBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ButtonThemeData parentButtonTheme = ButtonTheme.of(context);
-    final ButtonBarThemeData barTheme = ButtonBarTheme.of(context);
+    final parentButtonTheme = ButtonTheme.of(context);
+    final barTheme = ButtonBarTheme.of(context);
 
-    final ButtonThemeData buttonTheme = parentButtonTheme.copyWith(
+    final buttonTheme = parentButtonTheme.copyWith(
       textTheme: buttonTextTheme ??
           barTheme.buttonTextTheme ??
           ButtonTextTheme.primary,
@@ -71,7 +71,7 @@ class MongolButtonBar extends StatelessWidget {
           ButtonBarLayoutBehavior.padded,
     );
 
-    final double paddingUnit = buttonTheme.padding.vertical / 4.0;
+    final paddingUnit = buttonTheme.padding.vertical / 4.0;
     final Widget child = ButtonTheme.fromButtonThemeData(
       data: buttonTheme,
       child: _ButtonBarColumn(
@@ -179,19 +179,19 @@ class _RenderButtonBarColumn extends RenderFlex {
     if (size.height <= constraints.maxHeight) {
       super.performLayout();
     } else {
-      final BoxConstraints childConstraints =
+      final childConstraints =
           constraints.copyWith(minHeight: 0.0);
       RenderBox child;
-      double currentWidth = 0.0;
+      var currentWidth = 0.0;
       child = firstChild;
 
       while (child != null) {
-        final FlexParentData childParentData =
+        final childParentData =
             child.parentData as FlexParentData;
         child.layout(childConstraints, parentUsesSize: true);
         switch (mainAxisAlignment) {
           case MainAxisAlignment.center:
-            final double midpoint =
+            final midpoint =
                 (constraints.maxHeight - child.size.height) / 2.0;
             childParentData.offset = Offset(midpoint, currentWidth);
             break;

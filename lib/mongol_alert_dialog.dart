@@ -34,7 +34,7 @@ class MongolDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final DialogTheme dialogTheme = DialogTheme.of(context);
+    final dialogTheme = DialogTheme.of(context);
     return AnimatedPadding(
       padding: MediaQuery.of(context).viewInsets +
           const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
@@ -102,20 +102,20 @@ class MongolAlertDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-    final DialogTheme dialogTheme = DialogTheme.of(context);
+    final theme = Theme.of(context);
+    final dialogTheme = DialogTheme.of(context);
 
     Widget titleWidget;
     Widget contentWidget;
     Widget actionsWidget;
-    if (title != null)
+    if (title != null) {
       titleWidget = Padding(
         padding: titlePadding ??
             EdgeInsets.fromLTRB(24.0, 24.0, 24.0, content == null ? 20.0 : 0.0),
         child: DefaultTextStyle(
           style: titleTextStyle ??
               dialogTheme.titleTextStyle ??
-              theme.textTheme.title,
+              theme.textTheme.headline6,
           child: Semantics(
             child: title,
             namesRoute: true,
@@ -123,19 +123,21 @@ class MongolAlertDialog extends StatelessWidget {
           ),
         ),
       );
-
-    if (content != null)
+    }
+      
+    if (content != null) {
       contentWidget = Padding(
         padding: contentPadding,
         child: DefaultTextStyle(
           style: contentTextStyle ??
               dialogTheme.contentTextStyle ??
-              theme.textTheme.subhead,
+              theme.textTheme.subtitle1,
           child: content,
         ),
       );
-
-    if (actions != null)
+    }
+      
+    if (actions != null) {
       actionsWidget = Padding(
         padding: actionsPadding,
         child: MongolButtonBar(
@@ -143,7 +145,8 @@ class MongolAlertDialog extends StatelessWidget {
           children: actions,
         ),
       );
-
+    }
+      
     List<Widget> rowChildren;
 
     rowChildren = <Widget>[

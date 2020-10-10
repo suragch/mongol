@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mongol/mongol.dart';
 
 import 'demos/alert_dialog_demo.dart';
 import 'demos/gesture_detector_demo.dart';

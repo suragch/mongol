@@ -20,7 +20,7 @@ void main() {
       ),
     ));
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    var text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.3);
 
@@ -38,10 +38,10 @@ void main() {
       const Center(child: MongolText('Hello'))
     );
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    var text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.0);
-    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(14.0));
     expect(baseSize.height, equals(70.0));
 
@@ -55,7 +55,7 @@ void main() {
     text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.5);
-    final Size largeSize = tester.getSize(find.byType(MongolRichText));
+    final largeSize = tester.getSize(find.byType(MongolRichText));
     expect(largeSize.width, 21.0);
     expect(largeSize.height, equals(105.0));
   });
@@ -66,10 +66,10 @@ void main() {
         style: TextStyle(fontSize: 20.0)),
     ));
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    var text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.0);
-    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(20.0));
     expect(baseSize.height, equals(100.0));
 
@@ -82,7 +82,7 @@ void main() {
     text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.3);
-    final Size largeSize = tester.getSize(find.byType(MongolRichText));
+    final largeSize = tester.getSize(find.byType(MongolRichText));
     expect(largeSize.width, equals(26.0));
     expect(largeSize.height, anyOf(131.0, 130.0));
   });
@@ -111,7 +111,7 @@ void main() {
       ),
     );
 
-    final MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    final text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.text.style.fontSize, 20.0);
   });
@@ -149,7 +149,7 @@ void main() {
   //     ),
   //   );
   //   expect(tester.takeException(), null);
-  // }, skip: isBrowser); // TODO(yjbanov): https://github.com/flutter/flutter/issues/42086
+  // }, skip: isBrowser); 
 
   // testWidgets('TapGesture recognizers contribute link semantics', (WidgetTester tester) async {
   //   final SemanticsTester semantics = SemanticsTester(tester);
@@ -303,7 +303,7 @@ void main() {
   //   final Size textSizeLongestLine = tester.getSize(find.byType(Text));
   //   expect(textSizeLongestLine.width, equals(630.0));
   //   expect(textSizeLongestLine.height, equals(fontHeight * 2));
-  // }, skip: isBrowser);  // TODO(yjbanov): https://github.com/flutter/flutter/issues/44020
+  // }, skip: isBrowser);  
 
   // testWidgets('textWidthBasis with textAlign still obeys parent alignment', (WidgetTester tester) async {
   //   await tester.pumpWidget(
@@ -353,7 +353,7 @@ void main() {
   //   expect(tester.getSize(find.text('RIGHT ALIGNED, PARENT')).width, lessThan(width));
   //   expect(tester.getSize(find.text('LEFT ALIGNED, LONGEST LINE')).width, lessThan(width));
   //   expect(tester.getSize(find.text('RIGHT ALIGNED, LONGEST LINE')).width, equals(width));
-  // }, skip: isBrowser);  // TODO(yjbanov): https://github.com/flutter/flutter/issues/44020
+  // }, skip: isBrowser); 
 
   // testWidgets('Paragraph.getBoxesForRange returns nothing when selection range is zero length', (WidgetTester tester) async {
   //   final ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle());

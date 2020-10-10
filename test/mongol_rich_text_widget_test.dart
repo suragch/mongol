@@ -1,12 +1,18 @@
-import 'package:flutter/cupertino.dart';
+// Copyright 2014 The Flutter Authors.
+// Copyright 2020 Suragch.
+// All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mongol/mongol.dart';
 import 'package:mongol/mongol_rich_text.dart';
 
 void main() {
-  final TestWidgetsFlutterBinding binding =
-      TestWidgetsFlutterBinding.ensureInitialized();
+  final binding = TestWidgetsFlutterBinding.ensureInitialized()
+      as TestWidgetsFlutterBinding;
 
   testWidgets('MongolRichText has text', (WidgetTester tester) async {
     await tester.pumpWidget(MongolRichText(
@@ -16,7 +22,7 @@ void main() {
     final finder = find.byType(MongolRichText);
     expect(finder, findsOneWidget);
 
-    final MongolRichText richText = finder.evaluate().single.widget;
+    final richText = finder.evaluate().single.widget as MongolRichText;
     expect(richText.text.text, equals('T'));
   });
 
@@ -24,10 +30,10 @@ void main() {
       (WidgetTester tester) async {
     await tester.pumpWidget(Center(child: MongolText('Hello')));
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
 
-    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(14.0));
     expect(baseSize.height, equals(70.0));
   });
@@ -37,15 +43,15 @@ void main() {
     await binding.setSurfaceSize(Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
-    const String myString = 'A string that should not wrap';
+    const myString = 'A string that should not wrap';
     await tester.pumpWidget(
       Center(child: MongolText(myString)),
     );
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
 
-    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(14.0));
   });
 
@@ -55,15 +61,15 @@ void main() {
     await binding.setSurfaceSize(Size(1000, 500));
     addTearDown(() => binding.setSurfaceSize(null));
 
-    const String myString = 'A long long long string that should wrap';
+    const myString = 'A long long long string that should wrap';
     await tester.pumpWidget(
       Center(child: MongolText(myString)),
     );
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
 
-    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(28.0)); // two lines
     expect(baseSize.height, equals(406.0));
   });
@@ -73,15 +79,15 @@ void main() {
     await binding.setSurfaceSize(Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
-    const String myString = 'A string that\nshould wrap';
+    const myString = 'A string that\nshould wrap';
     await tester.pumpWidget(
       Center(child: MongolText(myString)),
     );
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
 
-    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(28.0));
     expect(baseSize.height, equals(182.0));
   });
@@ -91,32 +97,28 @@ void main() {
     await binding.setSurfaceSize(Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
-    const String myString = 'A string that\n should wrap';
+    const myString = 'A string that\n should wrap';
     await tester.pumpWidget(
       Center(child: MongolText(myString)),
     );
 
-    MongolRichText text = tester.firstWidget(find.byType(MongolRichText));
+    final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
 
-    final Size baseSize = tester.getSize(find.byType(MongolRichText));
+    final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(28.0));
     expect(baseSize.height, equals(182.0));
   });
 
   testWidgets('MongolRichText has correct instrinsic width',
       (WidgetTester tester) async {
-    MongolRenderParagraph paragraph =
-        MongolRenderParagraph(TextSpan(text: 'A string'));
+    final paragraph = MongolRenderParagraph(TextSpan(text: 'A string'));
 
-    final double textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
-    final double oneLineTextWidth =
-        paragraph.getMinIntrinsicWidth(double.infinity);
-    final double constrainedHeight = textHeight * 0.9;
-    final double wrappedTextHeight =
-        paragraph.getMinIntrinsicHeight(double.infinity);
-    final double twoLinesTextWidth =
-        paragraph.getMinIntrinsicWidth(constrainedHeight);
+    final textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
+    final oneLineTextWidth = paragraph.getMinIntrinsicWidth(double.infinity);
+    final constrainedHeight = textHeight * 0.9;
+    final wrappedTextHeight = paragraph.getMinIntrinsicHeight(double.infinity);
+    final twoLinesTextWidth = paragraph.getMinIntrinsicWidth(constrainedHeight);
 
     expect(wrappedTextHeight, greaterThan(0.0));
     expect(wrappedTextHeight, lessThan(textHeight));

@@ -1,4 +1,10 @@
-import 'package:flutter/cupertino.dart';
+// Copyright 2014 The Flutter Authors.
+// Copyright 2020 Suragch.
+// All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+import 'package:flutter/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -11,7 +17,7 @@ void main() {
     final finder = find.byType(MongolText);
     expect(finder, findsOneWidget);
 
-    final MongolText mongolText = finder.evaluate().single.widget;
+    final mongolText = finder.evaluate().single.widget as MongolText;
     expect(mongolText.data, equals('T'));
   });
 
@@ -23,11 +29,11 @@ void main() {
       ),
     );
 
-    MongolText text = tester.firstWidget(find.byType(MongolText));
+    final text = tester.firstWidget(find.byType(MongolText)) as MongolText;
     expect(text, isNotNull);
     expect(text.style.fontFamily, equals('Some Font'));
 
-    MongolRichText richText = tester.firstWidget(find.byType(MongolRichText));
+    final richText = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(richText, isNotNull);
     expect(richText.text.style.fontFamily, equals('Some Font'));
   });

@@ -81,8 +81,9 @@ class MongolRenderParagraph extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! TextParentData)
+    if (child.parentData is! TextParentData) {
       child.parentData = TextParentData();
+    }
   }
 
   final MongolTextPainter _textPainter;
@@ -181,28 +182,31 @@ class MongolRenderParagraph extends RenderBox
     assert(debugHandleEvent(event, entry));
     if (event is! PointerDownEvent) return;
     _layoutTextWithConstraints(constraints);
-    // final Offset offset = entry.localPosition;
-    // final TextPosition position = _textPainter.getPositionForOffset(offset);
-    // TODO: When supporting multiple spans, need to get span from painter.
-    final TextPosition position = TextPosition(offset: 0);
-    final TextSpan span = _textPainter.text.getSpanForPosition(position);
-    span?.recognizer?.addPointer(event);
+    final offset = entry.localPosition;
+    final position = _textPainter.getPositionForOffset(offset);
+    final span = _textPainter.text.getSpanForPosition(position);
+    if (span == null) {
+      return;
+    }
+    if (span is TextSpan) {
+      span.recognizer?.addPointer(event as PointerDownEvent);
+    }
   }
 
   @override
   void performLayout() {
     _layoutTextWithConstraints(constraints);
-    final Size textSize = _textPainter.size;
+    final textSize = _textPainter.size;
     size = constraints.constrain(textSize);
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
     _layoutTextWithConstraints(constraints);
-    final Canvas canvas = context.canvas;
+    final canvas = context.canvas;
     assert(() {
       if (debugRepaintTextRainbowEnabled) {
-        final Paint paint = Paint()..color = debugCurrentRepaintColor.toColor();
+        final paint = Paint()..color = debugCurrentRepaintColor.toColor();
         canvas.drawRect(offset & size, paint);
       }
       return true;

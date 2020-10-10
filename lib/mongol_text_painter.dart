@@ -172,7 +172,7 @@ class MongolTextPainter {
         maxHeight == _lastMaxHeight) return;
     _needsLayout = false;
     if (_paragraph == null) {
-      final MongolParagraphBuilder builder = MongolParagraphBuilder(
+      final builder = MongolParagraphBuilder(
         _createParagraphStyle(),
         textScaleFactor: _textScaleFactor,
       );
@@ -183,24 +183,29 @@ class MongolTextPainter {
     _lastMaxHeight = maxHeight;
     _paragraph.layout(MongolParagraphConstraints(height: maxHeight));
     if (minHeight != maxHeight) {
-      final double newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight);
-      if (newHeight != height)
+      final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight) as double;
+      if (newHeight != height) {
         _paragraph.layout(MongolParagraphConstraints(height: newHeight));
+      }
     }
   }
 
   void _addStyleToText(
     MongolParagraphBuilder builder,
-    TextSpan textSpan,
+    InlineSpan inlineSpan,
   ) {
+    if (inlineSpan is! TextSpan) {
+      throw UnimplementedError('Inline span support has not yet been implemented for MongolTextPainter');
+    }
+    final textSpan = inlineSpan as TextSpan;
     final style = textSpan.style;
     final text = textSpan.text;
     final children = textSpan.children;
-    final bool hasStyle = style != null;
+    final hasStyle = style != null;
     if (hasStyle) builder.pushStyle(style);
     if (text != null) builder.addText(text);
     if (children != null) {
-      for (TextSpan child in children) {
+      for (final child in children) {
         assert(child != null);
         _addStyleToText(builder, child);
       }
@@ -231,5 +236,11 @@ class MongolTextPainter {
       return true;
     }());
     _paragraph.draw(canvas, offset);
+  }
+
+  /// Returns the position within the text for the given pixel offset.
+  TextPosition getPositionForOffset(Offset offset) {
+    assert(!_needsLayout);
+    return _paragraph.getPositionForOffset(offset);
   }
 }

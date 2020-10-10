@@ -44,7 +44,7 @@ class _GestureTextState extends State<GestureText> {
       onScaleUpdate: (ScaleUpdateDetails scaleUpdateDetails) {
         setState(() {
           _fontScale =
-              (_baseFontScale * scaleUpdateDetails.scale).clamp(0.5, 10.0);
+              (_baseFontScale * scaleUpdateDetails.scale).clamp(0.5, 10.0) as double;
           _fontSize = _fontScale * _baseFontSize;
         });
       },
