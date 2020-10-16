@@ -129,4 +129,68 @@ void main() {
     expect(paragraph.getMaxIntrinsicWidth(constrainedHeight),
         equals(twoLinesTextWidth));
   });
+
+  testWidgets('MongolText does not rotate emoji automatically upon request',
+      (WidgetTester tester) async {
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const myString = '🇲🇳';
+    await tester.pumpWidget(
+      Center(
+        child: MongolText(
+          myString,
+          autoRotate: false,
+        ),
+      ),
+    );
+
+    final text = tester.firstWidget(find.byType(MongolRichText));
+    expect(text, isNotNull);
+
+    final baseSize = tester.getSize(find.byType(MongolRichText));
+    expect(baseSize.width, equals(14.0));
+    expect(baseSize.height, equals(28.0));
+  });
+
+  testWidgets('MongolText autoRotate defaults to true',
+      (WidgetTester tester) async {
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const myString = '🇲🇳';
+    await tester.pumpWidget(
+      Center(
+        child: MongolText(
+          myString,
+        ),
+      ),
+    );
+
+    final text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    expect(text, isNotNull);
+    expect(text.autoRotate, true);
+  });
+
+  testWidgets('MongolText rotates emoji automatically',
+      (WidgetTester tester) async {
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const myString = '🇲🇳';
+    await tester.pumpWidget(
+      Center(
+        child: MongolText(
+          myString,
+        ),
+      ),
+    );
+
+    final text = tester.firstWidget(find.byType(MongolRichText));
+    expect(text, isNotNull);
+
+    final baseSize = tester.getSize(find.byType(MongolRichText));
+    expect(baseSize.width, equals(28.0));
+    expect(baseSize.height, equals(14.0));
+  });
 }

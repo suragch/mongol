@@ -24,7 +24,7 @@ class EmojiCjkDemo extends StatelessWidget {
 const text = TextSpan(
   children: [
     TextSpan(text: 'ᠰᠠᠶᠢᠨ ᠪᠠᠶᠢᠨ᠎ᠠ ᠤᠤ︖ '),
-    TextSpan(text: '你好 ' , style: TextStyle(backgroundColor: Colors.yellow)),
+    TextSpan(text: '你好 '),
     //TextSpan(text: '👋 ', style: TextStyle(rotated: true)),
     TextSpan(text: '👨‍👩‍👧 '),
     TextSpan(text: '🇭🇺 '),

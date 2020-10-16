@@ -10,6 +10,7 @@ import 'dart:ui' as ui;
 
 import 'package:meta/meta.dart';
 import 'package:flutter/painting.dart';
+import 'package:characters/characters.dart';
 
 /// A paragraph of vertical Mongolian layout text.
 class MongolParagraph {
@@ -209,9 +210,10 @@ class MongolParagraph {
     final isFirstLine = matchedLine.textRunStart == 0;
     final isFirstRunInLine = matchedRun == _runs[matchedLine.textRunStart];
     final isFirstPositionInRun = runPosition.offset == 0;
-    final textAfinity = (!isFirstLine && isFirstRunInLine && isFirstPositionInRun)
-        ? downstream
-        : upstream;
+    final textAfinity =
+        (!isFirstLine && isFirstRunInLine && isFirstPositionInRun)
+            ? downstream
+            : upstream;
     return [textOffset, textAfinity];
   }
 
@@ -289,11 +291,14 @@ class MongolParagraphBuilder {
   MongolParagraphBuilder(
     ui.ParagraphStyle style, {
     double textScaleFactor = 1.0,
+    bool autoRotate = true,
   })  : _paragraphStyle = style,
-        _textScaleFactor = textScaleFactor;
+        _textScaleFactor = textScaleFactor,
+        _autoRotate = autoRotate;
 
   ui.ParagraphStyle _paragraphStyle;
   final double _textScaleFactor;
+  final bool _autoRotate;
   final _styleStack = _Stack<TextStyle>();
   final _rawStyledTextRuns = <_RawStyledTextRun>[];
 
@@ -374,7 +379,8 @@ class MongolParagraphBuilder {
 
       final paragraph = _builder.build();
       paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
-      final run = _TextRun(startIndex, endIndex, paragraph);
+      final isRotated = false; // TODO: change this
+      final run = _TextRun(startIndex, endIndex, isRotated, paragraph);
       runs.add(run);
       _builder = null;
       startIndex = endIndex;
@@ -384,12 +390,13 @@ class MongolParagraphBuilder {
   }
 
   bool _startsWithBreak(String run) {
-    return run.startsWith(LineBreaker.breakChar);
+    if (run.isEmpty) return false;
+    return LineBreaker.isBreakChar(run[0]);
   }
 
   bool _endsWithBreak(String run) {
     if (run.isEmpty) return false;
-    return (run[run.length - 1].contains(LineBreaker.breakChar));
+    return LineBreaker.isBreakChar(run[run.length - 1]);
   }
 
   ui.TextStyle _uiStyleForRun(int index) {
@@ -418,30 +425,129 @@ class BreakSegments extends Iterable<String> {
 ///
 /// LineBreaker gives the strings between the breaks upon iteration.
 class LineBreaker implements Iterator<String> {
-  LineBreaker(this.text);
+  LineBreaker(this.text) {
+    _characterIterator = text.characters.iterator;
+  }
+
   final String text;
 
-  String _currentTextRun;
-  int _startIndex = 0;
-  int _endIndex = 0;
+  CharacterRange _characterIterator;
 
-  // space or new line
-  static final breakChar = RegExp(' |\\n');
+  String _currentTextRun;
 
   @override
   String get current => _currentTextRun;
 
+  bool _atEndOfCharacterRange = false;
+  String _rotatedCharacterBuffer;
+
   @override
   bool moveNext() {
-    _startIndex = _endIndex;
-    if (_startIndex == text.length) {
+    if (_atEndOfCharacterRange) {
       _currentTextRun = null;
       return false;
     }
-    final next = text.indexOf(breakChar, _startIndex);
-    _endIndex = (next != -1) ? next + 1 : text.length;
-    _currentTextRun = text.substring(_startIndex, _endIndex);
+    if (_rotatedCharacterBuffer != null) {
+      _currentTextRun = _rotatedCharacterBuffer;
+      _rotatedCharacterBuffer = null;
+      return true;
+    }
+
+    final returnValue = StringBuffer();
+    while (_characterIterator.moveNext()) {
+      final current = _characterIterator.current;
+      if (isBreakChar(current)) {
+        returnValue.write(current);
+        _currentTextRun = returnValue.toString();
+        return true;
+      } else if (_isRotatable(current)) {
+        if (returnValue.isEmpty) {
+          _currentTextRun = current;
+          return true;
+        } else {
+          _currentTextRun = returnValue.toString();
+          _rotatedCharacterBuffer = current;
+          return true;
+        }
+      }
+      returnValue.write(current);
+    }
+    _currentTextRun = returnValue.toString();
+    if (_currentTextRun.isEmpty) {
+      return false;
+    }
+    _atEndOfCharacterRange = true;
     return true;
+  }
+
+  static bool isBreakChar(String character) {
+    return (character == ' ' || character == '\n');
+  }
+
+  static const MONGOL_QUICKCHECK_START = 0x1800;
+  static const MONGOL_QUICKCHECK_END = 0x2060;
+  static const KOREAN_JAMO_START = 0x1100;
+  static const KOREAN_JAMO_END = 0x11FF;
+  static const CJK_RADICAL_SUPPLEMENT_START = 0x2E80;
+  static const CJK_SYMBOLS_AND_PUNCTUATION_START = 0x3000;
+  static const CJK_SYMBOLS_AND_PUNCTUATION_MENKSOFT_END = 0x301C;
+  static const CIRCLE_NUMBER_21 = 0x3251;
+  static const CIRCLE_NUMBER_35 = 0x325F;
+  static const CIRCLE_NUMBER_36 = 0x32B1;
+  static const CIRCLE_NUMBER_50 = 0x32BF;
+  static const CJK_UNIFIED_IDEOGRAPHS_END = 0x9FFF;
+  static const HANGUL_SYLLABLES_START = 0xAC00;
+  static const HANGUL_JAMO_EXTENDED_B_END = 0xD7FF;
+  static const CJK_COMPATIBILITY_IDEOGRAPHS_START = 0xF900;
+  static const CJK_COMPATIBILITY_IDEOGRAPHS_END = 0xFAFF;
+  static const UNICODE_EMOJI_START = 0x1F000;
+
+  bool _isRotatable(String character) {
+    if (character.runes.length > 1) return true;
+
+    final codePoint = character.runes.first;
+
+    // Quick return: most Mongol chars should be in this range
+    if (codePoint >= MONGOL_QUICKCHECK_START &&
+        codePoint < MONGOL_QUICKCHECK_END) return false;
+
+    // Korean Jamo
+    if (codePoint < KOREAN_JAMO_START) return false; // latin, etc
+    if (codePoint <= KOREAN_JAMO_END) return true;
+
+    // Chinese and Japanese
+    if (codePoint >= CJK_RADICAL_SUPPLEMENT_START &&
+        codePoint <= CJK_UNIFIED_IDEOGRAPHS_END) {
+      // exceptions for font handled punctuation
+      if (codePoint >= CJK_SYMBOLS_AND_PUNCTUATION_START &&
+          codePoint <= CJK_SYMBOLS_AND_PUNCTUATION_MENKSOFT_END) return false;
+      if (codePoint >= CIRCLE_NUMBER_21 && codePoint <= CIRCLE_NUMBER_35) {
+        return false;
+      }
+
+      if (codePoint >= CIRCLE_NUMBER_36 && codePoint <= CIRCLE_NUMBER_50) {
+        return false;
+      }
+      return true;
+    }
+
+    // Korean Hangul
+    if (codePoint >= HANGUL_SYLLABLES_START &&
+        codePoint <= HANGUL_JAMO_EXTENDED_B_END) return true;
+
+    // More Chinese
+    if (codePoint >= CJK_COMPATIBILITY_IDEOGRAPHS_START &&
+        codePoint <= CJK_COMPATIBILITY_IDEOGRAPHS_END) return true;
+
+    // Emoji
+    if (_isEmoji(codePoint)) return true;
+
+    // all other code points
+    return false;
+  }
+
+  bool _isEmoji(int codePoint) {
+    return codePoint > UNICODE_EMOJI_START;
   }
 }
 
@@ -459,11 +565,12 @@ class _RawStyledTextRun {
 /// forms the run. The [paragraph] is the precomputed Paragraph object that
 /// contains the text run.
 class _TextRun {
-  _TextRun(this.start, this.end, this.paragraph);
+  _TextRun(this.start, this.end, this.isRotated, this.paragraph);
 
-  int start;
-  int end;
-  ui.Paragraph paragraph;
+  final int start;
+  final int end;
+  final bool isRotated;
+  final ui.Paragraph paragraph;
 }
 
 /// LineInfo stores information about each line in the paragraph.
@@ -475,9 +582,9 @@ class _TextRun {
 class _LineInfo {
   _LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
 
-  int textRunStart;
-  int textRunEnd;
-  Rect bounds;
+  final int textRunStart;
+  final int textRunEnd;
+  final Rect bounds;
 }
 
 // This is for keeping track of the text style stack.
