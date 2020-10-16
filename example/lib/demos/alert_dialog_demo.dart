@@ -18,25 +18,26 @@ class AlertDialogDemo extends StatelessWidget {
   }
 }
 
-showAlertDialog(BuildContext context) {
+void showAlertDialog(BuildContext context) {
   // set up the buttons
   Widget actionButton = FlatButton(
-    child: MongolText("ᠮᠡᠳᠡᠭᠰᠡᠨ"),
+    child: MongolText('ᠮᠡᠳᠡᠭᠰᠡᠨ'),
     onPressed: () {
       Navigator.pop(context);
     },
   );
 
   // set up the AlertDialog
-  MongolAlertDialog alert = MongolAlertDialog(
-    title: MongolText("ᠠᠰᠠᠭᠤᠳᠠᠯ ᠲᠠᠢ"),
-    content: MongolText("ᠬᠣᠯᠪᠣᠭᠳᠠᠬᠤ ᠪᠣᠯᠤᠮᠵᠢ ᠦᠭᠡᠢ ᠪᠠᠶᠢᠨ᠎ᠠ"),
+  final alert = MongolAlertDialog(
+    title: MongolText('ᠠᠰᠠᠭᠤᠳᠠᠯ ᠲᠠᠢ'),
+    content: MongolText('ᠬᠣᠯᠪᠣᠭᠳᠠᠬᠤ ᠪᠣᠯᠤᠮᠵᠢ ᠦᠭᠡᠢ ᠪᠠᠶᠢᠨ᠎ᠠ'),
     actions: [
       actionButton,
     ],
   );
 
   // show the dialog
+  
   showDialog(
     context: context,
     builder: (BuildContext context) {

@@ -70,9 +70,9 @@ class _BodyWidgetState extends State<BodyWidget> {
   }
 
   void _insertText(String myText) {
-    String text = _textEditingController.text;
-    TextSelection textSelection = _textEditingController.selection;
-    String newText =
+    final text = _textEditingController.text;
+    final textSelection = _textEditingController.selection;
+    final newText =
         text.replaceRange(textSelection.start, textSelection.end, myText);
     final myTextLength = myText.length;
     _textEditingController.text = newText;
@@ -83,13 +83,13 @@ class _BodyWidgetState extends State<BodyWidget> {
   }
 
   void _backspace() {
-    String text = _textEditingController.text;
-    TextSelection textSelection = _textEditingController.selection;
+    final text = _textEditingController.text;
+    final textSelection = _textEditingController.selection;
     final selectionLength = textSelection.end - textSelection.start;
 
     // There is a selection.
     if (selectionLength > 0) {
-      String newText =
+      final newText =
           text.replaceRange(textSelection.start, textSelection.end, '');
       _textEditingController.text = newText;
       _textEditingController.selection = textSelection.copyWith(
@@ -108,7 +108,7 @@ class _BodyWidgetState extends State<BodyWidget> {
     // TODO: Handle deleting invisible characters like MVS, FVS, etc.
     final newStart = textSelection.start - 1;
     final newEnd = textSelection.start;
-    String newText = text.replaceRange(newStart, newEnd, '');
+    final newText = text.replaceRange(newStart, newEnd, '');
     _textEditingController.text = newText;
     _textEditingController.selection = textSelection.copyWith(
       baseOffset: newStart,
