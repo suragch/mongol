@@ -56,7 +56,6 @@ class MongolText extends StatelessWidget {
     this.style,
     this.textScaleFactor,
     this.semanticsLabel,
-    this.autoRotate = true,
   })  : assert(
           data != null,
           'A non-null String must be provided to a MongolText widget.',
@@ -75,7 +74,6 @@ class MongolText extends StatelessWidget {
     this.style,
     this.textScaleFactor,
     this.semanticsLabel,
-    this.autoRotate = true,
   })  : assert(
           textSpan != null,
           'A non-null TextSpan must be provided to a Text.rich widget.',
@@ -112,20 +110,6 @@ class MongolText extends StatelessWidget {
   /// ```
   final String semanticsLabel;
 
-  /// Whether to automatically rotate any emoji and CJK characters.
-  /// 
-  /// The default is `true`.
-  /// 
-  /// If `true` then any emoji and CJK characters that appear in the string
-  /// will be rotated so that they are in the correct orientation in a vertical
-  /// orientation. If `false` then the emoji and CJK characters will appear in
-  /// the same orientation as Latin text.
-  /// 
-  /// One reason to set this to false is if you want to handle special rotation
-  /// yourself using a [MongolTextSpan]. In this way you could rotate numbers
-  /// like `2` or `22` but not `222`.
-  final bool autoRotate;
-
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = DefaultTextStyle.of(context);
@@ -145,7 +129,6 @@ class MongolText extends StatelessWidget {
         text: data,
         children: textSpan != null ? <TextSpan>[textSpan] : null,
       ),
-      autoRotate: autoRotate,
     );
     if (semanticsLabel != null) {
       result = Semantics(
@@ -173,6 +156,5 @@ class MongolText extends StatelessWidget {
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));
     }
-    properties.add(FlagProperty('autoRotate', value: autoRotate, ifTrue: 'auto rotating emoji and CJK characters', ifFalse: 'not auto rotating emoji or CJK characters', showName: true));
   }
 }

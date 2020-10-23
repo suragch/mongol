@@ -21,10 +21,8 @@ class MongolRichText extends LeafRenderObjectWidget {
     Key key,
     @required this.text,
     this.textScaleFactor = 1.0,
-    this.autoRotate = true,
   })  : assert(text != null),
         assert(textScaleFactor != null),
-        assert(autoRotate != null),
         super(key: key);
         
   /// The text to display in this widget.
@@ -36,27 +34,12 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// the specified font size.
   final double textScaleFactor;
 
-  /// Whether to automatically rotate any emoji and CJK characters.
-  /// 
-  /// The default is `true`.
-  /// 
-  /// If `true` then any emoji and CJK characters that appear in the string
-  /// will be rotated so that they are in the correct orientation in a vertical
-  /// orientation. If `false` then the emoji and CJK characters will appear in
-  /// the same orientation as Latin text.
-  /// 
-  /// One reason to set this to false is if you want to handle special rotation
-  /// yourself using a [MongolTextSpan]. In this way you could rotate numbers
-  /// like `2` or `22` but not `222`.
-  final bool autoRotate;
-
   @override
   MongolRenderParagraph createRenderObject(BuildContext context) {
     
     return MongolRenderParagraph(
       text,
       textScaleFactor: textScaleFactor,
-      autoRotate: autoRotate,
     );
   }
 
@@ -65,8 +48,7 @@ class MongolRichText extends LeafRenderObjectWidget {
       BuildContext context, MongolRenderParagraph renderObject) {
     renderObject
       ..text = text
-      ..textScaleFactor = textScaleFactor
-      ..autoRotate = autoRotate;
+      ..textScaleFactor = textScaleFactor;
   }
 
   @override
@@ -75,7 +57,6 @@ class MongolRichText extends LeafRenderObjectWidget {
     properties.add(StringProperty('text', text.toPlainText()));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
-    properties.add(FlagProperty('autoRotate', value: autoRotate, ifTrue: 'auto rotating emoji and CJK characters', ifFalse: 'not auto rotating emoji or CJK characters', showName: true));
   }
 }
 
@@ -91,10 +72,8 @@ class MongolRenderParagraph extends RenderBox
   MongolRenderParagraph(
     TextSpan text, {
     double textScaleFactor = 1.0,
-    bool autoRotate = true,
   })  : assert(text != null),
         assert(textScaleFactor != null),
-        assert(autoRotate != null),
         _textPainter = MongolTextPainter(
           text: text,
           textScaleFactor: textScaleFactor,
@@ -136,20 +115,6 @@ class MongolRenderParagraph extends RenderBox
     assert(value != null);
     if (_textPainter.textScaleFactor == value) return;
     _textPainter.textScaleFactor = value;
-    markNeedsLayout();
-  }
-
-  /// Whether to automatically rotate any emoji and CJK characters.
-  /// 
-  /// If `true` then any emoji and CJK characters that appear in the string
-  /// will be rotated so that they are in the correct orientation in a vertical
-  /// orientation. If `false` then the emoji and CJK characters will appear in
-  /// the same orientation as Latin text.
-  bool get autoRotate => _textPainter.autoRotate;
-  set autoRotate(bool value) {
-    assert(value != null);
-    if (_textPainter.autoRotate == value) return;
-    _textPainter.autoRotate = value;
     markNeedsLayout();
   }
 

@@ -291,14 +291,11 @@ class MongolParagraphBuilder {
   MongolParagraphBuilder(
     ui.ParagraphStyle style, {
     double textScaleFactor = 1.0,
-    bool autoRotate = true,
   })  : _paragraphStyle = style,
-        _textScaleFactor = textScaleFactor,
-        _autoRotate = autoRotate;
+        _textScaleFactor = textScaleFactor;
 
   ui.ParagraphStyle _paragraphStyle;
   final double _textScaleFactor;
-  final bool _autoRotate;
   final _styleStack = _Stack<TextStyle>();
   final _rawStyledTextRuns = <_RawStyledTextRun>[];
 

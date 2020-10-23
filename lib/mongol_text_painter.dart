@@ -35,13 +35,10 @@ class MongolTextPainter {
   MongolTextPainter({
     TextSpan text,
     double textScaleFactor = 1.0,
-    bool autoRotate = true,
   })  : assert(text == null || text.debugAssertIsValid()),
         assert(textScaleFactor != null),
-        assert(autoRotate != null),
         _text = text,
-        _textScaleFactor = textScaleFactor,
-        _autoRotate = autoRotate;
+        _textScaleFactor = textScaleFactor;
 
   /// Marks this text painter's layout information as dirty and removes cached
   /// information.
@@ -90,15 +87,6 @@ class MongolTextPainter {
     assert(value != null);
     if (_textScaleFactor == value) return;
     _textScaleFactor = value;
-    markNeedsLayout();
-  }
-
-  bool get autoRotate => _autoRotate;
-  bool _autoRotate;
-  set autoRotate(bool value) {
-    assert(value != null);
-    if (_autoRotate == value) return;
-    _autoRotate = value;
     markNeedsLayout();
   }
 
@@ -187,7 +175,6 @@ class MongolTextPainter {
       final builder = MongolParagraphBuilder(
         _createParagraphStyle(),
         textScaleFactor: _textScaleFactor,
-        autoRotate: _autoRotate,
       );
       _addStyleToText(builder, _text);
       _paragraph = builder.build();
