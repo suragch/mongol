@@ -151,4 +151,92 @@ void main() {
     expect(baseSize.width, equals(28.0));
     expect(baseSize.height, equals(14.0));
   });
+
+  testWidgets('MongolText rotates and stacks two CJK character',
+      (WidgetTester tester) async {
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const myString = '你好';
+    await tester.pumpWidget(
+      Center(
+        child: MongolText(
+          myString,
+        ),
+      ),
+    );
+
+    final text = tester.firstWidget(find.byType(MongolRichText));
+    expect(text, isNotNull);
+
+    final baseSize = tester.getSize(find.byType(MongolRichText));
+    expect(baseSize.width, equals(14.0));
+    expect(baseSize.height, equals(28.0));
+  });
+
+  testWidgets('MongolText handles mixed rotated and non-rotated text',
+      (WidgetTester tester) async {
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const myString = 'ᠰᠠᠶᠢᠨ ᠪᠠᠶᠢᠨ᠎ᠠ ᠤᠤ︖ 👨‍👩‍👧🇭🇺22';
+    await tester.pumpWidget(
+      Center(
+        child: MongolText(
+          myString,
+        ),
+      ),
+    );
+
+    final text = tester.firstWidget(find.byType(MongolRichText));
+    expect(text, isNotNull);
+
+    final baseSize = tester.getSize(find.byType(MongolRichText));
+    expect(baseSize.width, equals(42.0));
+    expect(baseSize.height, equals(287.0));
+  });
+
+  testWidgets('MongolText handles embedded formatting characters',
+      (WidgetTester tester) async {
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const myString = 'ᠨᠠ\u200dᠢᠮᠠ';
+    await tester.pumpWidget(
+      Center(
+        child: MongolText(
+          myString,
+        ),
+      ),
+    );
+
+    final text = tester.firstWidget(find.byType(MongolRichText));
+    expect(text, isNotNull);
+
+    final baseSize = tester.getSize(find.byType(MongolRichText));
+    expect(baseSize.width, equals(14.0));
+    expect(baseSize.height, equals(70.0));
+  });
+
+  testWidgets('MongolText handles normal and rotated mix without spaces',
+      (WidgetTester tester) async {
+    await binding.setSurfaceSize(Size(1000, 1000));
+    addTearDown(() => binding.setSurfaceSize(null));
+
+    const myString = 'a你';
+    await tester.pumpWidget(
+      Center(
+        child: MongolText(
+          myString,
+        ),
+      ),
+    );
+
+    final text = tester.firstWidget(find.byType(MongolRichText));
+    expect(text, isNotNull);
+
+    final baseSize = tester.getSize(find.byType(MongolRichText));
+    expect(baseSize.width, equals(14.0));
+    expect(baseSize.height, equals(28.0));
+  });
 }

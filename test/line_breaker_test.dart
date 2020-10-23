@@ -18,8 +18,8 @@ void main() {
     final text = 'hello  ';
     final breakSegments = BreakSegments(text);
     expect(breakSegments.length, equals(2));
-    expect(breakSegments.first, equals('hello '));
-    expect(breakSegments.last, equals(' '));
+    expect(breakSegments.first.text, equals('hello '));
+    expect(breakSegments.last.text, equals(' '));
   });
   
   test('BreakSegments finds no breaks in a single word', () {
@@ -32,16 +32,16 @@ void main() {
     final text = 'hello world';
     final breakSegments = BreakSegments(text);
     expect(breakSegments.length, equals(2));
-    expect(breakSegments.first, equals('hello '));
-    expect(breakSegments.last, equals('world'));
+    expect(breakSegments.first.text, equals('hello '));
+    expect(breakSegments.last.text, equals('world'));
   });
 
   test('BreakSegments breaks on newline', () {
     final text = 'hello\nworld';
     final breakSegments = BreakSegments(text);
     expect(breakSegments.length, equals(2));
-    expect(breakSegments.first, equals('hello\n'));
-    expect(breakSegments.last, equals('world'));
+    expect(breakSegments.first.text, equals('hello\n'));
+    expect(breakSegments.last.text, equals('world'));
   });
 
   test('BreakSegments breaks for emojis', () {
@@ -60,6 +60,18 @@ void main() {
     final text = 'hello 你好 asdf';
     final breakSegments = BreakSegments(text);
     expect(breakSegments.length, equals(5));
+  });
+
+  test('BreakSegments does not break for embedded formatting chars', () {
+    final text = 'ᠨᠠ\u200dᠢᠮᠠ';
+    final breakSegments = BreakSegments(text);
+    expect(breakSegments.length, equals(1));
+  });
+
+  test('BreakSegments differentiates nonrotated rotated mix', () {
+    final text = 'a你';
+    final breakSegments = BreakSegments(text);
+    expect(breakSegments.length, equals(2));
   });
 
 }

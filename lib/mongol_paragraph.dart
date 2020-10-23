@@ -85,8 +85,8 @@ class MongolParagraph {
     for (var i = 0; i < _runs.length; i++) {
       end = i;
       final run = _runs[i];
-      final runWidth = run.paragraph.maxIntrinsicWidth;
-      final runHeight = run.paragraph.height;
+      final runWidth = run.width;
+      final runHeight = run.height;
 
       if (lineWidth + runWidth > maxLineLength) {
         _addLine(start, end, lineWidth, lineHeight);
@@ -95,7 +95,7 @@ class MongolParagraph {
         start = end;
       } else {
         lineWidth += runWidth;
-        lineHeight = math.max(lineHeight, run.paragraph.height);
+        lineHeight = math.max(lineHeight, run.height);
       }
 
       if (_runEndsWithNewLine(run)) {
@@ -144,7 +144,7 @@ class MongolParagraph {
     var maxLineLength = 0.0;
     for (final line in _lines) {
       for (var i = line.textRunStart; i < line.textRunEnd; i++) {
-        final width = _runs[i].paragraph.maxIntrinsicWidth;
+        final width = _runs[i].width;
         maxRunWidth = math.max(width, maxRunWidth);
         sum += width;
       }
@@ -189,7 +189,7 @@ class MongolParagraph {
     for (var i = matchedLine.textRunStart; i < matchedLine.textRunEnd; i++) {
       final run = _runs[i];
       rotatedRunDy = bottomEdgeAfterRotating;
-      bottomEdgeAfterRotating += run.paragraph.maxIntrinsicWidth;
+      bottomEdgeAfterRotating += run.width;
       if (dy <= bottomEdgeAfterRotating) {
         matchedRun = run;
         break;
@@ -233,14 +233,26 @@ class MongolParagraph {
     // loop through every line
     for (final line in _lines) {
       // translate for the line height
-      canvas.translate(0, -line.bounds.height);
+      final dy = -line.bounds.height;
+      canvas.translate(0, dy);
 
       // draw each run in the current line
-      var dx = 0.0;
+      //var dx = 0.0;
+      canvas.save();
       for (var i = line.textRunStart; i < line.textRunEnd; i++) {
-        canvas.drawParagraph(_runs[i].paragraph, Offset(dx, 0));
-        dx += _runs[i].paragraph.longestLine;
+        //print(dx);
+        final run = _runs[i];
+        run.draw(canvas, Offset(0, 0));
+        //dx += run.width;
+        canvas.translate(run.width, 0);
+        //break;
+        // if (run.isRotated) {
+        // } else {
+        //   canvas.drawParagraph(run.paragraph, Offset(dx, 0));
+        //   dx += run.width;
+        // }
       }
+      canvas.restore();
     }
 
     canvas.restore();
@@ -360,30 +372,39 @@ class MongolParagraphBuilder {
     ui.ParagraphBuilder _builder;
     for (var i = 0; i < length; i++) {
       final style = _uiStyleForRun(i);
-      final text = _rawStyledTextRuns[i].text;
-      endIndex += text.length;
+      final segment = _rawStyledTextRuns[i].text;
+      endIndex += segment.text.length;
       _builder ??= ui.ParagraphBuilder(_paragraphStyle);
       _builder.pushStyle(style);
-      _builder.addText(_stripNewLineChar(text));
+      _builder.addText(_stripNewLineChar(segment.text));
       _builder.pop();
 
-      if (i < length - 1) {
-        final nextText = _rawStyledTextRuns[i + 1].text;
-        if (!_endsWithBreak(text) && !_startsWithBreak(nextText)) {
-          continue;
-        }
+      if (_isNonBreakingSegment(i)) {
+        continue;
       }
 
       final paragraph = _builder.build();
       paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
-      final isRotated = false; // TODO: change this
-      final run = _TextRun(startIndex, endIndex, isRotated, paragraph);
+      final run =
+          _TextRun(startIndex, endIndex, segment.isRotatable, paragraph);
       runs.add(run);
       _builder = null;
       startIndex = endIndex;
     }
 
     return MongolParagraph._(runs, _plainText.toString());
+  }
+
+  bool _isNonBreakingSegment(int i) {
+    final segment = _rawStyledTextRuns[i].text;
+    if (segment.isRotatable) return false;
+    if (_endsWithBreak(segment.text)) return false;
+
+    if (i >= _rawStyledTextRuns.length - 1) return false;
+    final nextSegment = _rawStyledTextRuns[i + 1].text;
+    if (nextSegment.isRotatable) return false;
+    if (_startsWithBreak(nextSegment.text)) return false;
+    return true;
   }
 
   bool _startsWithBreak(String run) {
@@ -410,18 +431,24 @@ class MongolParagraphBuilder {
 
 /// An iterable that iterates over the substrings of [text] between locations
 /// that line breaks are allowed.
-class BreakSegments extends Iterable<String> {
+class BreakSegments extends Iterable<RotatableString> {
   BreakSegments(this.text);
   final String text;
 
   @override
-  Iterator<String> get iterator => LineBreaker(text);
+  Iterator<RotatableString> get iterator => LineBreaker(text);
+}
+
+class RotatableString {
+  const RotatableString(this.text, this.isRotatable);
+  final String text;
+  final bool isRotatable;
 }
 
 /// Finds all the locations in a string of text where line breaks are allowed.
 ///
 /// LineBreaker gives the strings between the breaks upon iteration.
-class LineBreaker implements Iterator<String> {
+class LineBreaker implements Iterator<RotatableString> {
   LineBreaker(this.text) {
     _characterIterator = text.characters.iterator;
   }
@@ -430,13 +457,13 @@ class LineBreaker implements Iterator<String> {
 
   CharacterRange _characterIterator;
 
-  String _currentTextRun;
+  RotatableString _currentTextRun;
 
   @override
-  String get current => _currentTextRun;
+  RotatableString get current => _currentTextRun;
 
   bool _atEndOfCharacterRange = false;
-  String _rotatedCharacterBuffer;
+  RotatableString _rotatedCharacterBuffer;
 
   @override
   bool moveNext() {
@@ -455,22 +482,22 @@ class LineBreaker implements Iterator<String> {
       final current = _characterIterator.current;
       if (isBreakChar(current)) {
         returnValue.write(current);
-        _currentTextRun = returnValue.toString();
+        _currentTextRun = RotatableString(returnValue.toString(), false);
         return true;
       } else if (_isRotatable(current)) {
         if (returnValue.isEmpty) {
-          _currentTextRun = current;
+          _currentTextRun = RotatableString(current, true);
           return true;
         } else {
-          _currentTextRun = returnValue.toString();
-          _rotatedCharacterBuffer = current;
+          _currentTextRun = RotatableString(returnValue.toString(), false);
+          _rotatedCharacterBuffer = RotatableString(current, true);
           return true;
         }
       }
       returnValue.write(current);
     }
-    _currentTextRun = returnValue.toString();
-    if (_currentTextRun.isEmpty) {
+    _currentTextRun = RotatableString(returnValue.toString(), false);
+    if (_currentTextRun.text.isEmpty) {
       return false;
     }
     _atEndOfCharacterRange = true;
@@ -500,7 +527,7 @@ class LineBreaker implements Iterator<String> {
   static const UNICODE_EMOJI_START = 0x1F000;
 
   bool _isRotatable(String character) {
-    if (character.runes.length > 1) return true;
+    //if (character.runes.length > 1) return true;
 
     final codePoint = character.runes.first;
 
@@ -552,7 +579,7 @@ class LineBreaker implements Iterator<String> {
 class _RawStyledTextRun {
   _RawStyledTextRun(this.style, this.text);
   final TextStyle style;
-  final String text;
+  final RotatableString text;
 }
 
 /// A [_TextRun] describes the smallest unit of text that is printed on the
@@ -568,6 +595,37 @@ class _TextRun {
   final int end;
   final bool isRotated;
   final ui.Paragraph paragraph;
+
+  /// Returns the width of the unrotated [paragraph] taking into account
+  /// whether it [isRotated].
+  double get width {
+    if (isRotated) {
+      return paragraph.height;
+    }
+    return paragraph.maxIntrinsicWidth;
+  }
+
+  /// Returns the height of the unrotated [paragraph] taking into account
+  /// whether it [isRotated].
+  double get height {
+    if (isRotated) {
+      return paragraph.maxIntrinsicWidth;
+    }
+    return paragraph.height;
+  }
+
+  void draw(ui.Canvas canvas, ui.Offset offset) {
+    if (isRotated) {
+      canvas.save();
+      canvas.rotate(-math.pi / 2);
+      canvas.translate(-height, 0);
+      // canvas.rotate(math.pi / 2);
+      canvas.drawParagraph(paragraph, offset);
+      canvas.restore();
+    } else {
+      canvas.drawParagraph(paragraph, offset);
+    }
+  }
 }
 
 /// LineInfo stores information about each line in the paragraph.
