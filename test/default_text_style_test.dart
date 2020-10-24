@@ -12,7 +12,8 @@ import 'package:flutter/painting.dart';
 import 'package:mongol/mongol.dart';
 
 void main() {
-  testWidgets('DefaultTextStyle changes propagate to MongolRichText', (WidgetTester tester) async {
+  testWidgets('DefaultTextStyle changes propagate to MongolRichText',
+      (WidgetTester tester) async {
     const textWidget = MongolText('Hello');
     const s1 = TextStyle(
       fontSize: 10.0,
@@ -25,12 +26,14 @@ void main() {
       child: textWidget,
     ));
 
-    final text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    final text =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.text.style, s1);
   });
 
-  testWidgets('AnimatedDefaultTextStyle changes propagate to MongolText', (WidgetTester tester) async {
+  testWidgets('AnimatedDefaultTextStyle changes propagate to MongolText',
+      (WidgetTester tester) async {
     const textWidget = MongolText('Hello');
     const s1 = TextStyle(
       fontSize: 10.0,
@@ -49,7 +52,8 @@ void main() {
       duration: Duration(milliseconds: 1000),
     ));
 
-    final text1 = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    final text1 =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text1, isNotNull);
     expect(text1.text.style, s1);
     // expect(text1.textAlign, TextAlign.start);
@@ -66,12 +70,14 @@ void main() {
       overflow: TextOverflow.fade,
       maxLines: 3,
       textWidthBasis: TextWidthBasis.longestLine,
-      textHeightBehavior: ui.TextHeightBehavior(applyHeightToFirstAscent: false),
+      textHeightBehavior:
+          ui.TextHeightBehavior(applyHeightToFirstAscent: false),
       child: textWidget,
       duration: Duration(milliseconds: 1000),
     ));
 
-    final text2 = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    final text2 =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text2, isNotNull);
     expect(text2.text.style, s1); // animation hasn't started yet
     // expect(text2.textAlign, TextAlign.justify);
@@ -83,7 +89,8 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 1000));
 
-    final text3 = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    final text3 =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text3, isNotNull);
     expect(text3.text.style, s2); // animation has now finished
     // expect(text3.textAlign, TextAlign.justify);
@@ -92,5 +99,5 @@ void main() {
     // expect(text3.maxLines, 3);
     // expect(text2.textWidthBasis, TextWidthBasis.longestLine);
     // expect(text2.textHeightBehavior, const ui.TextHeightBehavior(applyHeightToFirstAscent: false));
- });
+  });
 }

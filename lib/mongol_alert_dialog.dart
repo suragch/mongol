@@ -124,7 +124,7 @@ class MongolAlertDialog extends StatelessWidget {
         ),
       );
     }
-      
+
     if (content != null) {
       contentWidget = Padding(
         padding: contentPadding,
@@ -136,7 +136,7 @@ class MongolAlertDialog extends StatelessWidget {
         ),
       );
     }
-      
+
     if (actions != null) {
       actionsWidget = Padding(
         padding: actionsPadding,
@@ -146,7 +146,7 @@ class MongolAlertDialog extends StatelessWidget {
         ),
       );
     }
-      
+
     List<Widget> rowChildren;
 
     rowChildren = <Widget>[

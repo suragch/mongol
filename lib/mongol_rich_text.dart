@@ -24,7 +24,7 @@ class MongolRichText extends LeafRenderObjectWidget {
   })  : assert(text != null),
         assert(textScaleFactor != null),
         super(key: key);
-        
+
   /// The text to display in this widget.
   final TextSpan text;
 
@@ -36,7 +36,6 @@ class MongolRichText extends LeafRenderObjectWidget {
 
   @override
   MongolRenderParagraph createRenderObject(BuildContext context) {
-    
     return MongolRenderParagraph(
       text,
       textScaleFactor: textScaleFactor,

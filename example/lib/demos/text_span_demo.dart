@@ -22,7 +22,10 @@ class ExampleWidget extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(),
       ),
-      child: MongolText.rich(text, textScaleFactor: 2.5,),
+      child: MongolText.rich(
+        text,
+        textScaleFactor: 2.5,
+      ),
     );
   }
 }
@@ -46,7 +49,10 @@ const text = TextSpan(
     TextSpan(text: 'ᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤ', style: TextStyle(color: Colors.blue)),
     TextSpan(text: 'ᠭ᠎ᠠ ᠨᠠᠢᠮᠠ '),
     TextSpan(text: 'ᠶᠢᠰᠦ ', style: TextStyle(fontSize: 20)),
-    TextSpan(text: 'ᠠᠷᠪᠠ', style: TextStyle(fontFamily: 'MenksoftAmuguleng', color: Colors.purple)),
+    TextSpan(
+        text: 'ᠠᠷᠪᠠ',
+        style:
+            TextStyle(fontFamily: 'MenksoftAmuguleng', color: Colors.purple)),
   ],
 );
 //const text = 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ';

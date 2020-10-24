@@ -30,7 +30,7 @@ import 'package:mongol/mongol_paragraph.dart';
 class MongolTextPainter {
   /// Creates a text painter that paints the given text.
   ///
-  /// The `text` argument is optional but [text] must be non-null before 
+  /// The `text` argument is optional but [text] must be non-null before
   /// calling [layout].
   MongolTextPainter({
     TextSpan text,
@@ -61,9 +61,9 @@ class MongolTextPainter {
   ///
   /// The [TextSpan] this provides is in the form of a tree that may contain
   /// multiple instances of [TextSpan]s. To obtain a plain text
-  /// representation of the contents of this [TextPainter], use 
-  /// [TextSpan.toPlainText] to get the full contents of all nodes in the tree. 
-  /// [TextSpan.text] will only provide the contents of the first node in the 
+  /// representation of the contents of this [TextPainter], use
+  /// [TextSpan.toPlainText] to get the full contents of all nodes in the tree.
+  /// [TextSpan.text] will only provide the contents of the first node in the
   /// tree.
   TextSpan get text => _text;
   TextSpan _text;
@@ -122,7 +122,7 @@ class MongolTextPainter {
     return _applyFloatingPointHack(_paragraph.minIntrinsicHeight);
   }
 
-  /// The height at which increasing the height of the text no longer decreases 
+  /// The height at which increasing the height of the text no longer decreases
   /// the width.
   ///
   /// Valid only after [layout] has been called.
@@ -130,7 +130,7 @@ class MongolTextPainter {
     assert(!_needsLayout);
     return _applyFloatingPointHack(_paragraph.maxIntrinsicHeight);
   }
-  
+
   /// The horizontal space required to paint this text.
   ///
   /// Valid only after [layout] has been called.
@@ -161,7 +161,7 @@ class MongolTextPainter {
   /// Computes the visual position of the glyphs for painting the text.
   ///
   /// The text will layout with a height that's as close to its max intrinsic
-  /// height as possible while still being greater than or equal to `minHeight` 
+  /// height as possible while still being greater than or equal to `minHeight`
   /// and less than or equal to `maxHeight`.
   ///
   /// The [text] property must be non-null before this is called.
@@ -183,7 +183,8 @@ class MongolTextPainter {
     _lastMaxHeight = maxHeight;
     _paragraph.layout(MongolParagraphConstraints(height: maxHeight));
     if (minHeight != maxHeight) {
-      final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight) as double;
+      final newHeight =
+          maxIntrinsicHeight.clamp(minHeight, maxHeight) as double;
       if (newHeight != height) {
         _paragraph.layout(MongolParagraphConstraints(height: newHeight));
       }
@@ -195,7 +196,8 @@ class MongolTextPainter {
     InlineSpan inlineSpan,
   ) {
     if (inlineSpan is! TextSpan) {
-      throw UnimplementedError('Inline span support has not yet been implemented for MongolTextPainter');
+      throw UnimplementedError(
+          'Inline span support has not yet been implemented for MongolTextPainter');
     }
     final textSpan = inlineSpan as TextSpan;
     final style = textSpan.style;
@@ -224,7 +226,7 @@ class MongolTextPainter {
   /// will not be visible by default.
   ///
   /// To set the text style, specify a [TextStyle] when creating the [TextSpan]
-  /// that you pass to the [MongolTextPainter] constructor or to the [text] 
+  /// that you pass to the [MongolTextPainter] constructor or to the [text]
   /// property.
   void paint(Canvas canvas, Offset offset) {
     assert(() {

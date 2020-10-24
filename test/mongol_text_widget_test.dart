@@ -33,7 +33,8 @@ void main() {
     expect(text, isNotNull);
     expect(text.style.fontFamily, equals('Some Font'));
 
-    final richText = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    final richText =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(richText, isNotNull);
     expect(richText.text.style.fontFamily, equals('Some Font'));
   });

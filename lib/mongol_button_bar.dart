@@ -179,20 +179,17 @@ class _RenderButtonBarColumn extends RenderFlex {
     if (size.height <= constraints.maxHeight) {
       super.performLayout();
     } else {
-      final childConstraints =
-          constraints.copyWith(minHeight: 0.0);
+      final childConstraints = constraints.copyWith(minHeight: 0.0);
       RenderBox child;
       var currentWidth = 0.0;
       child = firstChild;
 
       while (child != null) {
-        final childParentData =
-            child.parentData as FlexParentData;
+        final childParentData = child.parentData as FlexParentData;
         child.layout(childConstraints, parentUsesSize: true);
         switch (mainAxisAlignment) {
           case MainAxisAlignment.center:
-            final midpoint =
-                (constraints.maxHeight - child.size.height) / 2.0;
+            final midpoint = (constraints.maxHeight - child.size.height) / 2.0;
             childParentData.offset = Offset(midpoint, currentWidth);
             break;
           case MainAxisAlignment.end:

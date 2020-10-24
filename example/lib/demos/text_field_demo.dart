@@ -12,7 +12,6 @@ class TextFieldDemo extends StatelessWidget {
 }
 
 class SearchBody extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     return SafeArea(

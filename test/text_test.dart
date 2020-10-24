@@ -20,7 +20,8 @@ void main() {
       ),
     ));
 
-    var text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    var text =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.3);
 
@@ -33,12 +34,12 @@ void main() {
     expect(text.textScaleFactor, 1.0);
   });
 
-  testWidgets('MongolText respects textScaleFactor with default font size', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const Center(child: MongolText('Hello'))
-    );
+  testWidgets('MongolText respects textScaleFactor with default font size',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const Center(child: MongolText('Hello')));
 
-    var text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    var text =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.0);
     final baseSize = tester.getSize(find.byType(MongolRichText));
@@ -60,13 +61,14 @@ void main() {
     expect(largeSize.height, equals(105.0));
   });
 
-  testWidgets('MongolText respects textScaleFactor with explicit font size', (WidgetTester tester) async {
+  testWidgets('MongolText respects textScaleFactor with explicit font size',
+      (WidgetTester tester) async {
     await tester.pumpWidget(const Center(
-      child: MongolText('Hello',
-        style: TextStyle(fontSize: 20.0)),
+      child: MongolText('Hello', style: TextStyle(fontSize: 20.0)),
     ));
 
-    var text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    var text =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.0);
     final baseSize = tester.getSize(find.byType(MongolRichText));
@@ -75,8 +77,7 @@ void main() {
 
     await tester.pumpWidget(const Center(
       child: MongolText('Hello',
-        style: TextStyle(fontSize: 20.0),
-        textScaleFactor: 1.3),
+          style: TextStyle(fontSize: 20.0), textScaleFactor: 1.3),
     ));
 
     text = tester.firstWidget(find.byType(MongolRichText));
@@ -87,7 +88,9 @@ void main() {
     expect(largeSize.height, anyOf(131.0, 130.0));
   });
 
-  testWidgets('MongolText can be created from TextSpans and uses defaultTextStyle', (WidgetTester tester) async {
+  testWidgets(
+      'MongolText can be created from TextSpans and uses defaultTextStyle',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       const DefaultTextStyle(
         style: TextStyle(
@@ -111,7 +114,8 @@ void main() {
       ),
     );
 
-    final text = tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+    final text =
+        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.text.style.fontSize, 20.0);
   });
@@ -149,7 +153,7 @@ void main() {
   //     ),
   //   );
   //   expect(tester.takeException(), null);
-  // }, skip: isBrowser); 
+  // }, skip: isBrowser);
 
   // testWidgets('TapGesture recognizers contribute link semantics', (WidgetTester tester) async {
   //   final SemanticsTester semantics = SemanticsTester(tester);
@@ -303,7 +307,7 @@ void main() {
   //   final Size textSizeLongestLine = tester.getSize(find.byType(Text));
   //   expect(textSizeLongestLine.width, equals(630.0));
   //   expect(textSizeLongestLine.height, equals(fontHeight * 2));
-  // }, skip: isBrowser);  
+  // }, skip: isBrowser);
 
   // testWidgets('textWidthBasis with textAlign still obeys parent alignment', (WidgetTester tester) async {
   //   await tester.pumpWidget(
@@ -353,7 +357,7 @@ void main() {
   //   expect(tester.getSize(find.text('RIGHT ALIGNED, PARENT')).width, lessThan(width));
   //   expect(tester.getSize(find.text('LEFT ALIGNED, LONGEST LINE')).width, lessThan(width));
   //   expect(tester.getSize(find.text('RIGHT ALIGNED, LONGEST LINE')).width, equals(width));
-  // }, skip: isBrowser); 
+  // }, skip: isBrowser);
 
   // testWidgets('Paragraph.getBoxesForRange returns nothing when selection range is zero length', (WidgetTester tester) async {
   //   final ui.ParagraphBuilder builder = ui.ParagraphBuilder(ui.ParagraphStyle());

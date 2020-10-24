@@ -18,10 +18,7 @@ class DemoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'mongol',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'MenksoftQagan'
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'MenksoftQagan'),
       home: Scaffold(
         appBar: AppBar(title: Text('Mongol package demo')),
         body: HomeScreen(),

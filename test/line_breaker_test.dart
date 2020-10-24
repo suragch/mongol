@@ -21,13 +21,13 @@ void main() {
     expect(breakSegments.first.text, equals('hello '));
     expect(breakSegments.last.text, equals(' '));
   });
-  
+
   test('BreakSegments finds no breaks in a single word', () {
     final text = 'hello';
     final breakSegments = BreakSegments(text);
     expect(breakSegments.length, equals(1));
   });
-  
+
   test('BreakSegments breaks on space', () {
     final text = 'hello world';
     final breakSegments = BreakSegments(text);
@@ -73,5 +73,4 @@ void main() {
     final breakSegments = BreakSegments(text);
     expect(breakSegments.length, equals(2));
   });
-
 }

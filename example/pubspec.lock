@@ -80,7 +80,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.6.1"
+    version: "0.7.0"
   mongol_code:
     dependency: "direct main"
     description:

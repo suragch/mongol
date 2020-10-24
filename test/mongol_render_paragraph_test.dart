@@ -12,18 +12,13 @@ import 'package:mongol/mongol.dart';
 void main() {
   testWidgets('MongolRenderParagraph has correct instrinsic width',
       (WidgetTester tester) async {
-    
-    final paragraph =
-        MongolRenderParagraph(TextSpan(text: 'A string'));
+    final paragraph = MongolRenderParagraph(TextSpan(text: 'A string'));
 
     final textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
-    final oneLineTextWidth =
-        paragraph.getMinIntrinsicWidth(double.infinity);
+    final oneLineTextWidth = paragraph.getMinIntrinsicWidth(double.infinity);
     final constrainedHeight = textHeight * 0.9;
-    final wrappedTextHeight =
-        paragraph.getMinIntrinsicHeight(double.infinity);
-    final twoLinesTextWidth =
-        paragraph.getMinIntrinsicWidth(constrainedHeight);
+    final wrappedTextHeight = paragraph.getMinIntrinsicHeight(double.infinity);
+    final twoLinesTextWidth = paragraph.getMinIntrinsicWidth(constrainedHeight);
 
     expect(wrappedTextHeight, greaterThan(0.0));
     expect(wrappedTextHeight, lessThan(textHeight));

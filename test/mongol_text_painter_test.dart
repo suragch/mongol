@@ -187,7 +187,7 @@ void main() {
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 12);
     expect(position.affinity, TextAffinity.upstream);
-    
+
     // below final space of first line
     offset = Offset(10.0, 450.0);
     position = painter.getPositionForOffset(offset);

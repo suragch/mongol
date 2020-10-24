@@ -1,3 +1,7 @@
+## [0.7.0] - 2020.10.24
+
+- Support for rotating emoji and CJK characters.
+
 ## [0.6.1] - 2020.10.10
 
 - Added static analysis options.
