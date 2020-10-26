@@ -1,3 +1,7 @@
+## [0.7.1] - 2020.10.26
+
+- Lowered the minimum version number requirement for the `meta` dependency.
+
 ## [0.7.0] - 2020.10.24
 
 - Support for rotating emoji and CJK characters.
