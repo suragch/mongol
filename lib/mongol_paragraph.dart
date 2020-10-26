@@ -237,20 +237,11 @@ class MongolParagraph {
       canvas.translate(0, dy);
 
       // draw each run in the current line
-      //var dx = 0.0;
       canvas.save();
       for (var i = line.textRunStart; i < line.textRunEnd; i++) {
-        //print(dx);
         final run = _runs[i];
         run.draw(canvas, Offset(0, 0));
-        //dx += run.width;
         canvas.translate(run.width, 0);
-        //break;
-        // if (run.isRotated) {
-        // } else {
-        //   canvas.drawParagraph(run.paragraph, Offset(dx, 0));
-        //   dx += run.width;
-        // }
       }
       canvas.restore();
     }
@@ -619,7 +610,6 @@ class _TextRun {
       canvas.save();
       canvas.rotate(-math.pi / 2);
       canvas.translate(-height, 0);
-      // canvas.rotate(math.pi / 2);
       canvas.drawParagraph(paragraph, offset);
       canvas.restore();
     } else {
