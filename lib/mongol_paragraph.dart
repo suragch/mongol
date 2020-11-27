@@ -8,7 +8,6 @@ import 'dart:collection';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:meta/meta.dart';
 import 'package:flutter/painting.dart';
 import 'package:characters/characters.dart';
 
@@ -22,32 +21,32 @@ class MongolParagraph {
   final String _text;
   final List<_TextRun> _runs;
 
-  double _width;
-  double _height;
-  double _minIntrinsicHeight;
-  double _maxIntrinsicHeight;
+  double? _width;
+  double? _height;
+  double? _minIntrinsicHeight;
+  double? _maxIntrinsicHeight;
 
   /// The amount of horizontal space this paragraph occupies.
   ///
   /// Valid only after [layout] has been called.
-  double get width => _width;
+  double get width => _width ?? 0;
 
   /// The amount of vertical space this paragraph occupies.
   ///
   /// Valid only after [layout] has been called.
-  double get height => _height;
+  double get height => _height ?? 0;
 
   /// The minimum height that this paragraph could be without failing to paint
   /// its contents within itself.
   ///
   /// Valid only after [layout] has been called.
-  double get minIntrinsicHeight => _minIntrinsicHeight;
+  double get minIntrinsicHeight => _minIntrinsicHeight ?? 0;
 
   /// Returns the smallest height beyond which increasing the height never
   /// decreases the width.
   ///
   /// Valid only after [layout] has been called.
-  double get maxIntrinsicHeight => _maxIntrinsicHeight;
+  double get maxIntrinsicHeight => _maxIntrinsicHeight ?? double.infinity;
 
   /// Computes the size and position of each glyph in the paragraph.
   ///
@@ -69,7 +68,6 @@ class MongolParagraph {
   // Internally this method uses "width" and "height" naming with regard
   // to a horizontal line of text. Rotation doesn't happen until drawing.
   void _calculateLineBreaks(double maxLineLength) {
-    assert(_runs != null);
     if (_runs.isEmpty) {
       return;
     }
@@ -125,8 +123,6 @@ class MongolParagraph {
   }
 
   void _calculateWidth() {
-    assert(_lines != null);
-    assert(_runs != null);
     var sum = 0.0;
     for (final line in _lines) {
       sum += line.bounds.height;
@@ -137,8 +133,6 @@ class MongolParagraph {
   // Internally this translates a horizontal run width to the vertical name
   // that it is known as externally.
   void _calculateIntrinsicHeight() {
-    assert(_runs != null);
-
     var sum = 0.0;
     var maxRunWidth = 0.0;
     var maxLineLength = 0.0;
@@ -165,11 +159,8 @@ class MongolParagraph {
   // Both the line info and the text run are in horizontal orientation,
   // but the [dx] and [dy] offsets are in vertical orientation.
   List<int> _getPositionForOffset(double dx, double dy) {
-    assert(_lines != null);
-    assert(_runs != null);
-
     // find the line
-    _LineInfo matchedLine;
+    _LineInfo? matchedLine;
     var rightEdgeAfterRotation = 0.0;
     var rotatedRunDx = 0.0;
     var rotatedRunDy = 0.0;
@@ -184,7 +175,7 @@ class MongolParagraph {
     matchedLine ??= _lines.last;
 
     // find the run in the line
-    _TextRun matchedRun;
+    _TextRun? matchedRun;
     var bottomEdgeAfterRotating = 0.0;
     for (var i = matchedLine.textRunStart; i < matchedLine.textRunEnd; i++) {
       final run = _runs[i];
@@ -220,9 +211,6 @@ class MongolParagraph {
   /// Draws the precomputed text on a [canvas] one line at a time in vertical
   /// lines that wrap from left to right.
   void draw(Canvas canvas, Offset offset) {
-    assert(_lines != null);
-    assert(_runs != null);
-
     // translate for the offset
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
@@ -257,8 +245,8 @@ class MongolParagraph {
 /// The only constraint that can be specified is the [height].
 class MongolParagraphConstraints {
   const MongolParagraphConstraints({
-    @required this.height,
-  }) : assert(height != null);
+    required this.height,
+  });
 
   /// The height the paragraph should use when computing the positions of glyphs.
   final double height;
@@ -297,7 +285,7 @@ class MongolParagraphBuilder {
   })  : _paragraphStyle = style,
         _textScaleFactor = textScaleFactor;
 
-  ui.ParagraphStyle _paragraphStyle;
+  ui.ParagraphStyle? _paragraphStyle;
   final double _textScaleFactor;
   final _styleStack = _Stack<TextStyle>();
   final _rawStyledTextRuns = <_RawStyledTextRun>[];
@@ -360,12 +348,12 @@ class MongolParagraphBuilder {
     final length = _rawStyledTextRuns.length;
     var startIndex = 0;
     var endIndex = 0;
-    ui.ParagraphBuilder _builder;
+    ui.ParagraphBuilder? _builder;
     for (var i = 0; i < length; i++) {
       final style = _uiStyleForRun(i);
       final segment = _rawStyledTextRuns[i].text;
       endIndex += segment.text.length;
-      _builder ??= ui.ParagraphBuilder(_paragraphStyle);
+      _builder ??= ui.ParagraphBuilder(_paragraphStyle!);
       _builder.pushStyle(style);
       _builder.addText(_stripNewLineChar(segment.text));
       _builder.pop();
@@ -446,15 +434,21 @@ class LineBreaker implements Iterator<RotatableString> {
 
   final String text;
 
-  CharacterRange _characterIterator;
+  late CharacterRange _characterIterator;
 
-  RotatableString _currentTextRun;
+  RotatableString? _currentTextRun;
 
   @override
-  RotatableString get current => _currentTextRun;
+  RotatableString get current {
+    if (_currentTextRun == null) {
+      throw StateError(
+          'Current is undefined before moveNext is called or after last element.');
+    }
+    return _currentTextRun!;
+  }
 
   bool _atEndOfCharacterRange = false;
-  RotatableString _rotatedCharacterBuffer;
+  RotatableString? _rotatedCharacterBuffer;
 
   @override
   bool moveNext() {
@@ -488,7 +482,7 @@ class LineBreaker implements Iterator<RotatableString> {
       returnValue.write(current);
     }
     _currentTextRun = RotatableString(returnValue.toString(), false);
-    if (_currentTextRun.text.isEmpty) {
+    if (_currentTextRun!.text.isEmpty) {
       return false;
     }
     _atEndOfCharacterRange = true;
@@ -569,7 +563,7 @@ class LineBreaker implements Iterator<RotatableString> {
 // A data object to associate a text run with its style
 class _RawStyledTextRun {
   _RawStyledTextRun(this.style, this.text);
-  final TextStyle style;
+  final TextStyle? style;
   final RotatableString text;
 }
 

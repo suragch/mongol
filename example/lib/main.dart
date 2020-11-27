@@ -9,7 +9,6 @@ import 'demos/text_field_demo.dart';
 import 'demos/text_span_demo.dart';
 
 void main() {
-  //MongolFont.defaultFont = 'MenksoftQagan';
   runApp(DemoApp());
 }
 
@@ -67,9 +66,9 @@ class HomeScreen extends StatelessWidget {
 
 class DemoTile extends StatelessWidget {
   const DemoTile({
-    Key key,
-    @required this.title,
-    @required this.destination,
+    Key? key,
+    required this.title,
+    required this.destination,
   }) : super(key: key);
 
   final String title;

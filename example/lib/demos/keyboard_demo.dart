@@ -18,7 +18,8 @@ class BodyWidget extends StatefulWidget {
 }
 
 class _BodyWidgetState extends State<BodyWidget> {
-  TextEditingController _textEditingController;
+  late TextEditingController _textEditingController;
+
   @override
   void initState() {
     _textEditingController = TextEditingController();
@@ -119,17 +120,16 @@ class _BodyWidgetState extends State<BodyWidget> {
 
 class MongolKeyboard extends StatelessWidget {
   MongolKeyboard({
-    Key key,
+    Key? key,
     this.onTextInput,
     this.onBackspace,
   }) : super(key: key);
 
-  final ValueSetter<String> onTextInput;
-  final VoidCallback onBackspace;
+  final ValueSetter<String>? onTextInput;
+  final VoidCallback? onBackspace;
 
   void textInputHandler(String text) {
-    if (onTextInput == null) return;
-    onTextInput(text);
+    onTextInput?.call(text);
   }
 
   @override
@@ -332,7 +332,7 @@ class MongolKeyboard extends StatelessWidget {
           ),
           BackspaceKey(
             onBackspace: () {
-              onBackspace();
+              onBackspace?.call();
             },
           ),
         ],
@@ -342,16 +342,15 @@ class MongolKeyboard extends StatelessWidget {
 }
 
 class MongolKeyboardKey extends StatelessWidget {
-  final String text;
-
   const MongolKeyboardKey({
-    Key key,
-    this.text,
+    Key? key,
+    required this.text,
     this.onTextInput,
     this.flex = 1,
   }) : super(key: key);
 
-  final ValueSetter<String> onTextInput;
+  final String text;
+  final ValueSetter<String>? onTextInput;
   final int flex;
 
   @override
@@ -364,7 +363,7 @@ class MongolKeyboardKey extends StatelessWidget {
           color: Colors.blue.shade300,
           child: InkWell(
             onTap: () {
-              onTextInput(text);
+              onTextInput?.call(text);
             },
             child: Container(
               child: Center(child: MongolText(text)),
@@ -378,12 +377,12 @@ class MongolKeyboardKey extends StatelessWidget {
 
 class BackspaceKey extends StatelessWidget {
   const BackspaceKey({
-    Key key,
+    Key? key,
     this.onBackspace,
     this.flex = 1,
   }) : super(key: key);
 
-  final VoidCallback onBackspace;
+  final VoidCallback? onBackspace;
   final int flex;
 
   @override
@@ -396,7 +395,7 @@ class BackspaceKey extends StatelessWidget {
           color: Colors.blue.shade300,
           child: InkWell(
             onTap: () {
-              onBackspace();
+              onBackspace?.call();
             },
             child: Container(
               child: Center(

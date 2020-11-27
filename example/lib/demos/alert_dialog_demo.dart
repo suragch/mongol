@@ -37,7 +37,7 @@ void showAlertDialog(BuildContext context) {
   );
 
   // show the dialog
-  
+
   showDialog(
     context: context,
     builder: (BuildContext context) {

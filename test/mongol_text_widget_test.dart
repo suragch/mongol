@@ -31,11 +31,11 @@ void main() {
 
     final text = tester.firstWidget(find.byType(MongolText)) as MongolText;
     expect(text, isNotNull);
-    expect(text.style.fontFamily, equals('Some Font'));
+    expect(text.style!.fontFamily, equals('Some Font'));
 
     final richText =
         tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(richText, isNotNull);
-    expect(richText.text.style.fontFamily, equals('Some Font'));
+    expect(richText.text.style!.fontFamily, equals('Some Font'));
   });
 }

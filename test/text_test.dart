@@ -4,8 +4,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// @dart = 2.8
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -117,7 +115,7 @@ void main() {
     final text =
         tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
-    expect(text.text.style.fontSize, 20.0);
+    expect(text.text.style!.fontSize, 20.0);
   });
 
   // TODO the following features and tests need to be added:

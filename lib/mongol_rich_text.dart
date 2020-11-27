@@ -18,12 +18,10 @@ class MongolRichText extends LeafRenderObjectWidget {
   ///
   /// The [text] argument must not be null.
   const MongolRichText({
-    Key key,
-    @required this.text,
+    Key? key,
+    required this.text,
     this.textScaleFactor = 1.0,
-  })  : assert(text != null),
-        assert(textScaleFactor != null),
-        super(key: key);
+  }) : super(key: key);
 
   /// The text to display in this widget.
   final TextSpan text;
@@ -71,9 +69,7 @@ class MongolRenderParagraph extends RenderBox
   MongolRenderParagraph(
     TextSpan text, {
     double textScaleFactor = 1.0,
-  })  : assert(text != null),
-        assert(textScaleFactor != null),
-        _textPainter = MongolTextPainter(
+  }) : _textPainter = MongolTextPainter(
           text: text,
           textScaleFactor: textScaleFactor,
         );
@@ -88,9 +84,9 @@ class MongolRenderParagraph extends RenderBox
   final MongolTextPainter _textPainter;
 
   /// The text to display
-  TextSpan get text => _textPainter.text;
+  TextSpan get text => _textPainter.text!;
   set text(TextSpan value) {
-    switch (_textPainter.text.compareTo(value)) {
+    switch (_textPainter.text!.compareTo(value)) {
       case RenderComparison.identical:
       case RenderComparison.metadata:
         return;
@@ -111,7 +107,6 @@ class MongolRenderParagraph extends RenderBox
   /// the specified font size.
   double get textScaleFactor => _textPainter.textScaleFactor;
   set textScaleFactor(double value) {
-    assert(value != null);
     if (_textPainter.textScaleFactor == value) return;
     _textPainter.textScaleFactor = value;
     markNeedsLayout();
@@ -164,7 +159,6 @@ class MongolRenderParagraph extends RenderBox
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     assert(!debugNeedsLayout);
-    assert(constraints != null);
     assert(constraints.debugAssertIsValid());
     _layoutTextWithConstraints(constraints);
     // Since the text is rotated it doesn't make sense to use the rotated
@@ -183,12 +177,12 @@ class MongolRenderParagraph extends RenderBox
     _layoutTextWithConstraints(constraints);
     final offset = entry.localPosition;
     final position = _textPainter.getPositionForOffset(offset);
-    final span = _textPainter.text.getSpanForPosition(position);
+    final span = _textPainter.text!.getSpanForPosition(position);
     if (span == null) {
       return;
     }
     if (span is TextSpan) {
-      span.recognizer?.addPointer(event as PointerDownEvent);
+      span.recognizer?.addPointer(event);
     }
   }
 

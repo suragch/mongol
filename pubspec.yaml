@@ -1,18 +1,17 @@
 name: mongol
 description: This package provides Flutter widgets to display vertical Mongolian.
-version: 0.7.1
+version: 0.8.0-nullsafety.0
 homepage: https://github.com/suragch/mongol
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=2.12.0-29.10.beta <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   characters: ^1.0.0
-  meta: ^1.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  pedantic: ^1.9.0
+  pedantic: ^1.10.0-nullsafety.3

@@ -52,7 +52,7 @@ class MongolText extends StatelessWidget {
   /// The [data] parameter must not be null.
   const MongolText(
     this.data, {
-    Key key,
+    Key? key,
     this.style,
     this.textScaleFactor,
     this.semanticsLabel,
@@ -70,7 +70,7 @@ class MongolText extends StatelessWidget {
   /// See [MongolRichText] which provides a lower-level way to draw text.
   const MongolText.rich(
     this.textSpan, {
-    Key key,
+    Key? key,
     this.style,
     this.textScaleFactor,
     this.semanticsLabel,
@@ -82,19 +82,19 @@ class MongolText extends StatelessWidget {
         super(key: key);
 
   /// This is the text that the MongolText widget will display.
-  final String data;
+  final String? data;
 
   /// The text to display as a [TextSpan].
   ///
   /// This will be null if [data] is provided instead.
-  final TextSpan textSpan;
+  final TextSpan? textSpan;
 
   /// This is the style to use for the whole text string. If null a default
   /// style will be used.
-  final TextStyle style;
+  final TextStyle? style;
 
   /// Font pixels per logical pixel
-  final double textScaleFactor;
+  final double? textScaleFactor;
 
   /// An alternative semantics label for this text.
   ///
@@ -108,18 +108,17 @@ class MongolText extends StatelessWidget {
   /// ```dart
   /// MongolText(r'$$', semanticsLabel: 'Double dollars')
   /// ```
-  final String semanticsLabel;
+  final String? semanticsLabel;
 
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = DefaultTextStyle.of(context);
     var effectiveTextStyle = style;
-    if (style == null || style.inherit) {
-      //effectiveTextStyle = _defaultMongolTextStyle.merge(style);
+    if (style == null || style!.inherit) {
       effectiveTextStyle = defaultTextStyle.style.merge(effectiveTextStyle);
     }
     if (MediaQuery.boldTextOverride(context)) {
-      effectiveTextStyle = effectiveTextStyle
+      effectiveTextStyle = effectiveTextStyle!
           .merge(const TextStyle(fontWeight: FontWeight.bold));
     }
     Widget result = MongolRichText(
@@ -127,7 +126,7 @@ class MongolText extends StatelessWidget {
       text: TextSpan(
         style: effectiveTextStyle,
         text: data,
-        children: textSpan != null ? <TextSpan>[textSpan] : null,
+        children: textSpan != null ? <TextSpan>[textSpan!] : null,
       ),
     );
     if (semanticsLabel != null) {
@@ -147,7 +146,7 @@ class MongolText extends StatelessWidget {
     super.debugFillProperties(properties);
     properties.add(StringProperty('data', data, showName: false));
     if (textSpan != null) {
-      properties.add(textSpan.toDiagnosticsNode(
+      properties.add(textSpan!.toDiagnosticsNode(
           name: 'textSpan', style: DiagnosticsTreeStyle.transition));
     }
     style?.debugFillProperties(properties);

@@ -33,10 +33,9 @@ class MongolTextPainter {
   /// The `text` argument is optional but [text] must be non-null before
   /// calling [layout].
   MongolTextPainter({
-    TextSpan text,
+    TextSpan? text,
     double textScaleFactor = 1.0,
   })  : assert(text == null || text.debugAssertIsValid()),
-        assert(textScaleFactor != null),
         _text = text,
         _textScaleFactor = textScaleFactor;
 
@@ -51,7 +50,7 @@ class MongolTextPainter {
     _needsLayout = true;
   }
 
-  MongolParagraph _paragraph;
+  MongolParagraph? _paragraph;
   bool _needsLayout = true;
 
   /// The (potentially styled) text to paint.
@@ -65,9 +64,9 @@ class MongolTextPainter {
   /// [TextSpan.toPlainText] to get the full contents of all nodes in the tree.
   /// [TextSpan.text] will only provide the contents of the first node in the
   /// tree.
-  TextSpan get text => _text;
-  TextSpan _text;
-  set text(TextSpan value) {
+  TextSpan? get text => _text;
+  TextSpan? _text;
+  set text(TextSpan? value) {
     assert(value == null || value.debugAssertIsValid());
     if (_text == value) return;
     _text = value;
@@ -84,14 +83,13 @@ class MongolTextPainter {
   double get textScaleFactor => _textScaleFactor;
   double _textScaleFactor;
   set textScaleFactor(double value) {
-    assert(value != null);
     if (_textScaleFactor == value) return;
     _textScaleFactor = value;
     markNeedsLayout();
   }
 
   ui.ParagraphStyle _createParagraphStyle() {
-    return _text.style?.getParagraphStyle(
+    return _text!.style?.getParagraphStyle(
           textAlign: TextAlign.start,
           textDirection: TextDirection.ltr,
           textScaleFactor: textScaleFactor,
@@ -119,7 +117,7 @@ class MongolTextPainter {
   /// Valid only after [layout] has been called.
   double get minIntrinsicHeight {
     assert(!_needsLayout);
-    return _applyFloatingPointHack(_paragraph.minIntrinsicHeight);
+    return _applyFloatingPointHack(_paragraph!.minIntrinsicHeight);
   }
 
   /// The height at which increasing the height of the text no longer decreases
@@ -128,7 +126,7 @@ class MongolTextPainter {
   /// Valid only after [layout] has been called.
   double get maxIntrinsicHeight {
     assert(!_needsLayout);
-    return _applyFloatingPointHack(_paragraph.maxIntrinsicHeight);
+    return _applyFloatingPointHack(_paragraph!.maxIntrinsicHeight);
   }
 
   /// The horizontal space required to paint this text.
@@ -136,7 +134,7 @@ class MongolTextPainter {
   /// Valid only after [layout] has been called.
   double get width {
     assert(!_needsLayout);
-    return _applyFloatingPointHack(_paragraph.width);
+    return _applyFloatingPointHack(_paragraph!.width);
   }
 
   /// The vertical space required to paint this text.
@@ -144,7 +142,7 @@ class MongolTextPainter {
   /// Valid only after [layout] has been called.
   double get height {
     assert(!_needsLayout);
-    return _applyFloatingPointHack(_paragraph.height);
+    return _applyFloatingPointHack(_paragraph!.height);
   }
 
   /// The amount of space required to paint this text.
@@ -155,8 +153,8 @@ class MongolTextPainter {
     return Size(width, height);
   }
 
-  double _lastMinHeight;
-  double _lastMaxHeight;
+  double? _lastMinHeight;
+  double? _lastMaxHeight;
 
   /// Computes the visual position of the glyphs for painting the text.
   ///
@@ -176,17 +174,16 @@ class MongolTextPainter {
         _createParagraphStyle(),
         textScaleFactor: _textScaleFactor,
       );
-      _addStyleToText(builder, _text);
+      _addStyleToText(builder, _text!);
       _paragraph = builder.build();
     }
     _lastMinHeight = minHeight;
     _lastMaxHeight = maxHeight;
-    _paragraph.layout(MongolParagraphConstraints(height: maxHeight));
+    _paragraph!.layout(MongolParagraphConstraints(height: maxHeight));
     if (minHeight != maxHeight) {
-      final newHeight =
-          maxIntrinsicHeight.clamp(minHeight, maxHeight) as double;
+      final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight);
       if (newHeight != height) {
-        _paragraph.layout(MongolParagraphConstraints(height: newHeight));
+        _paragraph!.layout(MongolParagraphConstraints(height: newHeight));
       }
     }
   }
@@ -199,16 +196,15 @@ class MongolTextPainter {
       throw UnimplementedError(
           'Inline span support has not yet been implemented for MongolTextPainter');
     }
-    final textSpan = inlineSpan as TextSpan;
+    final textSpan = inlineSpan;
     final style = textSpan.style;
     final text = textSpan.text;
     final children = textSpan.children;
     final hasStyle = style != null;
-    if (hasStyle) builder.pushStyle(style);
+    if (hasStyle) builder.pushStyle(style!);
     if (text != null) builder.addText(text);
     if (children != null) {
       for (final child in children) {
-        assert(child != null);
         _addStyleToText(builder, child);
       }
     }
@@ -237,12 +233,12 @@ class MongolTextPainter {
       }
       return true;
     }());
-    _paragraph.draw(canvas, offset);
+    _paragraph!.draw(canvas, offset);
   }
 
   /// Returns the position within the text for the given pixel offset.
   TextPosition getPositionForOffset(Offset offset) {
     assert(!_needsLayout);
-    return _paragraph.getPositionForOffset(offset);
+    return _paragraph!.getPositionForOffset(offset);
   }
 }

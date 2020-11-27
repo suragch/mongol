@@ -11,7 +11,7 @@ import 'mongol_button_bar.dart';
 /// This class was adapted from Flutter [Dialog]
 class MongolDialog extends StatelessWidget {
   const MongolDialog({
-    Key key,
+    Key? key,
     this.backgroundColor,
     this.elevation,
     this.insetAnimationDuration = const Duration(milliseconds: 100),
@@ -20,12 +20,12 @@ class MongolDialog extends StatelessWidget {
     this.child,
   }) : super(key: key);
 
-  final Color backgroundColor;
-  final double elevation;
+  final Color? backgroundColor;
+  final double? elevation;
   final Duration insetAnimationDuration;
   final Curve insetAnimationCurve;
-  final ShapeBorder shape;
-  final Widget child;
+  final ShapeBorder? shape;
+  final Widget? child;
 
   static const RoundedRectangleBorder _defaultDialogShape =
       RoundedRectangleBorder(
@@ -69,7 +69,7 @@ class MongolDialog extends StatelessWidget {
 /// This class was adapted from the Flutter [AlertDialog] class
 class MongolAlertDialog extends StatelessWidget {
   const MongolAlertDialog({
-    Key key,
+    Key? key,
     this.title,
     this.titlePadding,
     this.titleTextStyle,
@@ -83,31 +83,30 @@ class MongolAlertDialog extends StatelessWidget {
     this.backgroundColor,
     this.elevation,
     this.shape,
-  })  : assert(contentPadding != null),
-        super(key: key);
+  }) : super(key: key);
 
-  final Widget title;
-  final EdgeInsetsGeometry titlePadding;
-  final TextStyle titleTextStyle;
-  final Widget content;
+  final Widget? title;
+  final EdgeInsetsGeometry? titlePadding;
+  final TextStyle? titleTextStyle;
+  final Widget? content;
   final EdgeInsetsGeometry contentPadding;
-  final TextStyle contentTextStyle;
-  final List<Widget> actions;
+  final TextStyle? contentTextStyle;
+  final List<Widget>? actions;
   final EdgeInsetsGeometry actionsPadding;
-  final VerticalDirection actionsOverflowDirection;
-  final EdgeInsetsGeometry buttonPadding;
-  final Color backgroundColor;
-  final double elevation;
-  final ShapeBorder shape;
+  final VerticalDirection? actionsOverflowDirection;
+  final EdgeInsetsGeometry? buttonPadding;
+  final Color? backgroundColor;
+  final double? elevation;
+  final ShapeBorder? shape;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dialogTheme = DialogTheme.of(context);
 
-    Widget titleWidget;
-    Widget contentWidget;
-    Widget actionsWidget;
+    Widget? titleWidget;
+    Widget? contentWidget;
+    Widget? actionsWidget;
     if (title != null) {
       titleWidget = Padding(
         padding: titlePadding ??
@@ -115,7 +114,7 @@ class MongolAlertDialog extends StatelessWidget {
         child: DefaultTextStyle(
           style: titleTextStyle ??
               dialogTheme.titleTextStyle ??
-              theme.textTheme.headline6,
+              theme.textTheme.headline6!,
           child: Semantics(
             child: title,
             namesRoute: true,
@@ -131,8 +130,8 @@ class MongolAlertDialog extends StatelessWidget {
         child: DefaultTextStyle(
           style: contentTextStyle ??
               dialogTheme.contentTextStyle ??
-              theme.textTheme.subtitle1,
-          child: content,
+              theme.textTheme.subtitle1!,
+          child: content!,
         ),
       );
     }
@@ -142,13 +141,12 @@ class MongolAlertDialog extends StatelessWidget {
         padding: actionsPadding,
         child: MongolButtonBar(
           buttonPadding: buttonPadding,
-          children: actions,
+          children: actions!,
         ),
       );
     }
 
     List<Widget> rowChildren;
-
     rowChildren = <Widget>[
       if (title != null || content != null)
         Flexible(
@@ -156,12 +154,12 @@ class MongolAlertDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
-              if (title != null) titleWidget,
-              if (content != null) contentWidget,
+              if (title != null) titleWidget!,
+              if (content != null) contentWidget!,
             ],
           ),
         ),
-      if (actions != null) actionsWidget,
+      if (actions != null) actionsWidget!,
     ];
 
     Widget dialogChild = IntrinsicHeight(

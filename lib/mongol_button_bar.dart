@@ -11,7 +11,7 @@ import 'package:flutter/rendering.dart';
 
 class MongolButtonBar extends StatelessWidget {
   const MongolButtonBar({
-    Key key,
+    Key? key,
     this.alignment,
     this.mainAxisSize,
     this.buttonTextTheme,
@@ -28,23 +28,23 @@ class MongolButtonBar extends StatelessWidget {
   ///
   /// If null then it will use [ButtonBarTheme.alignment]. If that is null,
   /// it will default to [MainAxisAlignment.end].
-  final MainAxisAlignment alignment;
+  final MainAxisAlignment? alignment;
 
   /// How much horizontal space is available. See [Column.mainAxisSize].
   ///
   /// If null then it will use the surrounding [ButtonBarTheme.mainAxisSize].
   /// If that is null, it will default to [MainAxisSize.max].
-  final MainAxisSize mainAxisSize;
+  final MainAxisSize? mainAxisSize;
 
-  final ButtonTextTheme buttonTextTheme;
+  final ButtonTextTheme? buttonTextTheme;
 
-  final double buttonMinWidth;
+  final double? buttonMinWidth;
 
-  final double buttonHeight;
+  final double? buttonHeight;
 
-  final EdgeInsetsGeometry buttonPadding;
+  final EdgeInsetsGeometry? buttonPadding;
 
-  final ButtonBarLayoutBehavior layoutBehavior;
+  final ButtonBarLayoutBehavior? layoutBehavior;
 
   /// The buttons to arrange horizontally.
   ///
@@ -103,8 +103,6 @@ class MongolButtonBar extends StatelessWidget {
           child: child,
         );
     }
-    assert(false);
-    return null;
   }
 }
 
@@ -112,7 +110,7 @@ class _ButtonBarColumn extends Flex {
   /// Creates a button bar that attempts to display in a column, but displays in
   /// a row if there is insufficient vertical space.
   _ButtonBarColumn({
-    List<Widget> children,
+    required List<Widget> children,
     Axis direction = Axis.vertical,
     MainAxisSize mainAxisSize = MainAxisSize.max,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
@@ -148,7 +146,7 @@ class _ButtonBarColumn extends Flex {
 
 class _RenderButtonBarColumn extends RenderFlex {
   _RenderButtonBarColumn({
-    List<RenderBox> children,
+    List<RenderBox>? children,
     Axis direction = Axis.vertical,
     MainAxisSize mainAxisSize = MainAxisSize.max,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
@@ -180,7 +178,7 @@ class _RenderButtonBarColumn extends RenderFlex {
       super.performLayout();
     } else {
       final childConstraints = constraints.copyWith(minHeight: 0.0);
-      RenderBox child;
+      RenderBox? child;
       var currentWidth = 0.0;
       child = firstChild;
 

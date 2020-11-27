@@ -1,3 +1,7 @@
+## [0.8.0-nullsafety.0] - 2020.11.27
+
+- Migrated to sound null safety
+
 ## [0.7.1] - 2020.10.26
 
 - Lowered the minimum version number requirement for the `meta` dependency.
