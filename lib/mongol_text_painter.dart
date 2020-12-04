@@ -4,11 +4,28 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:math';
 import 'dart:ui' as ui show ParagraphStyle;
 
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol_paragraph.dart';
+
+/// This is used to cache and pass the computed metrics regarding the
+/// caret's size and position. This is preferred due to the expensive
+/// nature of the calculation.
+class _CaretMetrics {
+  const _CaretMetrics({required this.offset, this.fullWidth});
+
+  /// The offset of the top left corner of the caret from the top left
+  /// corner of the paragraph.
+  final Offset offset;
+
+  /// The full width of the glyph at the caret position.
+  ///
+  /// Orientation is a vertical paragraph with horizontal caret.
+  final double? fullWidth;
+}
 
 /// An object that paints a Mongolian [TextSpan] tree into a [Canvas].
 ///
@@ -34,9 +51,11 @@ class MongolTextPainter {
   /// calling [layout].
   MongolTextPainter({
     TextSpan? text,
+    TextAlign textAlign = TextAlign.start,
     double textScaleFactor = 1.0,
   })  : assert(text == null || text.debugAssertIsValid()),
         _text = text,
+        _textAlign = textAlign,
         _textScaleFactor = textScaleFactor;
 
   /// Marks this text painter's layout information as dirty and removes cached
@@ -48,6 +67,8 @@ class MongolTextPainter {
   void markNeedsLayout() {
     _paragraph = null;
     _needsLayout = true;
+    _previousCaretPosition = null;
+    _previousCaretPrototype = null;
   }
 
   MongolParagraph? _paragraph;
@@ -74,6 +95,21 @@ class MongolTextPainter {
     _needsLayout = true;
   }
 
+  /// How the text should be aligned vertically.
+  ///
+  /// After this is set, you must call [layout] before the next call to [paint].
+  ///
+  /// The [textAlign] property defaults to [TextAlign.start].
+  TextAlign get textAlign => _textAlign;
+  TextAlign _textAlign;
+  set textAlign(TextAlign value) {
+    if (_textAlign == value) {
+      return;
+    }
+    _textAlign = value;
+    markNeedsLayout();
+  }
+
   /// The number of font pixels for each logical pixel.
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
@@ -90,7 +126,7 @@ class MongolTextPainter {
 
   ui.ParagraphStyle _createParagraphStyle() {
     return _text!.style?.getParagraphStyle(
-          textAlign: TextAlign.start,
+          textAlign: textAlign,
           textDirection: TextDirection.ltr,
           textScaleFactor: textScaleFactor,
           maxLines: null,
@@ -99,7 +135,7 @@ class MongolTextPainter {
           strutStyle: null,
         ) ??
         ui.ParagraphStyle(
-          textAlign: TextAlign.start,
+          textAlign: textAlign,
           textDirection: TextDirection.ltr,
           maxLines: null,
           ellipsis: null,
@@ -179,6 +215,9 @@ class MongolTextPainter {
     }
     _lastMinHeight = minHeight;
     _lastMaxHeight = maxHeight;
+    // A change in layout invalidates the cached caret metrics as well.
+    _previousCaretPosition = null;
+    _previousCaretPrototype = null;
     _paragraph!.layout(MongolParagraphConstraints(height: maxHeight));
     if (minHeight != maxHeight) {
       final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight);
@@ -234,6 +273,187 @@ class MongolTextPainter {
       return true;
     }());
     _paragraph!.draw(canvas, offset);
+  }
+
+  // Returns true iff the given value is a valid UTF-16 surrogate. The value
+  // must be a UTF-16 code unit, meaning it must be in the range 0x0000-0xFFFF.
+  //
+  // See also:
+  //   * https://en.wikipedia.org/wiki/UTF-16#Code_points_from_U+010000_to_U+10FFFF
+  static bool _isUtf16Surrogate(int value) {
+    return value & 0xF800 == 0xD800;
+  }
+
+  // Checks if the glyph is either [Unicode.RLM] or [Unicode.LRM]. These values take
+  // up zero space and do not have valid bounding boxes around them.
+  //
+  // We do not directly use the [Unicode] constants since they are strings.
+  static bool _isUnicodeDirectionality(int value) {
+    return value == 0x200F || value == 0x200E;
+  }
+
+  // Unicode value for a zero width joiner character.
+  static const int _zwjUtf16 = 0x200d;
+
+  // Get the Rect of the cursor (in logical pixels) based off the near edge
+  // of the character upstream from the given string offset.
+  Rect? _getRectFromUpstream(int offset, Rect caretPrototype) {
+    final flattenedText = _text!.toPlainText(includePlaceholders: false);
+    final prevCodeUnit = _text!.codeUnitAt(max(0, offset - 1));
+    if (prevCodeUnit == null) {
+      return null;
+    }
+
+    // Check for multi-code-unit glyphs such as emojis or zero width joiner.
+    final needsSearch = _isUtf16Surrogate(prevCodeUnit) ||
+        _text!.codeUnitAt(offset) == _zwjUtf16 ||
+        _isUnicodeDirectionality(prevCodeUnit);
+    var graphemeClusterLength = needsSearch ? 2 : 1;
+    var boxes = <TextBox>[];
+    while (boxes.isEmpty) {
+      final prevRuneOffset = offset - graphemeClusterLength;
+      boxes = _paragraph!.getBoxesForRange(prevRuneOffset, offset);
+      // When the range does not include a full cluster, no boxes will be returned.
+      if (boxes.isEmpty) {
+        // When we are at the beginning of the line, a non-surrogate position will
+        // return empty boxes. We break and try from downstream instead.
+        if (!needsSearch) {
+          break; // Only perform one iteration if no search is required.
+        }
+        if (prevRuneOffset < -flattenedText.length) {
+          break; // Stop iterating when beyond the max length of the text.
+        }
+        // Multiply by two to log(n) time cover the entire text span. This allows
+        // faster discovery of very long clusters and reduces the possibility
+        // of certain large clusters taking much longer than others, which can
+        // cause jank.
+        graphemeClusterLength *= 2;
+        continue;
+      }
+      final box = boxes.first;
+
+      // If the upstream character is a newline, cursor is at start of next line
+      const NEWLINE_CODE_UNIT = 10;
+      if (prevCodeUnit == NEWLINE_CODE_UNIT) {
+        return Rect.fromLTRB(box.right, _emptyOffset.dy,
+            box.right + box.right - box.left, _emptyOffset.dy);
+      }
+
+      final dy = box.bottom;
+      return Rect.fromLTRB(box.left, min(dy, _paragraph!.height), box.right,
+          min(dy, _paragraph!.height));
+    }
+    return null;
+  }
+
+  // Get the Rect of the cursor (in logical pixels) based off the near edge
+  // of the character downstream from the given string offset.
+  Rect? _getRectFromDownstream(int offset, Rect caretPrototype) {
+    final flattenedText = _text!.toPlainText(includePlaceholders: false);
+    // We cap the offset at the final index of the _text.
+    final nextCodeUnit =
+        _text!.codeUnitAt(min(offset, flattenedText.length - 1));
+    if (nextCodeUnit == null) return null;
+    // Check for multi-code-unit glyphs such as emojis or zero width joiner
+    final needsSearch = _isUtf16Surrogate(nextCodeUnit) ||
+        nextCodeUnit == _zwjUtf16 ||
+        _isUnicodeDirectionality(nextCodeUnit);
+    var graphemeClusterLength = needsSearch ? 2 : 1;
+    var boxes = <TextBox>[];
+    while (boxes.isEmpty) {
+      final nextRuneOffset = offset + graphemeClusterLength;
+      boxes = _paragraph!.getBoxesForRange(offset, nextRuneOffset);
+      // When the range does not include a full cluster, no boxes will be returned.
+      if (boxes.isEmpty) {
+        // When we are at the end of the line, a non-surrogate position will
+        // return empty boxes. We break and try from upstream instead.
+        if (!needsSearch) {
+          break; // Only perform one iteration if no search is required.
+        }
+        if (nextRuneOffset >= flattenedText.length << 1) {
+          break; // Stop iterating when beyond the max length of the text.
+        }
+        // Multiply by two to log(n) time cover the entire text span. This allows
+        // faster discovery of very long clusters and reduces the possibility
+        // of certain large clusters taking much longer than others, which can
+        // cause jank.
+        graphemeClusterLength *= 2;
+        continue;
+      }
+      final box = boxes.last;
+      final dy = box.top;
+      return Rect.fromLTRB(box.left, min(dy, _paragraph!.height), box.right,
+          min(dy, _paragraph!.height));
+    }
+    return null;
+  }
+
+  Offset get _emptyOffset {
+    assert(!_needsLayout); // implies textDirection is non-null
+    switch (textAlign) {
+      case TextAlign.start:
+      case TextAlign.justify:
+      case TextAlign.left:
+        return Offset.zero;
+      case TextAlign.end:
+      case TextAlign.right:
+        return Offset(0.0, height);
+      case TextAlign.center:
+        return Offset(0.0, height / 2.0);
+    }
+  }
+
+  /// Returns the offset at which to paint the caret.
+  ///
+  /// Valid only after [layout] has been called.
+  Offset getOffsetForCaret(TextPosition position, Rect caretPrototype) {
+    _computeCaretMetrics(position, caretPrototype);
+    return _caretMetrics.offset;
+  }
+
+  // Cached caret metrics. This allows multiple invokes of [getOffsetForCaret] and
+  // [getFullHeightForCaret] in a row without performing redundant and expensive
+  // get rect calls to the paragraph.
+  late _CaretMetrics _caretMetrics;
+
+  // Holds the TextPosition and caretPrototype the last caret metrics were
+  // computed with. When new values are passed in, we recompute the caret metrics,
+  // only as necessary.
+  TextPosition? _previousCaretPosition;
+  Rect? _previousCaretPrototype;
+
+  // Checks if the [position] and [caretPrototype] have changed from the cached
+  // version and recomputes the metrics required to position the caret.
+  void _computeCaretMetrics(TextPosition position, Rect caretPrototype) {
+    assert(!_needsLayout);
+    if (position == _previousCaretPosition &&
+        caretPrototype == _previousCaretPrototype) {
+      return;
+    }
+    final offset = position.offset;
+    Rect? rect;
+    switch (position.affinity) {
+      case TextAffinity.upstream:
+        {
+          rect = _getRectFromUpstream(offset, caretPrototype) ??
+              _getRectFromDownstream(offset, caretPrototype);
+          break;
+        }
+      case TextAffinity.downstream:
+        {
+          rect = _getRectFromDownstream(offset, caretPrototype) ??
+              _getRectFromUpstream(offset, caretPrototype);
+          break;
+        }
+    }
+    _caretMetrics = _CaretMetrics(
+      offset: rect != null ? Offset(rect.left, rect.top) : _emptyOffset,
+      fullWidth: rect != null ? rect.right - rect.left : null,
+    );
+
+    // Cache the input parameters to prevent repeat work later.
+    _previousCaretPosition = position;
+    _previousCaretPrototype = caretPrototype;
   }
 
   /// Returns the position within the text for the given pixel offset.

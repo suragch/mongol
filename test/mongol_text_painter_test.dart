@@ -4,6 +4,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:ui' as ui;
+
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -235,5 +237,34 @@ void main() {
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 23);
     expect(position.affinity, TextAffinity.upstream);
+  });
+
+  // Tests from
+  // https://github.com/flutter/flutter/blob/e3c441e0fdc299737abf0d763cad8bab71892bf7/packages/flutter/test/painting/text_painter_test.dart
+
+  test('MongolTextPainter caret test', () {
+    final painter = MongolTextPainter();
+
+    final text = 'A';
+    painter.text = TextSpan(text: text);
+    painter.layout();
+
+    final caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 0),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 0.0);
+    // caretOffset = painter.getOffsetForCaret(
+    //     ui.TextPosition(offset: text.length), ui.Rect.zero);
+    // expect(caretOffset.dx, painter.width);
+
+    // Check that getOffsetForCaret handles a character that is encoded as a
+    // surrogate pair.
+    // text = 'A\u{1F600}';
+    // painter.text = TextSpan(text: text);
+    // painter.layout();
+    // caretOffset = painter.getOffsetForCaret(
+    //     ui.TextPosition(offset: text.length), ui.Rect.zero);
+    // expect(caretOffset.dx, painter.width);
   });
 }

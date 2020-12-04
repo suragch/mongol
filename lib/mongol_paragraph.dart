@@ -236,6 +236,42 @@ class MongolParagraph {
 
     canvas.restore();
   }
+
+  /// Returns a list of text boxes that enclose the given text range.
+  ///
+  /// Coordinates of the TextBox are relative to the upper-left corner of the 
+  /// paragraph, where positive y values indicate down. Orientation is as 
+  /// vertical Mongolian text with left to right line wrapping.
+  List<ui.TextBox> getBoxesForRange(int start, int end) {
+    final boxes = <ui.TextBox>[];
+    var leftEdgeAfterRotation = 0.0;
+    for (var line in _lines) {
+      final indexAtBeginningOfLine = _runs[line.textRunStart].start;
+      if (start < indexAtBeginningOfLine) {
+        continue;
+      }
+
+      // Rotate the line and add TextBox
+      final top = line.bounds.left;
+      final right = leftEdgeAfterRotation + line.bounds.height;
+      final bottom = line.bounds.right;
+      final box = ui.TextBox.fromLTRBD(
+        leftEdgeAfterRotation,
+        right,
+        top,
+        bottom,
+        TextDirection.ltr,
+      );
+      boxes.add(box);
+
+
+      final indexAtEndOfLine = _runs[line.textRunEnd - 1].end;
+      if (end <= indexAtEndOfLine) {
+        break;
+      }
+    }
+    return boxes;
+  }
 }
 
 /// Layout constraints for [MongolParagraph] objects.
