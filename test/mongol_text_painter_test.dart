@@ -245,26 +245,143 @@ void main() {
   test('MongolTextPainter caret test', () {
     final painter = MongolTextPainter();
 
-    final text = 'A';
+    var text = 'A';
     painter.text = TextSpan(text: text);
     painter.layout();
 
-    final caretOffset = painter.getOffsetForCaret(
+    var caretOffset = painter.getOffsetForCaret(
       const ui.TextPosition(offset: 0),
       ui.Rect.zero,
     );
     expect(caretOffset.dy, 0.0);
-    // caretOffset = painter.getOffsetForCaret(
-    //     ui.TextPosition(offset: text.length), ui.Rect.zero);
-    // expect(caretOffset.dx, painter.width);
 
-    // Check that getOffsetForCaret handles a character that is encoded as a
-    // surrogate pair.
+    caretOffset = painter.getOffsetForCaret(
+      ui.TextPosition(offset: -1),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 0.0);
+
+    caretOffset = painter.getOffsetForCaret(
+      ui.TextPosition(offset: 2),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 0.0);
+
+    caretOffset = painter.getOffsetForCaret(
+      ui.TextPosition(offset: text.length),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, painter.height);
+
+    // // Check that getOffsetForCaret handles a character that is encoded as a
+    // // surrogate pair.
     // text = 'A\u{1F600}';
     // painter.text = TextSpan(text: text);
     // painter.layout();
+
     // caretOffset = painter.getOffsetForCaret(
-    //     ui.TextPosition(offset: text.length), ui.Rect.zero);
-    // expect(caretOffset.dx, painter.width);
+    //   ui.TextPosition(offset: text.length),
+    //   ui.Rect.zero,
+    // );
+    // expect(caretOffset.dy, painter.height);
+  });
+
+  test('TextPainter multiple characters single word', () {
+    final painter = MongolTextPainter();
+
+    var children = <TextSpan>[
+      const TextSpan(text: 'B'),
+      const TextSpan(text: 'C'),
+    ];
+    painter.text = TextSpan(text: null, children: children);
+    painter.layout();
+
+    var caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 0),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 0);
+    caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 1),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, painter.height / 2);
+    caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 2),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, painter.height);
+  });
+
+  test('TextPainter multiple words single line', () {
+    final painter = MongolTextPainter();
+
+    var children = <TextSpan>[
+      const TextSpan(text: 'BBB'),
+      const TextSpan(text: ' '),
+      const TextSpan(text: 'CCC'),
+    ];
+    painter.text = TextSpan(text: null, children: children);
+    painter.layout();
+
+    // caret at start
+    var caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 0),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 0);
+
+    // caret in middle of first word
+    caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 1),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 14.0);
+
+    // caretOffset = painter.getOffsetForCaret(
+    //   const ui.TextPosition(offset: 2),
+    //   ui.Rect.zero,
+    // );
+    // expect(caretOffset.dy, painter.height);
+
+
+  });
+
+  test('TextPainter null text test', () {
+    final painter = MongolTextPainter();
+
+    var children = <TextSpan>[
+      const TextSpan(text: 'B'),
+      const TextSpan(text: 'C'),
+    ];
+    painter.text = TextSpan(text: null, children: children);
+    painter.layout();
+
+    var caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 0),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 0);
+    caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 1),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, painter.height / 2);
+    caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 2),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, painter.height);
+
+    // children = <TextSpan>[];
+    // painter.text = TextSpan(text: null, children: children);
+    // painter.layout();
+
+    // caretOffset = painter.getOffsetForCaret(
+    //     const ui.TextPosition(offset: 0), ui.Rect.zero);
+    // expect(caretOffset.dx, 0);
+    // caretOffset = painter.getOffsetForCaret(
+    //     const ui.TextPosition(offset: 1), ui.Rect.zero);
+    // expect(caretOffset.dx, 0);
   });
 }

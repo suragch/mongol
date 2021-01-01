@@ -363,7 +363,8 @@ class MongolTextPainter {
     while (boxes.isEmpty) {
       final nextRuneOffset = offset + graphemeClusterLength;
       boxes = _paragraph!.getBoxesForRange(offset, nextRuneOffset);
-      // When the range does not include a full cluster, no boxes will be returned.
+      // When the range does not include a full grapheme cluster, no boxes will 
+      // be returned.
       if (boxes.isEmpty) {
         // When we are at the end of the line, a non-surrogate position will
         // return empty boxes. We break and try from upstream instead.

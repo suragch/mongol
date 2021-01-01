@@ -237,40 +237,126 @@ class MongolParagraph {
     canvas.restore();
   }
 
+  ui.TextBox _rotateClockwise(TextBox rect) {
+    final left = rect.top;
+    final top = rect.left;
+    final right = rect.bottom;
+    final bottom = rect.right;
+    return ui.TextBox.fromLTRBD(left, top, right, bottom, TextDirection.ltr);
+  }
+
   /// Returns a list of text boxes that enclose the given text range.
   ///
-  /// Coordinates of the TextBox are relative to the upper-left corner of the 
-  /// paragraph, where positive y values indicate down. Orientation is as 
+  /// Coordinates of the TextBox are relative to the upper-left corner of the
+  /// paragraph, where positive y values indicate down. Orientation is as
   /// vertical Mongolian text with left to right line wrapping.
   List<ui.TextBox> getBoxesForRange(int start, int end) {
     final boxes = <ui.TextBox>[];
-    var leftEdgeAfterRotation = 0.0;
-    for (var line in _lines) {
-      final indexAtBeginningOfLine = _runs[line.textRunStart].start;
-      if (start < indexAtBeginningOfLine) {
-        continue;
-      }
-
-      // Rotate the line and add TextBox
-      final top = line.bounds.left;
-      final right = leftEdgeAfterRotation + line.bounds.height;
-      final bottom = line.bounds.right;
-      final box = ui.TextBox.fromLTRBD(
-        leftEdgeAfterRotation,
-        right,
-        top,
-        bottom,
-        TextDirection.ltr,
-      );
-      boxes.add(box);
-
-
-      final indexAtEndOfLine = _runs[line.textRunEnd - 1].end;
-      if (end <= indexAtEndOfLine) {
-        break;
-      }
+    if (start < 0) {
+      return boxes;
     }
+    final run = _runs.first;
+    final indexAtEndOfRun = run.end;
+    if (start >= indexAtEndOfRun) {
+      return boxes;
+    }
+    final rect = run.paragraph.getBoxesForRange(start, end).first;
+    final textBox = _rotateClockwise(rect);
+    // final line = _lines.first;
+    // final indexAtEndOfLine = _runs[line.textRunEnd - 1].end;
+    // if (start >= indexAtEndOfLine) {
+    //   return boxes;
+    // }
+    // final textBox = _rotateClockwise(line.bounds);
+    boxes.add(textBox);
     return boxes;
+
+    // What happens if start is less than zero
+    // What happens if start is greater that than max
+    // What happens if end is less than zero
+    // What happens if end is greater that than max
+    // What happens if start is greater than end
+
+    // todo: if run range whole line then return without looping over runs
+
+    // final boxes = <ui.TextBox>[];
+
+    // // find start line
+    // int? startLineIndex;
+    // for (var i = 0; i < _lines.length; i++) {
+    //   final indexAtEndOfLine = _runs[_lines[i].textRunEnd - 1].end;
+    //   if (start < indexAtEndOfLine) {
+    //     startLineIndex = i;
+    //     break;
+    //   }
+    // }
+    // if (startLineIndex == null) {
+    //   return boxes;
+    // }
+
+    // // find start run
+    // int? startRunIndex;
+    // var indexOfFirstRunInLine = _lines[startLineIndex].textRunStart;
+    // var indexOfLastRunInLine = _lines[startLineIndex].textRunEnd - 1;
+    // for (var i = indexOfFirstRunInLine; i <= indexOfLastRunInLine; i++) {
+    //   if (start < _runs[i].end) {
+    //     startRunIndex = i;
+    //     break;
+    //   }
+    // }
+    // if (startRunIndex == null) {
+    //   throw RangeError('Did not find startRunIndex');
+    // }
+
+    // // find end line
+    // int? endLineIndex;
+    // for (var i = startLineIndex; i < _lines.length; i++) {
+    //   final indexAtEndOfLine = _runs[_lines[i].textRunEnd - 1].end;
+    //   if (end <= indexAtEndOfLine) {
+    //     endLineIndex = i;
+    //     break;
+    //   }
+    // }
+    // if (endLineIndex == null) {
+    //   throw RangeError('Did not find endLineIndex');
+    // }
+
+    // // find end run
+    // int? endRunIndex;
+    // indexOfFirstRunInLine = _lines[endLineIndex].textRunStart;
+    // indexOfLastRunInLine = _lines[endLineIndex].textRunEnd - 1;
+    // for (var i = indexOfFirstRunInLine; i <= indexOfLastRunInLine; i++) {
+    //   if (end <= _runs[i].end) {
+    //     endRunIndex = i;
+    //     break;
+    //   }
+    // }
+    // if (endRunIndex == null) {
+    //   throw RangeError('Did not find startRunIndex');
+    // }
+
+    // // todo: don't forget to unrotate boxes for emoji
+
+    // if (startRunIndex == endRunIndex) {
+    //   final run = _runs[startRunIndex];
+    //   final localStart = start - run.start;
+    //   final localEnd = end - run.start;
+    //   final localBox = run.paragraph.getBoxesForRange(localStart, localEnd).first;
+    //   final left = localBox.top;
+    //   final top = localBox.left;
+    //   final right = localBox.bottom;
+    //   final bottom = localBox.right;
+    //   final rotatedBox = ui.TextBox.fromLTRBD(
+    //     left,
+    //     top,
+    //     right,
+    //     bottom,
+    //     TextDirection.ltr,
+    //   );
+    //   boxes.add(rotatedBox);
+    // }
+
+    // return boxes;
   }
 }
 
