@@ -237,11 +237,11 @@ class MongolParagraph {
     canvas.restore();
   }
 
-  ui.TextBox _rotateClockwise(TextBox rect) {
+  ui.TextBox _rotateClockwise(TextBox rect, double verticalOffset) {
     final left = rect.top;
-    final top = rect.left;
+    final top = rect.left + verticalOffset;
     final right = rect.bottom;
-    final bottom = rect.right;
+    final bottom = rect.right + verticalOffset;
     return ui.TextBox.fromLTRBD(left, top, right, bottom, TextDirection.ltr);
   }
 
@@ -252,23 +252,44 @@ class MongolParagraph {
   /// vertical Mongolian text with left to right line wrapping.
   List<ui.TextBox> getBoxesForRange(int start, int end) {
     final boxes = <ui.TextBox>[];
-    if (start < 0) {
+
+    final totalLength = _text.length;
+    if (start < 0 || start >= totalLength) {
       return boxes;
     }
-    final run = _runs.first;
-    final indexAtEndOfRun = run.end;
-    if (start >= indexAtEndOfRun) {
+    final effectiveEnd = math.min(end, totalLength);
+
+    final lineRange = _findLineRange(charStart: start, charEnd: effectiveEnd);
+    if (lineRange == null) {
       return boxes;
     }
-    final rect = run.paragraph.getBoxesForRange(start, end).first;
-    final textBox = _rotateClockwise(rect);
-    // final line = _lines.first;
-    // final indexAtEndOfLine = _runs[line.textRunEnd - 1].end;
-    // if (start >= indexAtEndOfLine) {
-    //   return boxes;
-    // }
-    // final textBox = _rotateClockwise(line.bounds);
+    final runRange = _findRunRange(
+      lineStart: lineRange.start,
+      lineEnd: lineRange.end,
+      charStart: start,
+      charEnd: effectiveEnd,
+    );
+
+    final startRun = _runs[runRange.start];
+    final startIndexInStartRun = start - startRun.start;
+
+    final endRun = _runs[runRange.end - 1];
+    final endIndexInEndRun = effectiveEnd - endRun.start;
+
+    final verticalOffset = _getDistanceFromLineStartToRunStart(
+      lineRange.start,
+      runRange.start,
+    );
+    final rect = startRun.paragraph
+        .getBoxesForRange(
+          startIndexInStartRun,
+          endIndexInEndRun,
+        )
+        .first;
+    final textBox = _rotateClockwise(rect, verticalOffset);
+
     boxes.add(textBox);
+
     return boxes;
 
     // What happens if start is less than zero
@@ -279,85 +300,54 @@ class MongolParagraph {
 
     // todo: if run range whole line then return without looping over runs
 
-    // final boxes = <ui.TextBox>[];
-
-    // // find start line
-    // int? startLineIndex;
-    // for (var i = 0; i < _lines.length; i++) {
-    //   final indexAtEndOfLine = _runs[_lines[i].textRunEnd - 1].end;
-    //   if (start < indexAtEndOfLine) {
-    //     startLineIndex = i;
-    //     break;
-    //   }
-    // }
-    // if (startLineIndex == null) {
-    //   return boxes;
-    // }
-
-    // // find start run
-    // int? startRunIndex;
-    // var indexOfFirstRunInLine = _lines[startLineIndex].textRunStart;
-    // var indexOfLastRunInLine = _lines[startLineIndex].textRunEnd - 1;
-    // for (var i = indexOfFirstRunInLine; i <= indexOfLastRunInLine; i++) {
-    //   if (start < _runs[i].end) {
-    //     startRunIndex = i;
-    //     break;
-    //   }
-    // }
-    // if (startRunIndex == null) {
-    //   throw RangeError('Did not find startRunIndex');
-    // }
-
-    // // find end line
-    // int? endLineIndex;
-    // for (var i = startLineIndex; i < _lines.length; i++) {
-    //   final indexAtEndOfLine = _runs[_lines[i].textRunEnd - 1].end;
-    //   if (end <= indexAtEndOfLine) {
-    //     endLineIndex = i;
-    //     break;
-    //   }
-    // }
-    // if (endLineIndex == null) {
-    //   throw RangeError('Did not find endLineIndex');
-    // }
-
-    // // find end run
-    // int? endRunIndex;
-    // indexOfFirstRunInLine = _lines[endLineIndex].textRunStart;
-    // indexOfLastRunInLine = _lines[endLineIndex].textRunEnd - 1;
-    // for (var i = indexOfFirstRunInLine; i <= indexOfLastRunInLine; i++) {
-    //   if (end <= _runs[i].end) {
-    //     endRunIndex = i;
-    //     break;
-    //   }
-    // }
-    // if (endRunIndex == null) {
-    //   throw RangeError('Did not find startRunIndex');
-    // }
-
     // // todo: don't forget to unrotate boxes for emoji
-
-    // if (startRunIndex == endRunIndex) {
-    //   final run = _runs[startRunIndex];
-    //   final localStart = start - run.start;
-    //   final localEnd = end - run.start;
-    //   final localBox = run.paragraph.getBoxesForRange(localStart, localEnd).first;
-    //   final left = localBox.top;
-    //   final top = localBox.left;
-    //   final right = localBox.bottom;
-    //   final bottom = localBox.right;
-    //   final rotatedBox = ui.TextBox.fromLTRBD(
-    //     left,
-    //     top,
-    //     right,
-    //     bottom,
-    //     TextDirection.ltr,
-    //   );
-    //   boxes.add(rotatedBox);
-    // }
-
-    // return boxes;
   }
+
+  Range? _findLineRange({required int charStart, required int charEnd}) {
+    return Range(0, 1);
+  }
+
+  Range _findRunRange({
+    required int lineStart,
+    required int lineEnd,
+    required int charStart,
+    required int charEnd,
+  }) {
+    final start = _findRun(lineStart, charStart);
+    final end = _findRun(lineEnd - 1, charEnd - 1) + 1; // exclusive indexes
+    return Range(start, end);
+  }
+
+  int _findRun(int lineIndex, int charIndex) {
+    final line = _lines[lineIndex];
+    final min = line.textRunStart;
+    final max = line.textRunEnd - 1;
+    for (var i = min; i <= max; i++) {
+      if (charIndex < _runs[i].end) {
+        return i;
+      }
+    }
+    throw Error();
+  }
+
+  double _getDistanceFromLineStartToRunStart(int lineIndex, int runIndex) {
+    final startRunIndex = _lines[lineIndex].textRunStart;
+    var distance = 0.0;
+    for (var i = startRunIndex; i < runIndex; i++) {
+      distance += _runs[i].width;
+    }
+    return distance;
+  }
+}
+
+class Range {
+  Range(this.start, this.end);
+
+  /// start index (inclusive)
+  final int start;
+
+  /// end index (exclusive)
+  final int end;
 }
 
 /// Layout constraints for [MongolParagraph] objects.
@@ -698,12 +688,28 @@ class _RawStyledTextRun {
 class _TextRun {
   _TextRun(this.start, this.end, this.isRotated, this.paragraph);
 
+  /// The UTF-16 code unit index where this run starts within the entire text
+  /// range. The value in inclusive (that is, this is the actual start index).
   final int start;
+
+  /// The UTF-16 code unit index where this run ends within the entire text
+  /// range. The value is exclusive (that is, one unit beyond the last code
+  /// unit).
   final int end;
+
+  /// Whether this text run should be rotated 90 degrees counterclockwise in
+  /// relation to the rest of the text.
+  ///
+  /// This would normally be for emoji and  CJK characters so that they will
+  /// appear in the correct orientation in a vertical line of text.
   final bool isRotated;
+
+  /// The pre-computed text layout for this run.
+  ///
+  /// It includes the size but should never be more than one line.
   final ui.Paragraph paragraph;
 
-  /// Returns the width of the unrotated [paragraph] taking into account
+  /// Returns the width of the run (in horizontal orientation) taking into account
   /// whether it [isRotated].
   double get width {
     if (isRotated) {
@@ -712,7 +718,7 @@ class _TextRun {
     return paragraph.maxIntrinsicWidth;
   }
 
-  /// Returns the height of the unrotated [paragraph] taking into account
+  /// Returns the height of the run (in horizontal orientation) taking into account
   /// whether it [isRotated].
   double get height {
     if (isRotated) {
