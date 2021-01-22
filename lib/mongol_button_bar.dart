@@ -95,7 +95,7 @@ class MongolButtonBar extends StatelessWidget {
           ),
           child: child,
         );
-      case ButtonBarLayoutBehavior.constrained:
+      default: // ButtonBarLayoutBehavior.constrained:
         return Container(
           padding: EdgeInsets.symmetric(vertical: paddingUnit),
           constraints: const BoxConstraints(minWidth: 52.0),
