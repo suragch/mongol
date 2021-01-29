@@ -250,12 +250,12 @@ class MongolParagraph {
   /// Coordinates of the Rect are relative to the upper-left corner of the
   /// paragraph, where positive y values indicate down. Orientation is as
   /// vertical Mongolian text with left to right line wrapping.
-  /// 
-  /// Note that this method behaves slightly differently than 
+  ///
+  /// Note that this method behaves slightly differently than
   /// Paragraph.getBoxesForRange. The Paragraph version returns List<TextBox>,
   /// but TextBox doesn't accurately describe vertical text. Also,
   /// Paragraph.getBoxesForRange includes the entire line as a box (unless
-  /// there is intersperced LTR text), whereas this MongolParagraph 
+  /// there is intersperced LTR text), whereas this MongolParagraph
   /// getBoxesForRange version returns a separate box for every run (word). This
   /// behavior could be modified in the future to return a box for the whole
   /// line, so it's best not to assume every box is a text run.
@@ -288,14 +288,16 @@ class MongolParagraph {
           if (firstRun || lastRun) {
             final localStart = math.max(start, run.start) - run.start;
             final localEnd = math.min(end, run.end) - run.start;
-            final textBox = run.paragraph.getBoxesForRange(localStart, localEnd).first;
+            final textBox =
+                run.paragraph.getBoxesForRange(localStart, localEnd).first;
             final box = _toVerticalRect(textBox, dx, dy);
             boxes.add(box);
             if (end <= run.end) {
               return boxes;
             }
             firstRun = false;
-          } else { // intermediate run
+          } else {
+            // intermediate run
             final box = Rect.fromLTWH(dx, dy, run.height, run.width);
             boxes.add(box);
           }
@@ -315,53 +317,6 @@ class MongolParagraph {
     final bottom = rect.right + dy;
     return Rect.fromLTRB(left, top, right, bottom);
   }
-
-  Range? _findLineRange({required int charStart, required int charEnd}) {
-    return Range(0, 1);
-  }
-
-  Range _findRunRange({
-    required int lineStart,
-    required int lineEnd,
-    required int charStart,
-    required int charEnd,
-  }) {
-    final start = _findRun(lineStart, charStart);
-    final end = _findRun(lineEnd - 1, charEnd - 1) + 1; // exclusive indexes
-    return Range(start, end);
-  }
-
-  int _findRun(int lineIndex, int charIndex) {
-    final line = _lines[lineIndex];
-    final min = line.textRunStart;
-    final max = line.textRunEnd - 1;
-    for (var i = min; i <= max; i++) {
-      if (charIndex < _runs[i].end) {
-        return i;
-      }
-    }
-    throw Error();
-  }
-
-  double _getDistanceFromLineStartToRunStart(int lineIndex, int runIndex) {
-    final startRunIndex = _lines[lineIndex].textRunStart;
-    var distance = 0.0;
-    for (var i = startRunIndex; i < runIndex; i++) {
-      distance += _runs[i].width;
-    }
-    return distance;
-  }
-
-}
-
-class Range {
-  Range(this.start, this.end);
-
-  /// start index (inclusive)
-  final int start;
-
-  /// end index (exclusive)
-  final int end;
 }
 
 /// Layout constraints for [MongolParagraph] objects.
