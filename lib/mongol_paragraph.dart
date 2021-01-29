@@ -237,70 +237,83 @@ class MongolParagraph {
     canvas.restore();
   }
 
-  ui.TextBox _rotateClockwise(TextBox rect, double verticalOffset) {
-    final left = rect.top;
-    final top = rect.left + verticalOffset;
-    final right = rect.bottom;
-    final bottom = rect.right + verticalOffset;
-    return ui.TextBox.fromLTRBD(left, top, right, bottom, TextDirection.ltr);
-  }
+  // ui.TextBox _rotateClockwise(TextBox rect, double verticalOffset) {
+  //   final left = rect.top;
+  //   final top = rect.left + verticalOffset;
+  //   final right = rect.bottom;
+  //   final bottom = rect.right + verticalOffset;
+  //   return ui.TextBox.fromLTRBD(left, top, right, bottom, TextDirection.ltr);
+  // }
 
-  /// Returns a list of text boxes that enclose the given text range.
+  /// Returns a list of rects that enclose the given text range.
   ///
-  /// Coordinates of the TextBox are relative to the upper-left corner of the
+  /// Coordinates of the Rect are relative to the upper-left corner of the
   /// paragraph, where positive y values indicate down. Orientation is as
   /// vertical Mongolian text with left to right line wrapping.
-  List<ui.TextBox> getBoxesForRange(int start, int end) {
-    final boxes = <ui.TextBox>[];
+  /// 
+  /// Note that this method behaves slightly differently than 
+  /// Paragraph.getBoxesForRange. The Paragraph version returns List<TextBox>,
+  /// but TextBox doesn't accurately describe vertical text. Also,
+  /// Paragraph.getBoxesForRange includes the entire line as a box (unless
+  /// there is intersperced LTR text), whereas this MongolParagraph 
+  /// getBoxesForRange version returns a separate box for every run (word). This
+  /// behavior could be modified in the future to return a box for the whole
+  /// line, so it's best not to assume every box is a text run.
+  List<Rect> getBoxesForRange(int start, int end) {
+    final boxes = <Rect>[];
 
     final totalLength = _text.length;
     if (start < 0 || start >= totalLength) {
       return boxes;
     }
-    final effectiveEnd = math.min(end, totalLength);
 
-    final lineRange = _findLineRange(charStart: start, charEnd: effectiveEnd);
-    if (lineRange == null) {
-      return boxes;
+    // offset of the top left corner of the rect in vertical orientation
+    var dx = 0.0;
+    var dy = 0.0;
+
+    var firstRun = true;
+    for (var i = 0; i < _lines.length; i++) {
+      final line = _lines[i];
+      final lastRunIndex = line.textRunEnd - 1;
+      final lastCharIndex = _runs[lastRunIndex].end - 1;
+      if (lastCharIndex < start) {
+        dx += line.bounds.height;
+        continue;
+      }
+      dy = 0.0;
+      for (var j = line.textRunStart; j < line.textRunEnd; j++) {
+        final run = _runs[j];
+        if (run.end > start) {
+          final lastRun = run.end >= end;
+          if (firstRun || lastRun) {
+            final localStart = math.max(start, run.start) - run.start;
+            final localEnd = math.min(end, run.end) - run.start;
+            final textBox = run.paragraph.getBoxesForRange(localStart, localEnd).first;
+            final box = _toVerticalRect(textBox, dx, dy);
+            boxes.add(box);
+            if (end <= run.end) {
+              return boxes;
+            }
+            firstRun = false;
+          } else { // intermediate run
+            final box = Rect.fromLTWH(dx, dy, run.height, run.width);
+            boxes.add(box);
+          }
+        }
+        dy += run.width;
+      }
+      dx += line.bounds.height;
     }
-    final runRange = _findRunRange(
-      lineStart: lineRange.start,
-      lineEnd: lineRange.end,
-      charStart: start,
-      charEnd: effectiveEnd,
-    );
-
-    final startRun = _runs[runRange.start];
-    final startIndexInStartRun = start - startRun.start;
-
-    final endRun = _runs[runRange.end - 1];
-    final endIndexInEndRun = effectiveEnd - endRun.start;
-
-    final verticalOffset = _getDistanceFromLineStartToRunStart(
-      lineRange.start,
-      runRange.start,
-    );
-    final rect = startRun.paragraph
-        .getBoxesForRange(
-          startIndexInStartRun,
-          endIndexInEndRun,
-        )
-        .first;
-    final textBox = _rotateClockwise(rect, verticalOffset);
-
-    boxes.add(textBox);
 
     return boxes;
+  }
 
-    // What happens if start is less than zero
-    // What happens if start is greater that than max
-    // What happens if end is less than zero
-    // What happens if end is greater that than max
-    // What happens if start is greater than end
-
-    // todo: if run range whole line then return without looping over runs
-
-    // // todo: don't forget to unrotate boxes for emoji
+  Rect _toVerticalRect(ui.TextBox rect, double dx, double dy) {
+    final left = rect.top + dx;
+    final top = rect.left + dy;
+    final right = rect.bottom + dx;
+    final bottom = rect.right + dy;
+    return Rect.fromLTRB(left, top, right, bottom);
   }
 
   Range? _findLineRange({required int charStart, required int charEnd}) {
@@ -338,6 +351,7 @@ class MongolParagraph {
     }
     return distance;
   }
+
 }
 
 class Range {

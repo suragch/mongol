@@ -309,7 +309,7 @@ class MongolTextPainter {
         _text!.codeUnitAt(offset) == _zwjUtf16 ||
         _isUnicodeDirectionality(prevCodeUnit);
     var graphemeClusterLength = needsSearch ? 2 : 1;
-    var boxes = <TextBox>[];
+    var boxes = <Rect>[];
     while (boxes.isEmpty) {
       final prevRuneOffset = offset - graphemeClusterLength;
       boxes = _paragraph!.getBoxesForRange(prevRuneOffset, offset);
@@ -359,7 +359,7 @@ class MongolTextPainter {
         nextCodeUnit == _zwjUtf16 ||
         _isUnicodeDirectionality(nextCodeUnit);
     var graphemeClusterLength = needsSearch ? 2 : 1;
-    var boxes = <TextBox>[];
+    var boxes = <Rect>[];
     while (boxes.isEmpty) {
       final nextRuneOffset = offset + graphemeClusterLength;
       boxes = _paragraph!.getBoxesForRange(offset, nextRuneOffset);
