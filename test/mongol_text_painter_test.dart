@@ -273,17 +273,17 @@ void main() {
     );
     expect(caretOffset.dy, painter.height);
 
-    // // Check that getOffsetForCaret handles a character that is encoded as a
-    // // surrogate pair.
-    // text = 'A\u{1F600}';
-    // painter.text = TextSpan(text: text);
-    // painter.layout();
+    // Check that getOffsetForCaret handles a character that is encoded as a
+    // surrogate pair.
+    text = 'A\u{1F600}';
+    painter.text = TextSpan(text: text);
+    painter.layout();
 
-    // caretOffset = painter.getOffsetForCaret(
-    //   ui.TextPosition(offset: text.length),
-    //   ui.Rect.zero,
-    // );
-    // expect(caretOffset.dy, painter.height);
+    caretOffset = painter.getOffsetForCaret(
+      ui.TextPosition(offset: text.length),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, painter.height);
   });
 
   test('TextPainter multiple characters single word', () {
@@ -338,13 +338,19 @@ void main() {
     );
     expect(caretOffset.dy, 14.0);
 
-    // caretOffset = painter.getOffsetForCaret(
-    //   const ui.TextPosition(offset: 2),
-    //   ui.Rect.zero,
-    // );
-    // expect(caretOffset.dy, painter.height);
+    // caret in middle of second word
+    caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 5),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, 70);
 
-
+    // caret at end
+    caretOffset = painter.getOffsetForCaret(
+      const ui.TextPosition(offset: 7),
+      ui.Rect.zero,
+    );
+    expect(caretOffset.dy, painter.height);
   });
 
   test('TextPainter null text test', () {
@@ -373,15 +379,83 @@ void main() {
     );
     expect(caretOffset.dy, painter.height);
 
-    // children = <TextSpan>[];
-    // painter.text = TextSpan(text: null, children: children);
-    // painter.layout();
+    children = <TextSpan>[];
+    painter.text = TextSpan(text: null, children: children);
+    painter.layout();
 
-    // caretOffset = painter.getOffsetForCaret(
-    //     const ui.TextPosition(offset: 0), ui.Rect.zero);
-    // expect(caretOffset.dx, 0);
-    // caretOffset = painter.getOffsetForCaret(
-    //     const ui.TextPosition(offset: 1), ui.Rect.zero);
-    // expect(caretOffset.dx, 0);
+    caretOffset = painter.getOffsetForCaret(
+        const ui.TextPosition(offset: 0), ui.Rect.zero);
+    expect(caretOffset.dy, 0);
+    caretOffset = painter.getOffsetForCaret(
+        const ui.TextPosition(offset: 1), ui.Rect.zero);
+    expect(caretOffset.dy, 0);
   });
+
+  test('TextPainter caret emoji test', () {
+    final painter = MongolTextPainter();
+
+    // Format: '👨‍<zwj>👩‍<zwj>👦👨‍<zwj>👩‍<zwj>👧‍<zwj>👧👏<modifier>'
+    // One three-person family, one four-person family, one clapping hands (medium skin tone).
+    const text = '👨‍👩‍👦👨‍👩‍👧‍👧👏🏽';
+    painter.text = const TextSpan(text: text);
+    painter.layout(maxHeight: 10000);
+
+    expect(text.length, 23);
+
+    var caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 0), ui.Rect.zero);
+    expect(caretOffset.dy, 0); // 👨
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: text.length), ui.Rect.zero);
+    expect(caretOffset.dy, 42);
+    expect(painter.height, 42);
+
+    // Two UTF-16 codepoints per emoji, one codepoint per zwj
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 1), ui.Rect.zero);
+    expect(caretOffset.dy, 14); // 👨
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 2), ui.Rect.zero);
+    expect(caretOffset.dy, 14); // <zwj>
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 3), ui.Rect.zero);
+    expect(caretOffset.dy, 14); // 👩‍
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 4), ui.Rect.zero);
+    expect(caretOffset.dy, 14); // 👩‍
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 5), ui.Rect.zero);
+    expect(caretOffset.dy, 14); // <zwj>
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 6), ui.Rect.zero);
+    expect(caretOffset.dy, 14); // 👦
+    // https://github.com/flutter/flutter/issues/75051
+    //caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 7), ui.Rect.zero);
+    //expect(caretOffset.dy, 14); // 👦
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 8), ui.Rect.zero);
+    expect(caretOffset.dy, 14); // 👨
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 9), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👨
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 10), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // <zwj>
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 11), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👩‍
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 12), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👩‍
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 13), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // <zwj>
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 14), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👧‍
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 15), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👧‍
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 16), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // <zwj>
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 17), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👧
+    // https://github.com/flutter/flutter/issues/75051
+    // caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 18), ui.Rect.zero);
+    // expect(caretOffset.dy, 28); // 👧
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 19), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👏
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 20), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // 👏
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 21), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // <medium skin tone modifier>
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 22), ui.Rect.zero);
+    expect(caretOffset.dy, 28); // <medium skin tone modifier>
+    caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 23), ui.Rect.zero);
+    expect(caretOffset.dy, 42); // end of string
+  }, skip: isBrowser); // https://github.com/flutter/flutter/issues/56308
 }

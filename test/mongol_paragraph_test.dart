@@ -14,6 +14,27 @@ void main() {
     return paragraph;
   }
 
+  /// This group is for testing [getBoxesForRange].
+  ///
+  /// You can compare the behavior to [Paragraph] with the following code:
+  ///
+  /// ```
+  /// const text = 'ABC DEF 123 456\n' //   0-16
+  ///     'ABC DEF 123 456\n' //  16-32
+  ///     'ABC DEF 123 456\n' //  32-48
+  ///     'ABC DEF 123 456\n' //  48-64
+  ///     'ABC DEF 123 456\n'; // 64-80
+  /// final paragraphStyle = ui.ParagraphStyle(
+  ///   textDirection: ui.TextDirection.ltr,
+  /// );
+  /// final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
+  ///   ..addText(text);
+  /// final constraints = ui.ParagraphConstraints(width: 300);
+  /// final paragraph = paragraphBuilder.build();
+  /// paragraph.layout(constraints);
+  /// final boxes = paragraph.getBoxesForRange(21, 58);
+  /// print(boxes);
+  /// ```
   group('getBoxesForRange', () {
     test('single character gives correct ranges', () {
       final paragraph = _getParagraph('A', 300);
@@ -69,7 +90,7 @@ void main() {
       expect(boxes.first.top, 28.0);
       expect(boxes.first.right, 14.0);
       expect(boxes.first.bottom, 42.0);
-      
+
       boxes = paragraph.getBoxesForRange(0, 3);
       expect(boxes.length, 1);
       expect(boxes.first.left, 0.0);
@@ -130,78 +151,181 @@ void main() {
       // spanning both ranges
 
       boxes = paragraph.getBoxesForRange(0, 7);
-      expect(boxes.length, 2);
+      expect(boxes.length, 1);
       expect(boxes.first.left, 0.0);
       expect(boxes.first.top, 0.0);
       expect(boxes.first.width, 14.0);
-      expect(boxes.first.height, 56.0);
-      expect(boxes.last.left, 0.0);
-      expect(boxes.last.top, 56.0);
-      expect(boxes.last.width, 14.0);
-      expect(boxes.last.height, 42.0);
+      expect(boxes.first.height, 98.0);
     });
 
     test('multiple lines with selection spanning multiple lines', () {
-      const multipleLines = 
-      'ABC DEF 123 456\n'   //  0-16
-      'ABC DEF 123 456\n'   // 16-32
-      'ABC DEF 123 456\n'   // 32-48
-      'ABC DEF 123 456\n'   // 48-64
-      'ABC DEF 123 456\n';  // 64-80
+      const multipleLines =
+          'ABC DEF 123 456\n' //   0-16                         .
+          'ABC DEF 123 456\n' //  16-32
+          'ABC DEF 123 456\n' //  32-48
+          'ABC DEF 123 456\n' //  48-64
+          'ABC DEF 123 456\n'; // 64-80
       final paragraph = _getParagraph(multipleLines, 300);
 
       var boxes = paragraph.getBoxesForRange(21, 58); // 2nd row E to 4th row 2
-      expect(boxes.length, 10);
+      expect(boxes.length, 3);
 
       expect(boxes[0].left, 14.0);
       expect(boxes[0].top, 70.0);
       expect(boxes[0].width, 14.0);
-      expect(boxes[0].height, 42.0);
+      expect(boxes[0].height, 140.0);
 
-      expect(boxes[1].left, 14.0);
-      expect(boxes[1].top, 112.0);
+      expect(boxes[1].left, 28.0);
+      expect(boxes[1].top, 0.0);
       expect(boxes[1].width, 14.0);
-      expect(boxes[1].height, 56.0);
+      expect(boxes[1].height, 210.0);
 
-      expect(boxes[2].left, 14.0);
-      expect(boxes[2].top, 168.0);
+      expect(boxes[2].left, 42.0);
+      expect(boxes[2].top, 0.0);
       expect(boxes[2].width, 14.0);
-      expect(boxes[2].height, 42.0);
+      expect(boxes[2].height, 140.0);
 
-      expect(boxes[3].left, 28.0);
-      expect(boxes[3].top, 0.0);
-      expect(boxes[3].width, 14.0);
-      expect(boxes[3].height, 56.0);
+      boxes = paragraph.getBoxesForRange(21, 64); // 2nd row E to 4th row \n
+      expect(boxes.length, 3);
 
-      expect(boxes[4].left, 28.0);
-      expect(boxes[4].top, 56.0);
-      expect(boxes[4].width, 14.0);
-      expect(boxes[4].height, 56.0);
+      expect(boxes[0].left, 14.0);
+      expect(boxes[0].top, 70.0);
+      expect(boxes[0].width, 14.0);
+      expect(boxes[0].height, 140.0);
 
-      expect(boxes[5].left, 28.0);
-      expect(boxes[5].top, 112.0);
-      expect(boxes[5].width, 14.0);
-      expect(boxes[5].height, 56.0);
+      expect(boxes[1].left, 28.0);
+      expect(boxes[1].top, 0.0);
+      expect(boxes[1].width, 14.0);
+      expect(boxes[1].height, 210.0);
 
-      expect(boxes[6].left, 28.0);
-      expect(boxes[6].top, 168.0);
-      expect(boxes[6].width, 14.0);
-      expect(boxes[6].height, 42.0);
+      expect(boxes[2].left, 42.0);
+      expect(boxes[2].top, 0.0);
+      expect(boxes[2].width, 14.0);
+      expect(boxes[2].height, 210.0);
 
-      expect(boxes[7].left, 42.0);
-      expect(boxes[7].top, 0.0);
-      expect(boxes[7].width, 14.0);
-      expect(boxes[7].height, 56.0);
-
-      expect(boxes[8].left, 42.0);
-      expect(boxes[8].top, 56.0);
-      expect(boxes[8].width, 14.0);
-      expect(boxes[8].height, 56.0);
-
-      expect(boxes[9].left, 42.0);
-      expect(boxes[9].top, 112.0);
-      expect(boxes[9].width, 14.0);
-      expect(boxes[9].height, 28.0);
+      // test last char == line end
     });
+
+    test('handles grapheme clusters well', () {
+      const graphemeClusters =
+          '👨‍👩‍👦' // man + zwj + woman + zwj + boy                       0-8
+          '👨‍👩‍👧‍👧' // man + zwj + woman + zwj + girl + zwj + girl         8-19
+          '👏🏽'; // clapping + medium_skin_tone                       19-23
+      final paragraph = _getParagraph(graphemeClusters, 300);
+      expect(graphemeClusters.length, 23);
+
+      var boxes = paragraph.getBoxesForRange(0, 23);
+      expect(boxes.length, 1);
+
+      // incomplete grapheme clusters aren't counted
+      boxes = paragraph.getBoxesForRange(0, 1);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(0, 2);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(0, 7);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(3, 5);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(8, 16);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(10, 12);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(17, 19);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(19, 21);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(20, 21);
+      expect(boxes.length, 0);
+      boxes = paragraph.getBoxesForRange(21, 23);
+      expect(boxes.length, 0);
+      // https://github.com/flutter/flutter/issues/75051
+      // boxes = paragraph.getBoxesForRange(7, 9);
+      // expect(boxes.length, 0);
+      // boxes = paragraph.getBoxesForRange(18, 20);
+      // expect(boxes.length, 0);
+
+      // only complete ranges count
+      boxes = paragraph.getBoxesForRange(0, 8);
+      expect(boxes.length, 1);
+      // the actual width should be 14 but testing measures every emoji
+      expect(boxes.first.width, 42);
+      expect(boxes.first.height, 14);
+      boxes = paragraph.getBoxesForRange(8, 19);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 56);
+      expect(boxes.first.height, 14);
+      boxes = paragraph.getBoxesForRange(19, 23);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 28);
+      expect(boxes.first.height, 14);
+      boxes = paragraph.getBoxesForRange(0, 19);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 56);
+      expect(boxes.first.height, 28);
+      boxes = paragraph.getBoxesForRange(8, 23);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 56);
+      expect(boxes.first.height, 28);
+      boxes = paragraph.getBoxesForRange(0, 23);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 56);
+      expect(boxes.first.height, 42);
+
+      // partial ranges only return complete parts
+      boxes = paragraph.getBoxesForRange(0, 10);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 42);
+      expect(boxes.first.height, 14);
+      boxes = paragraph.getBoxesForRange(4, 22);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 56);
+      expect(boxes.first.height, 14);
+      expect(boxes.first.left, 0);
+      expect(boxes.first.top, 14);
+      expect(boxes.first.right, 56);
+      expect(boxes.first.bottom, 28);
+      boxes = paragraph.getBoxesForRange(15, 23);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 28);
+      expect(boxes.first.height, 14);
+      boxes = paragraph.getBoxesForRange(1, 32);
+      expect(boxes.length, 1);
+      expect(boxes.first.width, 56);
+      expect(boxes.first.height, 28);
+      expect(boxes.first.left, 0);
+      expect(boxes.first.top, 14);
+      expect(boxes.first.right, 56);
+      expect(boxes.first.bottom, 42);
+    });
+
+    // test('Partial ranges return empty boxes', () {
+    //   final text = '👨‍👩‍👦';
+    //   final paragraphStyle = ui.ParagraphStyle(
+    //     textDirection: ui.TextDirection.ltr,
+    //   );
+    //   final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
+    //     ..addText(text);
+    //   final constraints = ui.ParagraphConstraints(width: 300);
+    //   final paragraph = paragraphBuilder.build();
+    //   paragraph.layout(constraints);
+
+    //   var boxes = paragraph.getBoxesForRange(0, 8);
+    //   expect(boxes.length, 1);
+    //   boxes = paragraph.getBoxesForRange(1, 8);
+    //   expect(boxes.length, 0);
+    //   boxes = paragraph.getBoxesForRange(2, 8);
+    //   expect(boxes.length, 0);
+    //   boxes = paragraph.getBoxesForRange(3, 8);
+    //   expect(boxes.length, 0);
+    //   boxes = paragraph.getBoxesForRange(4, 8);
+    //   expect(boxes.length, 0);
+    //   boxes = paragraph.getBoxesForRange(5, 8);
+    //   expect(boxes.length, 0);
+    //   boxes = paragraph.getBoxesForRange(6, 8);
+    //   expect(boxes.length, 0);
+    //   boxes = paragraph.getBoxesForRange(7, 8);
+    //   print(boxes); // [TextBox.fromLTRBD(0.0, 0.0, 42.0, 14.0, TextDirection.ltr)]
+    //   expect(boxes.length, 0); // fails: Actual: <1>
+    // });
   });
 }

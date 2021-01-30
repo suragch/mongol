@@ -237,14 +237,6 @@ class MongolParagraph {
     canvas.restore();
   }
 
-  // ui.TextBox _rotateClockwise(TextBox rect, double verticalOffset) {
-  //   final left = rect.top;
-  //   final top = rect.left + verticalOffset;
-  //   final right = rect.bottom;
-  //   final bottom = rect.right + verticalOffset;
-  //   return ui.TextBox.fromLTRBD(left, top, right, bottom, TextDirection.ltr);
-  // }
-
   /// Returns a list of rects that enclose the given text range.
   ///
   /// Coordinates of the Rect are relative to the upper-left corner of the
@@ -253,69 +245,141 @@ class MongolParagraph {
   ///
   /// Note that this method behaves slightly differently than
   /// Paragraph.getBoxesForRange. The Paragraph version returns List<TextBox>,
-  /// but TextBox doesn't accurately describe vertical text. Also,
-  /// Paragraph.getBoxesForRange includes the entire line as a box (unless
-  /// there is intersperced LTR text), whereas this MongolParagraph
-  /// getBoxesForRange version returns a separate box for every run (word). This
-  /// behavior could be modified in the future to return a box for the whole
-  /// line, so it's best not to assume every box is a text run.
+  /// but TextBox doesn't accurately describe vertical text so Rect is used.
   List<Rect> getBoxesForRange(int start, int end) {
     final boxes = <Rect>[];
 
-    final totalLength = _text.length;
-    if (start < 0 || start >= totalLength) {
+    // The [start] index must be within the text range
+    final textLength = _text.length;
+    if (start < 0 || start >= _text.length) {
       return boxes;
     }
 
-    // offset of the top left corner of the rect in vertical orientation
-    var dx = 0.0;
-    var dy = 0.0;
+    // Allow the [end] index to be larger than the text length but don't use it
+    final effectiveEnd = math.min(textLength, end);
 
-    var firstRun = true;
+    // Horizontal offset for the left side of the vertical rect
+    var dx = 0.0;
+
+    // loop through each line
     for (var i = 0; i < _lines.length; i++) {
       final line = _lines[i];
       final lastRunIndex = line.textRunEnd - 1;
       final lastCharIndex = _runs[lastRunIndex].end - 1;
+
+      // skip empty lines before the selected range
       if (lastCharIndex < start) {
+        // The line is horizontal but dx is for vertical orientation
         dx += line.bounds.height;
         continue;
       }
-      dy = 0.0;
-      for (var j = line.textRunStart; j < line.textRunEnd; j++) {
-        final run = _runs[j];
-        if (run.end > start) {
-          final lastRun = run.end >= end;
-          if (firstRun || lastRun) {
-            final localStart = math.max(start, run.start) - run.start;
-            final localEnd = math.min(end, run.end) - run.start;
-            final textBox =
-                run.paragraph.getBoxesForRange(localStart, localEnd).first;
-            final box = _toVerticalRect(textBox, dx, dy);
-            boxes.add(box);
-            if (end <= run.end) {
-              return boxes;
-            }
-            firstRun = false;
-          } else {
-            // intermediate run
-            final box = Rect.fromLTWH(dx, dy, run.height, run.width);
-            boxes.add(box);
-          }
+
+      // If this is a full line then skip looping over the runs
+      // because the line size has already been cached.
+      if (boxes.isNotEmpty && lastCharIndex < effectiveEnd) {
+        final lineBounds = line.bounds;
+        final lineBox =
+            Rect.fromLTWH(dx, 0, lineBounds.height, lineBounds.width);
+        boxes.add(lineBox);
+        // If the selection goes to the end of this line then we're finished.
+        if (lastCharIndex == effectiveEnd - 1) {
+          return boxes;
         }
-        dy += run.width;
+      } else {
+        // check the runs one at a time
+        final lineBox = _getBoxFromLine(line, start, effectiveEnd, dx);
+
+        // partial selections of grapheme clusters should return no boxes
+        if (lineBox != Rect.zero) {
+          boxes.add(lineBox);
+        }
+
+        // If this is the last line there we're finished
+        if (lastCharIndex >= effectiveEnd - 1) {
+          return boxes;
+        }
       }
       dx += line.bounds.height;
     }
-
     return boxes;
   }
 
-  Rect _toVerticalRect(ui.TextBox rect, double dx, double dy) {
-    final left = rect.top + dx;
-    final top = rect.left + dy;
-    final right = rect.bottom + dx;
-    final bottom = rect.right + dy;
-    return Rect.fromLTRB(left, top, right, bottom);
+  // Takes a single line and finds the box that includes the selected range
+  Rect _getBoxFromLine(_LineInfo line, int start, int end, double dx) {
+    var boxWidth = 0.0;
+    var boxHeight = 0.0;
+
+    // This is the vertical offset for the box in vertical line orientation
+    // It will only be non-zero if this is the first box.
+    var dy = 0.0;
+
+    // loop though every run in the line
+    for (var j = line.textRunStart; j < line.textRunEnd; j++) {
+      final run = _runs[j];
+
+      // skips runs that are after selected range
+      if (run.start >= end) {
+        break;
+      }
+
+      // skip runs that are before the selected range
+      if (run.end <= start) {
+        dy += run.width;
+        continue;
+      }
+
+      // The size of full intermediate runs has already been cached
+      if (run.start >= start && run.end <= end) {
+        boxWidth = math.max(boxWidth, run.height);
+        boxHeight += run.width;
+        if (run.end == end) {
+          break;
+        }
+        continue;
+      }
+
+      // The range selection is in middle of a run
+      final localStart = math.max(start, run.start) - run.start;
+      final localEnd = math.min(end, run.end) - run.start;
+      final textBoxes = run.paragraph.getBoxesForRange(localStart, localEnd);
+
+      // empty boxes occur for partial selections of a grapheme cluster
+      if (textBoxes.isEmpty) {
+        if (end <= run.end) {
+          break;
+        } else {
+          dy += run.width;
+          continue;
+        }
+      }
+
+      // handle orientation differences for emoji and CJK characters
+      final box = textBoxes.first;
+      double verticalWidth;
+      double verticalHeight;
+      if (run.isRotated) {
+        verticalWidth = box.right;
+        verticalHeight = box.bottom;
+      } else {
+        dy += box.left;
+        verticalWidth = box.bottom;
+        verticalHeight = box.right - box.left;
+      }
+
+      // update the rect size
+      boxWidth = math.max(boxWidth, verticalWidth);
+      boxHeight += verticalHeight;
+
+      // if this is the last run then we're finished
+      if (end <= run.end) {
+        break;
+      }
+    }
+
+    if (boxWidth == 0.0 || boxHeight == 0.0) {
+      return Rect.zero;
+    }
+    return Rect.fromLTWH(dx, dy, boxWidth, boxHeight);
   }
 }
 
@@ -718,8 +782,16 @@ class _TextRun {
 class _LineInfo {
   _LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
 
+  /// The index of the run in [_runs] where this line starts
   final int textRunStart;
+
+  /// The index (exclusive) of the run in [_runs] where this line end
   final int textRunEnd;
+
+  /// The measured size of this unrotated line (horizontal orientation).
+  ///
+  /// There is no offset so [left] and [top] are `0`. Just use [width] and
+  /// [height].
   final Rect bounds;
 }
 
