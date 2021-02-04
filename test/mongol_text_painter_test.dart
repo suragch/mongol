@@ -11,9 +11,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/mongol_text_painter.dart';
 
-// TODO: add these tests:
-// https://github.com/flutter/flutter/blob/e3c441e0fdc299737abf0d763cad8bab71892bf7/packages/flutter/test/painting/text_painter_test.dart
-
 void main() {
   test('TextPainter returns correct offset for short one-line TextSpan', () {
     final painter = MongolTextPainter();
@@ -995,7 +992,184 @@ void main() {
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
   });
 
-  
+  // test('MongolTextPainter widget span', () {
+  //   final painter = MongolTextPainter();
+
+  //   const text = 'test';
+  //   painter.text = const TextSpan(
+  //     text: text,
+  //     children: <InlineSpan>[
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       TextSpan(text: text),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       TextSpan(text: text),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //       WidgetSpan(child: SizedBox(width: 50, height: 30)),
+  //     ],
+  //   );
+
+  //   // We provide dimensions for the widgets
+  //   painter.setPlaceholderDimensions(const <PlaceholderDimensions>[
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(51, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //     PlaceholderDimensions(size: Size(50, 30), baselineOffset: 25, alignment: ui.PlaceholderAlignment.bottom),
+  //   ]);
+
+  //   painter.layout(maxHeight: 500);
+
+  //   // Now, each of the WidgetSpans will have their own placeholder 'hole'.
+  //   var caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 1), ui.Rect.zero);
+  //   expect(caretOffset.dx, 14);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 4), ui.Rect.zero);
+  //   expect(caretOffset.dx, 56);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 5), ui.Rect.zero);
+  //   expect(caretOffset.dx, 106);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 6), ui.Rect.zero);
+  //   expect(caretOffset.dx, 120);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 10), ui.Rect.zero);
+  //   expect(caretOffset.dx, 212);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 11), ui.Rect.zero);
+  //   expect(caretOffset.dx, 262);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 12), ui.Rect.zero);
+  //   expect(caretOffset.dx, 276);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 13), ui.Rect.zero);
+  //   expect(caretOffset.dx, 290);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 14), ui.Rect.zero);
+  //   expect(caretOffset.dx, 304);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 15), ui.Rect.zero);
+  //   expect(caretOffset.dx, 318);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 16), ui.Rect.zero);
+  //   expect(caretOffset.dx, 368);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 17), ui.Rect.zero);
+  //   expect(caretOffset.dx, 418);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 18), ui.Rect.zero);
+  //   expect(caretOffset.dx, 0);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 19), ui.Rect.zero);
+  //   expect(caretOffset.dx, 50);
+  //   caretOffset = painter.getOffsetForCaret(const ui.TextPosition(offset: 23), ui.Rect.zero);
+  //   expect(caretOffset.dx, 250);
+
+  //   expect(painter.inlinePlaceholderBoxes!.length, 14);
+  //   expect(painter.inlinePlaceholderBoxes![0], const TextBox.fromLTRBD(56, 0, 106, 30, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![2], const TextBox.fromLTRBD(212, 0, 262, 30, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![3], const TextBox.fromLTRBD(318, 0, 368, 30, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![4], const TextBox.fromLTRBD(368, 0, 418, 30, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![5], const TextBox.fromLTRBD(418, 0, 468, 30, TextDirection.ltr));
+  //   // line should break here
+  //   expect(painter.inlinePlaceholderBoxes![6], const TextBox.fromLTRBD(0, 30, 50, 60, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![7], const TextBox.fromLTRBD(50, 30, 100, 60, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![10], const TextBox.fromLTRBD(200, 30, 250, 60, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![11], const TextBox.fromLTRBD(250, 30, 300, 60, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![12], const TextBox.fromLTRBD(300, 30, 351, 60, TextDirection.ltr));
+  //   expect(painter.inlinePlaceholderBoxes![13], const TextBox.fromLTRBD(351, 30, 401, 60, TextDirection.ltr));
+  // }, skip: isBrowser); // https://github.com/flutter/flutter/issues/42086
+
+  // // Null values are valid. See https://github.com/flutter/flutter/pull/48346#issuecomment-584839221
+  // test('MongolTextPainter set TextHeightBehavior null test', () {
+  //   final painter = MongolTextPainter(textHeightBehavior: null);
+
+  //   painter.textHeightBehavior = const TextHeightBehavior();
+  //   painter.textHeightBehavior = null;
+  // });
+
+  // test('MongolTextPainter line metrics', () {
+  //   final painter = MongolTextPainter();
+
+  //   const text = 'test1\nhello line two really long for soft break\nfinal line 4';
+  //   painter.text = const TextSpan(
+  //     text: text,
+  //   );
+
+  //   painter.layout(maxHeight: 300);
+
+  //   expect(painter.text, const TextSpan(text: text));
+  //   expect(painter.preferredLineWidth, 14);
+
+  //   final List<ui.LineMetrics> lines = painter.computeLineMetrics();
+
+  //   expect(lines.length, 4);
+
+  //   expect(lines[0].hardBreak, true);
+  //   expect(lines[1].hardBreak, false);
+  //   expect(lines[2].hardBreak, true);
+  //   expect(lines[3].hardBreak, true);
+
+  //   expect(lines[0].ascent, 11.199999809265137);
+  //   expect(lines[1].ascent, 11.199999809265137);
+  //   expect(lines[2].ascent, 11.199999809265137);
+  //   expect(lines[3].ascent, 11.199999809265137);
+
+  //   expect(lines[0].descent, 2.799999952316284);
+  //   expect(lines[1].descent, 2.799999952316284);
+  //   expect(lines[2].descent, 2.799999952316284);
+  //   expect(lines[3].descent, 2.799999952316284);
+
+  //   expect(lines[0].unscaledAscent, 11.199999809265137);
+  //   expect(lines[1].unscaledAscent, 11.199999809265137);
+  //   expect(lines[2].unscaledAscent, 11.199999809265137);
+  //   expect(lines[3].unscaledAscent, 11.199999809265137);
+
+  //   expect(lines[0].baseline, 11.200000047683716);
+  //   expect(lines[1].baseline, 25.200000047683716);
+  //   expect(lines[2].baseline, 39.200000047683716);
+  //   expect(lines[3].baseline, 53.200000047683716);
+
+  //   expect(lines[0].height, 14);
+  //   expect(lines[1].height, 14);
+  //   expect(lines[2].height, 14);
+  //   expect(lines[3].height, 14);
+
+  //   expect(lines[0].width, 70);
+  //   expect(lines[1].width, 294);
+  //   expect(lines[2].width, 266);
+  //   expect(lines[3].width, 168);
+
+  //   expect(lines[0].left, 0);
+  //   expect(lines[1].left, 0);
+  //   expect(lines[2].left, 0);
+  //   expect(lines[3].left, 0);
+
+  //   expect(lines[0].lineNumber, 0);
+  //   expect(lines[1].lineNumber, 1);
+  //   expect(lines[2].lineNumber, 2);
+  //   expect(lines[3].lineNumber, 3);
+  // }, skip: true); // https://github.com/flutter/flutter/issues/62819
+
+  // test('MongolTextPainter caret height and line height', () {
+  //   final painter = MongolTextPainter()
+  //     ..strutStyle = const StrutStyle(fontSize: 50.0);
+
+  //   const String text = 'A';
+  //   painter.text = const TextSpan(text: text, style: TextStyle(height: 1.0));
+  //   painter.layout();
+
+  //   final double caretHeight = painter.getFullHeightForCaret(
+  //     const ui.TextPosition(offset: 0),
+  //     ui.Rect.zero,
+  //   )!;
+  //   expect(caretHeight, 50.0);
+  // }, skip: isBrowser); // https://github.com/flutter/flutter/issues/56308
 }
 
 class MockCanvas extends Fake implements Canvas {}
