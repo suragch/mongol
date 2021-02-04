@@ -80,6 +80,7 @@ class MongolParagraph {
     var end = 0;
     var lineWidth = 0.0;
     var lineHeight = 0.0;
+    var runEndsWithNewLine = false;
     for (var i = 0; i < _runs.length; i++) {
       end = i;
       final run = _runs[i];
@@ -96,7 +97,8 @@ class MongolParagraph {
         lineHeight = math.max(lineHeight, run.height);
       }
 
-      if (_runEndsWithNewLine(run)) {
+      runEndsWithNewLine = _runEndsWithNewLine(run);
+      if (runEndsWithNewLine) {
         end = i + 1;
         _addLine(start, end, lineWidth, lineHeight);
         lineWidth = 0;
@@ -108,6 +110,12 @@ class MongolParagraph {
     end = _runs.length;
     if (start < end) {
       _addLine(start, end, lineWidth, lineHeight);
+    }
+
+    // add empty line with invalid run indexes for final newline char
+    if (runEndsWithNewLine) {
+      final height = _lines.last.bounds.height;
+      _addLine(-1, -1, 0, height);
     }
   }
 
@@ -251,7 +259,7 @@ class MongolParagraph {
 
     // The [start] index must be within the text range
     final textLength = _text.length;
-    if (start < 0 || start >= _text.length) {
+    if (start < 0 || start > _text.length) {
       return boxes;
     }
 
@@ -265,26 +273,32 @@ class MongolParagraph {
     for (var i = 0; i < _lines.length; i++) {
       final line = _lines[i];
       final lastRunIndex = line.textRunEnd - 1;
-      final lastCharIndex = _runs[lastRunIndex].end - 1;
+
+      // return empty line for invalid run indexes
+      // (This happens when text ends with newline char.)
+      if (lastRunIndex < 0) {
+        if (end > textLength) {
+          boxes.add(_lineBoundsAsBox(line, dx));
+        }
+        continue;
+      }
+
+      final lineLastCharIndex = _runs[lastRunIndex].end - 1;
 
       // skip empty lines before the selected range
-      if (lastCharIndex < start) {
+      if (lineLastCharIndex < start) {
         // The line is horizontal but dx is for vertical orientation
         dx += line.bounds.height;
         continue;
       }
 
+      final firstRunIndex = line.textRunStart;
+      final lineFirstCharIndex = _runs[firstRunIndex].start;
+
       // If this is a full line then skip looping over the runs
       // because the line size has already been cached.
-      if (boxes.isNotEmpty && lastCharIndex < effectiveEnd) {
-        final lineBounds = line.bounds;
-        final lineBox =
-            Rect.fromLTWH(dx, 0, lineBounds.height, lineBounds.width);
-        boxes.add(lineBox);
-        // If the selection goes to the end of this line then we're finished.
-        if (lastCharIndex == effectiveEnd - 1) {
-          return boxes;
-        }
+      if (lineFirstCharIndex >= start && lineLastCharIndex < effectiveEnd) {
+        boxes.add(_lineBoundsAsBox(line, dx));
       } else {
         // check the runs one at a time
         final lineBox = _getBoxFromLine(line, start, effectiveEnd, dx);
@@ -295,13 +309,18 @@ class MongolParagraph {
         }
 
         // If this is the last line there we're finished
-        if (lastCharIndex >= effectiveEnd - 1) {
+        if (lineLastCharIndex >= effectiveEnd - 1) {
           return boxes;
         }
       }
       dx += line.bounds.height;
     }
     return boxes;
+  }
+
+  Rect _lineBoundsAsBox(_LineInfo line, double dx) {
+    final lineBounds = line.bounds;
+    return Rect.fromLTWH(dx, 0, lineBounds.height, lineBounds.width);
   }
 
   // Takes a single line and finds the box that includes the selected range
@@ -500,7 +519,8 @@ class MongolParagraphBuilder {
       endIndex += segment.text.length;
       _builder ??= ui.ParagraphBuilder(_paragraphStyle!);
       _builder.pushStyle(style);
-      _builder.addText(_stripNewLineChar(segment.text));
+      final text = _stripNewLineChar(segment.text);
+      _builder.addText(text);
       _builder.pop();
 
       if (_isNonBreakingSegment(i)) {

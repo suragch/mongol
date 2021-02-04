@@ -298,8 +298,44 @@ void main() {
       expect(boxes.first.bottom, 42);
     });
 
+    test('handles newlines well', () {
+      final text = '\n';
+      final paragraph = _getParagraph(text, 300);
+      // final paragraphStyle = ui.ParagraphStyle();
+      // final paragraphBuilder = MongolParagraphBuilder(paragraphStyle);
+      // paragraphBuilder.addText(text);
+      // final constraints = MongolParagraphConstraints(height: 300);
+      // final paragraph = paragraphBuilder.build();
+      // paragraph.layout(constraints);
+
+      var boxes = paragraph.getBoxesForRange(0, 1);
+      expect(boxes.length, 1);
+      expect(boxes.first.left, 0.0);
+      expect(boxes.first.top, 0.0);
+      expect(boxes.first.right, 14.0);
+      expect(boxes.first.bottom, 0.0);
+
+      boxes = paragraph.getBoxesForRange(1, 2);
+      expect(boxes.length, 1);
+      expect(boxes.first.left, 14.0);
+      expect(boxes.first.top, 0.0);
+      expect(boxes.first.right, 28.0);
+      expect(boxes.first.bottom, 0.0);
+
+      boxes = paragraph.getBoxesForRange(0, 8);
+      expect(boxes.length, 2);
+      expect(boxes.first.left, 0.0);
+      expect(boxes.first.top, 0.0);
+      expect(boxes.first.right, 14.0);
+      expect(boxes.first.bottom, 0.0);
+      expect(boxes.last.left, 14.0);
+      expect(boxes.last.top, 0.0);
+      expect(boxes.last.right, 28.0);
+      expect(boxes.last.bottom, 0.0);
+    });
+
     // test('Partial ranges return empty boxes', () {
-    //   final text = '👨‍👩‍👦';
+    //   final text = '\n';
     //   final paragraphStyle = ui.ParagraphStyle(
     //     textDirection: ui.TextDirection.ltr,
     //   );
@@ -309,23 +345,24 @@ void main() {
     //   final paragraph = paragraphBuilder.build();
     //   paragraph.layout(constraints);
 
-    //   var boxes = paragraph.getBoxesForRange(0, 8);
-    //   expect(boxes.length, 1);
-    //   boxes = paragraph.getBoxesForRange(1, 8);
-    //   expect(boxes.length, 0);
-    //   boxes = paragraph.getBoxesForRange(2, 8);
-    //   expect(boxes.length, 0);
-    //   boxes = paragraph.getBoxesForRange(3, 8);
-    //   expect(boxes.length, 0);
-    //   boxes = paragraph.getBoxesForRange(4, 8);
-    //   expect(boxes.length, 0);
-    //   boxes = paragraph.getBoxesForRange(5, 8);
-    //   expect(boxes.length, 0);
-    //   boxes = paragraph.getBoxesForRange(6, 8);
-    //   expect(boxes.length, 0);
-    //   boxes = paragraph.getBoxesForRange(7, 8);
-    //   print(boxes); // [TextBox.fromLTRBD(0.0, 0.0, 42.0, 14.0, TextDirection.ltr)]
-    //   expect(boxes.length, 0); // fails: Actual: <1>
+    //   var boxes = paragraph.getBoxesForRange(1, 2);
+    //   print(boxes);
+    //   // [TextBox.fromLTRBD(0.0, 0.0, 0.0, 14.0, TextDirection.ltr),
+    //   //  TextBox.fromLTRBD(0.0, 14.0, 0.0, 28.0, TextDirection.ltr)]
     // });
   });
+
+  // group('line wrapping -', () {
+  //   test('newline character at end of text wraps last word', () {
+  //     final paragraphStyle = ui.ParagraphStyle();
+  //     final paragraphBuilder = MongolParagraphBuilder(paragraphStyle);
+  //     paragraphBuilder.addText('a\n');
+  //     final constraints = MongolParagraphConstraints(height: 300);
+  //     final paragraph = paragraphBuilder.build();
+  //     paragraph.layout(constraints);
+  //     //final paragraph = _getParagraph('a\n', 300);
+  //     print(paragraph.height);
+  //     print(paragraph.width);
+  //   });
+  // });
 }

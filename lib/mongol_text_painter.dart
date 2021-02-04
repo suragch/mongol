@@ -7,9 +7,14 @@
 import 'dart:math';
 import 'dart:ui' as ui show ParagraphStyle;
 
-import 'package:flutter/painting.dart';
+//import 'package:flutter/painting.dart' as painting;
 import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol_paragraph.dart';
+
+// The default font size if none is specified. This should be kept in
+// sync with the default values in text_style.dart, as well as the
+// defaults set in the engine (eg, LibTxt's text_style.h, paragraph_style.h).
+const double _kDefaultFontSize = 14.0;
 
 /// This is used to cache and pass the computed metrics regarding the
 /// caret's size and position. This is preferred due to the expensive
@@ -58,6 +63,9 @@ class MongolTextPainter {
         _textAlign = textAlign,
         _textScaleFactor = textScaleFactor;
 
+  MongolParagraph? _paragraph;
+  bool _needsLayout = true;
+
   /// Marks this text painter's layout information as dirty and removes cached
   /// information.
   ///
@@ -70,9 +78,6 @@ class MongolTextPainter {
     _previousCaretPosition = null;
     _previousCaretPrototype = null;
   }
-
-  MongolParagraph? _paragraph;
-  bool _needsLayout = true;
 
   /// The (potentially styled) text to paint.
   ///
@@ -90,9 +95,11 @@ class MongolTextPainter {
   set text(TextSpan? value) {
     assert(value == null || value.debugAssertIsValid());
     if (_text == value) return;
+    if (_text?.style != value?.style) {
+      _layoutTemplate = null;
+    }
     _text = value;
-    _paragraph = null;
-    _needsLayout = true;
+    markNeedsLayout();
   }
 
   /// How the text should be aligned vertically.
@@ -122,7 +129,10 @@ class MongolTextPainter {
     if (_textScaleFactor == value) return;
     _textScaleFactor = value;
     markNeedsLayout();
+    _layoutTemplate = null;
   }
+
+  MongolParagraph? _layoutTemplate;
 
   ui.ParagraphStyle _createParagraphStyle() {
     return _text!.style?.getParagraphStyle(
@@ -137,10 +147,42 @@ class MongolTextPainter {
         ui.ParagraphStyle(
           textAlign: textAlign,
           textDirection: TextDirection.ltr,
+          // Use the default font size to multiply by as RichText does not
+          // perform inheriting [TextStyle]s and would otherwise
+          // fail to apply textScaleFactor.
+          fontSize: _kDefaultFontSize * textScaleFactor,
           maxLines: null,
           ellipsis: null,
           locale: null,
         );
+  }
+
+  /// The width of a space in [text] in logical pixels.
+  ///
+  /// (This is in vertical orientation. In other words, it is the height
+  /// of a space in horizontal orientation.)
+  ///
+  /// Not every line of text in [text] will have this width, but this width
+  /// is "typical" for text in [text] and useful for sizing other objects
+  /// relative a typical line of text.
+  ///
+  /// Obtaining this value does not require calling [layout].
+  ///
+  /// The style of the [text] property is used to determine the font settings
+  /// that contribute to the [preferredLineWidth]. If [text] is null or if it
+  /// specifies no styles, the default [TextStyle] values are used (a 10 pixel
+  /// sans-serif font).
+  double get preferredLineWidth {
+    if (_layoutTemplate == null) {
+      final builder = MongolParagraphBuilder(_createParagraphStyle());
+      if (text?.style != null) {
+        builder.pushStyle(text!.style!);
+      }
+      builder.addText(' ');
+      _layoutTemplate = builder.build()
+        ..layout(const MongolParagraphConstraints(height: double.infinity));
+    }
+    return _layoutTemplate!.width;
   }
 
   double _applyFloatingPointHack(double layoutValue) {
@@ -363,7 +405,7 @@ class MongolTextPainter {
     while (boxes.isEmpty) {
       final nextRuneOffset = offset + graphemeClusterLength;
       boxes = _paragraph!.getBoxesForRange(offset, nextRuneOffset);
-      // When the range does not include a full grapheme cluster, no boxes will 
+      // When the range does not include a full grapheme cluster, no boxes will
       // be returned.
       if (boxes.isEmpty) {
         // When we are at the end of the line, a non-surrogate position will
