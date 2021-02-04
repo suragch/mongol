@@ -133,4 +133,3 @@ The text field is just a standard `TextField` rotated by 90 degrees. For that re
 - Improved keyboard
 - Various other text based widgets
 - Support `WidgetSpan`.
-- Replace TextAlign with MongolTextAlign

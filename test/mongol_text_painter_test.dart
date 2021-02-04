@@ -561,7 +561,7 @@ void main() {
       ),
     );
     painter.layout();
-    print(painter.size);
+    //print(painter.size);
     expect(painter.size, const Size(10.0, 50.0));
     // skip: currently minIntrinsicHeight is counting the space so returns 20.0
     // expect(painter.minIntrinsicHeight, 10.0);
@@ -835,7 +835,7 @@ void main() {
     // Given a one-line right aligned string, positioning the cursor at offset 0
     // means that it appears at the "end" of the string, after the character
     // that was typed first, at x=0.
-    painter.textAlign = TextAlign.right;
+    painter.textAlign = MongolTextAlign.bottom;
     text = 'aaa';
     painter.text = TextSpan(text: text);
     painter.layout();
@@ -846,7 +846,7 @@ void main() {
     );
     expect(caretOffset.dy, moreOrLessEquals(0.0, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
-    painter.textAlign = TextAlign.left;
+    painter.textAlign = MongolTextAlign.top;
 
     // When given an offset after a newline in the middle of a string,
     // getOffsetForCaret returns the start of the next line regardless of

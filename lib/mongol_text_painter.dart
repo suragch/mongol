@@ -32,6 +32,28 @@ class _CaretMetrics {
   final double? fullWidth;
 }
 
+/// Whether and how to align text vertically.
+///
+/// This is only used at the MongolTextPainter level and above. Below that the
+/// more primitive [TextAlign] enum is used and top is mapped to left and
+/// bottom is mapped to right.
+enum MongolTextAlign {
+  /// Align the text on the top edge of the container.
+  top,
+
+  /// Align the text on the bottom edge of the container.
+  bottom,
+
+  /// Align the text in the center of the container.
+  center,
+
+  /// Stretch lines of text that end with a soft line break to fill the height
+  /// of the container.
+  ///
+  /// Lines that end with hard line breaks are aligned towards the [top] edge.
+  justify,
+}
+
 /// An object that paints a Mongolian [TextSpan] tree into a [Canvas].
 ///
 /// To use a [MongolTextPainter], follow these steps:
@@ -56,7 +78,7 @@ class MongolTextPainter {
   /// calling [layout].
   MongolTextPainter({
     TextSpan? text,
-    TextAlign textAlign = TextAlign.start,
+    MongolTextAlign textAlign = MongolTextAlign.top,
     double textScaleFactor = 1.0,
   })  : assert(text == null || text.debugAssertIsValid()),
         _text = text,
@@ -106,10 +128,10 @@ class MongolTextPainter {
   ///
   /// After this is set, you must call [layout] before the next call to [paint].
   ///
-  /// The [textAlign] property defaults to [TextAlign.start].
-  TextAlign get textAlign => _textAlign;
-  TextAlign _textAlign;
-  set textAlign(TextAlign value) {
+  /// The [textAlign] property defaults to [MongolTextAlign.top].
+  MongolTextAlign get textAlign => _textAlign;
+  MongolTextAlign _textAlign;
+  set textAlign(MongolTextAlign value) {
     if (_textAlign == value) {
       return;
     }
@@ -136,7 +158,7 @@ class MongolTextPainter {
 
   ui.ParagraphStyle _createParagraphStyle() {
     return _text!.style?.getParagraphStyle(
-          textAlign: textAlign,
+          textAlign: _mapMongolTextAlign(),
           textDirection: TextDirection.ltr,
           textScaleFactor: textScaleFactor,
           maxLines: null,
@@ -145,7 +167,7 @@ class MongolTextPainter {
           strutStyle: null,
         ) ??
         ui.ParagraphStyle(
-          textAlign: textAlign,
+          textAlign: _mapMongolTextAlign(),
           textDirection: TextDirection.ltr,
           // Use the default font size to multiply by as RichText does not
           // perform inheriting [TextStyle]s and would otherwise
@@ -155,6 +177,19 @@ class MongolTextPainter {
           ellipsis: null,
           locale: null,
         );
+  }
+
+  TextAlign _mapMongolTextAlign() {
+    switch (textAlign) {
+      case MongolTextAlign.top:
+        return TextAlign.left;
+      case MongolTextAlign.bottom:
+        return TextAlign.right;
+      case MongolTextAlign.center:
+        return TextAlign.center;
+      case MongolTextAlign.justify:
+        return TextAlign.justify;
+    }
   }
 
   /// The width of a space in [text] in logical pixels.
@@ -432,16 +467,14 @@ class MongolTextPainter {
   }
 
   Offset get _emptyOffset {
-    assert(!_needsLayout); // implies textDirection is non-null
+    assert(!_needsLayout);
     switch (textAlign) {
-      case TextAlign.start:
-      case TextAlign.justify:
-      case TextAlign.left:
+      case MongolTextAlign.top:
+      case MongolTextAlign.justify:
         return Offset.zero;
-      case TextAlign.end:
-      case TextAlign.right:
+      case MongolTextAlign.bottom:
         return Offset(0.0, height);
-      case TextAlign.center:
+      case MongolTextAlign.center:
         return Offset(0.0, height / 2.0);
     }
   }
