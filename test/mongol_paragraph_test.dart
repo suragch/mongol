@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/mongol_paragraph.dart';
@@ -14,27 +15,27 @@ void main() {
     return paragraph;
   }
 
-  /// This group is for testing [getBoxesForRange].
-  ///
-  /// You can compare the behavior to [Paragraph] with the following code:
-  ///
-  /// ```
-  /// const text = 'ABC DEF 123 456\n' //   0-16
-  ///     'ABC DEF 123 456\n' //  16-32
-  ///     'ABC DEF 123 456\n' //  32-48
-  ///     'ABC DEF 123 456\n' //  48-64
-  ///     'ABC DEF 123 456\n'; // 64-80
-  /// final paragraphStyle = ui.ParagraphStyle(
-  ///   textDirection: ui.TextDirection.ltr,
-  /// );
-  /// final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
-  ///   ..addText(text);
-  /// final constraints = ui.ParagraphConstraints(width: 300);
-  /// final paragraph = paragraphBuilder.build();
-  /// paragraph.layout(constraints);
-  /// final boxes = paragraph.getBoxesForRange(21, 58);
-  /// print(boxes);
-  /// ```
+  // This group is for testing [getBoxesForRange].
+  //
+  // You can compare the behavior to [Paragraph] with the following code:
+  //
+  // ```
+  // const text = 'ABC DEF 123 456\n' //   0-16
+  //     'ABC DEF 123 456\n' //  16-32
+  //     'ABC DEF 123 456\n' //  32-48
+  //     'ABC DEF 123 456\n' //  48-64
+  //     'ABC DEF 123 456\n'; // 64-80
+  // final paragraphStyle = ui.ParagraphStyle(
+  //   textDirection: ui.TextDirection.ltr,
+  // );
+  // final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
+  //   ..addText(text);
+  // final constraints = ui.ParagraphConstraints(width: 300);
+  // final paragraph = paragraphBuilder.build();
+  // paragraph.layout(constraints);
+  // final boxes = paragraph.getBoxesForRange(21, 58);
+  // print(boxes);
+  // ```
   group('getBoxesForRange', () {
     test('single character gives correct ranges', () {
       final paragraph = _getParagraph('A', 300);
@@ -301,12 +302,6 @@ void main() {
     test('handles newlines well', () {
       final text = '\n';
       final paragraph = _getParagraph(text, 300);
-      // final paragraphStyle = ui.ParagraphStyle();
-      // final paragraphBuilder = MongolParagraphBuilder(paragraphStyle);
-      // paragraphBuilder.addText(text);
-      // final constraints = MongolParagraphConstraints(height: 300);
-      // final paragraph = paragraphBuilder.build();
-      // paragraph.layout(constraints);
 
       var boxes = paragraph.getBoxesForRange(0, 1);
       expect(boxes.length, 1);
@@ -333,36 +328,107 @@ void main() {
       expect(boxes.last.right, 28.0);
       expect(boxes.last.bottom, 0.0);
     });
-
-    // test('Partial ranges return empty boxes', () {
-    //   final text = '\n';
-    //   final paragraphStyle = ui.ParagraphStyle(
-    //     textDirection: ui.TextDirection.ltr,
-    //   );
-    //   final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
-    //     ..addText(text);
-    //   final constraints = ui.ParagraphConstraints(width: 300);
-    //   final paragraph = paragraphBuilder.build();
-    //   paragraph.layout(constraints);
-
-    //   var boxes = paragraph.getBoxesForRange(1, 2);
-    //   print(boxes);
-    //   // [TextBox.fromLTRBD(0.0, 0.0, 0.0, 14.0, TextDirection.ltr),
-    //   //  TextBox.fromLTRBD(0.0, 14.0, 0.0, 28.0, TextDirection.ltr)]
-    // });
   });
 
-  // group('line wrapping -', () {
-  //   test('newline character at end of text wraps last word', () {
-  //     final paragraphStyle = ui.ParagraphStyle();
-  //     final paragraphBuilder = MongolParagraphBuilder(paragraphStyle);
-  //     paragraphBuilder.addText('a\n');
-  //     final constraints = MongolParagraphConstraints(height: 300);
-  //     final paragraph = paragraphBuilder.build();
-  //     paragraph.layout(constraints);
-  //     //final paragraph = _getParagraph('a\n', 300);
-  //     print(paragraph.height);
-  //     print(paragraph.width);
-  //   });
+  group('miscellaneous methods -', () {
+    test('getPositionForOffset control test', () {
+      const text = 'I polished up that handle so carefullee\n'
+          "That now I am the Ruler of the Queen's Navee!";
+
+      final paragraph = _getParagraph(text, 1000);
+
+      final position20 =
+          paragraph.getPositionForOffset(const Offset(5.0, 20.0));
+      expect(position20.offset, greaterThan(0.0));
+
+      final position40 =
+          paragraph.getPositionForOffset(const Offset(5.0, 40.0));
+      expect(position40.offset, greaterThan(position20.offset));
+
+      final positionRight =
+          paragraph.getPositionForOffset(const Offset(20.0, 5.0));
+      expect(positionRight.offset, greaterThan(position40.offset));
+    });
+
+    test('getWordBoundary control test', () {
+      const text = 'I polished up that handle so carefullee\n'
+          "That now I am the Ruler of the Queen's Navee!";
+
+      final paragraph = _getParagraph(text, 1000);
+
+      final range5 = paragraph.getWordBoundary(const TextPosition(offset: 5));
+      expect(range5.textInside(text), equals('polished'));
+
+      final range50 = paragraph.getWordBoundary(const TextPosition(offset: 50));
+      expect(range50.textInside(text), equals(' '));
+
+      final range75 = paragraph.getWordBoundary(const TextPosition(offset: 75));
+      expect(range75.textInside(text), equals("Queen's"));
+
+      // TODO: this maybe isn't good. It should be '!'.
+      final range84 = paragraph.getWordBoundary(const TextPosition(offset: 84));
+      expect(range84.textInside(text), equals('Navee!'));
+
+      // TODO: Should this return the final run?
+      final range85 = paragraph.getWordBoundary(const TextPosition(offset: 85));
+      expect(range85, TextRange.empty);
+
+      // https://github.com/flutter/flutter/issues/75494
+      final range1000 =
+          paragraph.getWordBoundary(const TextPosition(offset: 1000));
+      expect(range1000, TextRange.empty);
+    });
+
+    test('getLineBoundary control test', () {
+      const text = 'I polished up that handle so carefullee\n'
+          "That now I am the Ruler of the Queen's Navee!";
+
+      final paragraph = _getParagraph(text, 1000);
+
+      final range5 = paragraph.getLineBoundary(const TextPosition(offset: 5));
+      expect(
+        range5.textInside(text),
+        equals('I polished up that handle so carefullee\n'),
+      );
+
+      final range40 = paragraph.getLineBoundary(const TextPosition(offset: 40));
+      expect(
+        range40.textInside(text),
+        equals("That now I am the Ruler of the Queen's Navee!"),
+      );
+
+      final range85 = paragraph.getLineBoundary(const TextPosition(offset: 75));
+      expect(
+        range85.textInside(text),
+        equals("That now I am the Ruler of the Queen's Navee!"),
+      );
+
+      final rangeLength =
+          paragraph.getLineBoundary(const TextPosition(offset: text.length));
+      expect(
+        rangeLength.textInside(text),
+        equals("That now I am the Ruler of the Queen's Navee!"),
+      );
+
+      final range1000 =
+          paragraph.getLineBoundary(const TextPosition(offset: 1000));
+      expect(range1000, TextRange.empty);
+    });
+  });
+
+  /// Keep this for testing Paragraph
+  ///
+  // test('Line boundary for out-of-range offset returns empty range', () {
+  //   const text = 'Hello world';
+  //   const offset = 12;
+  //   final paragraphStyle = ParagraphStyle(
+  //     textDirection: TextDirection.ltr,
+  //   );
+  //   final paragraphBuilder = ParagraphBuilder(paragraphStyle)..addText(text);
+  //   final constraints = ParagraphConstraints(width: 300);
+  //   final paragraph = paragraphBuilder.build();
+  //   paragraph.layout(constraints);
+  //   final range = paragraph.getLineBoundary(TextPosition(offset: offset));
+  //   expect(range, TextRange.empty);
   // });
 }

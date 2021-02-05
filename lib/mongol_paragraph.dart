@@ -400,6 +400,86 @@ class MongolParagraph {
     }
     return Rect.fromLTWH(dx, dy, boxWidth, boxHeight);
   }
+
+  /// Returns the [TextRange] of the word at the given [TextPosition].
+  ///
+  /// The current implementation just returns the currect text run, which is
+  /// generally a word.
+  TextRange getWordBoundary(TextPosition position) {
+    final offset = position.offset;
+    final run = _getRunFromOffset(offset);
+    if (run == null) {
+      return TextRange.empty;
+    }
+    return _splitBreakCharactersFromRun(run, offset);
+  }
+
+  // runs can include break characters currently so split them from the returned
+  // range
+  TextRange _splitBreakCharactersFromRun(_TextRun run, int offset) {
+    var start = run.start;
+    var end = run.end;
+    final finalChar = _text[end - 1];
+    if (LineBreaker.isBreakChar(finalChar)) {
+      if (offset == end - 1) {
+        start = end - 1;
+      } else {
+        end = end - 1;
+      }
+    }
+    return TextRange(start: start, end: end);
+  }
+
+  _TextRun? _getRunFromOffset(int offset) {
+    if (offset >= _text.length) {
+      return null;
+    }
+    var min = 0;
+    var max = _runs.length - 1;
+    // do a binary search
+    while (min <= max) {
+      final guess = (max + min) ~/ 2;
+      if (offset >= _runs[guess].end) {
+        min = guess + 1;
+        continue;
+      } else if (offset < _runs[guess].start) {
+        max = guess - 1;
+        continue;
+      } else {
+        return _runs[guess];
+      }
+    }
+    return null;
+  }
+
+  TextRange getLineBoundary(TextPosition position) {
+    final offset = position.offset;
+    if (offset > _text.length) {
+      return TextRange.empty;
+    }
+    var min = 0;
+    var max = _lines.length - 1;
+    var start = -1;
+    var end = -1;
+    // do a binary search
+    while (min <= max) {
+      final guess = (max + min) ~/ 2;
+      final line = _lines[guess];
+      start = _runs[line.textRunStart].start;
+      end = _runs[line.textRunEnd - 1].end;
+      if (offset >= end) {
+        min = guess + 1;
+        continue;
+      } else if (offset < start) {
+        max = guess - 1;
+        continue;
+      } else {
+        break;
+      }
+    }
+    return TextRange(start: start, end: end);
+  }
+
 }
 
 /// Layout constraints for [MongolParagraph] objects.

@@ -369,6 +369,22 @@ class MongolTextPainter {
     return value == 0x200F || value == 0x200E;
   }
 
+  /// Returns the closest offset after `offset` at which the input cursor can be
+  /// positioned.
+  int? getOffsetAfter(int offset) {
+    final nextCodeUnit = _text!.codeUnitAt(offset);
+    if (nextCodeUnit == null) return null;
+    return _isUtf16Surrogate(nextCodeUnit) ? offset + 2 : offset + 1;
+  }
+
+  /// Returns the closest offset before `offset` at which the input cursor can
+  /// be positioned.
+  int? getOffsetBefore(int offset) {
+    final prevCodeUnit = _text!.codeUnitAt(offset - 1);
+    if (prevCodeUnit == null) return null;
+    return _isUtf16Surrogate(prevCodeUnit) ? offset - 2 : offset - 1;
+  }
+
   // Unicode value for a zero width joiner character.
   static const int _zwjUtf16 = 0x200d;
 
@@ -532,9 +548,38 @@ class MongolTextPainter {
     _previousCaretPrototype = caretPrototype;
   }
 
+  /// Returns a list of rects that bound the given selection.
+  List<Rect> getBoxesForSelection(TextSelection selection) {
+    assert(!_needsLayout);
+    return _paragraph!.getBoxesForRange(
+      selection.start,
+      selection.end,
+    );
+  }
+
   /// Returns the position within the text for the given pixel offset.
   TextPosition getPositionForOffset(Offset offset) {
     assert(!_needsLayout);
     return _paragraph!.getPositionForOffset(offset);
+  }
+
+  /// Returns the text range of the word at the given offset. Characters not
+  /// part of a word, such as spaces, symbols, and punctuation, have word breaks
+  /// on both sides. In such cases, this method will return a text range that
+  /// contains the given text position.
+  ///
+  /// Word boundaries are defined more precisely in Unicode Standard Annex #29
+  /// <http://www.unicode.org/reports/tr29/#Word_Boundaries>.
+  TextRange getWordBoundary(TextPosition position) {
+    assert(!_needsLayout);
+    return _paragraph!.getWordBoundary(position);
+  }
+
+  /// Returns the text range of the line at the given offset.
+  ///
+  /// The newline, if any, is included in the range.
+  TextRange getLineBoundary(TextPosition position) {
+    assert(!_needsLayout);
+    return _paragraph!.getLineBoundary(position);
   }
 }
