@@ -161,10 +161,7 @@ class MongolRenderParagraph extends RenderBox
     assert(!debugNeedsLayout);
     assert(constraints.debugAssertIsValid());
     _layoutTextWithConstraints(constraints);
-    // Since the text is rotated it doesn't make sense to use the rotated
-    // text baseline because this is used for aligning with other widgets.
-    // Instead we will return the base of the widget.
-    return _textPainter.height;
+    return _textPainter.computeDistanceToActualBaseline(baseline);
   }
 
   @override

@@ -266,6 +266,16 @@ class MongolTextPainter {
     return Size(width, height);
   }
 
+  /// Since the text is rotated it doesn't make sense to use the rotated
+  /// text baseline because this is used for aligning with other widgets.
+  /// Instead we will return the base of the widget.
+  ///
+  /// Valid only after [layout] has been called.
+  double computeDistanceToActualBaseline(TextBaseline baseline) {
+    assert(!_needsLayout);
+    return height;
+  }
+
   double? _lastMinHeight;
   double? _lastMaxHeight;
 
