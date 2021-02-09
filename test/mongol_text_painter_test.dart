@@ -128,111 +128,92 @@ void main() {
   });
 
   test(
-      'TextPainter returns correct offset and affinity for soft-wrap multi-line TextSpan',
+      'MongolTextPainter returns correct offset and affinity for soft-wrap multi-line TextSpan',
       () {
-    final painter = MongolTextPainter();
-    painter.text = TextSpan(
-      text: 'ABCDE FGHIJ KLMNO PQRST',
-      style: TextStyle(fontSize: 30),
-    );
-    painter.layout(maxHeight: 400);
+    final painter = MongolTextPainter()
+      ..text = TextSpan(
+        text: 'ABCDE FGHIJ',
+        style: TextStyle(
+          height: 1.0,
+          fontSize: 10.0,
+          fontFamily: 'Ahem',
+        )
+      )
+      ..layout(maxHeight: 80);
 
-    expect(painter.size, Size(60.0, 360.0));
+    // FIXME: TextPainter returns 80 rather than 60 here.
+    expect(painter.size, Size(20.0, 60.0));
 
     // before the first character
     var offset = Offset(-1.0, -1.0);
     var position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
-    expect(position.affinity, TextAffinity.upstream);
+    expect(position.affinity, TextAffinity.downstream);
 
     // offset zero
     offset = Offset.zero;
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
-    expect(position.affinity, TextAffinity.upstream);
+    expect(position.affinity, TextAffinity.downstream);
 
     // on A closer to beginning of char
-    offset = Offset(10.0, 1.0);
+    offset = Offset(2.0, 2.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
-    expect(position.affinity, TextAffinity.upstream);
+    expect(position.affinity, TextAffinity.downstream);
 
     // on B closer to beginning of char
-    offset = Offset(10.0, 40.0);
+    offset = Offset(2.0, 12.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
-    expect(position.affinity, TextAffinity.upstream);
+    expect(position.affinity, TextAffinity.downstream);
 
     // left of B closer to beginning of char
-    offset = Offset(-10.0, 40.0);
+    offset = Offset(-2.0, 12.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
-    expect(position.affinity, TextAffinity.upstream);
+    expect(position.affinity, TextAffinity.downstream);
 
     // on J closer to beginning of char
-    offset = Offset(10.0, 310.0);
+    offset = Offset(12.0, 42.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 10);
-    expect(position.affinity, TextAffinity.upstream);
+    expect(position.affinity, TextAffinity.downstream);
 
     // on J closer to end of char
-    offset = Offset(10.0, 320.0);
+    offset = Offset(12.0, 48.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 11);
     expect(position.affinity, TextAffinity.upstream);
 
     // on final space of first line closer to end of char
-    offset = Offset(10.0, 350.0);
+    offset = Offset(2.0, 58.0);
     position = painter.getPositionForOffset(offset);
-    expect(position.offset, 12);
+    expect(position.offset, 6);
     expect(position.affinity, TextAffinity.upstream);
 
     // below final space of first line
-    offset = Offset(10.0, 450.0);
+    offset = Offset(2.0, 70.0);
     position = painter.getPositionForOffset(offset);
-    expect(position.offset, 12);
+    expect(position.offset, 6);
     expect(position.affinity, TextAffinity.upstream);
 
     // left of and below final space of first line
-    offset = Offset(-10.0, 450.0);
+    offset = Offset(-10.0, 4500.0);
     position = painter.getPositionForOffset(offset);
-    expect(position.offset, 12);
+    expect(position.offset, 6);
     expect(position.affinity, TextAffinity.upstream);
 
-    // on K closer to beginning of char
-    offset = Offset(40.0, 10.0);
+    // below J
+    offset = Offset(12.0, 500.0);
     position = painter.getPositionForOffset(offset);
-    expect(position.offset, 12);
-    expect(position.affinity, TextAffinity.downstream);
-
-    // to right and above K closer to beginning of char
-    offset = Offset(100.0, -10.0);
-    position = painter.getPositionForOffset(offset);
-    expect(position.offset, 12);
-    expect(position.affinity, TextAffinity.downstream);
-
-    // on T closer to end of char
-    offset = Offset(40.0, 320.0);
-    position = painter.getPositionForOffset(offset);
-    expect(position.offset, 23);
+    expect(position.offset, 11);
     expect(position.affinity, TextAffinity.upstream);
 
-    // below T
-    offset = Offset(40.0, 500.0);
-    position = painter.getPositionForOffset(offset);
-    expect(position.offset, 23);
-    expect(position.affinity, TextAffinity.upstream);
-
-    // right of T closer to beginning of char
-    offset = Offset(140.0, 310.0);
-    position = painter.getPositionForOffset(offset);
-    expect(position.offset, 22);
-    expect(position.affinity, TextAffinity.upstream);
-
-    // right of and below T
+    // right of and below J
     offset = Offset(500.0, 500.0);
     position = painter.getPositionForOffset(offset);
-    expect(position.offset, 23);
+    expect(position.offset, 11);
     expect(position.affinity, TextAffinity.upstream);
   });
 
@@ -546,87 +527,90 @@ void main() {
     expect(painter.size, const Size(100.0, 100.0));
   });
 
-  test('MongolTextPainter intrinsic dimensions', () {
-    const style = TextStyle(
-      inherit: false,
-      fontFamily: 'Ahem',
-      fontSize: 10.0,
-    );
-    MongolTextPainter painter;
+  test(
+    'MongolTextPainter intrinsic dimensions',
+    () {
+      const style = TextStyle(
+        inherit: false,
+        fontFamily: 'Ahem',
+        fontSize: 10.0,
+      );
+      MongolTextPainter painter;
 
-    painter = MongolTextPainter(
-      text: const TextSpan(
-        text: 'X X X',
-        style: style,
-      ),
-    );
-    painter.layout();
-    //print(painter.size);
-    expect(painter.size, const Size(10.0, 50.0));
-    // skip: currently minIntrinsicHeight is counting the space so returns 20.0
-    // expect(painter.minIntrinsicHeight, 10.0);
-    expect(painter.maxIntrinsicHeight, 50.0);
+      painter = MongolTextPainter(
+        text: const TextSpan(
+          text: 'X X X',
+          style: style,
+        ),
+      );
+      painter.layout();
+      //print(painter.size);
+      expect(painter.size, const Size(10.0, 50.0));
+      // skip: currently minIntrinsicHeight is counting the space so returns 20.0
+      // expect(painter.minIntrinsicHeight, 10.0);
+      expect(painter.maxIntrinsicHeight, 50.0);
 
-    // painter = MongolTextPainter(
-    //   text: const TextSpan(
-    //     text: 'X X X',
-    //     style: style,
-    //   ),
-    //   ellipsis: 'e',
-    // );
-    // painter.layout();
-    // expect(painter.size, const Size(50.0, 10.0));
-    // expect(painter.minIntrinsicHeight, 50.0);
-    // expect(painter.maxIntrinsicHeight, 50.0);
+      // painter = MongolTextPainter(
+      //   text: const TextSpan(
+      //     text: 'X X X',
+      //     style: style,
+      //   ),
+      //   ellipsis: 'e',
+      // );
+      // painter.layout();
+      // expect(painter.size, const Size(50.0, 10.0));
+      // expect(painter.minIntrinsicHeight, 50.0);
+      // expect(painter.maxIntrinsicHeight, 50.0);
 
-    // painter = MongolTextPainter(
-    //   text: const TextSpan(
-    //     text: 'X X XXXX',
-    //     style: style,
-    //   ),
-    //   maxLines: 2,
-    // );
-    // painter.layout();
-    // expect(painter.size, const Size(80.0, 10.0));
-    // expect(painter.minIntrinsicHeight, 40.0);
-    // expect(painter.maxIntrinsicHeight, 80.0);
+      // painter = MongolTextPainter(
+      //   text: const TextSpan(
+      //     text: 'X X XXXX',
+      //     style: style,
+      //   ),
+      //   maxLines: 2,
+      // );
+      // painter.layout();
+      // expect(painter.size, const Size(80.0, 10.0));
+      // expect(painter.minIntrinsicHeight, 40.0);
+      // expect(painter.maxIntrinsicHeight, 80.0);
 
-    // painter = MongolTextPainter(
-    //   text: const TextSpan(
-    //     text: 'X X XXXX XX',
-    //     style: style,
-    //   ),
-    //   maxLines: 2,
-    // );
-    // painter.layout();
-    // expect(painter.size, const Size(110.0, 10.0));
-    // expect(painter.minIntrinsicHeight, 70.0);
-    // expect(painter.maxIntrinsicHeight, 110.0);
+      // painter = MongolTextPainter(
+      //   text: const TextSpan(
+      //     text: 'X X XXXX XX',
+      //     style: style,
+      //   ),
+      //   maxLines: 2,
+      // );
+      // painter.layout();
+      // expect(painter.size, const Size(110.0, 10.0));
+      // expect(painter.minIntrinsicHeight, 70.0);
+      // expect(painter.maxIntrinsicHeight, 110.0);
 
-    // painter = MongolTextPainter(
-    //   text: const TextSpan(
-    //     text: 'XXXXXXXX XXXX XX X',
-    //     style: style,
-    //   ),
-    //   maxLines: 2,
-    // );
-    // painter.layout();
-    // expect(painter.size, const Size(180.0, 10.0));
-    // expect(painter.minIntrinsicHeight, 90.0);
-    // expect(painter.maxIntrinsicHeight, 180.0);
+      // painter = MongolTextPainter(
+      //   text: const TextSpan(
+      //     text: 'XXXXXXXX XXXX XX X',
+      //     style: style,
+      //   ),
+      //   maxLines: 2,
+      // );
+      // painter.layout();
+      // expect(painter.size, const Size(180.0, 10.0));
+      // expect(painter.minIntrinsicHeight, 90.0);
+      // expect(painter.maxIntrinsicHeight, 180.0);
 
-    // painter = MongolTextPainter(
-    //   text: const TextSpan(
-    //     text: 'X XX XXXX XXXXXXXX',
-    //     style: style,
-    //   ),
-    //   maxLines: 2,
-    // );
-    // painter.layout();
-    // expect(painter.size, const Size(180.0, 10.0));
-    // expect(painter.minIntrinsicHeight, 90.0);
-    // expect(painter.maxIntrinsicHeight, 180.0);
-  },); // https://github.com/flutter/flutter/issues/13512
+      // painter = MongolTextPainter(
+      //   text: const TextSpan(
+      //     text: 'X XX XXXX XXXXXXXX',
+      //     style: style,
+      //   ),
+      //   maxLines: 2,
+      // );
+      // painter.layout();
+      // expect(painter.size, const Size(180.0, 10.0));
+      // expect(painter.minIntrinsicHeight, 90.0);
+      // expect(painter.maxIntrinsicHeight, 180.0);
+    },
+  ); // https://github.com/flutter/flutter/issues/13512
 
   test('MongolTextPainter handles newlines properly', () {
     final painter = MongolTextPainter();
@@ -644,52 +628,60 @@ void main() {
       ui.TextPosition(offset: offset),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset, affinity: ui.TextAffinity.upstream),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
     offset = 1;
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset, affinity: ui.TextAffinity.upstream),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
     offset = 2;
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset, affinity: ui.TextAffinity.upstream),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
     offset = 3;
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset, affinity: ui.TextAffinity.upstream),
       ui.Rect.zero,
     );
-    expect(caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
+    expect(
+        caretOffset.dy, moreOrLessEquals(SIZE_OF_A * offset, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
 
     // For explicit newlines, getOffsetForCaret places the caret at the location
@@ -773,7 +765,8 @@ void main() {
     // end of one line and start of next using affinity.
     text = 'aaaaaaa a'; // Just enough to wrap one character over to second line
     painter.text = TextSpan(text: text);
-    painter.layout(maxHeight: 100); // SIZE_OF_A * text.length > 100, so it wraps
+    painter.layout(
+        maxHeight: 100); // SIZE_OF_A * text.length > 100, so it wraps
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: text.length - 1),
       ui.Rect.zero,
@@ -782,7 +775,8 @@ void main() {
     expect(caretOffset.dy, moreOrLessEquals(0.0, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(SIZE_OF_A, epsilon: 0.0001));
     caretOffset = painter.getOffsetForCaret(
-      ui.TextPosition(offset: text.length - 1, affinity: ui.TextAffinity.upstream),
+      ui.TextPosition(
+          offset: text.length - 1, affinity: ui.TextAffinity.upstream),
       ui.Rect.zero,
     );
     // When affinity is upstream, cursor is at end of first line
@@ -969,7 +963,7 @@ void main() {
       ui.Rect.zero,
     );
     expect(caretOffset.dy, moreOrLessEquals(0.0, epsilon: 0.0001));
-    expect(caretOffset.dx,moreOrLessEquals(SIZE_OF_A, epsilon: 0.0001));
+    expect(caretOffset.dx, moreOrLessEquals(SIZE_OF_A, epsilon: 0.0001));
     caretOffset = painter.getOffsetForCaret(
       ui.TextPosition(offset: offset, affinity: TextAffinity.upstream),
       ui.Rect.zero,

@@ -206,13 +206,14 @@ class MongolParagraph {
     // find the afinity
     const upstream = 0;
     const downstream = 1;
-    final isFirstLine = matchedLine.textRunStart == 0;
-    final isFirstRunInLine = matchedRun == _runs[matchedLine.textRunStart];
-    final isFirstPositionInRun = runPosition.offset == 0;
+    final lineEndCharOffset = _runs[matchedLine.textRunEnd - 1].end;
+    // final isFirstLine = matchedLine.textRunStart == 0;
+    // final isFirstRunInLine = matchedRun == _runs[matchedLine.textRunStart];
+    // final isFirstPositionInRun = runPosition.offset == 0;
     final textAfinity =
-        (!isFirstLine && isFirstRunInLine && isFirstPositionInRun)
-            ? downstream
-            : upstream;
+        (textOffset == lineEndCharOffset)
+            ? upstream
+            : downstream;
     return [textOffset, textAfinity];
   }
 

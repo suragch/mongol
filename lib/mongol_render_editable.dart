@@ -2071,8 +2071,7 @@ class MongolRenderEditable extends RenderBox
     final height = forceLine
         ? constraints.maxHeight
         : constraints.constrainHeight(_textPainter.size.height + _caretMargin);
-    return Size(height,
-        constraints.constrainWidth(_preferredWidth(constraints.maxHeight)));
+    return Size(constraints.constrainWidth(_preferredWidth(constraints.maxHeight)), height);
   }
 
   @override
@@ -2093,8 +2092,9 @@ class MongolRenderEditable extends RenderBox
     final height = forceLine
         ? constraints.maxHeight
         : constraints.constrainHeight(_textPainter.size.height + _caretMargin);
-    size = Size(height,
-        constraints.constrainWidth(_preferredWidth(constraints.maxHeight)));
+    size = Size(
+        constraints.constrainWidth(_preferredWidth(constraints.maxHeight)),
+        height);
     final contentSize =
         Size(textPainterSize.width, textPainterSize.height + _caretMargin);
 
