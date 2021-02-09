@@ -513,8 +513,16 @@ class MongolTextPainter {
     return _caretMetrics.offset;
   }
 
+  /// Returns the strut bounded width of the glyph at the given `position`.
+  ///
+  /// Valid only after [layout] has been called.
+  double? getFullWidthForCaret(TextPosition position, Rect caretPrototype) {
+    _computeCaretMetrics(position, caretPrototype);
+    return _caretMetrics.fullWidth;
+  }
+
   // Cached caret metrics. This allows multiple invokes of [getOffsetForCaret] and
-  // [getFullHeightForCaret] in a row without performing redundant and expensive
+  // [getFullWidthForCaret] in a row without performing redundant and expensive
   // get rect calls to the paragraph.
   late _CaretMetrics _caretMetrics;
 

@@ -17,9 +17,6 @@ import 'package:mongol/mongol_text_painter.dart';
 const double _kCaretGap = 1.0; // pixels
 const double _kCaretWidthOffset = 2.0; // pixels
 
-// The corner radius of the floating cursor in pixels.
-const Radius _kFloatingCaretRadius = Radius.circular(1.0);
-
 /// Signature for the callback that reports when the user changes the selection
 /// (including the cursor location).
 ///
@@ -168,7 +165,6 @@ class MongolRenderEditable extends RenderBox
     TextSpan? text,
     MongolTextAlign textAlign = MongolTextAlign.top,
     Color? cursorColor,
-    Color? backgroundCursorColor,
     ValueNotifier<bool>? showCursor,
     bool? hasFocus,
     required LayerLink startHandleLayerLink,
@@ -195,8 +191,8 @@ class MongolRenderEditable extends RenderBox
     bool? enableInteractiveSelection,
     Clip clipBehavior = Clip.hardEdge,
     required this.textSelectionDelegate,
-    RenderEditablePainter? painter,
-    RenderEditablePainter? foregroundPainter,
+    MongolRenderEditablePainter? painter,
+    MongolRenderEditablePainter? foregroundPainter,
   })  : assert(maxLines == null || maxLines > 0),
         assert(minLines == null || minLines > 0),
         assert(
@@ -241,22 +237,20 @@ class MongolRenderEditable extends RenderBox
     _caretPainter.caretColor = cursorColor;
     _caretPainter.cursorRadius = cursorRadius;
     _caretPainter.cursorOffset = cursorOffset;
-    // TODO: can we get rid of this?
-    _caretPainter.backgroundCursorColor = backgroundCursorColor;
 
     _updateForegroundPainter(foregroundPainter);
     _updatePainter(painter);
   }
 
   /// Child render objects
-  _RenderEditableCustomPaint? _foregroundRenderObject;
-  _RenderEditableCustomPaint? _backgroundRenderObject;
+  _MongolRenderEditableCustomPaint? _foregroundRenderObject;
+  _MongolRenderEditableCustomPaint? _backgroundRenderObject;
 
-  void _updateForegroundPainter(RenderEditablePainter? newPainter) {
+  void _updateForegroundPainter(MongolRenderEditablePainter? newPainter) {
     final effectivePainter = (newPainter == null)
         ? _builtInForegroundPainters
         : _CompositeRenderEditablePainter(
-            painters: <RenderEditablePainter>[
+            painters: <MongolRenderEditablePainter>[
               _builtInForegroundPainters,
               newPainter,
             ],
@@ -264,7 +258,7 @@ class MongolRenderEditable extends RenderBox
 
     if (_foregroundRenderObject == null) {
       final foregroundRenderObject =
-          _RenderEditableCustomPaint(painter: effectivePainter);
+          _MongolRenderEditableCustomPaint(painter: effectivePainter);
       adoptChild(foregroundRenderObject);
       _foregroundRenderObject = foregroundRenderObject;
     } else {
@@ -273,24 +267,24 @@ class MongolRenderEditable extends RenderBox
     _foregroundPainter = newPainter;
   }
 
-  /// The [RenderEditablePainter] to use for painting above this
+  /// The [MongolRenderEditablePainter] to use for painting above this
   /// [MongolRenderEditable]'s text content.
   ///
-  /// The new [RenderEditablePainter] will replace the previously specified
+  /// The new [MongolRenderEditablePainter] will replace the previously specified
   /// foreground painter, and schedule a repaint if the new painter's
   /// `shouldRepaint` method returns true.
-  RenderEditablePainter? get foregroundPainter => _foregroundPainter;
-  RenderEditablePainter? _foregroundPainter;
-  set foregroundPainter(RenderEditablePainter? newPainter) {
+  MongolRenderEditablePainter? get foregroundPainter => _foregroundPainter;
+  MongolRenderEditablePainter? _foregroundPainter;
+  set foregroundPainter(MongolRenderEditablePainter? newPainter) {
     if (newPainter == _foregroundPainter) return;
     _updateForegroundPainter(newPainter);
   }
 
-  void _updatePainter(RenderEditablePainter? newPainter) {
+  void _updatePainter(MongolRenderEditablePainter? newPainter) {
     final effectivePainter = (newPainter == null)
         ? _builtInPainters
         : _CompositeRenderEditablePainter(
-            painters: <RenderEditablePainter>[
+            painters: <MongolRenderEditablePainter>[
               _builtInPainters,
               newPainter,
             ],
@@ -298,7 +292,7 @@ class MongolRenderEditable extends RenderBox
 
     if (_backgroundRenderObject == null) {
       final backgroundRenderObject =
-          _RenderEditableCustomPaint(painter: effectivePainter);
+          _MongolRenderEditableCustomPaint(painter: effectivePainter);
       adoptChild(backgroundRenderObject);
       _backgroundRenderObject = backgroundRenderObject;
     } else {
@@ -307,15 +301,15 @@ class MongolRenderEditable extends RenderBox
     _painter = newPainter;
   }
 
-  /// Sets the [RenderEditablePainter] to use for painting beneath this
+  /// Sets the [MongolRenderEditablePainter] to use for painting beneath this
   /// [MongolRenderEditable]'s text content.
   ///
-  /// The new [RenderEditablePainter] will replace the previously specified
+  /// The new [MongolRenderEditablePainter] will replace the previously specified
   /// painter, and schedule a repaint if the new painter's `shouldRepaint`
   /// method returns true.
-  RenderEditablePainter? get painter => _painter;
-  RenderEditablePainter? _painter;
-  set painter(RenderEditablePainter? newPainter) {
+  MongolRenderEditablePainter? get painter => _painter;
+  MongolRenderEditablePainter? _painter;
+  set painter(MongolRenderEditablePainter? newPainter) {
     if (newPainter == _painter) return;
     _updatePainter(newPainter);
   }
@@ -331,7 +325,7 @@ class MongolRenderEditable extends RenderBox
   _CompositeRenderEditablePainter? _cachedBuiltInForegroundPainters;
   _CompositeRenderEditablePainter _createBuiltInForegroundPainters() {
     return _CompositeRenderEditablePainter(
-      painters: <RenderEditablePainter>[
+      painters: <MongolRenderEditablePainter>[
         _caretPainter,
       ],
     );
@@ -342,7 +336,7 @@ class MongolRenderEditable extends RenderBox
   _CompositeRenderEditablePainter? _cachedBuiltInPainters;
   _CompositeRenderEditablePainter _createBuiltInPainters() {
     return _CompositeRenderEditablePainter(
-      painters: <RenderEditablePainter>[
+      painters: <MongolRenderEditablePainter>[
         _selectionPainter,
       ],
     );
@@ -1308,9 +1302,6 @@ class MongolRenderEditable extends RenderBox
     markNeedsPaint();
   }
 
-  bool _floatingCursorOn = false;
-  late TextPosition _floatingCursorTextPosition;
-
   /// Whether to allow the user to change the selection.
   ///
   /// Since [MongolRenderEditable] does not handle selection manipulation
@@ -1965,7 +1956,7 @@ class MongolRenderEditable extends RenderBox
     assert(
         _textLayoutLastMaxHeight == constraints.maxHeight &&
             _textLayoutLastMinHeight == constraints.minHeight,
-        'Last width ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).');
+        'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).');
     final word = _textPainter.getWordBoundary(position);
     // When long-pressing past the end of the text, we want a collapsed cursor.
     if (position.offset >= word.end) {
@@ -2009,7 +2000,7 @@ class MongolRenderEditable extends RenderBox
     assert(
         _textLayoutLastMaxHeight == constraints.maxHeight &&
             _textLayoutLastMinHeight == constraints.minHeight,
-        'Last width ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).');
+        'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).');
     final line = _textPainter.getLineBoundary(position);
     if (position.offset >= line.end) {
       return TextSelection.fromPosition(position);
@@ -2027,10 +2018,8 @@ class MongolRenderEditable extends RenderBox
         _textLayoutLastMinHeight == minHeight) return;
     final availableMaxHeight = math.max(0.0, maxHeight - _caretMargin);
     final availableMinHeight = math.min(minHeight, availableMaxHeight);
-    final textMaxHeight =
-        _isMultiline ? availableMaxHeight : double.infinity;
-    final textMinHeight =
-        forceLine ? availableMaxHeight : availableMinHeight;
+    final textMaxHeight = _isMultiline ? availableMaxHeight : double.infinity;
+    final textMinHeight = forceLine ? availableMaxHeight : availableMinHeight;
     _textPainter.layout(
       minHeight: textMinHeight,
       maxHeight: textMaxHeight,
@@ -2045,13 +2034,15 @@ class MongolRenderEditable extends RenderBox
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
       case TargetPlatform.macOS:
-        _caretPrototype = Rect.fromLTWH(0.0, 0.0, cursorWidth + 2, cursorHeight);
+        _caretPrototype =
+            Rect.fromLTWH(0.0, 0.0, cursorWidth + 2, cursorHeight);
         break;
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
       case TargetPlatform.linux:
       case TargetPlatform.windows:
-        _caretPrototype = Rect.fromLTWH(_kCaretWidthOffset, 0.0, cursorWidth - 2.0 * _kCaretWidthOffset, cursorHeight);
+        _caretPrototype = Rect.fromLTWH(_kCaretWidthOffset, 0.0,
+            cursorWidth - 2.0 * _kCaretWidthOffset, cursorHeight);
         break;
     }
   }
@@ -2075,16 +2066,20 @@ class MongolRenderEditable extends RenderBox
 
   @override
   Size computeDryLayout(BoxConstraints constraints) {
-    _layoutText(minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
-    final height = forceLine ? constraints.maxHeight : constraints
-        .constrainHeight(_textPainter.size.height + _caretMargin);
-    return Size(height, constraints.constrainWidth(_preferredWidth(constraints.maxHeight)));
+    _layoutText(
+        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    final height = forceLine
+        ? constraints.maxHeight
+        : constraints.constrainHeight(_textPainter.size.height + _caretMargin);
+    return Size(height,
+        constraints.constrainWidth(_preferredWidth(constraints.maxHeight)));
   }
 
   @override
   void performLayout() {
     final constraints = this.constraints;
-    _layoutText(minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _layoutText(
+        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
     _computeCaretPrototype();
     // We grab _textPainter.size here because assigning to `size` on the next
     // line will trigger us to validate our intrinsic sizes, which will change
@@ -2095,10 +2090,13 @@ class MongolRenderEditable extends RenderBox
     // though we currently don't use those here.
     // See also MongolRenderParagraph which has a similar issue.
     final textPainterSize = _textPainter.size;
-    final height = forceLine ? constraints.maxHeight : constraints
-        .constrainHeight(_textPainter.size.height + _caretMargin);
-    size = Size(height, constraints.constrainWidth(_preferredWidth(constraints.maxHeight)));
-    final contentSize = Size(textPainterSize.width, textPainterSize.height + _caretMargin);
+    final height = forceLine
+        ? constraints.maxHeight
+        : constraints.constrainHeight(_textPainter.size.height + _caretMargin);
+    size = Size(height,
+        constraints.constrainWidth(_preferredWidth(constraints.maxHeight)));
+    final contentSize =
+        Size(textPainterSize.width, textPainterSize.height + _caretMargin);
 
     final painterConstraints = BoxConstraints.tight(contentSize);
 
@@ -2110,105 +2108,14 @@ class MongolRenderEditable extends RenderBox
     offset.applyContentDimensions(0.0, _maxScrollExtent);
   }
 
-  // The relative origin in relation to the distance the user has theoretically
-  // dragged the floating cursor offscreen. This value is used to account for the
-  // difference in the rendering position and the raw offset value.
-  Offset _relativeOrigin = Offset.zero;
-  Offset? _previousOffset;
-  bool _resetOriginOnLeft = false;
-  bool _resetOriginOnRight = false;
-  bool _resetOriginOnTop = false;
-  bool _resetOriginOnBottom = false;
-  double? _resetFloatingCursorAnimationValue;
-
-  /// Returns the position within the text field closest to the raw cursor offset.
-  Offset calculateBoundedFloatingCursorOffset(Offset rawCursorOffset) {
-    // Offset deltaPosition = Offset.zero;
-    // final double topBound = -floatingCursorAddedMargin.top;
-    // final double bottomBound = _textPainter.height - preferredLineHeight + floatingCursorAddedMargin.bottom;
-    // final double leftBound = -floatingCursorAddedMargin.left;
-    // final double rightBound = _textPainter.width + floatingCursorAddedMargin.right;
-
-    // if (_previousOffset != null)
-    //   deltaPosition = rawCursorOffset - _previousOffset!;
-
-    // // If the raw cursor offset has gone off an edge, we want to reset the relative
-    // // origin of the dragging when the user drags back into the field.
-    // if (_resetOriginOnLeft && deltaPosition.dx > 0) {
-    //   _relativeOrigin = Offset(rawCursorOffset.dx - leftBound, _relativeOrigin.dy);
-    //   _resetOriginOnLeft = false;
-    // } else if (_resetOriginOnRight && deltaPosition.dx < 0) {
-    //   _relativeOrigin = Offset(rawCursorOffset.dx - rightBound, _relativeOrigin.dy);
-    //   _resetOriginOnRight = false;
-    // }
-    // if (_resetOriginOnTop && deltaPosition.dy > 0) {
-    //   _relativeOrigin = Offset(_relativeOrigin.dx, rawCursorOffset.dy - topBound);
-    //   _resetOriginOnTop = false;
-    // } else if (_resetOriginOnBottom && deltaPosition.dy < 0) {
-    //   _relativeOrigin = Offset(_relativeOrigin.dx, rawCursorOffset.dy - bottomBound);
-    //   _resetOriginOnBottom = false;
-    // }
-
-    // final double currentX = rawCursorOffset.dx - _relativeOrigin.dx;
-    // final double currentY = rawCursorOffset.dy - _relativeOrigin.dy;
-    // final double adjustedX = math.min(math.max(currentX, leftBound), rightBound);
-    // final double adjustedY = math.min(math.max(currentY, topBound), bottomBound);
-    // final Offset adjustedOffset = Offset(adjustedX, adjustedY);
-
-    // if (currentX < leftBound && deltaPosition.dx < 0)
-    //   _resetOriginOnLeft = true;
-    // else if (currentX > rightBound && deltaPosition.dx > 0)
-    //   _resetOriginOnRight = true;
-    // if (currentY < topBound && deltaPosition.dy < 0)
-    //   _resetOriginOnTop = true;
-    // else if (currentY > bottomBound && deltaPosition.dy > 0)
-    //   _resetOriginOnBottom = true;
-
-    // _previousOffset = rawCursorOffset;
-
-    // return adjustedOffset;
-    return Offset.zero;
-  }
-
-  /// Sets the screen position of the floating cursor and the text position
-  /// closest to the cursor.
-  void setFloatingCursor(FloatingCursorDragState state, Offset boundedOffset,
-      TextPosition lastTextPosition,
-      {double? resetLerpValue}) {
-    // assert(state != null);
-    // assert(boundedOffset != null);
-    // assert(lastTextPosition != null);
-    // if (state == FloatingCursorDragState.Start) {
-    //   _relativeOrigin = Offset.zero;
-    //   _previousOffset = null;
-    //   _resetOriginOnBottom = false;
-    //   _resetOriginOnTop = false;
-    //   _resetOriginOnRight = false;
-    //   _resetOriginOnBottom = false;
-    // }
-    // _floatingCursorOn = state != FloatingCursorDragState.End;
-    // _resetFloatingCursorAnimationValue = resetLerpValue;
-    // if (_floatingCursorOn) {
-    //   _floatingCursorTextPosition = lastTextPosition;
-    //   final double? animationValue = _resetFloatingCursorAnimationValue;
-    //   final EdgeInsets sizeAdjustment = animationValue != null
-    //     ? EdgeInsets.lerp(_kFloatingCaretSizeIncrease, EdgeInsets.zero, animationValue)!
-    //     : _kFloatingCaretSizeIncrease;
-    //   _caretPainter.floatingCursorRect = sizeAdjustment.inflateRect(_caretPrototype).shift(boundedOffset);
-    // } else {
-    //   _caretPainter.floatingCursorRect = null;
-    // }
-    // _caretPainter.showRegularCaret = _resetFloatingCursorAnimationValue == null;
-  }
-
   void _paintContents(PaintingContext context, Offset offset) {
     assert(
         _textLayoutLastMaxHeight == constraints.maxHeight &&
             _textLayoutLastMinHeight == constraints.minHeight,
-        'Last width ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).');
+        'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).');
     final effectiveOffset = offset + _paintOffset;
 
-    if (selection != null && !_floatingCursorOn) {
+    if (selection != null) {
       _updateSelectionExtentsVisibility(effectiveOffset);
     }
 
@@ -2226,7 +2133,7 @@ class MongolRenderEditable extends RenderBox
 
   void _paintHandleLayers(
       PaintingContext context, List<TextSelectionPoint> endpoints) {
-    Offset startPoint = endpoints[0].point;
+    var startPoint = endpoints[0].point;
     startPoint = Offset(
       startPoint.dx.clamp(0.0, size.width),
       startPoint.dy.clamp(0.0, size.height),
@@ -2237,7 +2144,7 @@ class MongolRenderEditable extends RenderBox
       Offset.zero,
     );
     if (endpoints.length == 2) {
-      Offset endPoint = endpoints[1].point;
+      var endPoint = endpoints[1].point;
       endPoint = Offset(
         endPoint.dx.clamp(0.0, size.width),
         endPoint.dy.clamp(0.0, size.height),
@@ -2252,15 +2159,17 @@ class MongolRenderEditable extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    // _layoutText(minWidth: constraints.minWidth, maxWidth: constraints.maxWidth);
-    // if (_hasVisualOverflow && clipBehavior != Clip.none) {
-    //   _clipRectLayer = context.pushClipRect(needsCompositing, offset, Offset.zero & size, _paintContents,
-    //       clipBehavior: clipBehavior, oldLayer: _clipRectLayer);
-    // } else {
-    //   _clipRectLayer = null;
-    //   _paintContents(context, offset);
-    // }
-    // _paintHandleLayers(context, getEndpointsForSelection(selection!));
+    _layoutText(
+        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    if (_hasVisualOverflow && clipBehavior != Clip.none) {
+      _clipRectLayer = context.pushClipRect(
+          needsCompositing, offset, Offset.zero & size, _paintContents,
+          clipBehavior: clipBehavior, oldLayer: _clipRectLayer);
+    } else {
+      _clipRectLayer = null;
+      _paintContents(context, offset);
+    }
+    _paintHandleLayers(context, getEndpointsForSelection(selection!));
   }
 
   ClipRectLayer? _clipRectLayer;
@@ -2281,7 +2190,6 @@ class MongolRenderEditable extends RenderBox
         DiagnosticsProperty<bool>('expands', expands, defaultValue: false));
     properties.add(ColorProperty('selectionColor', selectionColor));
     properties.add(DoubleProperty('textScaleFactor', textScaleFactor));
-    //properties.add(DiagnosticsProperty<Locale>('locale', locale, defaultValue: null));
     properties.add(DiagnosticsProperty<TextSelection>('selection', selection));
     properties.add(DiagnosticsProperty<ViewportOffset>('offset', offset));
   }
@@ -2298,14 +2206,14 @@ class MongolRenderEditable extends RenderBox
   }
 }
 
-class _RenderEditableCustomPaint extends RenderBox {
-  _RenderEditableCustomPaint({
-    RenderEditablePainter? painter,
+class _MongolRenderEditableCustomPaint extends RenderBox {
+  _MongolRenderEditableCustomPaint({
+    MongolRenderEditablePainter? painter,
   })  : _painter = painter,
         super();
 
   @override
-  RenderEditable? get parent => super.parent as RenderEditable?;
+  MongolRenderEditable? get parent => super.parent as MongolRenderEditable?;
 
   @override
   bool get isRepaintBoundary => true;
@@ -2313,12 +2221,12 @@ class _RenderEditableCustomPaint extends RenderBox {
   @override
   bool get sizedByParent => true;
 
-  RenderEditablePainter? get painter => _painter;
-  RenderEditablePainter? _painter;
-  set painter(RenderEditablePainter? newValue) {
+  MongolRenderEditablePainter? get painter => _painter;
+  MongolRenderEditablePainter? _painter;
+  set painter(MongolRenderEditablePainter? newValue) {
     if (newValue == painter) return;
 
-    final RenderEditablePainter? oldPainter = painter;
+    final oldPainter = painter;
     _painter = newValue;
 
     if (newValue?.shouldRepaint(oldPainter) ?? true) markNeedsPaint();
@@ -2331,9 +2239,9 @@ class _RenderEditableCustomPaint extends RenderBox {
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    final RenderEditable? parent = this.parent;
+    final parent = this.parent;
     assert(parent != null);
-    final RenderEditablePainter? painter = this.painter;
+    final painter = this.painter;
     if (painter != null && parent != null) {
       painter.paint(context.canvas, size, parent);
     }
@@ -2355,32 +2263,33 @@ class _RenderEditableCustomPaint extends RenderBox {
   Size computeDryLayout(BoxConstraints constraints) => constraints.biggest;
 }
 
-/// An interface that paints within a [RenderEditable]'s bounds, above or
+/// An interface that paints within a [MongolRenderEditable]'s bounds, above or
 /// beneath its text content.
 ///
 /// This painter is typically used for painting auxiliary content that depends
 /// on text layout metrics (for instance, for painting carets and text highlight
-/// blocks). It can paint independently from its [RenderEditable], allowing it
-/// to repaint without triggering a repaint on the entire [RenderEditable] stack
-/// when only auxiliary content changes (e.g. a blinking cursor) are present. It
-/// will be scheduled to repaint when:
+/// blocks). It can paint independently from its [MongolRenderEditable],
+/// allowing it to repaint without triggering a repaint on the entire
+/// [MongolRenderEditable] stack when only auxiliary content changes (e.g. a
+/// blinking cursor) are present. It will be scheduled to repaint when:
 ///
-///  * It's assigned to a new [RenderEditable] and the [shouldRepaint] method
-///    returns true.
-///  * Any of the [RenderEditable]s it is attached to repaints.
+///  * It's assigned to a new [MongolRenderEditable] and the [shouldRepaint]
+///    method returns true.
+///  * Any of the [MongolRenderEditable]s it is attached to repaints.
 ///  * The [notifyListeners] method is called, which typically happens when the
 ///    painter's attributes change.
 ///
 /// See also:
 ///
-///  * [RenderEditable.foregroundPainter], which takes a [RenderEditablePainter]
-///    and sets it as the foreground painter of the [RenderEditable].
-///  * [RenderEditable.painter], which takes a [RenderEditablePainter]
-///    and sets it as the background painter of the [RenderEditable].
+///  * [MongolRenderEditable.foregroundPainter], which takes a
+///    [MongolRenderEditablePainter] and sets it as the foreground painter of
+///    the [MongolRenderEditable].
+///  * [MongolRenderEditable.painter], which takes a [MongolRenderEditablePainter]
+///    and sets it as the background painter of the [MongolRenderEditable].
 ///  * [CustomPainter] a similar class which paints within a [RenderCustomPaint].
-abstract class RenderEditablePainter extends ChangeNotifier {
-  /// Determines whether repaint is needed when a new [RenderEditablePainter]
-  /// is provided to a [RenderEditable].
+abstract class MongolRenderEditablePainter extends ChangeNotifier {
+  /// Determines whether repaint is needed when a new
+  /// [MongolRenderEditablePainter] is provided to a [MongolRenderEditable].
   ///
   /// If the new instance represents different information than the old
   /// instance, then the method should return true, otherwise it should return
@@ -2389,23 +2298,25 @@ abstract class RenderEditablePainter extends ChangeNotifier {
   ///
   /// If the method returns false, then the [paint] call might be optimized
   /// away. However, the [paint] method will get called whenever the
-  /// [RenderEditable]s it attaches to repaint, even if [shouldRepaint] returns
-  /// false.
-  bool shouldRepaint(RenderEditablePainter? oldDelegate);
+  /// [MongolRenderEditable]s it attaches to repaint, even if [shouldRepaint]
+  /// returns false.
+  bool shouldRepaint(MongolRenderEditablePainter? oldDelegate);
 
-  /// Paints within the bounds of a [RenderEditable].
+  /// Paints within the bounds of a [MongolRenderEditable].
   ///
-  /// The given [Canvas] has the same coordinate space as the [RenderEditable],
-  /// which may be different from the coordinate space the [RenderEditable]'s
-  /// [TextPainter] uses, when the text moves inside the [RenderEditable].
+  /// The given [Canvas] has the same coordinate space as the
+  /// [MongolRenderEditable], which may be different from the coordinate space
+  /// the [MongolRenderEditable]'s [MongolTextPainter] uses, when the text moves
+  /// inside the [MongolRenderEditable].
   ///
   /// Paint operations performed outside of the region defined by the [canvas]'s
-  /// origin and the [size] parameter may get clipped, when [RenderEditable]'s
-  /// [RenderEditable.clipBehavior] is not [Clip.none].
-  void paint(Canvas canvas, Size size, RenderEditable renderEditable);
+  /// origin and the [size] parameter may get clipped, when
+  /// [MongolRenderEditable]'s [MongolRenderEditable.clipBehavior] is not
+  /// [Clip.none].
+  void paint(Canvas canvas, Size size, MongolRenderEditable renderEditable);
 }
 
-class _TextHighlightPainter extends RenderEditablePainter {
+class _TextHighlightPainter extends MongolRenderEditablePainter {
   _TextHighlightPainter({TextRange? highlightedRange, Color? highlightColor})
       : _highlightedRange = highlightedRange,
         _highlightColor = highlightColor;
@@ -2428,72 +2339,39 @@ class _TextHighlightPainter extends RenderEditablePainter {
     notifyListeners();
   }
 
-  /// Controls how tall the selection highlight boxes are computed to be.
-  ///
-  /// See [ui.BoxHeightStyle] for details on available styles.
-  // ui.BoxHeightStyle get selectionHeightStyle => _selectionHeightStyle;
-  // ui.BoxHeightStyle _selectionHeightStyle = ui.BoxHeightStyle.tight;
-  // set selectionHeightStyle(ui.BoxHeightStyle value) {
-  //   assert(value != null);
-  //   if (_selectionHeightStyle == value)
-  //     return;
-  //   _selectionHeightStyle = value;
-  //   notifyListeners();
-  // }
-
-  /// Controls how wide the selection highlight boxes are computed to be.
-  ///
-  /// See [ui.BoxWidthStyle] for details on available styles.
-  // ui.BoxWidthStyle get selectionWidthStyle => _selectionWidthStyle;
-  // ui.BoxWidthStyle _selectionWidthStyle = ui.BoxWidthStyle.tight;
-  // set selectionWidthStyle(ui.BoxWidthStyle value) {
-  //   assert(value != null);
-  //   if (_selectionWidthStyle == value)
-  //     return;
-  //   _selectionWidthStyle = value;
-  //   notifyListeners();
-  // }
-
   @override
-  void paint(Canvas canvas, Size size, RenderEditable renderEditable) {
-    final TextRange? range = highlightedRange;
-    final Color? color = highlightColor;
+  void paint(Canvas canvas, Size size, MongolRenderEditable renderEditable) {
+    final range = highlightedRange;
+    final color = highlightColor;
     if (range == null || color == null || range.isCollapsed) {
       return;
     }
 
-    // highlightPaint.color = color;
-    // final List<TextBox> boxes = renderEditable._textPainter.getBoxesForSelection(
-    //   TextSelection(baseOffset: range.start, extentOffset: range.end),
-    //   boxHeightStyle: selectionHeightStyle,
-    //   boxWidthStyle: selectionWidthStyle
-    // );
+    highlightPaint.color = color;
+    final boxes = renderEditable._textPainter.getBoxesForSelection(
+      TextSelection(baseOffset: range.start, extentOffset: range.end),
+    );
 
-    // for (final TextBox box in boxes)
-    //   canvas.drawRect(box.toRect().shift(renderEditable._paintOffset), highlightPaint);
+    for (final box in boxes) {
+      canvas.drawRect(box.shift(renderEditable._paintOffset), highlightPaint);
+    }
   }
 
   @override
-  bool shouldRepaint(RenderEditablePainter? oldDelegate) {
-    // TODO: implement shouldRepaint
-    throw UnimplementedError();
+  bool shouldRepaint(MongolRenderEditablePainter? oldDelegate) {
+    if (identical(oldDelegate, this)) {
+      return false;
+    }
+    if (oldDelegate == null) {
+      return highlightColor != null && highlightedRange != null;
+    }
+    return oldDelegate is! _TextHighlightPainter ||
+        oldDelegate.highlightColor != highlightColor ||
+        oldDelegate.highlightedRange != highlightedRange;
   }
-
-  // @override
-  // bool shouldRepaint(RenderEditablePainter? oldDelegate) {
-  //   if (identical(oldDelegate, this))
-  //     return false;
-  //   if (oldDelegate == null)
-  //     return highlightColor != null && highlightedRange != null;
-  //   return oldDelegate is! _TextHighlightPainter
-  //       || oldDelegate.highlightColor != highlightColor
-  //       || oldDelegate.highlightedRange != highlightedRange
-  //       || oldDelegate.selectionHeightStyle != selectionHeightStyle
-  //       || oldDelegate.selectionWidthStyle != selectionWidthStyle;
-  // }
 }
 
-class _CaretPainter extends RenderEditablePainter {
+class _CaretPainter extends MongolRenderEditablePainter {
   _CaretPainter(this.caretPaintCallback);
 
   bool get shouldPaint => _shouldPaint;
@@ -2505,8 +2383,6 @@ class _CaretPainter extends RenderEditablePainter {
   }
 
   CaretChangedHandler caretPaintCallback;
-
-  bool showRegularCaret = false;
 
   final Paint caretPaint = Paint();
   late final Paint floatingCursorPaint = Paint();
@@ -2536,162 +2412,109 @@ class _CaretPainter extends RenderEditablePainter {
     notifyListeners();
   }
 
-  Color? get backgroundCursorColor => _backgroundCursorColor;
-  Color? _backgroundCursorColor;
-  set backgroundCursorColor(Color? value) {
-    if (backgroundCursorColor?.value == value?.value) return;
-
-    _backgroundCursorColor = value;
-    if (showRegularCaret) notifyListeners();
-  }
-
-  Rect? get floatingCursorRect => _floatingCursorRect;
-  Rect? _floatingCursorRect;
-  set floatingCursorRect(Rect? value) {
-    if (_floatingCursorRect == value) return;
-    _floatingCursorRect = value;
-    notifyListeners();
-  }
-
-  void paintRegularCursor(Canvas canvas, RenderEditable renderEditable,
+  void paintRegularCursor(Canvas canvas, MongolRenderEditable renderEditable,
       Color caretColor, TextPosition textPosition) {
-    // final Rect caretPrototype = renderEditable._caretPrototype;
-    // final Offset caretOffset = renderEditable._textPainter.getOffsetForCaret(textPosition, caretPrototype);
-    // Rect caretRect = caretPrototype.shift(caretOffset + cursorOffset);
+    final caretPrototype = renderEditable._caretPrototype;
+    final caretOffset = renderEditable._textPainter
+        .getOffsetForCaret(textPosition, caretPrototype);
+    var caretRect = caretPrototype.shift(caretOffset + cursorOffset);
 
-    // final double? caretHeight = renderEditable._textPainter.getFullHeightForCaret(textPosition, caretPrototype);
-    // if (caretHeight != null) {
-    //   switch (defaultTargetPlatform) {
-    //     case TargetPlatform.iOS:
-    //     case TargetPlatform.macOS:
-    //       final double heightDiff = caretHeight - caretRect.height;
-    //       // Center the caret vertically along the text.
-    //       caretRect = Rect.fromLTWH(
-    //         caretRect.left,
-    //         caretRect.top + heightDiff / 2,
-    //         caretRect.width,
-    //         caretRect.height,
-    //       );
-    //       break;
-    //     case TargetPlatform.android:
-    //     case TargetPlatform.fuchsia:
-    //     case TargetPlatform.linux:
-    //     case TargetPlatform.windows:
-    //       // Override the height to take the full height of the glyph at the TextPosition
-    //       // when not on iOS. iOS has special handling that creates a taller caret.
-    //       // TODO(garyq): See the TODO for _computeCaretPrototype().
-    //       caretRect = Rect.fromLTWH(
-    //         caretRect.left,
-    //         caretRect.top - _kCaretHeightOffset,
-    //         caretRect.width,
-    //         caretHeight,
-    //       );
-    //       break;
-    //   }
-    // }
+    final caretWidth = renderEditable._textPainter
+        .getFullWidthForCaret(textPosition, caretPrototype);
+    if (caretWidth != null) {
+      caretRect = Rect.fromLTWH(
+        caretRect.left - _kCaretWidthOffset,
+        caretRect.top,
+        caretWidth,
+        caretRect.height,
+      );
+    }
 
-    // caretRect = caretRect.shift(renderEditable._paintOffset);
-    // final Rect integralRect = caretRect.shift(renderEditable._snapToPhysicalPixel(caretRect.topLeft));
+    caretRect = caretRect.shift(renderEditable._paintOffset);
+    final integralRect =
+        caretRect.shift(renderEditable._snapToPhysicalPixel(caretRect.topLeft));
 
-    // if (shouldPaint) {
-    //   final Radius? radius = cursorRadius;
-    //   caretPaint.color = caretColor;
-    //   if (radius == null) {
-    //     canvas.drawRect(integralRect, caretPaint);
-    //   } else {
-    //     final RRect caretRRect = RRect.fromRectAndRadius(integralRect, radius);
-    //     canvas.drawRRect(caretRRect, caretPaint);
-    //   }
-    // }
-    // caretPaintCallback(integralRect);
+    if (shouldPaint) {
+      final radius = cursorRadius;
+      caretPaint.color = caretColor;
+      if (radius == null) {
+        canvas.drawRect(integralRect, caretPaint);
+      } else {
+        final caretRRect = RRect.fromRectAndRadius(integralRect, radius);
+        canvas.drawRRect(caretRRect, caretPaint);
+      }
+    }
+    caretPaintCallback(integralRect);
   }
 
   @override
-  void paint(Canvas canvas, Size size, RenderEditable renderEditable) {
-    // // Compute the caret location even when `shouldPaint` is false.
+  void paint(Canvas canvas, Size size, MongolRenderEditable renderEditable) {
+    // Compute the caret location even when `shouldPaint` is false.
 
-    // assert(renderEditable != null);
-    // final TextSelection? selection = renderEditable.selection;
+    final selection = renderEditable.selection;
 
-    // // TODO(LongCatIsLooong): skip painting the caret when the selection is
-    // // (-1, -1).
-    // if (selection == null || !selection.isCollapsed)
-    //   return;
+    if (selection == null || !selection.isCollapsed) {
+      return;
+    }
 
-    // final Rect? floatingCursorRect = this.floatingCursorRect;
+    final caretColor = this.caretColor;
+    final caretTextPosition = selection.extent;
 
-    // final Color? caretColor = floatingCursorRect == null
-    //   ? this.caretColor
-    //   : showRegularCaret ? backgroundCursorColor : null;
-    // final TextPosition caretTextPosition = floatingCursorRect == null
-    //   ? selection.extent
-    //   : renderEditable._floatingCursorTextPosition;
-
-    // if (caretColor != null) {
-    //   paintRegularCursor(canvas, renderEditable, caretColor, caretTextPosition);
-    // }
-
-    // final Color? floatingCursorColor = this.caretColor?.withOpacity(0.75);
-    // // Floating Cursor.
-    // if (floatingCursorRect == null || floatingCursorColor == null || !shouldPaint)
-    //   return;
-
-    // canvas.drawRRect(
-    //   RRect.fromRectAndRadius(floatingCursorRect.shift(renderEditable._paintOffset), _kFloatingCaretRadius),
-    //   floatingCursorPaint..color = floatingCursorColor,
-    // );
+    if (caretColor != null) {
+      paintRegularCursor(canvas, renderEditable, caretColor, caretTextPosition);
+    }
   }
 
   @override
-  bool shouldRepaint(RenderEditablePainter? oldDelegate) {
+  bool shouldRepaint(MongolRenderEditablePainter? oldDelegate) {
     if (identical(this, oldDelegate)) return false;
 
     if (oldDelegate == null) return shouldPaint;
     return oldDelegate is! _CaretPainter ||
         oldDelegate.shouldPaint != shouldPaint ||
-        oldDelegate.showRegularCaret != showRegularCaret ||
         oldDelegate.caretColor != caretColor ||
         oldDelegate.cursorRadius != cursorRadius ||
-        oldDelegate.cursorOffset != cursorOffset ||
-        oldDelegate.backgroundCursorColor != backgroundCursorColor ||
-        oldDelegate.floatingCursorRect != floatingCursorRect;
+        oldDelegate.cursorOffset != cursorOffset;
   }
 }
 
-class _CompositeRenderEditablePainter extends RenderEditablePainter {
+class _CompositeRenderEditablePainter extends MongolRenderEditablePainter {
   _CompositeRenderEditablePainter({required this.painters});
 
-  final List<RenderEditablePainter> painters;
+  final List<MongolRenderEditablePainter> painters;
 
   @override
   void addListener(VoidCallback listener) {
-    for (final RenderEditablePainter painter in painters)
+    for (final painter in painters) {
       painter.addListener(listener);
+    }
   }
 
   @override
   void removeListener(VoidCallback listener) {
-    for (final RenderEditablePainter painter in painters)
+    for (final painter in painters) {
       painter.removeListener(listener);
+    }
   }
 
   @override
-  void paint(Canvas canvas, Size size, RenderEditable renderEditable) {
-    for (final RenderEditablePainter painter in painters)
+  void paint(Canvas canvas, Size size, MongolRenderEditable renderEditable) {
+    for (final painter in painters) {
       painter.paint(canvas, size, renderEditable);
+    }
   }
 
   @override
-  bool shouldRepaint(RenderEditablePainter? oldDelegate) {
+  bool shouldRepaint(MongolRenderEditablePainter? oldDelegate) {
     if (identical(oldDelegate, this)) return false;
     if (oldDelegate is! _CompositeRenderEditablePainter ||
         oldDelegate.painters.length != painters.length) return true;
 
-    final Iterator<RenderEditablePainter> oldPainters =
-        oldDelegate.painters.iterator;
-    final Iterator<RenderEditablePainter> newPainters = painters.iterator;
-    while (oldPainters.moveNext() && newPainters.moveNext())
+    final oldPainters = oldDelegate.painters.iterator;
+    final newPainters = painters.iterator;
+    while (oldPainters.moveNext() && newPainters.moveNext()) {
       if (newPainters.current.shouldRepaint(oldPainters.current)) return true;
+    }
 
     return false;
   }
