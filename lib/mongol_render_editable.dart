@@ -21,66 +21,16 @@ const double _kCaretWidthOffset = 2.0; // pixels
 /// (including the cursor location).
 ///
 /// Used by [MongolRenderEditable.onSelectionChanged].
-typedef SelectionChangedHandler = void Function(
+typedef MongolSelectionChangedHandler = void Function(
   TextSelection selection,
   MongolRenderEditable renderObject,
   SelectionChangedCause cause,
 );
 
-/// Indicates what triggered the change in selected text (including changes to
-/// the cursor location).
-enum SelectionChangedCause {
-  /// The user tapped on the text and that caused the selection (or the location
-  /// of the cursor) to change.
-  tap,
-
-  /// The user tapped twice in quick succession on the text and that caused
-  /// the selection (or the location of the cursor) to change.
-  doubleTap,
-
-  /// The user long-pressed the text and that caused the selection (or the
-  /// location of the cursor) to change.
-  longPress,
-
-  /// The user force-pressed the text and that caused the selection (or the
-  /// location of the cursor) to change.
-  forcePress,
-
-  /// The user used the keyboard to change the selection or the location of the
-  /// cursor.
-  ///
-  /// Keyboard-triggered selection changes may be caused by the IME as well as
-  /// by accessibility tools (e.g. TalkBack on Android).
-  keyboard,
-
-  /// The user used the mouse to change the selection by dragging over a piece
-  /// of text.
-  drag,
-}
-
-/// Signature for the callback that reports when the caret location changes.
-///
-/// Used by [MongolRenderEditable.onCaretChanged].
-typedef CaretChangedHandler = void Function(Rect caretRect);
-
-/// Represents the coordinates of the point in a selection relative to top left
-/// of the [MongolRenderEditable] that holds the selection.
-@immutable
-class TextSelectionPoint {
-  /// Creates a description of a point in a text selection.
-  ///
-  /// The [point] argument must not be null.
-  const TextSelectionPoint(this.point);
-
-  /// Coordinates of the top right or bottom right corner of the selection,
-  /// relative to the top left of the [MongolRenderEditable] object.
-  final Offset point;
-
-  @override
-  String toString() {
-    return '$point';
-  }
-}
+// /// Signature for the callback that reports when the caret location changes.
+// ///
+// /// Used by [MongolRenderEditable.onCaretChanged].
+// typedef CaretChangedHandler = void Function(Rect caretRect);
 
 // Check if the given code unit is a white space or separator
 // character.
@@ -345,7 +295,7 @@ class MongolRenderEditable extends RenderBox
   /// Called when the selection changes.
   ///
   /// If this is null, then selection changes will be ignored.
-  SelectionChangedHandler? onSelectionChanged;
+  MongolSelectionChangedHandler? onSelectionChanged;
 
   double? _textLayoutLastMaxHeight;
   double? _textLayoutLastMinHeight;
@@ -1600,13 +1550,13 @@ class MongolRenderEditable extends RenderBox
       final caretOffset =
           _textPainter.getOffsetForCaret(selection.extent, _caretPrototype);
       final start = Offset(preferredLineWidth, 0.0) + caretOffset + paintOffset;
-      return <TextSelectionPoint>[TextSelectionPoint(start)];
+      return <TextSelectionPoint>[TextSelectionPoint(start, TextDirection.ltr)];
     } else {
       final start = Offset(boxes.first.left, boxes.first.bottom) + paintOffset;
       final end = Offset(boxes.last.right, boxes.last.bottom) + paintOffset;
       return <TextSelectionPoint>[
-        TextSelectionPoint(start),
-        TextSelectionPoint(end),
+        TextSelectionPoint(start, TextDirection.ltr),
+        TextSelectionPoint(end, TextDirection.ltr),
       ];
     }
   }
