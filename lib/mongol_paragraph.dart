@@ -167,6 +167,13 @@ class MongolParagraph {
   // Both the line info and the text run are in horizontal orientation,
   // but the [dx] and [dy] offsets are in vertical orientation.
   List<int> _getPositionForOffset(double dx, double dy) {
+    const upstream = 0;
+    const downstream = 1;
+
+    if (_lines.isEmpty) {
+      return [0, downstream];
+    }
+
     // find the line
     _LineInfo? matchedLine;
     var rightEdgeAfterRotation = 0.0;
@@ -204,12 +211,7 @@ class MongolParagraph {
     final textOffset = matchedRun.start + runPosition.offset;
 
     // find the afinity
-    const upstream = 0;
-    const downstream = 1;
     final lineEndCharOffset = _runs[matchedLine.textRunEnd - 1].end;
-    // final isFirstLine = matchedLine.textRunStart == 0;
-    // final isFirstRunInLine = matchedRun == _runs[matchedLine.textRunStart];
-    // final isFirstPositionInRun = runPosition.offset == 0;
     final textAfinity =
         (textOffset == lineEndCharOffset)
             ? upstream
@@ -408,6 +410,9 @@ class MongolParagraph {
   /// generally a word.
   TextRange getWordBoundary(TextPosition position) {
     final offset = position.offset;
+    if (offset >= _text.length) {
+      return TextRange(start: _text.length, end: offset);
+    }
     final run = _getRunFromOffset(offset);
     if (run == null) {
       return TextRange.empty;

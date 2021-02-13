@@ -154,7 +154,6 @@ class MongolTextSelectionOverlay {
   bool get handlesVisible => _handlesVisible;
   bool _handlesVisible = false;
   set handlesVisible(bool visible) {
-    assert(visible != null);
     if (_handlesVisible == visible) {
       return;
     }

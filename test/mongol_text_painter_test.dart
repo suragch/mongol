@@ -132,13 +132,12 @@ void main() {
       () {
     final painter = MongolTextPainter()
       ..text = TextSpan(
-        text: 'ABCDE FGHIJ',
-        style: TextStyle(
-          height: 1.0,
-          fontSize: 10.0,
-          fontFamily: 'Ahem',
-        )
-      )
+          text: 'ABCDE FGHIJ',
+          style: TextStyle(
+            height: 1.0,
+            fontSize: 10.0,
+            fontFamily: 'Ahem',
+          ))
       ..layout(maxHeight: 80);
 
     // FIXME: TextPainter returns 80 rather than 60 here.
@@ -984,6 +983,22 @@ void main() {
     );
     expect(caretOffset.dy, moreOrLessEquals(0.0, epsilon: 0.0001));
     expect(caretOffset.dx, moreOrLessEquals(0.0, epsilon: 0.0001));
+  });
+
+  test('getWordBoundary returns range even if offset greater than length', () {
+    final painter = MongolTextPainter();
+    // final painter = TextPainter();
+    // painter.textDirection = TextDirection.ltr;
+    var text = 'test for words';
+    painter.text = TextSpan(text: text);
+    painter.layout();
+
+    var wordRange = painter.getWordBoundary(TextPosition(offset: 14, affinity: TextAffinity.upstream));
+    expect(wordRange, TextRange(start: 14, end: 14));
+    wordRange = painter.getWordBoundary(TextPosition(offset: 14, affinity: TextAffinity.downstream));
+    expect(wordRange, TextRange(start: 14, end: 14));
+    wordRange = painter.getWordBoundary(TextPosition(offset: 20, affinity: TextAffinity.downstream));
+    expect(wordRange, TextRange(start: 14, end: 20));
   });
 
   // test('MongolTextPainter widget span', () {

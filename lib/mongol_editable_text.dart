@@ -14,7 +14,7 @@ import 'package:flutter/material.dart' show kMinInteractiveDimension;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
 
 import 'package:mongol/mongol_render_editable.dart';
 import 'package:mongol/mongol_text_painter.dart';
@@ -968,7 +968,7 @@ class MongolEditableText extends StatefulWidget {
   }
 
   @override
-  EditableTextState createState() => EditableTextState();
+  MongolEditableTextState createState() => MongolEditableTextState();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
@@ -1266,7 +1266,6 @@ class MongolEditableTextState extends State<MongolEditableText>
           value.selection, renderEditable, SelectionChangedCause.keyboard);
     } else {
       hideToolbar();
-      _currentPromptRectRange = null;
 
       if (_hasInputConnection) {
         _showCaretOnScreen();
@@ -1894,7 +1893,6 @@ class MongolEditableTextState extends State<MongolEditableText>
       WidgetsBinding.instance!.removeObserver(this);
       // Clear the selection and composition state if this widget lost focus.
       _value = TextEditingValue(text: _value.text);
-      _currentPromptRectRange = null;
     }
     updateKeepAlive();
   }
@@ -2028,14 +2026,9 @@ class MongolEditableTextState extends State<MongolEditableText>
     return _createTextInputConfiguration(_needsAutofill);
   }
 
-  // null if no promptRect should be shown.
-  TextRange? _currentPromptRectRange;
-
   @override
   void showAutocorrectionPromptRect(int start, int end) {
-    setState(() {
-      _currentPromptRectRange = TextRange(start: start, end: end);
-    });
+    // unimplemented
   }
 
   VoidCallback? _semanticsOnCopy(TextSelectionControls? controls) {

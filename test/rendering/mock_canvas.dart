@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: omit_local_variable_types
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'dart:ui' as ui show Paragraph, Image;
 
 import 'package:flutter/foundation.dart';
@@ -492,7 +495,7 @@ class _PathMatcher extends Matcher {
 }
 
 class _MismatchedCall {
-  const _MismatchedCall(this.message, this.callIntroduction, this.call) : assert(call != null);
+  const _MismatchedCall(this.message, this.callIntroduction, this.call);
   final String message;
   final String callIntroduction;
   final RecordedInvocation call;
@@ -1377,7 +1380,6 @@ class _SomethingPaintPredicate extends _PaintPredicate {
 
   @override
   void match(Iterator<RecordedInvocation> call) {
-    assert(predicate != null);
     RecordedInvocation currentCall;
     do {
       currentCall = call.current;
@@ -1407,7 +1409,6 @@ class _EverythingPaintPredicate extends _PaintPredicate {
 
   @override
   void match(Iterator<RecordedInvocation> call) {
-    assert(predicate != null);
     while (call.moveNext()) {
       final RecordedInvocation currentCall = call.current;
       if (!currentCall.invocation.isMethod)

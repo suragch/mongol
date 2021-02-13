@@ -832,6 +832,7 @@ class MongolRenderEditable extends RenderBox
     assert(_shortcutKeys.contains(key), 'shortcut key $key not recognized.');
     if (key == LogicalKeyboardKey.keyC) {
       if (!selection.isCollapsed) {
+        // ignore: unawaited_futures
         Clipboard.setData(ClipboardData(text: selection.textInside(text)));
       }
       return;
@@ -839,6 +840,7 @@ class MongolRenderEditable extends RenderBox
     TextEditingValue? value;
     if (key == LogicalKeyboardKey.keyX && !_readOnly) {
       if (!selection.isCollapsed) {
+        // ignore: unawaited_futures
         Clipboard.setData(ClipboardData(text: selection.textInside(text)));
         value = TextEditingValue(
           text: selection.textBefore(text) + selection.textAfter(text),

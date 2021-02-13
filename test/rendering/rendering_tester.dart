@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: omit_local_variable_types
+// ignore_for_file: curly_braces_in_flow_control_structures
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -150,7 +153,6 @@ void layout(
   EnginePhase phase = EnginePhase.layout,
   VoidCallback? onErrors,
 }) {
-  assert(box != null); // If you want to just repump the last box, call pumpFrame().
   assert(box.parent == null); // We stick the box in another, so you can't reuse it easily, sorry.
 
   renderer.renderView.child = null;
@@ -172,10 +174,7 @@ void layout(
 ///
 /// If `onErrors` is not null, it is set as [TestRenderingFlutterBinding.onError].
 void pumpFrame({ EnginePhase phase = EnginePhase.layout, VoidCallback? onErrors }) {
-  assert(renderer != null);
-  assert(renderer.renderView != null);
-  assert(renderer.renderView.child != null); // call layout() first!
-
+  
   if (onErrors != null) {
     renderer.onErrors = onErrors;
   }

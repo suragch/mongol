@@ -369,14 +369,13 @@ void main() {
       final range84 = paragraph.getWordBoundary(const TextPosition(offset: 84));
       expect(range84.textInside(text), equals('Navee!'));
 
-      // TODO: Should this return the final run?
       final range85 = paragraph.getWordBoundary(const TextPosition(offset: 85));
-      expect(range85, TextRange.empty);
+      expect(range85, TextRange(start: 85, end: 85));
 
       // https://github.com/flutter/flutter/issues/75494
       final range1000 =
           paragraph.getWordBoundary(const TextPosition(offset: 1000));
-      expect(range1000, TextRange.empty);
+      expect(range1000, TextRange(start: 85, end: 1000));
     });
 
     test('getLineBoundary control test', () {
@@ -414,12 +413,20 @@ void main() {
           paragraph.getLineBoundary(const TextPosition(offset: 1000));
       expect(range1000, TextRange.empty);
     });
+
+    test('getPositionForOffset with empty content does not crash', () {
+      const text = '';
+      final paragraph = _getParagraph(text, 1000);
+      final position = paragraph.getPositionForOffset(Offset(400, 300));
+      expect(position, TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
+    });
   });
+
+  
 
   /// Keep this for testing Paragraph
   ///
-  // test('Line boundary for out-of-range offset returns empty range', () {
-  //   const text = 'Hello world';
+  // test('Empty paragraph', () {
   //   const offset = 12;
   //   final paragraphStyle = ParagraphStyle(
   //     textDirection: TextDirection.ltr,
@@ -429,6 +436,7 @@ void main() {
   //   final paragraph = paragraphBuilder.build();
   //   paragraph.layout(constraints);
   //   final range = paragraph.getLineBoundary(TextPosition(offset: offset));
-  //   expect(range, TextRange.empty);
+  //   final position = paragraph.getPositionForOffset(Offset(400, 300));
+  //   expect(position, TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
   // });
 }
