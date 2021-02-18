@@ -5,9 +5,9 @@
 // found in the LICENSE file.
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import 'mongol_render_paragraph.dart';
 import 'mongol_text_painter.dart';
 
 /// A string of rich text in vertical Mongolian layout.
@@ -64,13 +64,20 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// Creates a paragraph of rich text in vertical orientation for traditional
   /// Mongolian.
   ///
+  /// The [maxLines] property may be null (and indeed defaults to null), but if
+  /// it is not null, it must be greater than zero.
+  ///
   /// The [text] argument must not be null.
   const MongolRichText({
     Key? key,
     required this.text,
     this.textAlign = MongolTextAlign.top,
+    this.softWrap = true,
+    this.overflow = TextOverflow.clip,
     this.textScaleFactor = 1.0,
-  }) : super(key: key);
+    this.maxLines,
+  })  : assert(maxLines == null || maxLines > 0),
+        super(key: key);
 
   /// The text to display in this widget.
   final TextSpan text;
@@ -78,18 +85,38 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// How the text should be aligned vertically.
   final MongolTextAlign textAlign;
 
+  /// Whether the text should break at soft line breaks.
+  ///
+  /// If false, the glyphs in the text will be positioned as if there was 
+  /// unlimited vertical space.
+  final bool softWrap;
+
+  /// How visual overflow should be handled.
+  final TextOverflow overflow;
+
   /// The number of font pixels for each logical pixel.
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
   final double textScaleFactor;
 
+  /// An optional maximum number of lines for the text to span, wrapping if
+  /// necessary. If the text exceeds the given number of lines, it will be
+  /// truncated according to [overflow].
+  ///
+  /// If this is 1, text will not wrap. Otherwise, text will be wrapped at the
+  /// edge of the box.
+  final int? maxLines;
+
   @override
   MongolRenderParagraph createRenderObject(BuildContext context) {
     return MongolRenderParagraph(
       text,
       textAlign: textAlign,
+      softWrap: softWrap,
+      overflow: overflow,
       textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
     );
   }
 
@@ -99,7 +126,10 @@ class MongolRichText extends LeafRenderObjectWidget {
     renderObject
       ..text = text
       ..textAlign = textAlign
-      ..textScaleFactor = textScaleFactor;
+      ..softWrap = softWrap
+      ..overflow = overflow
+      ..textScaleFactor = textScaleFactor
+      ..maxLines = maxLines;
   }
 
   @override
@@ -108,184 +138,13 @@ class MongolRichText extends LeafRenderObjectWidget {
     properties.add(StringProperty('text', text.toPlainText()));
     properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
         defaultValue: MongolTextAlign.top));
+    properties.add(FlagProperty('softWrap', value: softWrap, ifTrue: 'wrapping at box height', ifFalse: 'no wrapping except at line break characters', showName: true));
+    properties.add(EnumProperty<TextOverflow>('overflow', overflow,
+        defaultValue: TextOverflow.clip));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
+    properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
   }
 }
 
-/// A render object that displays a paragraph of vertical Mongolian text.
-class MongolRenderParagraph extends RenderBox
-    with
-        ContainerRenderObjectMixin<RenderBox, TextParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, TextParentData>,
-        RelayoutWhenSystemFontsChangeMixin {
-  /// Creates a vertical paragraph render object.
-  ///
-  /// The [text] argument must not be null.
-  MongolRenderParagraph(
-    TextSpan text, {
-    MongolTextAlign textAlign = MongolTextAlign.top,
-    double textScaleFactor = 1.0,
-  }) : _textPainter = MongolTextPainter(
-          text: text,
-          textAlign: textAlign,
-          textScaleFactor: textScaleFactor,
-        );
 
-  @override
-  void setupParentData(RenderBox child) {
-    if (child.parentData is! TextParentData) {
-      child.parentData = TextParentData();
-    }
-  }
-
-  final MongolTextPainter _textPainter;
-
-  /// The text to display
-  TextSpan get text => _textPainter.text!;
-  set text(TextSpan value) {
-    switch (_textPainter.text!.compareTo(value)) {
-      case RenderComparison.identical:
-      case RenderComparison.metadata:
-        return;
-      case RenderComparison.paint:
-        _textPainter.text = value;
-        markNeedsPaint();
-        break;
-      case RenderComparison.layout:
-        _textPainter.text = value;
-        markNeedsLayout();
-        break;
-    }
-  }
-
-  /// How the text should be aligned vertically.
-  MongolTextAlign get textAlign => _textPainter.textAlign;
-  set textAlign(MongolTextAlign value) {
-    if (_textPainter.textAlign == value) {
-      return;
-    }
-    _textPainter.textAlign = value;
-    markNeedsPaint();
-  }
-
-  /// The number of font pixels for each logical pixel.
-  ///
-  /// For example, if the text scale factor is 1.5, text will be 50% larger than
-  /// the specified font size.
-  double get textScaleFactor => _textPainter.textScaleFactor;
-  set textScaleFactor(double value) {
-    if (_textPainter.textScaleFactor == value) return;
-    _textPainter.textScaleFactor = value;
-    markNeedsLayout();
-  }
-
-  void _layoutText({
-    double minHeight = 0.0,
-    double maxHeight = double.infinity,
-  }) {
-    _textPainter.layout(
-      minHeight: minHeight,
-      maxHeight: maxHeight,
-    );
-  }
-
-  void _layoutTextWithConstraints(BoxConstraints constraints) {
-    _layoutText(
-      minHeight: constraints.minHeight,
-      maxHeight: constraints.maxHeight,
-    );
-  }
-
-  @override
-  double computeMinIntrinsicHeight(double width) {
-    _layoutText();
-    return _textPainter.minIntrinsicHeight;
-  }
-
-  @override
-  double computeMaxIntrinsicHeight(double width) {
-    _layoutText();
-    return _textPainter.maxIntrinsicHeight;
-  }
-
-  double _computeIntrinsicWidth(double height) {
-    _layoutText(minHeight: height, maxHeight: height);
-    return _textPainter.width;
-  }
-
-  @override
-  double computeMinIntrinsicWidth(double height) {
-    return _computeIntrinsicWidth(height);
-  }
-
-  @override
-  double computeMaxIntrinsicWidth(double height) {
-    return _computeIntrinsicWidth(height);
-  }
-
-  @override
-  double computeDistanceToActualBaseline(TextBaseline baseline) {
-    assert(!debugNeedsLayout);
-    assert(constraints.debugAssertIsValid());
-    _layoutTextWithConstraints(constraints);
-    return _textPainter.computeDistanceToActualBaseline(baseline);
-  }
-
-  @override
-  bool hitTestSelf(Offset position) => true;
-
-  @override
-  void handleEvent(PointerEvent event, BoxHitTestEntry entry) {
-    assert(debugHandleEvent(event, entry));
-    if (event is! PointerDownEvent) return;
-    _layoutTextWithConstraints(constraints);
-    final offset = entry.localPosition;
-    final position = _textPainter.getPositionForOffset(offset);
-    final span = _textPainter.text!.getSpanForPosition(position);
-    if (span == null) {
-      return;
-    }
-    if (span is TextSpan) {
-      span.recognizer?.addPointer(event);
-    }
-  }
-
-  @override
-  void performLayout() {
-    _layoutTextWithConstraints(constraints);
-    final textSize = _textPainter.size;
-    size = constraints.constrain(textSize);
-  }
-
-  @override
-  void paint(PaintingContext context, Offset offset) {
-    _layoutTextWithConstraints(constraints);
-    final canvas = context.canvas;
-    assert(() {
-      if (debugRepaintTextRainbowEnabled) {
-        final paint = Paint()..color = debugCurrentRepaintColor.toColor();
-        canvas.drawRect(offset & size, paint);
-      }
-      return true;
-    }());
-
-    _textPainter.paint(canvas, offset);
-  }
-
-  @override
-  List<DiagnosticsNode> debugDescribeChildren() {
-    return <DiagnosticsNode>[
-      text.toDiagnosticsNode(
-          name: 'text', style: DiagnosticsTreeStyle.transition)
-    ];
-  }
-
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign));
-    properties.add(
-        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
-  }
-}

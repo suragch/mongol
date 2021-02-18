@@ -71,13 +71,19 @@ class MongolText extends StatelessWidget {
   /// If the [style] argument is null, the text will use the style from the
   /// closest enclosing [DefaultTextStyle].
   ///
-  /// The [data] parameter must not be null.
+  /// The [overflow] property's behavior is affected by the [softWrap] argument.
+  /// If the [softWrap] is true or null, the glyph causing overflow, and those 
+  /// that follow, will not be rendered. Otherwise, it will be shown with the 
+  /// given overflow option.
   const MongolText(
     this.data, {
     Key? key,
     this.style,
     this.textAlign,
+    this.softWrap,
+    this.overflow,
     this.textScaleFactor,
+    this.maxLines,
     this.semanticsLabel,
   })  : assert(
           data != null,
@@ -96,7 +102,10 @@ class MongolText extends StatelessWidget {
     Key? key,
     this.style,
     this.textAlign,
+    this.softWrap,
+    this.overflow,
     this.textScaleFactor,
+    this.maxLines,
     this.semanticsLabel,
   })  : assert(
           textSpan != null,
@@ -120,8 +129,33 @@ class MongolText extends StatelessWidget {
   /// How the text should be aligned vertically.
   final MongolTextAlign? textAlign;
 
+  /// Whether the text should break at soft line breaks.
+  ///
+  /// If false, the glyphs in the text will be positioned as if there were 
+  /// unlimited vertical space.
+  final bool? softWrap;
+
+  /// How visual overflow should be handled.
+  ///
+  /// Defaults to retrieving the value from the nearest [DefaultTextStyle] ancestor.
+  final TextOverflow? overflow;
+
   /// Font pixels per logical pixel
   final double? textScaleFactor;
+
+  /// An optional maximum number of lines for the text to span, wrapping if 
+  /// necessary. If the text exceeds the given number of lines, it will be 
+  /// truncated according to [overflow].
+  ///
+  /// If this is 1, text will not wrap. Otherwise, text will be wrapped at the
+  /// edge of the box.
+  ///
+  /// If this is null, but there is an ambient [DefaultTextStyle] that specifies
+  /// an explicit number for its [DefaultTextStyle.maxLines], then the
+  /// [DefaultTextStyle] value will take precedence. You can use a 
+  /// [MongolRichText] widget directly to entirely override the 
+  /// [DefaultTextStyle].
+  final int? maxLines;
 
   /// An alternative semantics label for this text.
   ///
@@ -151,7 +185,10 @@ class MongolText extends StatelessWidget {
     final defaultTextAlign = mapHorizontalToMongolTextAlign(defaultTextStyle.textAlign);
     Widget result = MongolRichText(
       textAlign: textAlign ?? defaultTextAlign ?? MongolTextAlign.top,
+      softWrap: softWrap ?? defaultTextStyle.softWrap,
+      overflow: overflow ?? defaultTextStyle.overflow,
       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+      maxLines: maxLines ?? defaultTextStyle.maxLines,
       text: TextSpan(
         style: effectiveTextStyle,
         text: data,
@@ -180,8 +217,11 @@ class MongolText extends StatelessWidget {
     }
     style?.debugFillProperties(properties);
     properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign, defaultValue: null));
+    properties.add(FlagProperty('softWrap', value: softWrap, ifTrue: 'wrapping at box height', ifFalse: 'no wrapping except at line break characters', showName: true));
+    properties.add(EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
+    properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));
     }
