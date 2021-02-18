@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'mongol_rich_text.dart';
+import 'mongol_text_painter.dart';
 
 /// A run of vertical text with a single style.
 ///
@@ -21,6 +22,27 @@ import 'mongol_rich_text.dart';
 /// be merged with the closest enclosing [DefaultTextStyle]. This merging
 /// behavior is useful, for example, to make the text bold while using the
 /// default font family and size.
+/// 
+/// {@tool snippet}
+///
+/// This example shows how to display text using the [MongolText] widget with the
+/// [overflow] set to [TextOverflow.ellipsis].
+///
+/// If the text is shorter than the available space, it is displayed in full 
+/// without an ellipsis.
+///
+/// If the text overflows, the Text widget displays an ellipsis to trim the 
+/// overflowing text.
+///
+/// ```dart
+/// Text(
+///   'Hello, $_name! How are you?',
+///   textAlign: MongolTextAlign.center,
+///   overflow: TextOverflow.ellipsis,
+///   style: TextStyle(fontWeight: FontWeight.bold),
+/// )
+/// ```
+/// {@end-tool}
 ///
 /// Using the [MongolText.rich] constructor, the [MongolText] widget can
 /// display a paragraph with differently styled [TextSpan]s. The sample
@@ -54,6 +76,7 @@ class MongolText extends StatelessWidget {
     this.data, {
     Key? key,
     this.style,
+    this.textAlign,
     this.textScaleFactor,
     this.semanticsLabel,
   })  : assert(
@@ -72,6 +95,7 @@ class MongolText extends StatelessWidget {
     this.textSpan, {
     Key? key,
     this.style,
+    this.textAlign,
     this.textScaleFactor,
     this.semanticsLabel,
   })  : assert(
@@ -92,6 +116,9 @@ class MongolText extends StatelessWidget {
   /// This is the style to use for the whole text string. If null a default
   /// style will be used.
   final TextStyle? style;
+
+  /// How the text should be aligned vertically.
+  final MongolTextAlign? textAlign;
 
   /// Font pixels per logical pixel
   final double? textScaleFactor;
@@ -121,7 +148,9 @@ class MongolText extends StatelessWidget {
       effectiveTextStyle = effectiveTextStyle!
           .merge(const TextStyle(fontWeight: FontWeight.bold));
     }
+    final defaultTextAlign = mapHorizontalToMongolTextAlign(defaultTextStyle.textAlign);
     Widget result = MongolRichText(
+      textAlign: textAlign ?? defaultTextAlign ?? MongolTextAlign.top,
       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
       text: TextSpan(
         style: effectiveTextStyle,
@@ -150,6 +179,7 @@ class MongolText extends StatelessWidget {
           name: 'textSpan', style: DiagnosticsTreeStyle.transition));
     }
     style?.debugFillProperties(properties);
+    properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign, defaultValue: null));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
     if (semanticsLabel != null) {

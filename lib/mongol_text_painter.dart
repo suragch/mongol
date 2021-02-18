@@ -54,6 +54,37 @@ enum MongolTextAlign {
   justify,
 }
 
+/// A convenience method for converting MongolTextAlign to TextAlign
+TextAlign mapMongolToHorizontalTextAlign(MongolTextAlign textAlign) {
+  switch (textAlign) {
+    case MongolTextAlign.top:
+      return TextAlign.left;
+    case MongolTextAlign.bottom:
+      return TextAlign.right;
+    case MongolTextAlign.center:
+      return TextAlign.center;
+    case MongolTextAlign.justify:
+      return TextAlign.justify;
+  }
+}
+
+/// A convenience method for converting MongolTextAlign to TextAlign
+MongolTextAlign? mapHorizontalToMongolTextAlign(TextAlign? textAlign) {
+  if (textAlign == null) return null;
+  switch (textAlign) {
+    case TextAlign.left:
+    case TextAlign.start:
+      return MongolTextAlign.top;
+    case TextAlign.right:
+    case TextAlign.end:
+      return MongolTextAlign.bottom;
+    case TextAlign.center:
+      return MongolTextAlign.center;
+    case TextAlign.justify:
+      return MongolTextAlign.justify;
+  }
+}
+
 /// An object that paints a Mongolian [TextSpan] tree into a [Canvas].
 ///
 /// To use a [MongolTextPainter], follow these steps:
@@ -158,7 +189,7 @@ class MongolTextPainter {
 
   ui.ParagraphStyle _createParagraphStyle() {
     return _text!.style?.getParagraphStyle(
-          textAlign: _mapMongolTextAlign(),
+          textAlign: mapMongolToHorizontalTextAlign(textAlign),
           textDirection: TextDirection.ltr,
           textScaleFactor: textScaleFactor,
           maxLines: null,
@@ -167,7 +198,7 @@ class MongolTextPainter {
           strutStyle: null,
         ) ??
         ui.ParagraphStyle(
-          textAlign: _mapMongolTextAlign(),
+          textAlign: mapMongolToHorizontalTextAlign(textAlign),
           textDirection: TextDirection.ltr,
           // Use the default font size to multiply by as RichText does not
           // perform inheriting [TextStyle]s and would otherwise
@@ -177,19 +208,6 @@ class MongolTextPainter {
           ellipsis: null,
           locale: null,
         );
-  }
-
-  TextAlign _mapMongolTextAlign() {
-    switch (textAlign) {
-      case MongolTextAlign.top:
-        return TextAlign.left;
-      case MongolTextAlign.bottom:
-        return TextAlign.right;
-      case MongolTextAlign.center:
-        return TextAlign.center;
-      case MongolTextAlign.justify:
-        return TextAlign.justify;
-    }
   }
 
   /// The width of a space in [text] in logical pixels.
@@ -266,14 +284,18 @@ class MongolTextPainter {
     return Size(width, height);
   }
 
-  /// Since the text is rotated it doesn't make sense to use the rotated
-  /// text baseline because this is used for aligning with other widgets.
-  /// Instead we will return the base of the widget.
+  /// Even though the text is rotated, it is still useful to have a baseline
+  /// along which to layout objects. (For example in the MongolInputDecorator.)
   ///
   /// Valid only after [layout] has been called.
   double computeDistanceToActualBaseline(TextBaseline baseline) {
     assert(!_needsLayout);
-    return height;
+    switch (baseline) {
+      case TextBaseline.alphabetic:
+        return _paragraph!.alphabeticBaseline;
+      case TextBaseline.ideographic:
+        return _paragraph!.ideographicBaseline;
+    }
   }
 
   double? _lastMinHeight;

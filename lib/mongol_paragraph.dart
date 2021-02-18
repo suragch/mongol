@@ -48,6 +48,22 @@ class MongolParagraph {
   /// Valid only after [layout] has been called.
   double get maxIntrinsicHeight => _maxIntrinsicHeight ?? double.infinity;
 
+  /// The distance to the alphabetic baseline the same as for horizontal text.
+  double get alphabeticBaseline {
+    if (_runs.isEmpty) {
+      return 0.0;
+    }
+    return _runs.first.paragraph.alphabeticBaseline;
+  } 
+
+  /// The distance to the ideographic baseline the same as for horizontal text.
+  double get ideographicBaseline {
+    if (_runs.isEmpty) {
+      return 0.0;
+    }
+    return _runs.first.paragraph.ideographicBaseline;
+  } 
+
   /// Computes the size and position of each glyph in the paragraph.
   ///
   /// The [MongolParagraphConstraints] control how tall the text is allowed
