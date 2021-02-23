@@ -5,9 +5,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/mongol_paragraph.dart';
 
 void main() {
-  MongolParagraph _getParagraph(String text, double height) {
-    final paragraphStyle = ui.ParagraphStyle();
-    final paragraphBuilder = MongolParagraphBuilder(paragraphStyle);
+  MongolParagraph _getParagraph(
+    String text,
+    double height, {
+    int? maxLines,
+    String? ellipsis,
+  }) {
+    final paragraphStyle = ui.ParagraphStyle(ellipsis: ellipsis);
+    final paragraphBuilder = MongolParagraphBuilder(paragraphStyle,
+        maxLines: maxLines, ellipsis: ellipsis);
     paragraphBuilder.addText(text);
     final constraints = MongolParagraphConstraints(height: height);
     final paragraph = paragraphBuilder.build();
@@ -418,11 +424,66 @@ void main() {
       const text = '';
       final paragraph = _getParagraph(text, 1000);
       final position = paragraph.getPositionForOffset(Offset(400, 300));
-      expect(position, TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
+      expect(position,
+          TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
     });
   });
 
-  
+  group('maxlines -', () {
+    test('Paragraph handles maxlines', () {
+      const text = 'this is some long text that should break over 3 lines';
+
+      // multiline
+      var paragraph = _getParagraph(text, 300, maxLines: null);
+      var exceededMaxLines = paragraph.didExceedMaxLines;
+      expect(exceededMaxLines, false);
+      var width = paragraph.width;
+      expect(width, 42);
+
+      // single line
+      paragraph = _getParagraph(text, 300, maxLines: 1);
+      exceededMaxLines = paragraph.didExceedMaxLines;
+      expect(exceededMaxLines, true);
+      width = paragraph.width;
+      expect(width, 14);
+
+      // two lines
+      paragraph = _getParagraph(text, 300, maxLines: 2);
+      exceededMaxLines = paragraph.didExceedMaxLines;
+      expect(exceededMaxLines, true);
+      width = paragraph.width;
+      expect(width, 28);
+
+      // three lines
+      paragraph = _getParagraph(text, 300, maxLines: 3);
+      exceededMaxLines = paragraph.didExceedMaxLines;
+      expect(exceededMaxLines, false);
+      width = paragraph.width;
+      expect(width, 42);
+    });
+
+    test('last run has ellipsis when exceeding max lines', () {
+      const text = 'this is some long text that should break over 3 lines';
+
+      // line without ellipsis
+      var paragraph = _getParagraph(text, 300, maxLines: 1);
+      final lineHeightWithoutEllipsis = 252;
+      expect(paragraph.maxIntrinsicHeight, lineHeightWithoutEllipsis);
+
+      // size of ellipsis
+      const ellipsis = '\u2026';
+      final ellipsisParagraph = _getParagraph(ellipsis, 300);
+      final ellipsisHeight = ellipsisParagraph.maxIntrinsicHeight;
+      expect(ellipsisHeight, 14);
+
+      // line that has room for ellipsis before overflowing
+      paragraph = _getParagraph(text, 300, maxLines: 1, ellipsis: ellipsis);
+      expect(
+        paragraph.maxIntrinsicHeight,
+        lineHeightWithoutEllipsis + ellipsisHeight,
+      );
+    });
+  });
 
   /// Keep this for testing Paragraph
   ///
@@ -430,13 +491,17 @@ void main() {
   //   const offset = 12;
   //   final paragraphStyle = ParagraphStyle(
   //     textDirection: TextDirection.ltr,
+  //     maxLines: -1,
   //   );
+  //   final text = 'asdf';
   //   final paragraphBuilder = ParagraphBuilder(paragraphStyle)..addText(text);
   //   final constraints = ParagraphConstraints(width: 300);
   //   final paragraph = paragraphBuilder.build();
   //   paragraph.layout(constraints);
-  //   final range = paragraph.getLineBoundary(TextPosition(offset: offset));
-  //   final position = paragraph.getPositionForOffset(Offset(400, 300));
-  //   expect(position, TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
+  //   final asdf = paragraph.didExceedMaxLines;
+  //   expect(asdf, true);
+  //   // final range = paragraph.getLineBoundary(TextPosition(offset: offset));
+  //   // final position = paragraph.getPositionForOffset(Offset(400, 300));
+  //   // expect(position, TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
   // });
 }

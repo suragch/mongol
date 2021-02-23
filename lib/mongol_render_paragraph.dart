@@ -12,6 +12,7 @@ import 'package:flutter/widgets.dart';
 
 import 'mongol_text_painter.dart';
 
+// TODO: This is a horizontal elipsis. Should we use a Mongolian elipsis U+1801?
 const String _kEllipsis = '\u2026';
 
 /// A render object that displays a paragraph of vertical Mongolian text.
@@ -39,6 +40,7 @@ class MongolRenderParagraph extends RenderBox
           textAlign: textAlign,
           textScaleFactor: textScaleFactor,
           maxLines: maxLines,
+          ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,
         );
 
   @override

@@ -14,7 +14,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_test/flutter_test.dart' hide Finder; 
+import 'package:flutter_test/flutter_test.dart' hide Finder;
 import 'package:mongol/mongol_editable_text.dart';
 import 'package:mongol/mongol_render_editable.dart';
 import 'package:mongol/mongol_text_painter.dart';
@@ -1136,7 +1136,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Paste'), kIsWeb ? findsNothing : findsOneWidget);
   });
-  
+
   testMongolWidgets('can show the toolbar after clearing all text',
       (tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/35998.
@@ -1486,12 +1486,12 @@ void main() {
     expect(tester.testTextInput.setClientArgs!['readOnly'], isFalse);
   });
 
-  testMongolWidgets('Fires onChanged when text changes via TextSelectionOverlay',
+  testMongolWidgets(
+      'Fires onChanged when text changes via TextSelectionOverlay',
       (tester) async {
     late String changedValue;
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: TextEditingController(),
         focusNode: FocusNode(),
         style: Typography.material2018(platform: TargetPlatform.android)
@@ -1574,7 +1574,6 @@ void main() {
                 child: Text('Previous Widget', key: previousKey),
                 onPressed: () {}),
             MongolEditableText(
-
               controller: TextEditingController(),
               focusNode: focusNode,
               style: Typography.material2018(platform: TargetPlatform.android)
@@ -1624,7 +1623,6 @@ void main() {
 
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: TextEditingController(),
         focusNode: focusNode,
         style: Typography.material2018(platform: TargetPlatform.android)
@@ -1665,7 +1663,6 @@ void main() {
 
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: TextEditingController(),
         focusNode: focusNode,
         style: Typography.material2018(platform: TargetPlatform.android)
@@ -1709,7 +1706,6 @@ void main() {
 
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: TextEditingController(),
         focusNode: focusNode,
         style: Typography.material2018(platform: TargetPlatform.android)
@@ -1753,7 +1749,6 @@ void main() {
 
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: TextEditingController(),
         focusNode: focusNode,
         style: Typography.material2018(platform: TargetPlatform.android)
@@ -1797,7 +1792,6 @@ void main() {
 
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: TextEditingController(),
         focusNode: focusNode,
         style: Typography.material2018(platform: TargetPlatform.android)
@@ -1935,7 +1929,6 @@ void main() {
               child: Center(
                 child: Material(
                   child: MongolEditableText(
-
                     controller: currentController,
                     focusNode: focusNode,
                     style: Typography.material2018(
@@ -2004,7 +1997,8 @@ void main() {
     );
   });
 
-  testMongolWidgets('MongolEditableText identifies as text field (w/ focus) in semantics',
+  testMongolWidgets(
+      'MongolEditableText identifies as text field (w/ focus) in semantics',
       (tester) async {
     final SemanticsTester semantics = SemanticsTester(tester);
 
@@ -2015,7 +2009,6 @@ void main() {
           node: focusScopeNode,
           autofocus: true,
           child: MongolEditableText(
-
             controller: controller,
             focusNode: focusNode,
             style: textStyle,
@@ -2054,7 +2047,6 @@ void main() {
           node: focusScopeNode,
           autofocus: true,
           child: MongolEditableText(
-
             controller: controller,
             focusNode: focusNode,
             style: textStyle,
@@ -2077,7 +2069,6 @@ void main() {
           node: focusScopeNode,
           autofocus: true,
           child: MongolEditableText(
-
             controller: controller,
             focusNode: focusNode,
             style: textStyle,
@@ -2113,7 +2104,6 @@ void main() {
         child: FocusScope(
           node: focusScopeNode,
           child: MongolEditableText(
-
             controller: controller,
             focusNode: focusNode,
             style: textStyle,
@@ -2155,7 +2145,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -2239,7 +2228,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -2322,8 +2310,7 @@ void main() {
     semantics.dispose();
   });
 
-  testMongolWidgets('can move cursor with a11y means - word',
-      (tester) async {
+  testMongolWidgets('can move cursor with a11y means - word', (tester) async {
     final SemanticsTester semantics = SemanticsTester(tester);
     const bool doNotExtendSelection = false;
 
@@ -2333,7 +2320,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -2436,7 +2422,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -2538,7 +2523,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -2629,15 +2613,13 @@ void main() {
     semantics.dispose();
   });
 
-  testMongolWidgets('password fields have correct semantics',
-      (tester) async {
+  testMongolWidgets('password fields have correct semantics', (tester) async {
     final SemanticsTester semantics = SemanticsTester(tester);
 
     controller.text = 'super-secret-password!!1';
 
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         obscureText: true,
         controller: controller,
         focusNode: focusNode,
@@ -2695,7 +2677,6 @@ void main() {
 
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -2741,7 +2722,6 @@ void main() {
     // Now change it to make it obscure text.
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         obscureText: true,
         focusNode: focusNode,
@@ -2795,7 +2775,8 @@ void main() {
     semantics.dispose();
   });
 
-  testMongolWidgets('password fields can have their obscuring character customized',
+  testMongolWidgets(
+      'password fields can have their obscuring character customized',
       (tester) async {
     const String originalText = 'super-secret-password!!1';
     controller.text = originalText;
@@ -2803,7 +2784,6 @@ void main() {
     const String obscuringCharacter = '#';
     await tester.pumpWidget(MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         obscuringCharacter: obscuringCharacter,
         obscureText: true,
@@ -2822,7 +2802,6 @@ void main() {
         MockTextSelectionControls controls, MongolWidgetTester tester) {
       return tester.pumpWidget(MaterialApp(
         home: MongolEditableText(
-
           controller: controller,
           focusNode: focusNode,
           style: textStyle,
@@ -3068,8 +3047,7 @@ void main() {
     expect(called, 2);
   });
 
-  testMongolWidgets('default keyboardAppearance is respected',
-      (tester) async {
+  testMongolWidgets('default keyboardAppearance is respected', (tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/22212.
 
     final List<MethodCall> log = <MethodCall>[];
@@ -3089,7 +3067,6 @@ void main() {
               .black
               .subtitle1!,
           cursorColor: Colors.blue,
-
         ),
       ),
     );
@@ -3119,7 +3096,6 @@ void main() {
               .black
               .subtitle1!,
           cursorColor: Colors.blue,
-
         ),
       ),
     );
@@ -3167,7 +3143,6 @@ void main() {
                   .black
                   .subtitle1!,
               cursorColor: Colors.blue,
-
             ),
             const SizedBox(width: 200.0),
             MongolEditableText(
@@ -3178,7 +3153,6 @@ void main() {
                   .black
                   .subtitle1!,
               cursorColor: Colors.blue,
-
               minLines: 10,
               maxLines: 20,
             ),
@@ -3322,7 +3296,6 @@ void main() {
             fontWeight: FontWeight.w600,
           ),
           cursorColor: Colors.blue,
-
         ),
       ),
     );
@@ -3374,7 +3347,6 @@ void main() {
               child: Center(
                 child: Material(
                   child: MongolEditableText(
-
                     key: editableTextKey,
                     controller: controller,
                     focusNode: FocusNode(),
@@ -3428,7 +3400,6 @@ void main() {
           child: Center(
             child: Material(
               child: MongolEditableText(
-
                 controller: controller,
                 focusNode: FocusNode(),
                 style: textStyle,
@@ -3482,8 +3453,7 @@ void main() {
         skip:
             isBrowser); // Related to https://github.com/flutter/flutter/issues/66089
 
-    testMongolWidgets('only send updates when necessary',
-        (tester) async {
+    testMongolWidgets('only send updates when necessary', (tester) async {
       controller.value = TextEditingValue(
           text: 'a' * 100, composing: const TextRange(start: 0, end: 10));
       await tester.pumpWidget(builder());
@@ -3523,8 +3493,7 @@ void main() {
     });
   });
 
-  testMongolWidgets('custom keyboardAppearance is respected',
-      (tester) async {
+  testMongolWidgets('custom keyboardAppearance is respected', (tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/22212.
 
     final List<MethodCall> log = <MethodCall>[];
@@ -3544,7 +3513,6 @@ void main() {
               .black
               .subtitle1!,
           cursorColor: Colors.blue,
-
           keyboardAppearance: Brightness.dark,
         ),
       ),
@@ -3572,7 +3540,6 @@ void main() {
       // So we can show overlays.
       home: MongolEditableText(
         autofocus: true,
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -3602,7 +3569,7 @@ void main() {
     expect(renderEditable.text!.text, 'text composing text');
     expect(renderEditable.text!.style!.decoration, isNull);
   });
-  
+
   // TODO: make this pass when I understand handles better
   // testMongolWidgets('text selection handle visibility', (tester) async {
   //   // Text with two separate words to select.
@@ -3953,7 +3920,6 @@ void main() {
                 .black
                 .subtitle1!,
             cursorColor: Colors.blue,
-
             selectionControls: materialTextSelectionControls,
             keyboardType: TextInputType.text,
             textAlign: MongolTextAlign.bottom,
@@ -4630,8 +4596,7 @@ void main() {
   //   // On web, using keyboard for selection is handled by the browser.
   // }, skip: kIsWeb);
 
-  testMongolWidgets('keyboard shortcuts respect read-only',
-      (tester) async {
+  testMongolWidgets('keyboard shortcuts respect read-only', (tester) async {
     final String platform = describeEnum(defaultTargetPlatform).toLowerCase();
     final TextEditingController controller =
         TextEditingController(text: testText);
@@ -4655,7 +4620,6 @@ void main() {
                 .black
                 .subtitle1!,
             cursorColor: Colors.blue,
-
             selectionControls: materialTextSelectionControls,
             keyboardType: TextInputType.text,
             textAlign: MongolTextAlign.bottom,
@@ -5015,7 +4979,6 @@ void main() {
                 .subtitle1!
                 .copyWith(fontFamily: 'Roboto'),
             cursorColor: Colors.blue,
-
             selectionControls: materialTextSelectionControls,
             keyboardType: TextInputType.text,
           ),
@@ -5049,7 +5012,8 @@ void main() {
         equals(renderEditable.maxScrollExtent));
   });
 
-  testMongolWidgets('bringIntoView brings the caret into view when in a viewport',
+  testMongolWidgets(
+      'bringIntoView brings the caret into view when in a viewport',
       (tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/55547.
     final TextEditingController controller =
@@ -5073,7 +5037,6 @@ void main() {
               focusNode: FocusNode(),
               style: textStyle,
               cursorColor: Colors.blue,
-
             ),
           ),
         ),
@@ -5115,7 +5078,6 @@ void main() {
               focusNode: FocusNode(),
               style: textStyle,
               cursorColor: Colors.blue,
-
               scrollPhysics: physics,
             ),
           ),
@@ -5157,7 +5119,6 @@ void main() {
               focusNode: FocusNode(),
               style: textStyle,
               cursorColor: Colors.blue,
-
             ),
           ),
         ),
@@ -5265,8 +5226,7 @@ void main() {
       );
     });
 
-    testMongolWidgets('batch edits need to be nested properly',
-        (tester) async {
+    testMongolWidgets('batch edits need to be nested properly', (tester) async {
       await tester.pumpWidget(widget);
 
       // Connect.
@@ -5294,7 +5254,7 @@ void main() {
       // Connect.
       await tester.showKeyboard(find.byType(MongolEditableText));
 
-      final  state =
+      final state =
           tester.state<MongolEditableTextState>(find.byWidget(editableText));
       state.updateEditingValue(const TextEditingValue(text: 'remote value'));
       tester.testTextInput.log.clear();
@@ -5535,7 +5495,6 @@ void main() {
       controller: controller,
       focusNode: FocusNode(),
       cursorColor: Colors.red,
-      
       style: Typography.material2018(platform: TargetPlatform.android)
           .black
           .subtitle1!
@@ -5586,7 +5545,6 @@ void main() {
       controller: controller,
       focusNode: FocusNode(),
       cursorColor: Colors.red,
-      
       style: Typography.material2018(platform: TargetPlatform.android)
           .black
           .subtitle1!
@@ -5785,7 +5743,6 @@ void main() {
                     focusNode: focusNode,
                     style: textStyle,
                     cursorColor: Colors.red,
-                    
                     keyboardType: TextInputType.multiline,
                     inputFormatters: <TextInputFormatter>[
                       formatter,
@@ -5866,7 +5823,6 @@ void main() {
                     focusNode: focusNode,
                     style: textStyle,
                     cursorColor: Colors.red,
-                    
                     keyboardType: TextInputType.multiline,
                     onChanged: (String value) {},
                   ),
@@ -5932,7 +5888,8 @@ void main() {
   });
 
   group('TextEditingController', () {
-    testMongolWidgets('TextEditingController.text set to empty string clears field',
+    testMongolWidgets(
+        'TextEditingController.text set to empty string clears field',
         (tester) async {
       final TextEditingController controller = TextEditingController();
       await tester.pumpWidget(
@@ -5946,7 +5903,6 @@ void main() {
                   focusNode: focusNode,
                   style: textStyle,
                   cursorColor: Colors.red,
-                  
                   keyboardType: TextInputType.multiline,
                   onChanged: (String value) {},
                 ),
@@ -5991,7 +5947,6 @@ void main() {
                       focusNode: focusNode,
                       style: textStyle,
                       cursorColor: Colors.red,
-                      
                       keyboardType: TextInputType.multiline,
                       onChanged: (String value) {},
                     ),
@@ -6086,7 +6041,6 @@ void main() {
             .black
             .subtitle1!,
         cursorColor: Colors.blue,
-
         selectionControls: materialTextSelectionControls,
         keyboardType: TextInputType.text,
         textAlign: MongolTextAlign.bottom,
@@ -6109,7 +6063,6 @@ void main() {
           node: focusScopeNode,
           autofocus: true,
           child: MongolEditableText(
-
             controller: controller,
             focusNode: focusNode,
             maxLines: 1, // Sets text keyboard implicitly.
@@ -6171,8 +6124,7 @@ void main() {
     expect(formatter.log, referenceLog);
   });
 
-  testMongolWidgets('formatter logic handles repeat filtering',
-      (tester) async {
+  testMongolWidgets('formatter logic handles repeat filtering', (tester) async {
     final MockTextFormatter formatter = MockTextFormatter();
     await tester.pumpWidget(
       MediaQuery(
@@ -6181,7 +6133,6 @@ void main() {
           node: focusScopeNode,
           autofocus: true,
           child: MongolEditableText(
-
             controller: controller,
             focusNode: focusNode,
             maxLines: 1, // Sets text keyboard implicitly.
@@ -6280,7 +6231,6 @@ void main() {
           node: focusScopeNode,
           autofocus: true,
           child: MongolEditableText(
-
             controller: controller,
             focusNode: focusNode,
             maxLines: 1, // Sets text keyboard implicitly.
@@ -6324,7 +6274,7 @@ void main() {
   //         node: focusScopeNode,
   //         autofocus: true,
   //         child: MongolEditableText(
-            
+
   //           controller: controller,
   //           focusNode: focusNode,
   //           maxLines: 1, // Sets text keyboard implicitly.
@@ -6391,7 +6341,7 @@ void main() {
   //         node: focusScopeNode,
   //         autofocus: true,
   //         child: MongolEditableText(
-            
+
   //           controller: controller,
   //           focusNode: focusNode,
   //           maxLines: 1, // Sets text keyboard implicitly.
@@ -6445,7 +6395,7 @@ void main() {
   //         node: focusScopeNode,
   //         autofocus: true,
   //         child: MongolEditableText(
-  //           
+  //
   //           controller: controller,
   //           focusNode: focusNode,
   //           maxLines: 1, // Sets text keyboard implicitly.
@@ -6493,7 +6443,7 @@ void main() {
   //         node: focusScopeNode,
   //         autofocus: true,
   //         child: MongolEditableText(
-  //           
+  //
   //           controller: controller,
   //           focusNode: focusNode,
   //           maxLines: 1, // Sets text keyboard implicitly.
@@ -6543,7 +6493,7 @@ void main() {
   //         node: focusScopeNode,
   //         autofocus: true,
   //         child: MongolEditableText(
-  //           
+  //
   //           controller: controller,
   //           focusNode: focusNode,
   //           maxLines: 1, // Sets text keyboard implicitly.
@@ -6594,7 +6544,7 @@ void main() {
   //         node: focusScopeNode,
   //         autofocus: true,
   //         child: MongolEditableText(
-  //           
+  //
   //           controller: controller,
   //           focusNode: focusNode,
   //           maxLines: 1, // Sets text keyboard implicitly.
@@ -6636,7 +6586,6 @@ void main() {
             cursor: SystemMouseCursors.forbidden,
             child: MongolEditableText(
               controller: controller,
-
               focusNode: focusNode,
               style: textStyle,
               cursorColor: cursorColor,
@@ -6668,7 +6617,6 @@ void main() {
             cursor: SystemMouseCursors.forbidden,
             child: MongolEditableText(
               controller: controller,
-
               focusNode: focusNode,
               style: textStyle,
               cursorColor: cursorColor,
@@ -6682,12 +6630,10 @@ void main() {
         SystemMouseCursors.text);
   });
 
-  testMongolWidgets('Can access characters on editing string',
-      (tester) async {
+  testMongolWidgets('Can access characters on editing string', (tester) async {
     late int charactersLength;
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: TextEditingController(),
         focusNode: FocusNode(),
         style: Typography.material2018(platform: TargetPlatform.android)
@@ -6719,7 +6665,6 @@ void main() {
         node: focusScopeNode,
         autofocus: true,
         child: MongolEditableText(
-
           controller: controller,
           focusNode: focusNode,
           style: textStyle,
@@ -6737,7 +6682,6 @@ void main() {
         node: focusScopeNode,
         autofocus: true,
         child: MongolEditableText(
-
           controller: controller,
           focusNode: focusNode,
           style: textStyle,
@@ -6854,11 +6798,11 @@ void main() {
         false);
   });
 
-  testMongolWidgets('Preserves composing range if cursor moves within that range',
+  testMongolWidgets(
+      'Preserves composing range if cursor moves within that range',
       (tester) async {
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -6883,7 +6827,6 @@ void main() {
       (tester) async {
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -6920,11 +6863,9 @@ void main() {
     expect(state.currentTextEditingValue.composing, TextRange.empty);
   });
 
-  testMongolWidgets('More resetting composing ranges',
-      (tester) async {
+  testMongolWidgets('More resetting composing ranges', (tester) async {
     final Widget widget = MaterialApp(
       home: MongolEditableText(
-
         controller: controller,
         focusNode: focusNode,
         style: textStyle,
@@ -6987,7 +6928,6 @@ void main() {
     ) async {
       final Widget widget = MaterialApp(
         home: MongolEditableText(
-
           controller: controller,
           focusNode: focusNode,
           inputFormatters: <TextInputFormatter>[formatter],
@@ -7002,7 +6942,8 @@ void main() {
     }
 
     // Regression test for https://github.com/flutter/flutter/issues/65374.
-    testMongolWidgets('will not cause crash while the TextEditingValue is composing',
+    testMongolWidgets(
+        'will not cause crash while the TextEditingValue is composing',
         (tester) async {
       await setupWidget(
         tester,
@@ -7011,8 +6952,8 @@ void main() {
         ),
       );
 
-      final MongolEditableTextState state =
-          tester.state<MongolEditableTextState>(find.byType(MongolEditableText));
+      final MongolEditableTextState state = tester
+          .state<MongolEditableTextState>(find.byType(MongolEditableText));
       state.updateEditingValue(const TextEditingValue(text: 'abcde'));
       expect(state.currentTextEditingValue.composing, TextRange.empty);
       state.updateEditingValue(const TextEditingValue(
@@ -7042,8 +6983,8 @@ void main() {
         ),
       );
 
-      final MongolEditableTextState state =
-          tester.state<MongolEditableTextState>(find.byType(MongolEditableText));
+      final MongolEditableTextState state = tester
+          .state<MongolEditableTextState>(find.byType(MongolEditableText));
 
       // Initially we're at maxLength with no composing text.
       controller.text = 'abcde';
@@ -7307,8 +7248,7 @@ void main() {
   group('callback errors', () {
     const String errorText = 'Test MongolEditableText callback error';
 
-    testMongolWidgets('onSelectionChanged can throw errors',
-        (tester) async {
+    testMongolWidgets('onSelectionChanged can throw errors', (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: MongolEditableText(
           showSelectionHandles: true,
@@ -7318,7 +7258,6 @@ void main() {
           ),
           focusNode: FocusNode(),
           cursorColor: Colors.red,
-          
           style: Typography.material2018(platform: TargetPlatform.android)
               .black
               .subtitle1!
@@ -7349,7 +7288,6 @@ void main() {
           ),
           focusNode: FocusNode(),
           cursorColor: Colors.red,
-          
           style: Typography.material2018(platform: TargetPlatform.android)
               .black
               .subtitle1!
@@ -7368,8 +7306,7 @@ void main() {
       expect(error.toString(), contains(errorText));
     });
 
-    testMongolWidgets('onEditingComplete can throw errors',
-        (tester) async {
+    testMongolWidgets('onEditingComplete can throw errors', (tester) async {
       await tester.pumpWidget(MaterialApp(
         home: MongolEditableText(
           showSelectionHandles: true,
@@ -7379,7 +7316,6 @@ void main() {
           ),
           focusNode: FocusNode(),
           cursorColor: Colors.red,
-          
           style: Typography.material2018(platform: TargetPlatform.android)
               .black
               .subtitle1!
@@ -7413,7 +7349,6 @@ void main() {
           ),
           focusNode: FocusNode(),
           cursorColor: Colors.red,
-          
           style: Typography.material2018(platform: TargetPlatform.android)
               .black
               .subtitle1!
@@ -7448,7 +7383,6 @@ void main() {
         child: MongolEditableText(
           autofocus: true,
           controller: unsettableController,
-
           focusNode: focusNode,
           style: textStyle,
           cursorColor: cursorColor,
@@ -7536,6 +7470,7 @@ class MockTextSelectionControls extends Fake implements TextSelectionControls {
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
     ClipboardStatusNotifier clipboardStatus,
+    //Offset? lastSecondaryTapDownPosition,
   ) {
     return Container();
   }
@@ -7720,4 +7655,3 @@ class SkipPaintingRenderObject extends RenderProxyBox {
 //         withComposing: withComposing);
 //   }
 // }
-

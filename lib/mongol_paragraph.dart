@@ -12,14 +12,33 @@ import 'package:flutter/painting.dart';
 import 'package:characters/characters.dart';
 
 /// A paragraph of vertical Mongolian layout text.
+///
+/// This class is a replacement for the Paragraph class. Since Paragraph hands
+/// all it's work down to the Flutter engine, this class also does the work
+/// of line-wrapping and laying out the text.
+///
+/// The text is divided into a list of [_runs] where each run is a short
+/// substring (usually a word or CJK/emoji character). Sometimes a run includes
+/// multiple styles in which case [_rawStyledTextRuns] are used temorarily
+/// before they can be combined into single [_runs] just based on words. The
+/// [_runs] are then measured and layed out in [_lines] based on the given
+/// constraints.
 class MongolParagraph {
   /// This class is created by the library, and should not be instantiated
   /// or extended directly.
   ///
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
-  MongolParagraph._(this._runs, this._text);
+  MongolParagraph._(
+    this._runs,
+    this._text,
+    this._maxLines,
+    this._ellipsis,
+  );
+
   final String _text;
   final List<_TextRun> _runs;
+  final int? _maxLines;
+  final _TextRun? _ellipsis;
 
   double? _width;
   double? _height;
@@ -54,7 +73,7 @@ class MongolParagraph {
       return 0.0;
     }
     return _runs.first.paragraph.alphabeticBaseline;
-  } 
+  }
 
   /// The distance to the ideographic baseline the same as for horizontal text.
   double get ideographicBaseline {
@@ -62,7 +81,20 @@ class MongolParagraph {
       return 0.0;
     }
     return _runs.first.paragraph.ideographicBaseline;
-  } 
+  }
+
+  /// True if there is more horizontal content, but the text was truncated, either
+  /// because we reached `maxLines` lines of text or because the `maxLines` was
+  /// null, `ellipsis` was not null, and one of the lines exceeded the height
+  /// constraint.
+  ///
+  /// See the discussion of the `maxLines` and `ellipsis` arguments at
+  /// [ParagraphStyle].
+  bool get didExceedMaxLines {
+    return _didExceedMaxLines;
+  }
+
+  bool _didExceedMaxLines = false;
 
   /// Computes the size and position of each glyph in the paragraph.
   ///
@@ -89,6 +121,7 @@ class MongolParagraph {
     }
     if (_lines.isNotEmpty) {
       _lines.clear();
+      _didExceedMaxLines = false;
     }
 
     // add run lengths until exceeds length
@@ -121,6 +154,10 @@ class MongolParagraph {
         lineHeight = 0;
         start = end;
       }
+
+      if (_didExceedMaxLines) {
+        break;
+      }
     }
 
     end = _runs.length;
@@ -141,6 +178,11 @@ class MongolParagraph {
   }
 
   void _addLine(int start, int end, double width, double height) {
+    if (_maxLines != null && _maxLines! <= _lines.length) {
+      _didExceedMaxLines = true;
+      return;
+    }
+    _didExceedMaxLines = false;
     final bounds = Rect.fromLTRB(0, 0, width, height);
     final lineInfo = _LineInfo(start, end, bounds);
     _lines.add(lineInfo);
@@ -229,15 +271,15 @@ class MongolParagraph {
     // find the afinity
     final lineEndCharOffset = _runs[matchedLine.textRunEnd - 1].end;
     final textAfinity =
-        (textOffset == lineEndCharOffset)
-            ? upstream
-            : downstream;
+        (textOffset == lineEndCharOffset) ? upstream : downstream;
     return [textOffset, textAfinity];
   }
 
   /// Draws the precomputed text on a [canvas] one line at a time in vertical
   /// lines that wrap from left to right.
   void draw(Canvas canvas, Offset offset) {
+    final shouldDrawEllipsis = _didExceedMaxLines && _ellipsis != null;
+
     // translate for the offset
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
@@ -246,17 +288,31 @@ class MongolParagraph {
     canvas.rotate(math.pi / 2);
 
     // loop through every line
-    for (final line in _lines) {
+    for (var i = 0; i < _lines.length; i++) {
+      final line = _lines[i];
+
       // translate for the line height
       final dy = -line.bounds.height;
       canvas.translate(0, dy);
 
       // draw each run in the current line
       canvas.save();
-      for (var i = line.textRunStart; i < line.textRunEnd; i++) {
-        final run = _runs[i];
-        run.draw(canvas, Offset(0, 0));
-        canvas.translate(run.width, 0);
+      final startIndex = line.textRunStart;
+      final endIndex = line.textRunEnd - 1;
+      final isLastLine = i == _lines.length - 1;
+      for (var j = startIndex; j <= endIndex; j++) {
+        if (shouldDrawEllipsis && isLastLine && j == endIndex) {
+          if (maxIntrinsicHeight + _ellipsis!.height < height) {
+            final run = _runs[j];
+            run.draw(canvas, Offset(0, 0));
+            canvas.translate(run.width, 0);
+          }
+          _ellipsis!.draw(canvas, Offset(0, 0));
+        } else {
+          final run = _runs[j];
+          run.draw(canvas, Offset(0, 0));
+          canvas.translate(run.width, 0);
+        }
       }
       canvas.restore();
     }
@@ -501,7 +557,6 @@ class MongolParagraph {
     }
     return TextRange(start: start, end: end);
   }
-
 }
 
 /// Layout constraints for [MongolParagraph] objects.
@@ -548,11 +603,18 @@ class MongolParagraphBuilder {
   MongolParagraphBuilder(
     ui.ParagraphStyle style, {
     double textScaleFactor = 1.0,
+    int? maxLines,
+    String? ellipsis,
   })  : _paragraphStyle = style,
-        _textScaleFactor = textScaleFactor;
+        _textScaleFactor = textScaleFactor,
+        _maxLines = maxLines,
+        _ellipsis = ellipsis;
 
   ui.ParagraphStyle? _paragraphStyle;
   final double _textScaleFactor;
+  final int? _maxLines;
+  final String? _ellipsis;
+  //_TextRun? _ellipsisRun;
   final _styleStack = _Stack<TextStyle>();
   final _rawStyledTextRuns = <_RawStyledTextRun>[];
 
@@ -614,31 +676,37 @@ class MongolParagraphBuilder {
     final length = _rawStyledTextRuns.length;
     var startIndex = 0;
     var endIndex = 0;
-    ui.ParagraphBuilder? _builder;
+    ui.ParagraphBuilder? builder;
+    ui.TextStyle? style;
     for (var i = 0; i < length; i++) {
-      final style = _uiStyleForRun(i);
+      style = _uiStyleForRun(i);
       final segment = _rawStyledTextRuns[i].text;
       endIndex += segment.text.length;
-      _builder ??= ui.ParagraphBuilder(_paragraphStyle!);
-      _builder.pushStyle(style);
+      builder ??= ui.ParagraphBuilder(_paragraphStyle!);
+      builder.pushStyle(style);
       final text = _stripNewLineChar(segment.text);
-      _builder.addText(text);
-      _builder.pop();
+      builder.addText(text);
+      builder.pop();
 
       if (_isNonBreakingSegment(i)) {
         continue;
       }
 
-      final paragraph = _builder.build();
+      final paragraph = builder.build();
       paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
       final run =
           _TextRun(startIndex, endIndex, segment.isRotatable, paragraph);
       runs.add(run);
-      _builder = null;
+      builder = null;
       startIndex = endIndex;
     }
 
-    return MongolParagraph._(runs, _plainText.toString());
+    return MongolParagraph._(
+      runs,
+      _plainText.toString(),
+      _maxLines,
+      _ellipsisRun(style),
+    );
   }
 
   bool _isNonBreakingSegment(int i) {
@@ -672,6 +740,20 @@ class MongolParagraphBuilder {
   String _stripNewLineChar(String text) {
     if (!text.endsWith('\n')) return text;
     return text.replaceAll('\n', '');
+  }
+
+  _TextRun? _ellipsisRun(ui.TextStyle? style) {
+    if (_ellipsis == null) {
+      return null;
+    }
+    final builder = ui.ParagraphBuilder(_paragraphStyle!);
+    if (style != null) {
+      builder.pushStyle(style);
+    }
+    builder.addText(_ellipsis!);
+    final paragraph = builder.build();
+    paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
+    return _TextRun(-1, -1, false, paragraph);
   }
 }
 

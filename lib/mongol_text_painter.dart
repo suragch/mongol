@@ -111,10 +111,15 @@ class MongolTextPainter {
     TextSpan? text,
     MongolTextAlign textAlign = MongolTextAlign.top,
     double textScaleFactor = 1.0,
+    int? maxLines,
+    String? ellipsis,
   })  : assert(text == null || text.debugAssertIsValid()),
+        assert(maxLines == null || maxLines > 0),
         _text = text,
         _textAlign = textAlign,
-        _textScaleFactor = textScaleFactor;
+        _textScaleFactor = textScaleFactor,
+        _maxLines = maxLines,
+        _ellipsis = ellipsis;
 
   MongolParagraph? _paragraph;
   bool _needsLayout = true;
@@ -185,6 +190,52 @@ class MongolTextPainter {
     _layoutTemplate = null;
   }
 
+  /// The string used to ellipsize overflowing text. Setting this to a non-empty
+  /// string will cause this string to be substituted for the remaining text
+  /// if the text can not fit within the specified maximum height.
+  ///
+  /// Specifically, the ellipsis is applied to the last line before the line
+  /// truncated by [maxLines], if [maxLines] is non-null and that line overflows
+  /// the height constraint, or to the first line that is taller than the height
+  /// constraint, if [maxLines] is null. The height constraint is the `maxHeight`
+  /// passed to [layout].
+  ///
+  /// After this is set, you must call [layout] before the next call to [paint].
+  ///
+  /// The higher layers of the system, such as the [MongolText] widget, represent
+  /// overflow effects using the [TextOverflow] enum. The
+  /// [TextOverflow.ellipsis] value corresponds to setting this property to
+  /// U+2026 HORIZONTAL ELLIPSIS (…).
+  String? get ellipsis => _ellipsis;
+  String? _ellipsis;
+  set ellipsis(String? value) {
+    assert(value == null || value.isNotEmpty);
+    if (_ellipsis == value) {
+      return;
+    }
+    _ellipsis = value;
+    markNeedsLayout();
+  }
+
+  /// An optional maximum number of lines for the text to span, wrapping if
+  /// necessary.
+  ///
+  /// If the text exceeds the given number of lines, it is truncated such that
+  /// subsequent lines are dropped.
+  ///
+  /// After this is set, you must call [layout] before the next call to [paint].
+  int? get maxLines => _maxLines;
+  int? _maxLines;
+  /// The value may be null. If it is not null, then it must be greater than zero.
+  set maxLines(int? value) {
+    assert(value == null || value > 0);
+    if (_maxLines == value) {
+      return;
+    }
+    _maxLines = value;
+    markNeedsLayout();
+  }
+
   MongolParagraph? _layoutTemplate;
 
   ui.ParagraphStyle _createParagraphStyle() {
@@ -192,8 +243,8 @@ class MongolTextPainter {
           textAlign: mapMongolToHorizontalTextAlign(textAlign),
           textDirection: TextDirection.ltr,
           textScaleFactor: textScaleFactor,
-          maxLines: null,
-          ellipsis: null,
+          maxLines: maxLines,
+          ellipsis: ellipsis,
           locale: null,
           strutStyle: null,
         ) ??
@@ -204,8 +255,8 @@ class MongolTextPainter {
           // perform inheriting [TextStyle]s and would otherwise
           // fail to apply textScaleFactor.
           fontSize: _kDefaultFontSize * textScaleFactor,
-          maxLines: null,
-          ellipsis: null,
+          maxLines: maxLines,
+          ellipsis: ellipsis,
           locale: null,
         );
   }
@@ -298,6 +349,22 @@ class MongolTextPainter {
     }
   }
 
+  /// Whether any text was truncated or ellipsized.
+  ///
+  /// If [maxLines] is not null, this is true if there were more lines to be
+  /// drawn than the given [maxLines], and thus at least one line was omitted in
+  /// the output; otherwise it is false.
+  ///
+  /// If [maxLines] is null, this is true if [ellipsis] is not the empty string
+  /// and there was a line that overflowed the `maxHeight` argument passed to
+  /// [layout]; otherwise it is false.
+  ///
+  /// Valid only after [layout] has been called.
+  bool get didExceedMaxLines {
+    assert(!_needsLayout);
+    return _paragraph!.didExceedMaxLines;
+  }
+
   double? _lastMinHeight;
   double? _lastMaxHeight;
 
@@ -318,6 +385,8 @@ class MongolTextPainter {
       final builder = MongolParagraphBuilder(
         _createParagraphStyle(),
         textScaleFactor: _textScaleFactor,
+        maxLines: _maxLines,
+        ellipsis: _ellipsis,
       );
       _addStyleToText(builder, _text!);
       _paragraph = builder.build();
