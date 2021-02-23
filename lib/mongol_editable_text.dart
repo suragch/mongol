@@ -609,7 +609,8 @@ class MongolEditableText extends StatefulWidget {
 
   /// How wide the cursor will be.
   ///
-  /// If this property is null, [RenderEditable.preferredLineWidth] will be used.
+  /// If this property is null, [MongolRenderEditable.preferredLineWidth] will 
+  /// be used.
   final double? cursorWidth;
 
   /// How thick the cursor will be.
