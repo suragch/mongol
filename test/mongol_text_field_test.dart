@@ -18,8 +18,11 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mongol/mongol_editable_text.dart';
+import 'package:mongol/mongol_input_decorator.dart';
 import 'package:mongol/mongol_render_editable.dart';
+import 'package:mongol/mongol_text.dart';
 import 'package:mongol/mongol_text_field.dart';
+import 'package:mongol/mongol_text_painter.dart';
 
 import 'widgets/binding.dart';
 import 'widgets/editable_text_utils.dart';
@@ -31,7 +34,8 @@ import 'widgets/semantics_tester.dart';
 // import '../widgets/semantics_tester.dart';
 // import 'feedback_tester.dart';
 
-typedef FormatEditUpdateCallback = void Function(TextEditingValue, TextEditingValue);
+typedef FormatEditUpdateCallback = void Function(
+    TextEditingValue, TextEditingValue);
 
 class MockClipboard {
   Object _clipboardData = <String, dynamic>{
@@ -49,29 +53,33 @@ class MockClipboard {
   }
 }
 
-class MaterialLocalizationsDelegate extends LocalizationsDelegate<MaterialLocalizations> {
+class MaterialLocalizationsDelegate
+    extends LocalizationsDelegate<MaterialLocalizations> {
   @override
   bool isSupported(Locale locale) => true;
 
   @override
-  Future<MaterialLocalizations> load(Locale locale) => DefaultMaterialLocalizations.load(locale);
+  Future<MaterialLocalizations> load(Locale locale) =>
+      DefaultMaterialLocalizations.load(locale);
 
   @override
   bool shouldReload(MaterialLocalizationsDelegate old) => false;
 }
 
-class WidgetsLocalizationsDelegate extends LocalizationsDelegate<WidgetsLocalizations> {
+class WidgetsLocalizationsDelegate
+    extends LocalizationsDelegate<WidgetsLocalizations> {
   @override
   bool isSupported(Locale locale) => true;
 
   @override
-  Future<WidgetsLocalizations> load(Locale locale) => DefaultWidgetsLocalizations.load(locale);
+  Future<WidgetsLocalizations> load(Locale locale) =>
+      DefaultWidgetsLocalizations.load(locale);
 
   @override
   bool shouldReload(WidgetsLocalizationsDelegate old) => false;
 }
 
-Widget overlay({ required Widget child }) {
+Widget overlay({required Widget child}) {
   final entry = OverlayEntry(
     builder: (BuildContext context) {
       return Center(
@@ -94,7 +102,7 @@ Widget overlayWithEntry(OverlayEntry entry) {
     child: Directionality(
       textDirection: TextDirection.ltr,
       child: MediaQuery(
-        data: const MediaQueryData(size: Size(800.0, 600.0)),
+        data: const MediaQueryData(size: Size(600.0, 800.0)),
         child: Overlay(
           initialEntries: <OverlayEntry>[
             entry,
@@ -105,7 +113,7 @@ Widget overlayWithEntry(OverlayEntry entry) {
   );
 }
 
-Widget boilerplate({ required Widget child }) {
+Widget boilerplate({required Widget child}) {
   return MaterialApp(
     home: Localizations(
       locale: const Locale('en', 'US'),
@@ -116,7 +124,7 @@ Widget boilerplate({ required Widget child }) {
       child: Directionality(
         textDirection: TextDirection.ltr,
         child: MediaQuery(
-          data: const MediaQueryData(size: Size(800.0, 600.0)),
+          data: const MediaQueryData(size: Size(600.0, 800.0)),
           child: Center(
             child: Material(
               child: child,
@@ -133,20 +141,24 @@ Future<void> skipPastScrollingAnimation(MongolWidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 200));
 }
 
-double getOpacity(WidgetTester tester, Finder finder) {
-  return tester.widget<FadeTransition>(
-    find.ancestor(
-      of: finder,
-      matching: find.byType(FadeTransition),
-    ),
-  ).opacity.value;
+double getOpacity(MongolWidgetTester tester, Finder finder) {
+  return tester
+      .widget<FadeTransition>(
+        find.ancestor(
+          of: finder,
+          matching: find.byType(FadeTransition),
+        ),
+      )
+      .opacity
+      .value;
 }
 
 class TestFormatter extends TextInputFormatter {
   TestFormatter(this.onFormatEditUpdate);
   FormatEditUpdateCallback onFormatEditUpdate;
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     onFormatEditUpdate(oldValue, newValue);
     return newValue;
   }
@@ -155,15 +167,14 @@ class TestFormatter extends TextInputFormatter {
 void main() {
   MongolTestWidgetsFlutterBinding.ensureInitialized();
   final mockClipboard = MockClipboard();
-  SystemChannels.platform.setMockMethodCallHandler(mockClipboard.handleMethodCall);
+  SystemChannels.platform
+      .setMockMethodCallHandler(mockClipboard.handleMethodCall);
 
-  const kThreeLines =
-    'First line of text is\n'
-    'Second line goes until\n'
-    'Third line of stuff';
+  const kThreeLines = 'First line of text is\n'
+      'Second line goes until\n'
+      'Third line of stuff';
   const kMoreThanFourLines =
-    kThreeLines +
-    "\nFourth line won't display and ends at";
+      kThreeLines + "\nFourth line won't display and ends at";
   // Gap between caret and edge of input, defined in editable.dart.
   const kCaretGap = 1;
 
@@ -223,12 +234,12 @@ void main() {
   //   await gesture.up();
   //   await tester.pumpAndSettle();
   //   expect(controller.selection, const TextSelection(baseOffset: 0, extentOffset: 5));
-  //   expect(find.text('Cut'), findsOneWidget);
-  //   expect(find.text('Copy'), findsOneWidget);
-  //   expect(find.text('Paste'), findsOneWidget);
+  //   expect(findMongol.text('Cut'), findsOneWidget);
+  //   expect(findMongol.text('Copy'), findsOneWidget);
+  //   expect(findMongol.text('Paste'), findsOneWidget);
 
   //   // Copy the first word.
-  //   await tester.tap(find.text('Copy'));
+  //   await tester.tap(findMongol.text('Copy'));
   //   await tester.pumpAndSettle();
   //   expect(controller.text, 'blah1 blah2');
   //   expect(controller.selection, const TextSelection(baseOffset: 5, extentOffset: 5));
@@ -240,10 +251,10 @@ void main() {
   //   await gesture.up();
   //   await tester.pumpAndSettle();
   //   expect(controller.selection, const TextSelection(baseOffset: 11, extentOffset: 11, affinity: TextAffinity.upstream));
-  //   expect(find.text('Cut'), findsNothing);
-  //   expect(find.text('Copy'), findsNothing);
-  //   expect(find.text('Paste'), findsOneWidget);
-  //   await tester.tap(find.text('Paste'));
+  //   expect(findMongol.text('Cut'), findsNothing);
+  //   expect(findMongol.text('Copy'), findsNothing);
+  //   expect(findMongol.text('Paste'), findsOneWidget);
+  //   await tester.tap(findMongol.text('Paste'));
   //   await tester.pumpAndSettle();
   //   expect(controller.text, 'blah1 blah2blah1');
   //   expect(controller.selection, const TextSelection(baseOffset: 16, extentOffset: 16));
@@ -253,19 +264,21 @@ void main() {
   //   await tester.pump();
   //   await gesture.up();
   //   await tester.pumpAndSettle();
-  //   expect(find.text('Cut'), findsOneWidget);
-  //   expect(find.text('Copy'), findsOneWidget);
-  //   expect(find.text('Paste'), findsOneWidget);
+  //   expect(findMongol.text('Cut'), findsOneWidget);
+  //   expect(findMongol.text('Copy'), findsOneWidget);
+  //   expect(findMongol.text('Paste'), findsOneWidget);
   //   expect(controller.selection, const TextSelection(baseOffset: 0, extentOffset: 5));
-  //   await tester.tap(find.text('Cut'));
+  //   await tester.tap(findMongol.text('Cut'));
   //   await tester.pumpAndSettle();
   //   expect(controller.text, ' blah2blah1');
   //   expect(controller.selection, const TextSelection(baseOffset: 0, extentOffset: 0));
   //   expect(find.byType(CupertinoButton), findsNothing);
   // }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.macOS, TargetPlatform.windows, TargetPlatform.linux }), skip: kIsWeb);
 
-  testMongolWidgets('MongolTextField passes onEditingComplete to MongolEditableText', (tester) async {
-    final VoidCallback onEditingComplete = () { };
+  testMongolWidgets(
+      'MongolTextField passes onEditingComplete to MongolEditableText',
+      (tester) async {
+    final VoidCallback onEditingComplete = () {};
 
     await tester.pumpWidget(
       MaterialApp(
@@ -280,7 +293,8 @@ void main() {
     final Finder editableTextFinder = find.byType(MongolEditableText);
     expect(editableTextFinder, findsOneWidget);
 
-    final MongolEditableText editableTextWidget = tester.widget(editableTextFinder);
+    final MongolEditableText editableTextWidget =
+        tester.widget(editableTextFinder);
     expect(editableTextWidget.onEditingComplete, onEditingComplete);
   });
 
@@ -302,7 +316,8 @@ void main() {
       ),
     );
 
-    RenderBox findTextFieldBox() => tester.renderObject(find.byKey(textFieldKey));
+    RenderBox findTextFieldBox() =>
+        tester.renderObject(find.byKey(textFieldKey));
 
     final RenderBox inputBox = findTextFieldBox();
     final Size emptyInputSize = inputBox.size;
@@ -338,7 +353,8 @@ void main() {
     );
     await tester.showKeyboard(find.byType(MongolTextField));
 
-    final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+    final MongolEditableTextState editableText =
+        tester.state(find.byType(MongolEditableText));
 
     // Check that the cursor visibility toggles after each blink interval.
     Future<void> checkCursorToggle() async {
@@ -379,8 +395,10 @@ void main() {
     await tester.tap(textFinder);
     await tester.pump();
 
-    final MongolEditableTextState editableTextState = tester.firstState(find.byType(MongolEditableText));
-    final MongolRenderEditable renderEditable = editableTextState.renderEditable;
+    final MongolEditableTextState editableTextState =
+        tester.firstState(find.byType(MongolEditableText));
+    final MongolRenderEditable renderEditable =
+        editableTextState.renderEditable;
 
     expect(renderEditable.cursorColor!.alpha, 255);
 
@@ -400,7 +418,9 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
 
     expect(renderEditable.cursorColor!.alpha, 0);
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }));
+  },
+      variant: const TargetPlatformVariant(
+          <TargetPlatform>{TargetPlatform.iOS, TargetPlatform.macOS}));
 
   testMongolWidgets('Cursor radius is 2.0', (tester) async {
     await tester.pumpWidget(
@@ -411,21 +431,25 @@ void main() {
       ),
     );
 
-    final MongolEditableTextState editableTextState = tester.firstState(find.byType(MongolEditableText));
-    final MongolRenderEditable renderEditable = editableTextState.renderEditable;
+    final MongolEditableTextState editableTextState =
+        tester.firstState(find.byType(MongolEditableText));
+    final MongolRenderEditable renderEditable =
+        editableTextState.renderEditable;
 
     expect(renderEditable.cursorRadius, const Radius.circular(2.0));
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }));
+  },
+      variant: const TargetPlatformVariant(
+          <TargetPlatform>{TargetPlatform.iOS, TargetPlatform.macOS}));
 
   testMongolWidgets('cursor has expected defaults', (tester) async {
     await tester.pumpWidget(
-        overlay(
-          child: const MongolTextField(
-          ),
-        ),
+      overlay(
+        child: const MongolTextField(),
+      ),
     );
 
-    final MongolTextField textField = tester.firstWidget(find.byType(MongolTextField));
+    final MongolTextField textField =
+        tester.firstWidget(find.byType(MongolTextField));
     expect(textField.cursorHeight, 2.0);
     expect(textField.cursorWidth, null);
     expect(textField.cursorRadius, null);
@@ -433,14 +457,15 @@ void main() {
 
   testMongolWidgets('cursor has expected radius value', (tester) async {
     await tester.pumpWidget(
-        overlay(
-          child: const MongolTextField(
-            cursorRadius: Radius.circular(3.0),
-          ),
+      overlay(
+        child: const MongolTextField(
+          cursorRadius: Radius.circular(3.0),
         ),
+      ),
     );
 
-    final MongolTextField textField = tester.firstWidget(find.byType(MongolTextField));
+    final MongolTextField textField =
+        tester.firstWidget(find.byType(MongolTextField));
     expect(textField.cursorHeight, 2.0);
     expect(textField.cursorRadius, const Radius.circular(3.0));
   });
@@ -499,46 +524,46 @@ void main() {
   //   );
   // }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }));
 
-  testMongolWidgets('TextInputFormatter gets correct selection value', (tester) async {
-    late TextEditingValue actualOldValue;
-    late TextEditingValue actualNewValue;
-    final FormatEditUpdateCallback callBack = (TextEditingValue oldValue, TextEditingValue newValue) {
-      actualOldValue = oldValue;
-      actualNewValue = newValue;
-    };
-    final FocusNode focusNode = FocusNode();
-    final TextEditingController controller = TextEditingController(text: '123');
-    await tester.pumpWidget(
-      boilerplate(
-        child: MongolTextField(
-          controller: controller,
-          focusNode: focusNode,
-          inputFormatters: <TextInputFormatter>[TestFormatter(callBack)],
-        ),
-      ),
-    );
+  // testMongolWidgets('TextInputFormatter gets correct selection value', (tester) async {
+  //   late TextEditingValue actualOldValue;
+  //   late TextEditingValue actualNewValue;
+  //   final FormatEditUpdateCallback callBack = (TextEditingValue oldValue, TextEditingValue newValue) {
+  //     actualOldValue = oldValue;
+  //     actualNewValue = newValue;
+  //   };
+  //   final FocusNode focusNode = FocusNode();
+  //   final TextEditingController controller = TextEditingController(text: '123');
+  //   await tester.pumpWidget(
+  //     boilerplate(
+  //       child: MongolTextField(
+  //         controller: controller,
+  //         focusNode: focusNode,
+  //         inputFormatters: <TextInputFormatter>[TestFormatter(callBack)],
+  //       ),
+  //     ),
+  //   );
 
-    await tester.tap(find.byType(MongolTextField));
-    await tester.pumpAndSettle();
+  //   await tester.tap(find.byType(MongolTextField));
+  //   await tester.pumpAndSettle();
 
-    await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
-    await tester.pumpAndSettle();
+  //   await tester.sendKeyEvent(LogicalKeyboardKey.backspace);
+  //   await tester.pumpAndSettle();
 
-    expect(
-      actualOldValue,
-      const TextEditingValue(
-        text: '123',
-        selection: TextSelection.collapsed(offset: 3, affinity: TextAffinity.upstream),
-      ),
-    );
-    expect(
-      actualNewValue,
-      const TextEditingValue(
-        text: '12',
-        selection: TextSelection.collapsed(offset: 2),
-      ),
-    );
-  });
+  //   expect(
+  //     actualOldValue,
+  //     const TextEditingValue(
+  //       text: '123',
+  //       selection: TextSelection.collapsed(offset: 3, affinity: TextAffinity.upstream),
+  //     ),
+  //   );
+  //   expect(
+  //     actualNewValue,
+  //     const TextEditingValue(
+  //       text: '12',
+  //       selection: TextSelection.collapsed(offset: 2),
+  //     ),
+  //   );
+  // });
 
   // testMongolWidgets('text field selection toolbar renders correctly inside opacity', (tester) async {
   //   await tester.pumpWidget(
@@ -582,7 +607,7 @@ void main() {
   //   await tester.pump(const Duration(seconds: 1));
 
   //   // Sanity check that the toolbar widget exists.
-  //   expect(find.text('Paste'), findsOneWidget);
+  //   expect(findMongol.text('Paste'), findsOneWidget);
 
   //   await expectLater(
   //     // The toolbar exists in the Overlay above the MaterialApp.
@@ -634,10 +659,10 @@ void main() {
   //   );
 
   //   // Selected text shows 'Copy', and not 'Paste', 'Cut', 'Select All'.
-  //   expect(find.text('Paste'), findsNothing);
-  //   expect(find.text('Copy'), findsOneWidget);
-  //   expect(find.text('Cut'), findsNothing);
-  //   expect(find.text('Select All'), findsNothing);
+  //   expect(findMongol.text('Paste'), findsNothing);
+  //   expect(findMongol.text('Copy'), findsOneWidget);
+  //   expect(findMongol.text('Cut'), findsNothing);
+  //   expect(findMongol.text('Select All'), findsNothing);
   // },
   //   variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }),
   // );
@@ -765,10 +790,10 @@ void main() {
   //   await tester.pump();
 
   //   // Selected text shows 'Copy', and not 'Paste', 'Cut', 'Select all'.
-  //   expect(find.text('Paste'), findsNothing);
-  //   expect(find.text('Copy'), findsOneWidget);
-  //   expect(find.text('Cut'), findsNothing);
-  //   expect(find.text('Select all'), findsNothing);
+  //   expect(findMongol.text('Paste'), findsNothing);
+  //   expect(findMongol.text('Copy'), findsOneWidget);
+  //   expect(findMongol.text('Cut'), findsNothing);
+  //   expect(findMongol.text('Select all'), findsNothing);
   // },
   //   variant: const TargetPlatformVariant(<TargetPlatform>{
   //     TargetPlatform.android,
@@ -876,7 +901,7 @@ void main() {
 
   //   expect(inputBox, findInputBox());
   //   inputBox = findInputBox();
-  //   expect(inputBox.size.height, greaterThan(oneLineInputSize.height));
+  //   expect(inputBox.size.width, greaterThan(oneLineInputSize.width));
   //   final Size twoLineInputSize = inputBox.size;
 
   //   // Enter a string with the same number of characters as testValueTwoLines,
@@ -889,7 +914,7 @@ void main() {
 
   //   expect(inputBox, findInputBox());
   //   inputBox = findInputBox();
-  //   expect(inputBox.size.height, oneLineInputSize.height);
+  //   expect(inputBox.size.width, oneLineInputSize.width);
 
   //   // Swapping the final space for a letter causes it to wrap to 2 lines.
   //   const String testValueSpacesOverflow = testValueOneLine + '         a';
@@ -899,7 +924,7 @@ void main() {
 
   //   expect(inputBox, findInputBox());
   //   inputBox = findInputBox();
-  //   expect(inputBox.size.height, twoLineInputSize.height);
+  //   expect(inputBox.size.width, twoLineInputSize.width);
 
   //   // Positioning the cursor at the end of a line overflowing with spaces puts
   //   // it inside the input still.
@@ -908,222 +933,225 @@ void main() {
   //   await tester.tapAt(textOffsetToPosition(tester, testValueSpaces.length));
   //   await tester.pump();
 
-  //   final double inputWidth = findRenderEditable(tester).size.width;
+  //   final double inputHeight = findRenderEditable(tester).size.height;
   //   final Offset cursorOffsetSpaces = findRenderEditable(tester).getLocalRectForCaret(
   //     const TextPosition(offset: testValueSpaces.length),
   //   ).bottomRight;
 
-  //   expect(cursorOffsetSpaces.dx, inputWidth - kCaretGap);
+  //   expect(cursorOffsetSpaces.dy, inputHeight - kCaretGap);
   // });
 
-  // testMongolWidgets('mobile obscureText control test', (tester) async {
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: const MongolTextField(
-  //         obscureText: true,
-  //         decoration: InputDecoration(
-  //           hintText: 'Placeholder',
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   await tester.showKeyboard(find.byType(MongolTextField));
+  testMongolWidgets('mobile obscureText control test', (tester) async {
+    await tester.pumpWidget(
+      overlay(
+        child: const MongolTextField(
+          obscureText: true,
+          decoration: InputDecoration(
+            hintText: 'Placeholder',
+          ),
+        ),
+      ),
+    );
+    await tester.showKeyboard(find.byType(MongolTextField));
 
-  //   const String testValue = 'ABC';
-  //   tester.testTextInput.updateEditingValue(const TextEditingValue(
-  //     text: testValue,
-  //     selection: TextSelection.collapsed(offset: testValue.length),
-  //   ));
+    const String testValue = 'ABC';
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+      text: testValue,
+      selection: TextSelection.collapsed(offset: testValue.length),
+    ));
 
-  //   await tester.pump();
+    await tester.pump();
 
-  //   // Enter a character into the obscured field and verify that the character
-  //   // is temporarily shown to the user and then changed to a bullet.
-  //   const String newChar = 'X';
-  //   tester.testTextInput.updateEditingValue(const TextEditingValue(
-  //     text: testValue + newChar,
-  //     selection: TextSelection.collapsed(offset: testValue.length + 1),
-  //   ));
+    // Enter a character into the obscured field and verify that the character
+    // is temporarily shown to the user and then changed to a bullet.
+    const String newChar = 'X';
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+      text: testValue + newChar,
+      selection: TextSelection.collapsed(offset: testValue.length + 1),
+    ));
 
-  //   await tester.pump();
+    await tester.pump();
 
-  //   String editText = findRenderEditable(tester).text!.text!;
-  //   expect(editText.substring(editText.length - 1), newChar);
+    String editText = findRenderEditable(tester).text!.text!;
+    expect(editText.substring(editText.length - 1), newChar);
 
-  //   await tester.pump(const Duration(seconds: 2));
+    await tester.pump(const Duration(seconds: 2));
 
-  //   editText = findRenderEditable(tester).text!.text!;
-  //   expect(editText.substring(editText.length - 1), '\u2022');
-  // }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS, TargetPlatform.android }));
+    editText = findRenderEditable(tester).text!.text!;
+    expect(editText.substring(editText.length - 1), '\u2022');
+  },
+      variant: const TargetPlatformVariant(
+          <TargetPlatform>{TargetPlatform.iOS, TargetPlatform.android}));
 
-  // testMongolWidgets('desktop obscureText control test', (tester) async {
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: const MongolTextField(
-  //         obscureText: true,
-  //         decoration: InputDecoration(
-  //           hintText: 'Placeholder',
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   await tester.showKeyboard(find.byType(MongolTextField));
+  testMongolWidgets('desktop obscureText control test', (tester) async {
+    await tester.pumpWidget(
+      overlay(
+        child: const MongolTextField(
+          obscureText: true,
+          decoration: InputDecoration(
+            hintText: 'Placeholder',
+          ),
+        ),
+      ),
+    );
+    await tester.showKeyboard(find.byType(MongolTextField));
 
-  //   const String testValue = 'ABC';
-  //   tester.testTextInput.updateEditingValue(const TextEditingValue(
-  //     text: testValue,
-  //     selection: TextSelection.collapsed(offset: testValue.length),
-  //   ));
+    const String testValue = 'ABC';
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+      text: testValue,
+      selection: TextSelection.collapsed(offset: testValue.length),
+    ));
 
-  //   await tester.pump();
+    await tester.pump();
 
-  //   // Enter a character into the obscured field and verify that the character
-  //   // isn't shown to the user.
-  //   const String newChar = 'X';
-  //   tester.testTextInput.updateEditingValue(const TextEditingValue(
-  //     text: testValue + newChar,
-  //     selection: TextSelection.collapsed(offset: testValue.length + 1),
-  //   ));
+    // Enter a character into the obscured field and verify that the character
+    // isn't shown to the user.
+    const String newChar = 'X';
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+      text: testValue + newChar,
+      selection: TextSelection.collapsed(offset: testValue.length + 1),
+    ));
 
-  //   await tester.pump();
+    await tester.pump();
 
-  //   final String editText = findRenderEditable(tester).text!.text!;
-  //   expect(editText.substring(editText.length - 1), '\u2022');
-  // }, variant: const TargetPlatformVariant(<TargetPlatform>{
-  //     TargetPlatform.macOS,
-  //     TargetPlatform.linux,
-  //     TargetPlatform.windows,
-  // }));
+    final String editText = findRenderEditable(tester).text!.text!;
+    expect(editText.substring(editText.length - 1), '\u2022');
+  },
+      variant: const TargetPlatformVariant(<TargetPlatform>{
+        TargetPlatform.macOS,
+        TargetPlatform.linux,
+        TargetPlatform.windows,
+      }));
 
-  // testMongolWidgets('Caret position is updated on tap', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Caret position is updated on tap', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //       ),
-  //     ),
-  //   );
-  //   expect(controller.selection.baseOffset, -1);
-  //   expect(controller.selection.extentOffset, -1);
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+        ),
+      ),
+    );
+    expect(controller.selection.baseOffset, -1);
+    expect(controller.selection.extentOffset, -1);
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   // Tap to reposition the caret.
-  //   final int tapIndex = testValue.indexOf('e');
-  //   final Offset ePos = textOffsetToPosition(tester, tapIndex);
-  //   await tester.tapAt(ePos);
-  //   await tester.pump();
+    // Tap to reposition the caret.
+    final int tapIndex = testValue.indexOf('e');
+    final Offset ePos = textOffsetToPosition(tester, tapIndex);
+    await tester.tapAt(ePos);
+    await tester.pump();
 
-  //   expect(controller.selection.baseOffset, tapIndex);
-  //   expect(controller.selection.extentOffset, tapIndex);
-  // });
+    expect(controller.selection.baseOffset, tapIndex);
+    expect(controller.selection.extentOffset, tapIndex);
+  });
 
-  // testMongolWidgets('enableInteractiveSelection = false, tap', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('enableInteractiveSelection = false, tap', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //         enableInteractiveSelection: false,
-  //       ),
-  //     ),
-  //   );
-  //   expect(controller.selection.baseOffset, -1);
-  //   expect(controller.selection.extentOffset, -1);
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+          enableInteractiveSelection: false,
+        ),
+      ),
+    );
+    expect(controller.selection.baseOffset, -1);
+    expect(controller.selection.extentOffset, -1);
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   // Tap would ordinarily reposition the caret.
-  //   final int tapIndex = testValue.indexOf('e');
-  //   final Offset ePos = textOffsetToPosition(tester, tapIndex);
-  //   await tester.tapAt(ePos);
-  //   await tester.pump();
+    // Tap would ordinarily reposition the caret.
+    final int tapIndex = testValue.indexOf('e');
+    final Offset ePos = textOffsetToPosition(tester, tapIndex);
+    await tester.tapAt(ePos);
+    await tester.pump();
 
-  //   expect(controller.selection.baseOffset, -1);
-  //   expect(controller.selection.extentOffset, -1);
-  // });
+    expect(controller.selection.baseOffset, -1);
+    expect(controller.selection.extentOffset, -1);
+  });
 
-  // testMongolWidgets('Can long press to select', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Can long press to select', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+        ),
+      ),
+    );
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   expect(controller.value.text, testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    expect(controller.value.text, testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.isCollapsed, true);
 
-  //   // Long press the 'e' to select 'def'.
-  //   final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
-  //   await tester.longPressAt(ePos, pointer: 7);
-  //   await tester.pump();
+    // Long press the 'e' to select 'def'.
+    final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
+    await tester.longPressAt(ePos, pointer: 7);
+    await tester.pump();
 
-  //   // 'def' is selected.
-  //   expect(controller.selection.baseOffset, testValue.indexOf('d'));
-  //   expect(controller.selection.extentOffset, testValue.indexOf('f')+1);
+    // 'def' is selected.
+    expect(controller.selection.baseOffset, testValue.indexOf('d'));
+    expect(controller.selection.extentOffset, testValue.indexOf('f') + 1);
 
-  //   // Tapping elsewhere immediately collapses and moves the cursor.
-  //   await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('h')));
-  //   await tester.pump();
+    // Tapping elsewhere immediately collapses and moves the cursor.
+    await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('h')));
+    await tester.pump();
 
-  //   expect(controller.selection.isCollapsed, true);
-  //   expect(controller.selection.baseOffset, testValue.indexOf('h'));
-  // });
+    expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.baseOffset, testValue.indexOf('h'));
+  });
 
-  // testMongolWidgets("Slight movements in longpress don't hide/show handles", (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets("Slight movements in longpress don't hide/show handles",
+      (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+        ),
+      ),
+    );
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   expect(controller.value.text, testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    expect(controller.value.text, testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.isCollapsed, true);
 
-  //   // Long press the 'e' to select 'def', but don't release the gesture.
-  //   final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
-  //   final TestGesture gesture = await tester.startGesture(ePos, pointer: 7);
-  //   await tester.pump(const Duration(seconds: 2));
-  //   await tester.pumpAndSettle();
+    // Long press the 'e' to select 'def', but don't release the gesture.
+    final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
+    final TestGesture gesture = await tester.startGesture(ePos, pointer: 7);
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pumpAndSettle();
 
-  //   // Handles are shown
-  //   final Finder fadeFinder = find.byType(FadeTransition);
-  //   expect(fadeFinder, findsNWidgets(2)); // 2 handles, 1 toolbar
-  //   FadeTransition handle = tester.widget(fadeFinder.at(0));
-  //   expect(handle.opacity.value, equals(1.0));
+    // Handles are shown
+    final Finder fadeFinder = find.byType(FadeTransition);
+    expect(fadeFinder, findsNWidgets(2)); // 2 handles, 1 toolbar
+    FadeTransition handle = tester.widget(fadeFinder.at(0));
+    expect(handle.opacity.value, equals(1.0));
 
-  //   // Move the gesture very slightly
-  //   await gesture.moveBy(const Offset(1.0, 1.0));
-  //   await tester.pump(TextSelectionOverlay.fadeDuration * 0.5);
-  //   handle = tester.widget(fadeFinder.at(0));
+    // Move the gesture very slightly
+    await gesture.moveBy(const Offset(1.0, 1.0));
+    await tester.pump(TextSelectionOverlay.fadeDuration * 0.5);
+    handle = tester.widget(fadeFinder.at(0));
 
-  //   // The handle should still be fully opaque.
-  //   expect(handle.opacity.value, equals(1.0));
-  // });
-
+    // The handle should still be fully opaque.
+    expect(handle.opacity.value, equals(1.0));
+  });
 
   // testMongolWidgets('Long pressing a field with selection 0,0 shows the selection menu', (tester) async {
   //   await tester.pumpWidget(overlay(
@@ -1136,120 +1164,124 @@ void main() {
   //     ),
   //   ));
 
-  //   expect(find.text('Paste'), findsNothing);
+  //   expect(findMongol.text('Paste'), findsNothing);
   //   final Offset emptyPos = textOffsetToPosition(tester, 0);
   //   await tester.longPressAt(emptyPos, pointer: 7);
   //   await tester.pumpAndSettle();
-  //   expect(find.text('Paste'), findsOneWidget);
+  //   expect(findMongol.text('Paste'), findsOneWidget);
   // });
 
-  // testMongolWidgets('Entering text hides selection handle caret', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Entering text hides selection handle caret',
+      (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+        ),
+      ),
+    );
 
-  //   const String testValue = 'abcdefghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   expect(controller.value.text, testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abcdefghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    expect(controller.value.text, testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   // Handle not shown.
-  //   expect(controller.selection.isCollapsed, true);
-  //   final Finder fadeFinder = find.byType(FadeTransition);
-  //   expect(fadeFinder, findsNothing);
+    // Handle not shown.
+    expect(controller.selection.isCollapsed, true);
+    final Finder fadeFinder = find.byType(FadeTransition);
+    expect(fadeFinder, findsNothing);
 
-  //   // Tap on the text field to show the handle.
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pumpAndSettle();
-  //   expect(controller.selection.isCollapsed, true);
-  //   expect(fadeFinder, findsNWidgets(1));
-  //   final FadeTransition handle = tester.widget(fadeFinder.at(0));
-  //   expect(handle.opacity.value, equals(1.0));
+    // Tap on the text field to show the handle.
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pumpAndSettle();
+    expect(controller.selection.isCollapsed, true);
+    expect(fadeFinder, findsNWidgets(1));
+    final FadeTransition handle = tester.widget(fadeFinder.at(0));
+    expect(handle.opacity.value, equals(1.0));
 
-  //   // Enter more text.
-  //   const String testValueAddition = 'jklmni';
-  //   await tester.enterText(find.byType(MongolTextField), testValueAddition);
-  //   expect(controller.value.text, testValueAddition);
-  //   await skipPastScrollingAnimation(tester);
+    // Enter more text.
+    const String testValueAddition = 'jklmni';
+    await tester.enterText(find.byType(MongolTextField), testValueAddition);
+    expect(controller.value.text, testValueAddition);
+    await skipPastScrollingAnimation(tester);
 
-  //   // Handle not shown.
-  //   expect(controller.selection.isCollapsed, true);
-  //   expect(fadeFinder, findsNothing);
-  // });
+    // Handle not shown.
+    expect(controller.selection.isCollapsed, true);
+    expect(fadeFinder, findsNothing);
+  });
 
-  // testMongolWidgets('Mouse long press is just like a tap', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Mouse long press is just like a tap', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+        ),
+      ),
+    );
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   expect(controller.value.text, testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    expect(controller.value.text, testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.isCollapsed, true);
 
-  //   // Long press the 'e' using a mouse device.
-  //   final int eIndex = testValue.indexOf('e');
-  //   final Offset ePos = textOffsetToPosition(tester, eIndex);
-  //   final TestGesture gesture = await tester.startGesture(ePos, kind: PointerDeviceKind.mouse);
-  //   addTearDown(gesture.removePointer);
-  //   await tester.pump(const Duration(seconds: 2));
-  //   await gesture.up();
-  //   await tester.pump();
+    // Long press the 'e' using a mouse device.
+    final int eIndex = testValue.indexOf('e');
+    final Offset ePos = textOffsetToPosition(tester, eIndex);
+    final TestGesture gesture =
+        await tester.startGesture(ePos, kind: PointerDeviceKind.mouse);
+    addTearDown(gesture.removePointer);
+    await tester.pump(const Duration(seconds: 2));
+    await gesture.up();
+    await tester.pump();
 
-  //   // The cursor is placed just like a regular tap.
-  //   expect(controller.selection.baseOffset, eIndex);
-  //   expect(controller.selection.extentOffset, eIndex);
-  // });
+    // The cursor is placed just like a regular tap.
+    expect(controller.selection.baseOffset, eIndex);
+    expect(controller.selection.extentOffset, eIndex);
+  });
 
-  // testMongolWidgets('Read only text field basic', (tester) async {
-  //   final TextEditingController controller = TextEditingController(text: 'readonly');
+  testMongolWidgets('Read only text field basic', (tester) async {
+    final TextEditingController controller =
+        TextEditingController(text: 'readonly');
 
-  //   await tester.pumpWidget(
-  //       overlay(
-  //         child: MongolTextField(
-  //           controller: controller,
-  //           readOnly: true,
-  //         ),
-  //       ),
-  //   );
-  //   // Read only text field cannot open keyboard.
-  //   await tester.showKeyboard(find.byType(MongolTextField));
-  //   expect(tester.testTextInput.hasAnyClients, false);
-  //   await skipPastScrollingAnimation(tester);
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+          readOnly: true,
+        ),
+      ),
+    );
+    // Read only text field cannot open keyboard.
+    await tester.showKeyboard(find.byType(MongolTextField));
+    expect(tester.testTextInput.hasAnyClients, false);
+    await skipPastScrollingAnimation(tester);
 
-  //   expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.isCollapsed, true);
 
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pump();
-  //   expect(tester.testTextInput.hasAnyClients, false);
-  //   final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
-  //   // Collapse selection should not paint.
-  //   expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
-  //   // Long press on the 'd' character of text 'readOnly' to show context menu.
-  //   const int dIndex = 3;
-  //   final Offset dPos = textOffsetToPosition(tester, dIndex);
-  //   await tester.longPressAt(dPos);
-  //   await tester.pumpAndSettle();
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pump();
+    expect(tester.testTextInput.hasAnyClients, false);
+    final MongolEditableTextState editableText =
+        tester.state(find.byType(MongolEditableText));
+    // Collapse selection should not paint.
+    expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
+    // Long press on the 'd' character of text 'readOnly' to show context menu.
+    const int dIndex = 3;
+    final Offset dPos = textOffsetToPosition(tester, dIndex);
+    await tester.longPressAt(dPos);
+    await tester.pumpAndSettle();
 
-  //   // Context menu should not have paste and cut.
-  //   expect(find.text('Copy'), findsOneWidget);
-  //   expect(find.text('Paste'), findsNothing);
-  //   expect(find.text('Cut'), findsNothing);
-  // });
+    // Context menu should not have paste and cut.
+    expect(find.text('Copy'), findsOneWidget);
+    expect(find.text('Paste'), findsNothing);
+    expect(find.text('Cut'), findsNothing);
+  });
 
   // testMongolWidgets('does not paint toolbar when no options available', (tester) async {
   //   await tester.pumpWidget(
@@ -1272,212 +1304,237 @@ void main() {
   //   expect(find.byType(CupertinoTextSelectionToolbar), findsNothing);
   // }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }));
 
-  // testMongolWidgets('text field build empty toolbar when no options available', (tester) async {
-  //   await tester.pumpWidget(
-  //       const MaterialApp(
-  //         home: Material(
-  //           child: MongolTextField(
-  //             readOnly: true,
-  //           ),
-  //         ),
-  //       ),
-  //   );
+  testMongolWidgets('text field build empty toolbar when no options available',
+      (tester) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Material(
+          child: MongolTextField(
+            readOnly: true,
+          ),
+        ),
+      ),
+    );
 
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pump(const Duration(milliseconds: 50));
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pump(const Duration(milliseconds: 50));
 
-  //   await tester.tap(find.byType(MongolTextField));
-  //   // Wait for context menu to be built.
-  //   await tester.pumpAndSettle();
-  //   final RenderBox container = tester.renderObject(find.descendant(
-  //     of: find.byType(FadeTransition),
-  //     matching: find.byType(SizedBox),
-  //   ).first);
-  //   expect(container.size, Size.zero);
-  // }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.android, TargetPlatform.fuchsia, TargetPlatform.linux, TargetPlatform.windows }));
+    await tester.tap(find.byType(MongolTextField));
+    // Wait for context menu to be built.
+    await tester.pumpAndSettle();
+    final RenderBox container = tester.renderObject(find
+        .descendant(
+          of: find.byType(FadeTransition),
+          matching: find.byType(SizedBox),
+        )
+        .first);
+    expect(container.size, Size.zero);
+  },
+      variant: const TargetPlatformVariant(<TargetPlatform>{
+        TargetPlatform.android,
+        TargetPlatform.fuchsia,
+        TargetPlatform.linux,
+        TargetPlatform.windows
+      }));
 
-  // testMongolWidgets('Sawping controllers should update selection', (tester) async {
-  //   TextEditingController controller = TextEditingController(text: 'readonly');
-  //   final OverlayEntry entry = OverlayEntry(
-  //     builder: (BuildContext context) {
-  //       return Center(
-  //         child: Material(
-  //           child: MongolTextField(
-  //             controller: controller,
-  //             readOnly: true,
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  //   await tester.pumpWidget(overlayWithEntry(entry));
-  //   const int dIndex = 3;
-  //   final Offset dPos = textOffsetToPosition(tester, dIndex);
-  //   await tester.longPressAt(dPos);
-  //   await tester.pumpAndSettle();
-  //   final MongolEditableTextState state = tester.state(find.byType(MongolEditableText));
-  //   TextSelection currentOverlaySelection =
-  //       state.selectionOverlay!.value.selection;
-  //   expect(currentOverlaySelection.baseOffset, 0);
-  //   expect(currentOverlaySelection.extentOffset, 8);
+  testMongolWidgets('Swaping controllers should update selection',
+      (tester) async {
+    TextEditingController controller = TextEditingController(text: 'readonly');
+    final OverlayEntry entry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Center(
+          child: Material(
+            child: MongolTextField(
+              controller: controller,
+              readOnly: true,
+            ),
+          ),
+        );
+      },
+    );
+    await tester.pumpWidget(overlayWithEntry(entry));
+    const int dIndex = 3;
+    final Offset dPos = textOffsetToPosition(tester, dIndex);
+    await tester.longPressAt(dPos);
+    await tester.pumpAndSettle();
+    final MongolEditableTextState state =
+        tester.state(find.byType(MongolEditableText));
+    TextSelection currentOverlaySelection =
+        state.selectionOverlay!.value.selection;
+    expect(currentOverlaySelection.baseOffset, 0);
+    expect(currentOverlaySelection.extentOffset, 8);
 
-  //   // Update selection from [0 to 8] to [1 to 7].
-  //   controller = TextEditingController.fromValue(
-  //     controller.value.copyWith(selection: const TextSelection(
-  //       baseOffset: 1,
-  //       extentOffset: 7,
-  //     )),
-  //   );
+    // Update selection from [0 to 8] to [1 to 7].
+    controller = TextEditingController.fromValue(
+      controller.value.copyWith(
+          selection: const TextSelection(
+        baseOffset: 1,
+        extentOffset: 7,
+      )),
+    );
 
-  //   // Mark entry to be dirty in order to trigger overlay update.
-  //   entry.markNeedsBuild();
+    // Mark entry to be dirty in order to trigger overlay update.
+    entry.markNeedsBuild();
 
-  //   await tester.pump();
-  //   currentOverlaySelection = state.selectionOverlay!.value.selection;
-  //   expect(currentOverlaySelection.baseOffset, 1);
-  //   expect(currentOverlaySelection.extentOffset, 7);
-  // });
+    await tester.pump();
+    currentOverlaySelection = state.selectionOverlay!.value.selection;
+    expect(currentOverlaySelection.baseOffset, 1);
+    expect(currentOverlaySelection.extentOffset, 7);
+  });
 
-  // testMongolWidgets('Read only text should not compose', (tester) async {
-  //   final TextEditingController controller = TextEditingController.fromValue(
-  //       const TextEditingValue(
-  //           text: 'readonly',
-  //           composing: TextRange(start: 0, end: 8), // Simulate text composing.
-  //       ),
-  //   );
+  testMongolWidgets('Read only text should not compose', (tester) async {
+    final TextEditingController controller = TextEditingController.fromValue(
+      const TextEditingValue(
+        text: 'readonly',
+        composing: TextRange(start: 0, end: 8), // Simulate text composing.
+      ),
+    );
 
-  //   await tester.pumpWidget(
-  //       overlay(
-  //         child: MongolTextField(
-  //           controller: controller,
-  //           readOnly: true,
-  //         ),
-  //       ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+          readOnly: true,
+        ),
+      ),
+    );
 
-  //   final MongolRenderEditable renderEditable = findRenderEditable(tester);
-  //   // There should be no composing.
-  //   expect(renderEditable.text, TextSpan(text:'readonly', style: renderEditable.text!.style));
-  // });
+    final MongolRenderEditable renderEditable = findRenderEditable(tester);
+    // There should be no composing.
+    expect(renderEditable.text,
+        TextSpan(text: 'readonly', style: renderEditable.text!.style));
+  });
 
-  // testMongolWidgets('Dynamically switching between read only and not read only should hide or show collapse cursor', (tester) async {
-  //   final TextEditingController controller = TextEditingController(text: 'readonly');
-  //   bool readOnly = true;
-  //   final OverlayEntry entry = OverlayEntry(
-  //     builder: (BuildContext context) {
-  //       return Center(
-  //         child: Material(
-  //           child: MongolTextField(
-  //             controller: controller,
-  //             readOnly: readOnly,
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  //   await tester.pumpWidget(overlayWithEntry(entry));
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pump();
+  testMongolWidgets(
+      'Dynamically switching between read only and not read only should hide or show collapse cursor',
+      (tester) async {
+    final TextEditingController controller =
+        TextEditingController(text: 'readonly');
+    bool readOnly = true;
+    final OverlayEntry entry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Center(
+          child: Material(
+            child: MongolTextField(
+              controller: controller,
+              readOnly: readOnly,
+            ),
+          ),
+        );
+      },
+    );
+    await tester.pumpWidget(overlayWithEntry(entry));
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pump();
 
-  //   final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
-  //   // Collapse selection should not paint.
-  //   expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
+    final MongolEditableTextState editableText =
+        tester.state(find.byType(MongolEditableText));
+    // Collapse selection should not paint.
+    expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
 
-  //   readOnly = false;
-  //   // Mark entry to be dirty in order to trigger overlay update.
-  //   entry.markNeedsBuild();
-  //   await tester.pumpAndSettle();
-  //   expect(editableText.selectionOverlay!.handlesAreVisible, isTrue);
+    readOnly = false;
+    // Mark entry to be dirty in order to trigger overlay update.
+    entry.markNeedsBuild();
+    await tester.pumpAndSettle();
+    expect(editableText.selectionOverlay!.handlesAreVisible, isTrue);
 
-  //   readOnly = true;
-  //   entry.markNeedsBuild();
-  //   await tester.pumpAndSettle();
-  //   expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
-  // });
+    readOnly = true;
+    entry.markNeedsBuild();
+    await tester.pumpAndSettle();
+    expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
+  });
 
-  // testMongolWidgets('Dynamically switching to read only should close input connection', (tester) async {
-  //   final TextEditingController controller = TextEditingController(text: 'readonly');
-  //   bool readOnly = false;
-  //   final OverlayEntry entry = OverlayEntry(
-  //     builder: (BuildContext context) {
-  //       return Center(
-  //         child: Material(
-  //           child: MongolTextField(
-  //             controller: controller,
-  //             readOnly: readOnly,
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  //   await tester.pumpWidget(overlayWithEntry(entry));
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pump();
-  //   expect(tester.testTextInput.hasAnyClients, true);
+  testMongolWidgets(
+      'Dynamically switching to read only should close input connection',
+      (tester) async {
+    final TextEditingController controller =
+        TextEditingController(text: 'readonly');
+    bool readOnly = false;
+    final OverlayEntry entry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Center(
+          child: Material(
+            child: MongolTextField(
+              controller: controller,
+              readOnly: readOnly,
+            ),
+          ),
+        );
+      },
+    );
+    await tester.pumpWidget(overlayWithEntry(entry));
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pump();
+    expect(tester.testTextInput.hasAnyClients, true);
 
-  //   readOnly = true;
-  //   // Mark entry to be dirty in order to trigger overlay update.
-  //   entry.markNeedsBuild();
-  //   await tester.pump();
-  //   expect(tester.testTextInput.hasAnyClients, false);
-  // });
+    readOnly = true;
+    // Mark entry to be dirty in order to trigger overlay update.
+    entry.markNeedsBuild();
+    await tester.pump();
+    expect(tester.testTextInput.hasAnyClients, false);
+  });
 
-  // testMongolWidgets('Dynamically switching to non read only should open input connection', (tester) async {
-  //   final TextEditingController controller = TextEditingController(text: 'readonly');
-  //   bool readOnly = true;
-  //   final OverlayEntry entry = OverlayEntry(
-  //     builder: (BuildContext context) {
-  //       return Center(
-  //         child: Material(
-  //           child: MongolTextField(
-  //             controller: controller,
-  //             readOnly: readOnly,
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  //   await tester.pumpWidget(overlayWithEntry(entry));
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pump();
-  //   expect(tester.testTextInput.hasAnyClients, false);
+  testMongolWidgets(
+      'Dynamically switching to non read only should open input connection',
+      (tester) async {
+    final TextEditingController controller =
+        TextEditingController(text: 'readonly');
+    bool readOnly = true;
+    final OverlayEntry entry = OverlayEntry(
+      builder: (BuildContext context) {
+        return Center(
+          child: Material(
+            child: MongolTextField(
+              controller: controller,
+              readOnly: readOnly,
+            ),
+          ),
+        );
+      },
+    );
+    await tester.pumpWidget(overlayWithEntry(entry));
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pump();
+    expect(tester.testTextInput.hasAnyClients, false);
 
-  //   readOnly = false;
-  //   // Mark entry to be dirty in order to trigger overlay update.
-  //   entry.markNeedsBuild();
-  //   await tester.pump();
-  //   expect(tester.testTextInput.hasAnyClients, true);
-  // });
+    readOnly = false;
+    // Mark entry to be dirty in order to trigger overlay update.
+    entry.markNeedsBuild();
+    await tester.pump();
+    expect(tester.testTextInput.hasAnyClients, true);
+  });
 
-  // testMongolWidgets('enableInteractiveSelection = false, long-press', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('enableInteractiveSelection = false, long-press',
+      (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //         enableInteractiveSelection: false,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+          enableInteractiveSelection: false,
+        ),
+      ),
+    );
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   expect(controller.value.text, testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    expect(controller.value.text, testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.isCollapsed, true);
 
-  //   // Long press the 'e' to select 'def'.
-  //   final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
-  //   await tester.longPressAt(ePos, pointer: 7);
-  //   await tester.pump();
+    // Long press the 'e' to select 'def'.
+    final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
+    await tester.longPressAt(ePos, pointer: 7);
+    await tester.pump();
 
-  //   expect(controller.selection.isCollapsed, true);
-  //   expect(controller.selection.baseOffset, -1);
-  //   expect(controller.selection.extentOffset, -1);
-  // });
+    expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.baseOffset, -1);
+    expect(controller.selection.extentOffset, -1);
+  });
 
+  // // TODO: This one is probably important to make work
   // testMongolWidgets('Can select text by dragging with a mouse', (tester) async {
   //   final TextEditingController controller = TextEditingController();
 
@@ -1511,6 +1568,7 @@ void main() {
   //   expect(controller.selection.extentOffset, testValue.indexOf('g'));
   // });
 
+  // // TODO: This one is probably important to make work
   // testMongolWidgets('Continuous dragging does not cause flickering', (tester) async {
   //   int selectionChangedCount = 0;
   //   const String testValue = 'abc def ghi';
@@ -1564,6 +1622,7 @@ void main() {
   //   expect(controller.selection.extentOffset, 9);
   // });
 
+  // // TODO: This one is probably important to make work
   // testMongolWidgets('Dragging in opposite direction also works', (tester) async {
   //   final TextEditingController controller = TextEditingController();
 
@@ -1753,102 +1812,109 @@ void main() {
   //   expect(controller.selection.extentOffset, 5);
   // });
 
-  // testMongolWidgets('Can use selection toolbar', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Can use selection toolbar', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+        ),
+      ),
+    );
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   // Tap the selection handle to bring up the "paste / select all" menu.
-  //   await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('e')));
-  //   await tester.pump();
-  //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
-  //   RenderEditable renderEditable = findRenderEditable(tester);
-  //   List<TextSelectionPoint> endpoints = globalize(
-  //     renderEditable.getEndpointsForSelection(controller.selection),
-  //     renderEditable,
-  //   );
-  //   // Tapping on the part of the handle's GestureDetector where it overlaps
-  //   // with the text itself does not show the menu, so add a small vertical
-  //   // offset to tap below the text.
-  //   await tester.tapAt(endpoints[0].point + const Offset(1.0, 13.0));
-  //   await tester.pump();
-  //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
+    // Tap the selection handle to bring up the "paste / select all" menu.
+    await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('e')));
+    await tester.pump();
+    await tester.pump(const Duration(
+        milliseconds: 200)); // skip past the frame where the opacity is zero
+    MongolRenderEditable renderEditable = findRenderEditable(tester);
+    List<TextSelectionPoint> endpoints = globalize(
+      renderEditable.getEndpointsForSelection(controller.selection),
+      renderEditable,
+    );
+    // Tapping on the part of the handle's GestureDetector where it overlaps
+    // with the text itself does not show the menu, so add a small vertical
+    // offset to tap below the text.
+    await tester.tapAt(endpoints[0].point + const Offset(1.0, 13.0));
+    await tester.pump();
+    await tester.pump(const Duration(
+        milliseconds: 200)); // skip past the frame where the opacity is zero
 
-  //   // Select all should select all the text.
-  //   await tester.tap(find.text('Select all'));
-  //   await tester.pump();
-  //   expect(controller.selection.baseOffset, 0);
-  //   expect(controller.selection.extentOffset, testValue.length);
+    // Select all should select all the text.
+    await tester.tap(find.text('Select all'));
+    await tester.pump();
+    expect(controller.selection.baseOffset, 0);
+    expect(controller.selection.extentOffset, testValue.length);
 
-  //   // Copy should reset the selection.
-  //   await tester.tap(find.text('Copy'));
-  //   await skipPastScrollingAnimation(tester);
-  //   expect(controller.selection.isCollapsed, true);
+    // Copy should reset the selection.
+    await tester.tap(find.text('Copy'));
+    await skipPastScrollingAnimation(tester);
+    expect(controller.selection.isCollapsed, true);
 
-  //   // Tap again to bring back the menu.
-  //   await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('e')));
-  //   await tester.pump();
-  //   // Allow time for handle to appear and double tap to time out.
-  //   await tester.pump(const Duration(milliseconds: 300));
-  //   expect(controller.selection.isCollapsed, true);
-  //   expect(controller.selection.baseOffset, testValue.indexOf('e'));
-  //   expect(controller.selection.extentOffset, testValue.indexOf('e'));
-  //   renderEditable = findRenderEditable(tester);
-  //   endpoints = globalize(
-  //     renderEditable.getEndpointsForSelection(controller.selection),
-  //     renderEditable,
-  //   );
-  //   await tester.tapAt(endpoints[0].point + const Offset(1.0, 1.0));
-  //   await tester.pump();
-  //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
-  //   expect(controller.selection.isCollapsed, true);
-  //   expect(controller.selection.baseOffset, testValue.indexOf('e'));
-  //   expect(controller.selection.extentOffset, testValue.indexOf('e'));
+    // Tap again to bring back the menu.
+    await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('e')));
+    await tester.pump();
+    // Allow time for handle to appear and double tap to time out.
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.baseOffset, testValue.indexOf('e'));
+    expect(controller.selection.extentOffset, testValue.indexOf('e'));
+    renderEditable = findRenderEditable(tester);
+    endpoints = globalize(
+      renderEditable.getEndpointsForSelection(controller.selection),
+      renderEditable,
+    );
+    await tester.tapAt(endpoints[0].point + const Offset(1.0, 1.0));
+    await tester.pump();
+    await tester.pump(const Duration(
+        milliseconds: 200)); // skip past the frame where the opacity is zero
+    expect(controller.selection.isCollapsed, true);
+    expect(controller.selection.baseOffset, testValue.indexOf('e'));
+    expect(controller.selection.extentOffset, testValue.indexOf('e'));
 
-  //   // Paste right before the 'e'.
-  //   await tester.tap(find.text('Paste'));
-  //   await tester.pump();
-  //   expect(controller.text, 'abc d${testValue}ef ghi');
-  // });
+    // Paste right before the 'e'.
+    await tester.tap(find.text('Paste'));
+    await tester.pump();
+    expect(controller.text, 'abc d${testValue}ef ghi');
+  });
 
-  // // Show the selection menu at the given index into the text by tapping to
-  // // place the cursor and then tapping on the handle.
-  // Future<void> _showSelectionMenuAt(WidgetTester tester, TextEditingController controller, int index) async {
-  //   await tester.tapAt(tester.getCenter(find.byType(MongolEditableText)));
-  //   await tester.pump();
-  //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
-  //   expect(find.text('Select all'), findsNothing);
+  // Show the selection menu at the given index into the text by tapping to
+  // place the cursor and then tapping on the handle.
+  Future<void> _showSelectionMenuAt(MongolWidgetTester tester,
+      TextEditingController controller, int index) async {
+    await tester.tapAt(tester.getCenter(find.byType(MongolEditableText)));
+    await tester.pump();
+    await tester.pump(const Duration(
+        milliseconds: 200)); // skip past the frame where the opacity is zero
+    expect(find.text('Select all'), findsNothing);
 
-  //   // Tap the selection handle to bring up the "paste / select all" menu for
-  //   // the last line of text.
-  //   await tester.tapAt(textOffsetToPosition(tester, index));
-  //   await tester.pump();
-  //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
-  //   final MongolRenderEditable renderEditable = findRenderEditable(tester);
-  //   final List<TextSelectionPoint> endpoints = globalize(
-  //     renderEditable.getEndpointsForSelection(controller.selection),
-  //     renderEditable,
-  //   );
-  //   // Tapping on the part of the handle's GestureDetector where it overlaps
-  //   // with the text itself does not show the menu, so add a small vertical
-  //   // offset to tap below the text.
-  //   await tester.tapAt(endpoints[0].point + const Offset(1.0, 13.0));
-  //   await tester.pump();
-  //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
-  // }
+    // Tap the selection handle to bring up the "paste / select all" menu for
+    // the last line of text.
+    await tester.tapAt(textOffsetToPosition(tester, index));
+    await tester.pump();
+    await tester.pump(const Duration(
+        milliseconds: 200)); // skip past the frame where the opacity is zero
+    final MongolRenderEditable renderEditable = findRenderEditable(tester);
+    final List<TextSelectionPoint> endpoints = globalize(
+      renderEditable.getEndpointsForSelection(controller.selection),
+      renderEditable,
+    );
+    // Tapping on the part of the handle's GestureDetector where it overlaps
+    // with the text itself does not show the menu, so add a small vertical
+    // offset to tap below the text.
+    await tester.tapAt(endpoints[0].point + const Offset(1.0, 13.0));
+    await tester.pump();
+    await tester.pump(const Duration(
+        milliseconds: 200)); // skip past the frame where the opacity is zero
+  }
 
   // testMongolWidgets(
-  //   'Check the toolbar appears below the TextField when there is not enough space above the TextField to show it',
+  //   'Check the toolbar appears below the MongolTextField when there is not enough space above the MongolTextField to show it',
   //   (tester) async {
   //     // This is a regression test for
   //     // https://github.com/flutter/flutter/issues/29808
@@ -1873,7 +1939,7 @@ void main() {
   //     await _showSelectionMenuAt(tester, controller, testValue.indexOf('e'));
 
   //     // Verify the selection toolbar position is below the text.
-  //     Offset toolbarTopLeft = tester.getTopLeft(find.text('Select all'));
+  //     Offset toolbarTopLeft = tester.getTopLeft(findMongol.text('Select all'));
   //     Offset textFieldTopLeft = tester.getTopLeft(find.byType(MongolTextField));
   //     expect(textFieldTopLeft.dy, lessThan(toolbarTopLeft.dy));
 
@@ -1894,7 +1960,7 @@ void main() {
   //     await _showSelectionMenuAt(tester, controller, testValue.indexOf('e'));
 
   //     // Verify the selection toolbar position
-  //     toolbarTopLeft = tester.getTopLeft(find.text('Select all'));
+  //     toolbarTopLeft = tester.getTopLeft(findMongol.text('Select all'));
   //     textFieldTopLeft = tester.getTopLeft(find.byType(MongolTextField));
   //     expect(toolbarTopLeft.dy, lessThan(textFieldTopLeft.dy));
   //   },
@@ -1920,7 +1986,7 @@ void main() {
   //       ),
   //     ));
 
-  //     expect(find.text('Select all'), findsNothing);
+  //     expect(findMongol.text('Select all'), findsNothing);
   //     const String testValue = 'abc\ndef\nghi\njkl\nmno\npqr';
   //     await tester.enterText(find.byType(MongolTextField), testValue);
   //     await skipPastScrollingAnimation(tester);
@@ -1928,8 +1994,8 @@ void main() {
   //     // Show the selection menu on the first line and verify the selection
   //     // toolbar position is below the first line.
   //     await _showSelectionMenuAt(tester, controller, testValue.indexOf('c'));
-  //     expect(find.text('Select all'), findsOneWidget);
-  //     final Offset firstLineToolbarTopLeft = tester.getTopLeft(find.text('Select all'));
+  //     expect(findMongol.text('Select all'), findsOneWidget);
+  //     final Offset firstLineToolbarTopLeft = tester.getTopLeft(findMongol.text('Select all'));
   //     final Offset firstLineTopLeft = textOffsetToPosition(tester, testValue.indexOf('a'));
   //     expect(firstLineTopLeft.dy, lessThan(firstLineToolbarTopLeft.dy));
 
@@ -1937,8 +2003,8 @@ void main() {
   //     // selection toolbar position is above that line and above the first
   //     // line's toolbar.
   //     await _showSelectionMenuAt(tester, controller, testValue.indexOf('o'));
-  //     expect(find.text('Select all'), findsOneWidget);
-  //     final Offset penultimateLineToolbarTopLeft = tester.getTopLeft(find.text('Select all'));
+  //     expect(findMongol.text('Select all'), findsOneWidget);
+  //     final Offset penultimateLineToolbarTopLeft = tester.getTopLeft(findMongol.text('Select all'));
   //     final Offset penultimateLineTopLeft = textOffsetToPosition(tester, testValue.indexOf('p'));
   //     expect(penultimateLineToolbarTopLeft.dy, lessThan(penultimateLineTopLeft.dy));
   //     expect(penultimateLineToolbarTopLeft.dy, lessThan(firstLineToolbarTopLeft.dy));
@@ -1947,171 +2013,179 @@ void main() {
   //     // toolbar position is above that line and below the position of the
   //     // second to last line's toolbar.
   //     await _showSelectionMenuAt(tester, controller, testValue.indexOf('r'));
-  //     expect(find.text('Select all'), findsOneWidget);
-  //     final Offset lastLineToolbarTopLeft = tester.getTopLeft(find.text('Select all'));
+  //     expect(findMongol.text('Select all'), findsOneWidget);
+  //     final Offset lastLineToolbarTopLeft = tester.getTopLeft(findMongol.text('Select all'));
   //     final Offset lastLineTopLeft = textOffsetToPosition(tester, testValue.indexOf('p'));
   //     expect(lastLineToolbarTopLeft.dy, lessThan(lastLineTopLeft.dy));
   //     expect(lastLineToolbarTopLeft.dy, greaterThan(penultimateLineToolbarTopLeft.dy));
   //   },
   // );
 
-  // testMongolWidgets('Selection toolbar fades in', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Selection toolbar fades in', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          controller: controller,
+        ),
+      ),
+    );
 
-  //   const String testValue = 'abc def ghi';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-  //   await skipPastScrollingAnimation(tester);
+    const String testValue = 'abc def ghi';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+    await skipPastScrollingAnimation(tester);
 
-  //   // Tap the selection handle to bring up the "paste / select all" menu.
-  //   await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('e')));
-  //   await tester.pump();
-  //   // Allow time for the handle to appear and for a double tap to time out.
-  //   await tester.pump(const Duration(milliseconds: 600));
-  //   final MongolRenderEditable renderEditable = findRenderEditable(tester);
-  //   final List<TextSelectionPoint> endpoints = globalize(
-  //     renderEditable.getEndpointsForSelection(controller.selection),
-  //     renderEditable,
-  //   );
-  //   await tester.tapAt(endpoints[0].point + const Offset(1.0, 1.0));
-  //   // Pump an extra frame to allow the selection menu to read the clipboard.
-  //   await tester.pump();
-  //   await tester.pump();
+    // Tap the selection handle to bring up the "paste / select all" menu.
+    await tester.tapAt(textOffsetToPosition(tester, testValue.indexOf('e')));
+    await tester.pump();
+    // Allow time for the handle to appear and for a double tap to time out.
+    await tester.pump(const Duration(milliseconds: 600));
+    final MongolRenderEditable renderEditable = findRenderEditable(tester);
+    final List<TextSelectionPoint> endpoints = globalize(
+      renderEditable.getEndpointsForSelection(controller.selection),
+      renderEditable,
+    );
+    await tester.tapAt(endpoints[0].point + const Offset(1.0, 1.0));
+    // Pump an extra frame to allow the selection menu to read the clipboard.
+    await tester.pump();
+    await tester.pump();
 
-  //   // Toolbar should fade in. Starting at 0% opacity.
-  //   final Element target = tester.element(find.text('Select all'));
-  //   final FadeTransition opacity = target.findAncestorWidgetOfExactType<FadeTransition>()!;
-  //   expect(opacity.opacity.value, equals(0.0));
+    // Toolbar should fade in. Starting at 0% opacity.
+    final Element target = tester.element(find.text('Select all'));
+    final FadeTransition opacity =
+        target.findAncestorWidgetOfExactType<FadeTransition>()!;
+    expect(opacity.opacity.value, equals(0.0));
 
-  //   // Still fading in.
-  //   await tester.pump(const Duration(milliseconds: 50));
-  //   final FadeTransition opacity2 = target.findAncestorWidgetOfExactType<FadeTransition>()!;
-  //   expect(opacity, same(opacity2));
-  //   expect(opacity.opacity.value, greaterThan(0.0));
-  //   expect(opacity.opacity.value, lessThan(1.0));
+    // Still fading in.
+    await tester.pump(const Duration(milliseconds: 50));
+    final FadeTransition opacity2 =
+        target.findAncestorWidgetOfExactType<FadeTransition>()!;
+    expect(opacity, same(opacity2));
+    expect(opacity.opacity.value, greaterThan(0.0));
+    expect(opacity.opacity.value, lessThan(1.0));
 
-  //   // End the test here to ensure the animation is properly disposed of.
-  // });
+    // End the test here to ensure the animation is properly disposed of.
+  });
 
-  // testMongolWidgets('An obscured TextField is selectable by default', (tester) async {
-  //   // This is a regression test for
-  //   // https://github.com/flutter/flutter/issues/32845
+  testMongolWidgets('An obscured MongolTextField is selectable by default',
+      (tester) async {
+    // This is a regression test for
+    // https://github.com/flutter/flutter/issues/32845
 
-  //   final TextEditingController controller = TextEditingController();
-  //   Widget buildFrame(bool obscureText) {
-  //     return overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //         obscureText: obscureText,
-  //       ),
-  //     );
-  //   }
+    final TextEditingController controller = TextEditingController();
+    Widget buildFrame(bool obscureText) {
+      return overlay(
+        child: MongolTextField(
+          controller: controller,
+          obscureText: obscureText,
+        ),
+      );
+    }
 
-  //   // Obscure text and don't enable or disable selection.
-  //   await tester.pumpWidget(buildFrame(true));
-  //   await tester.enterText(find.byType(MongolTextField), 'abcdefghi');
-  //   await skipPastScrollingAnimation(tester);
-  //   expect(controller.selection.isCollapsed, true);
+    // Obscure text and don't enable or disable selection.
+    await tester.pumpWidget(buildFrame(true));
+    await tester.enterText(find.byType(MongolTextField), 'abcdefghi');
+    await skipPastScrollingAnimation(tester);
+    expect(controller.selection.isCollapsed, true);
 
-  //   // Long press does select text.
-  //   final Offset ePos = textOffsetToPosition(tester, 1);
-  //   await tester.longPressAt(ePos, pointer: 7);
-  //   await tester.pump();
-  //   expect(controller.selection.isCollapsed, false);
-  // });
+    // Long press does select text.
+    final Offset ePos = textOffsetToPosition(tester, 1);
+    await tester.longPressAt(ePos, pointer: 7);
+    await tester.pump();
+    expect(controller.selection.isCollapsed, false);
+  });
 
-  // testMongolWidgets('An obscured TextField is not selectable when disabled', (tester) async {
-  //   // This is a regression test for
-  //   // https://github.com/flutter/flutter/issues/32845
+  testMongolWidgets(
+      'An obscured MongolTextField is not selectable when disabled',
+      (tester) async {
+    // This is a regression test for
+    // https://github.com/flutter/flutter/issues/32845
 
-  //   final TextEditingController controller = TextEditingController();
-  //   Widget buildFrame(bool obscureText, bool enableInteractiveSelection) {
-  //     return overlay(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //         obscureText: obscureText,
-  //         enableInteractiveSelection: enableInteractiveSelection,
-  //       ),
-  //     );
-  //   }
+    final TextEditingController controller = TextEditingController();
+    Widget buildFrame(bool obscureText, bool enableInteractiveSelection) {
+      return overlay(
+        child: MongolTextField(
+          controller: controller,
+          obscureText: obscureText,
+          enableInteractiveSelection: enableInteractiveSelection,
+        ),
+      );
+    }
 
-  //   // Explicitly disabled selection on obscured text.
-  //   await tester.pumpWidget(buildFrame(true, false));
-  //   await tester.enterText(find.byType(MongolTextField), 'abcdefghi');
-  //   await skipPastScrollingAnimation(tester);
-  //   expect(controller.selection.isCollapsed, true);
+    // Explicitly disabled selection on obscured text.
+    await tester.pumpWidget(buildFrame(true, false));
+    await tester.enterText(find.byType(MongolTextField), 'abcdefghi');
+    await skipPastScrollingAnimation(tester);
+    expect(controller.selection.isCollapsed, true);
 
-  //   // Long press doesn't select text.
-  //   final Offset ePos2 = textOffsetToPosition(tester, 1);
-  //   await tester.longPressAt(ePos2, pointer: 7);
-  //   await tester.pump();
-  //   expect(controller.selection.isCollapsed, true);
-  // });
+    // Long press doesn't select text.
+    final Offset ePos2 = textOffsetToPosition(tester, 1);
+    await tester.longPressAt(ePos2, pointer: 7);
+    await tester.pump();
+    expect(controller.selection.isCollapsed, true);
+  });
 
-  // testMongolWidgets('An obscured TextField is selected as one word', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('An obscured MongolTextField is selected as one word',
+      (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(overlay(
-  //     child: MongolTextField(
-  //       controller: controller,
-  //       obscureText: true,
-  //     ),
-  //   ));
-  //   await tester.enterText(find.byType(MongolTextField), 'abcde fghi');
-  //   await skipPastScrollingAnimation(tester);
+    await tester.pumpWidget(overlay(
+      child: MongolTextField(
+        controller: controller,
+        obscureText: true,
+      ),
+    ));
+    await tester.enterText(find.byType(MongolTextField), 'abcde fghi');
+    await skipPastScrollingAnimation(tester);
 
-  //   // Long press does select text.
-  //   final Offset bPos = textOffsetToPosition(tester, 1);
-  //   await tester.longPressAt(bPos, pointer: 7);
-  //   await tester.pump();
-  //   final TextSelection selection = controller.selection;
-  //   expect(selection.isCollapsed, false);
-  //   expect(selection.baseOffset, 0);
-  //   expect(selection.extentOffset, 10);
-  // });
+    // Long press does select text.
+    final Offset bPos = textOffsetToPosition(tester, 1);
+    await tester.longPressAt(bPos, pointer: 7);
+    await tester.pump();
+    final TextSelection selection = controller.selection;
+    expect(selection.isCollapsed, false);
+    expect(selection.baseOffset, 0);
+    expect(selection.extentOffset, 10);
+  });
 
-  // testMongolWidgets('An obscured TextField has correct default context menu', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets(
+      'An obscured MongolTextField has correct default context menu',
+      (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(overlay(
-  //     child: MongolTextField(
-  //       controller: controller,
-  //       obscureText: true,
-  //     ),
-  //   ));
-  //   await tester.enterText(find.byType(MongolTextField), 'abcde fghi');
-  //   await skipPastScrollingAnimation(tester);
+    await tester.pumpWidget(overlay(
+      child: MongolTextField(
+        controller: controller,
+        obscureText: true,
+      ),
+    ));
+    await tester.enterText(find.byType(MongolTextField), 'abcde fghi');
+    await skipPastScrollingAnimation(tester);
 
-  //   // Long press to select text.
-  //   final Offset bPos = textOffsetToPosition(tester, 1);
-  //   await tester.longPressAt(bPos, pointer: 7);
-  //   await tester.pumpAndSettle();
+    // Long press to select text.
+    final Offset bPos = textOffsetToPosition(tester, 1);
+    await tester.longPressAt(bPos, pointer: 7);
+    await tester.pumpAndSettle();
 
-  //   // Should only have paste option when whole obscure text is selected.
-  //   expect(find.text('Paste'), findsOneWidget);
-  //   expect(find.text('Copy'), findsNothing);
-  //   expect(find.text('Cut'), findsNothing);
-  //   expect(find.text('Select all'), findsNothing);
+    // Should only have paste option when whole obscure text is selected.
+    expect(find.text('Paste'), findsOneWidget);
+    expect(find.text('Copy'), findsNothing);
+    expect(find.text('Cut'), findsNothing);
+    expect(find.text('Select all'), findsNothing);
 
-  //   // Long press at the end
-  //   final Offset iPos = textOffsetToPosition(tester, 10);
-  //   final Offset slightRight = iPos + const Offset(30.0, 0.0);
-  //   await tester.longPressAt(slightRight, pointer: 7);
-  //   await tester.pumpAndSettle();
+    // Long press at the end
+    final Offset iPos = textOffsetToPosition(tester, 10);
+    final Offset slightRight = iPos + const Offset(0.0, 30.0);
+    await tester.longPressAt(slightRight, pointer: 7);
+    await tester.pumpAndSettle();
 
-  //   // Should have paste and select all options when collapse.
-  //   expect(find.text('Paste'), findsOneWidget);
-  //   expect(find.text('Select all'), findsOneWidget);
-  //   expect(find.text('Copy'), findsNothing);
-  //   expect(find.text('Cut'), findsNothing);
-  // });
+    // Should have paste and select all options when collapse.
+    expect(find.text('Paste'), findsOneWidget);
+    expect(find.text('Select all'), findsOneWidget);
+    expect(find.text('Copy'), findsNothing);
+    expect(find.text('Cut'), findsNothing);
+  });
 
   // testMongolWidgets('MongolTextField height with minLines unset', (tester) async {
   //   await tester.pumpWidget(textFieldBuilder());
@@ -2126,14 +2200,14 @@ void main() {
   //   expect(findInputBox(), equals(inputBox));
   //   expect(inputBox.size, equals(emptyInputSize));
 
-  //   // Even when entering multiline text, TextField doesn't grow. It's a single
+  //   // Even when entering multiline text, MongolTextField doesn't grow. It's a single
   //   // line input.
   //   await tester.enterText(find.byType(MongolTextField), kThreeLines);
   //   await tester.pumpWidget(textFieldBuilder());
   //   expect(findInputBox(), equals(inputBox));
   //   expect(inputBox.size, equals(emptyInputSize));
 
-  //   // maxLines: 3 makes the TextField 3 lines tall
+  //   // maxLines: 3 makes the MongolTextField 3 lines tall
   //   await tester.enterText(find.byType(MongolTextField), '');
   //   await tester.pumpWidget(textFieldBuilder(maxLines: 3));
   //   expect(findInputBox(), equals(inputBox));
@@ -2228,6 +2302,7 @@ void main() {
   //   }, throwsAssertionError);
   // });
 
+  // // TODO: this one is probably important to fix
   // testMongolWidgets('Multiline text when wrapped in Expanded', (tester) async {
   //   Widget expandedTextFieldBuilder({
   //     int? maxLines = 1,
@@ -2235,7 +2310,7 @@ void main() {
   //     bool expands = false,
   //   }) {
   //     return boilerplate(
-  //       child: Column(
+  //       child: Row(
   //         mainAxisAlignment: MainAxisAlignment.center,
   //         children: <Widget>[
   //           Expanded(
@@ -2259,13 +2334,13 @@ void main() {
 
   //   RenderBox findBorder() {
   //     return tester.renderObject(find.descendant(
-  //       of: find.byType(InputDecorator),
+  //       of: find.byType(MongolInputDecorator),
   //       matching: find.byWidgetPredicate((Widget w) => '${w.runtimeType}' == '_BorderContainer'),
   //     ));
   //   }
   //   final RenderBox border = findBorder();
 
-  //   // Without expanded: true and maxLines: null, the TextField does not expand
+  //   // Without expanded: true and maxLines: null, the MongolTextField does not expand
   //   // to fill its parent when wrapped in an Expanded widget.
   //   final Size unexpandedInputSize = border.size;
 
@@ -2367,8 +2442,8 @@ void main() {
   //   expect(inputBox.size.width, errorNullInputSize.width);
   // });
 
-  // testMongolWidgets('Growable TextField when content height exceeds parent', (tester) async {
-  //   const double height = 200.0;
+  // testMongolWidgets('Growable MongolTextField when content height exceeds parent', (tester) async {
+  //   const double width = 200.0;
   //   const double padding = 24.0;
 
   //   Widget containedTextFieldBuilder({
@@ -2379,7 +2454,7 @@ void main() {
   //   }) {
   //     return boilerplate(
   //       child: Container(
-  //         height: height,
+  //         width: width,
   //         child: MongolTextField(
   //           key: textFieldKey,
   //           maxLines: null,
@@ -2399,66 +2474,66 @@ void main() {
 
   //   final RenderBox inputBox = findEditableText();
 
-  //   // With no decoration and when overflowing with content, the EditableText
-  //   // takes up the full height minus the padding, so the input fits perfectly
+  //   // With no decoration and when overflowing with content, the MongolEditableText
+  //   // takes up the full width minus the padding, so the input fits perfectly
   //   // inside the parent.
   //   await tester.enterText(find.byType(MongolTextField), 'a\n' * 11);
   //   await tester.pump();
   //   expect(findEditableText(), equals(inputBox));
-  //   expect(inputBox.size.height, height - padding);
+  //   expect(inputBox.size.width, width - padding);
 
-  //   // Adding a counter causes the EditableText to shrink to fit the counter
+  //   // Adding a counter causes the MongolEditableText to shrink to fit the counter
   //   // inside the parent as well.
-  //   const double counterHeight = 40.0;
+  //   const double counterWidth = 40.0;
   //   const double subtextGap = 8.0;
-  //   const double counterSpace = counterHeight + subtextGap;
+  //   const double counterSpace = counterWidth + subtextGap;
   //   await tester.pumpWidget(containedTextFieldBuilder(
-  //     counter: Container(height: counterHeight),
+  //     counter: Container(width: counterWidth),
   //   ));
   //   expect(findEditableText(), equals(inputBox));
-  //   expect(inputBox.size.height, height - padding - counterSpace);
+  //   expect(inputBox.size.width, width - padding - counterSpace);
 
-  //   // Including helperText causes the EditableText to shrink to fit the text
+  //   // Including helperText causes the MongolEditableText to shrink to fit the text
   //   // inside the parent as well.
   //   await tester.pumpWidget(containedTextFieldBuilder(
   //     helperText: 'I am helperText',
   //   ));
   //   expect(findEditableText(), equals(inputBox));
   //   const double helperTextSpace = 12.0;
-  //   expect(inputBox.size.height, height - padding - helperTextSpace - subtextGap);
+  //   expect(inputBox.size.width, width - padding - helperTextSpace - subtextGap);
 
-  //   // When both helperText and counter are present, EditableText shrinks by the
-  //   // height of the taller of the two in order to fit both within the parent.
+  //   // When both helperText and counter are present, MongolEditableText shrinks by the
+  //   // width of the wider of the two in order to fit both within the parent.
   //   await tester.pumpWidget(containedTextFieldBuilder(
-  //     counter: Container(height: counterHeight),
+  //     counter: Container(width: counterWidth),
   //     helperText: 'I am helperText',
   //   ));
   //   expect(findEditableText(), equals(inputBox));
-  //   expect(inputBox.size.height, height - padding - counterSpace);
+  //   expect(inputBox.size.width, width - padding - counterSpace);
 
-  //   // When a label is present, EditableText shrinks to fit it at the top so
-  //   // that the bottom of the input still lines up perfectly with the parent.
+  //   // When a label is present, MongolEditableText shrinks to fit it at the top so
+  //   // that the right side of the input still lines up perfectly with the parent.
   //   await tester.pumpWidget(containedTextFieldBuilder(
   //     labelText: 'I am labelText',
   //   ));
   //   const double labelSpace = 16.0;
   //   expect(findEditableText(), equals(inputBox));
-  //   expect(inputBox.size.height, height - padding - labelSpace);
+  //   expect(inputBox.size.width, width - padding - labelSpace);
 
-  //   // When decoration is present on the top and bottom, EditableText shrinks to
+  //   // When decoration is present on the left and right, MongolEditableText shrinks to
   //   // fit both inside the parent independently.
   //   await tester.pumpWidget(containedTextFieldBuilder(
-  //     counter: Container(height: counterHeight),
+  //     counter: Container(width: counterWidth),
   //     labelText: 'I am labelText',
   //   ));
   //   expect(findEditableText(), equals(inputBox));
-  //   expect(inputBox.size.height, height - padding - counterSpace - labelSpace);
+  //   expect(inputBox.size.width, width - padding - counterSpace - labelSpace);
 
   //   // When a prefix or suffix is present in an input that's full of content,
   //   // it is ignored and allowed to expand beyond the top of the input. Other
   //   // top and bottom decoration is still respected.
   //   await tester.pumpWidget(containedTextFieldBuilder(
-  //     counter: Container(height: counterHeight),
+  //     counter: Container(width: counterWidth),
   //     labelText: 'I am labelText',
   //     prefix: const SizedBox(
   //       width: 10,
@@ -2467,8 +2542,8 @@ void main() {
   //   ));
   //   expect(findEditableText(), equals(inputBox));
   //   expect(
-  //     inputBox.size.height,
-  //     height
+  //     inputBox.size.width,
+  //     width
   //     - padding
   //     - labelSpace
   //     - counterSpace,
@@ -2506,7 +2581,7 @@ void main() {
 
   //   const int maxLines = 3;
   //   await tester.pumpWidget(builder(maxLines, multipleLineText));
-  //   final Text hintTextWidget = tester.widget(find.text(multipleLineText));
+  //   final MongolText hintTextWidget = tester.widget(find.text(multipleLineText));
   //   expect(hintTextWidget.maxLines, equals(maxLines));
   //   expect(findHintText(multipleLineText).size.width, greaterThanOrEqualTo(oneLineHintSize.width));
   //   expect(findHintText(multipleLineText).size.height, greaterThanOrEqualTo(oneLineHintSize.height));
@@ -2619,20 +2694,20 @@ void main() {
   //   // Check that the last line of text is not displayed.
   //   final Offset firstPos = textOffsetToPosition(tester, kMoreThanFourLines.indexOf('First'));
   //   final Offset fourthPos = textOffsetToPosition(tester, kMoreThanFourLines.indexOf('Fourth'));
-  //   expect(firstPos.dx, 0);
-  //   expect(fourthPos.dx, 0);
-  //   expect(firstPos.dx, fourthPos.dx);
-  //   expect(firstPos.dy, lessThan(fourthPos.dy));
+  //   expect(0, firstPos.dy);
+  //   expect(0, fourthPos.dy);
+  //   expect(firstPos.dy, fourthPos.dy);
+  //   expect(firstPos.dx, lessThan(fourthPos.dx));
   //   expect(inputBox.hitTest(BoxHitTestResult(), position: inputBox.globalToLocal(firstPos)), isTrue);
   //   expect(inputBox.hitTest(BoxHitTestResult(), position: inputBox.globalToLocal(fourthPos)), isFalse);
 
   //   TestGesture gesture = await tester.startGesture(firstPos, pointer: 7);
   //   await tester.pump();
-  //   await gesture.moveBy(const Offset(0.0, -1000.0));
+  //   await gesture.moveBy(const Offset(-1000.0, 0.0));
   //   await tester.pump(const Duration(seconds: 1));
   //   // Wait and drag again to trigger https://github.com/flutter/flutter/issues/6329
   //   // (No idea why this is necessary, but the bug wouldn't repro without it.)
-  //   await gesture.moveBy(const Offset(0.0, -1000.0));
+  //   await gesture.moveBy(const Offset(-1000.0, 0.0));
   //   await tester.pump(const Duration(seconds: 1));
   //   await gesture.up();
   //   await tester.pump();
@@ -2642,7 +2717,7 @@ void main() {
   //   Offset newFirstPos = textOffsetToPosition(tester, kMoreThanFourLines.indexOf('First'));
   //   Offset newFourthPos = textOffsetToPosition(tester, kMoreThanFourLines.indexOf('Fourth'));
 
-  //   expect(newFirstPos.dy, lessThan(firstPos.dy));
+  //   expect(newFirstPos.dx, lessThan(firstPos.dx));
   //   expect(inputBox.hitTest(BoxHitTestResult(), position: inputBox.globalToLocal(newFirstPos)), isFalse);
   //   expect(inputBox.hitTest(BoxHitTestResult(), position: inputBox.globalToLocal(newFourthPos)), isTrue);
 
@@ -2693,418 +2768,431 @@ void main() {
   //   expect(inputBox.hitTest(BoxHitTestResult(), position: inputBox.globalToLocal(newFourthPos)), isFalse);
   // });
 
-  // testMongolWidgets('MongolTextField smoke test', (tester) async {
-  //   late String textFieldValue;
+  testMongolWidgets('MongolTextField smoke test', (tester) async {
+    late String textFieldValue;
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         decoration: null,
-  //         onChanged: (String value) {
-  //           textFieldValue = value;
-  //         },
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          decoration: null,
+          onChanged: (String value) {
+            textFieldValue = value;
+          },
+        ),
+      ),
+    );
 
-  //   Future<void> checkText(String testValue) {
-  //     return TestAsyncUtils.guard(() async {
-  //       await tester.enterText(find.byType(MongolTextField), testValue);
+    Future<void> checkText(String testValue) {
+      return TestAsyncUtils.guard(() async {
+        await tester.enterText(find.byType(MongolTextField), testValue);
 
-  //       // Check that the onChanged event handler fired.
-  //       expect(textFieldValue, equals(testValue));
+        // Check that the onChanged event handler fired.
+        expect(textFieldValue, equals(testValue));
 
-  //       await tester.pump();
-  //     });
-  //   }
+        await tester.pump();
+      });
+    }
 
-  //   await checkText('Hello World');
-  // });
+    await checkText('Hello World');
+  });
 
-  // testMongolWidgets('MongolTextField with global key', (tester) async {
-  //   final GlobalKey textFieldKey = GlobalKey(debugLabel: 'textFieldKey');
-  //   late String textFieldValue;
+  testMongolWidgets('MongolTextField with global key', (tester) async {
+    final GlobalKey textFieldKey = GlobalKey(debugLabel: 'textFieldKey');
+    late String textFieldValue;
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         key: textFieldKey,
-  //         decoration: const InputDecoration(
-  //           hintText: 'Placeholder',
-  //         ),
-  //         onChanged: (String value) { textFieldValue = value; },
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          key: textFieldKey,
+          decoration: const InputDecoration(
+            hintText: 'Placeholder',
+          ),
+          onChanged: (String value) {
+            textFieldValue = value;
+          },
+        ),
+      ),
+    );
 
-  //   Future<void> checkText(String testValue) async {
-  //     return TestAsyncUtils.guard(() async {
-  //       await tester.enterText(find.byType(MongolTextField), testValue);
+    Future<void> checkText(String testValue) async {
+      return TestAsyncUtils.guard(() async {
+        await tester.enterText(find.byType(MongolTextField), testValue);
 
-  //       // Check that the onChanged event handler fired.
-  //       expect(textFieldValue, equals(testValue));
+        // Check that the onChanged event handler fired.
+        expect(textFieldValue, equals(testValue));
 
-  //       await tester.pump();
-  //     });
-  //   }
+        await tester.pump();
+      });
+    }
 
-  //   await checkText('Hello World');
-  // });
+    await checkText('Hello World');
+  });
 
-  // testMongolWidgets('MongolTextField errorText trumps helperText', (tester) async {
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: const MongolTextField(
-  //         decoration: InputDecoration(
-  //           errorText: 'error text',
-  //           helperText: 'helper text',
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   expect(find.text('helper text'), findsNothing);
-  //   expect(find.text('error text'), findsOneWidget);
-  // });
+  testMongolWidgets('MongolTextField errorText trumps helperText',
+      (tester) async {
+    await tester.pumpWidget(
+      overlay(
+        child: const MongolTextField(
+          decoration: InputDecoration(
+            errorText: 'error text',
+            helperText: 'helper text',
+          ),
+        ),
+      ),
+    );
+    expect(findMongol.text('helper text'), findsNothing);
+    expect(findMongol.text('error text'), findsOneWidget);
+  });
 
-  // testMongolWidgets('MongolTextField with default helperStyle', (tester) async {
-  //   final ThemeData themeData = ThemeData(hintColor: Colors.blue[500]);
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Theme(
-  //         data: themeData,
-  //         child: const MongolTextField(
-  //           decoration: InputDecoration(
-  //             helperText: 'helper text',
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   final Text helperText = tester.widget(find.text('helper text'));
-  //   expect(helperText.style!.color, themeData.hintColor);
-  //   expect(helperText.style!.fontSize, Typography.englishLike2014.caption!.fontSize);
-  // });
+  testMongolWidgets('MongolTextField with default helperStyle', (tester) async {
+    final ThemeData themeData = ThemeData(hintColor: Colors.blue[500]);
+    await tester.pumpWidget(
+      overlay(
+        child: Theme(
+          data: themeData,
+          child: const MongolTextField(
+            decoration: InputDecoration(
+              helperText: 'helper text',
+            ),
+          ),
+        ),
+      ),
+    );
+    final MongolText helperText = tester.widget(findMongol.text('helper text'));
+    expect(helperText.style!.color, themeData.hintColor);
+    expect(helperText.style!.fontSize,
+        Typography.englishLike2014.caption!.fontSize);
+  });
 
-  // testMongolWidgets('MongolTextField with specified helperStyle', (tester) async {
-  //   final TextStyle style = TextStyle(
-  //     inherit: false,
-  //     color: Colors.pink[500],
-  //     fontSize: 10.0,
-  //   );
+  testMongolWidgets('MongolTextField with specified helperStyle',
+      (tester) async {
+    final TextStyle style = TextStyle(
+      inherit: false,
+      color: Colors.pink[500],
+      fontSize: 10.0,
+    );
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         decoration: InputDecoration(
-  //           helperText: 'helper text',
-  //           helperStyle: style,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   final Text helperText = tester.widget(find.text('helper text'));
-  //   expect(helperText.style, style);
-  // });
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          decoration: InputDecoration(
+            helperText: 'helper text',
+            helperStyle: style,
+          ),
+        ),
+      ),
+    );
+    final MongolText helperText = tester.widget(findMongol.text('helper text'));
+    expect(helperText.style, style);
+  });
 
-  // testMongolWidgets('MongolTextField with default hintStyle', (tester) async {
-  //   final TextStyle style = TextStyle(
-  //     color: Colors.pink[500],
-  //     fontSize: 10.0,
-  //   );
-  //   final ThemeData themeData = ThemeData(
-  //     hintColor: Colors.blue[500],
-  //   );
+  testMongolWidgets('MongolTextField with default hintStyle', (tester) async {
+    final TextStyle style = TextStyle(
+      color: Colors.pink[500],
+      fontSize: 10.0,
+    );
+    final ThemeData themeData = ThemeData(
+      hintColor: Colors.blue[500],
+    );
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Theme(
-  //         data: themeData,
-  //         child: MongolTextField(
-  //           decoration: const InputDecoration(
-  //             hintText: 'Placeholder',
-  //           ),
-  //           style: style,
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Theme(
+          data: themeData,
+          child: MongolTextField(
+            decoration: const InputDecoration(
+              hintText: 'Placeholder',
+            ),
+            style: style,
+          ),
+        ),
+      ),
+    );
 
-  //   final Text hintText = tester.widget(find.text('Placeholder'));
-  //   expect(hintText.style!.color, themeData.hintColor);
-  //   expect(hintText.style!.fontSize, style.fontSize);
-  // });
+    final MongolText hintText = tester.widget(findMongol.text('Placeholder'));
+    expect(hintText.style!.color, themeData.hintColor);
+    expect(hintText.style!.fontSize, style.fontSize);
+  });
 
-  // testMongolWidgets('MongolTextField with specified hintStyle', (tester) async {
-  //   final TextStyle hintStyle = TextStyle(
-  //     inherit: false,
-  //     color: Colors.pink[500],
-  //     fontSize: 10.0,
-  //   );
+  testMongolWidgets('MongolTextField with specified hintStyle', (tester) async {
+    final TextStyle hintStyle = TextStyle(
+      inherit: false,
+      color: Colors.pink[500],
+      fontSize: 10.0,
+    );
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         decoration: InputDecoration(
-  //           hintText: 'Placeholder',
-  //           hintStyle: hintStyle,
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          decoration: InputDecoration(
+            hintText: 'Placeholder',
+            hintStyle: hintStyle,
+          ),
+        ),
+      ),
+    );
 
-  //   final Text hintText = tester.widget(find.text('Placeholder'));
-  //   expect(hintText.style, hintStyle);
-  // });
+    final MongolText hintText = tester.widget(findMongol.text('Placeholder'));
+    expect(hintText.style, hintStyle);
+  });
 
-  // testMongolWidgets('MongolTextField with specified prefixStyle', (tester) async {
-  //   final TextStyle prefixStyle = TextStyle(
-  //     inherit: false,
-  //     color: Colors.pink[500],
-  //     fontSize: 10.0,
-  //   );
+  testMongolWidgets('MongolTextField with specified prefixStyle',
+      (tester) async {
+    final TextStyle prefixStyle = TextStyle(
+      inherit: false,
+      color: Colors.pink[500],
+      fontSize: 10.0,
+    );
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         decoration: InputDecoration(
-  //           prefixText: 'Prefix:',
-  //           prefixStyle: prefixStyle,
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          decoration: InputDecoration(
+            prefixText: 'Prefix:',
+            prefixStyle: prefixStyle,
+          ),
+        ),
+      ),
+    );
 
-  //   final Text prefixText = tester.widget(find.text('Prefix:'));
-  //   expect(prefixText.style, prefixStyle);
-  // });
+    final MongolText prefixText = tester.widget(findMongol.text('Prefix:'));
+    expect(prefixText.style, prefixStyle);
+  });
 
-  // testMongolWidgets('MongolTextField with specified suffixStyle', (tester) async {
-  //   final TextStyle suffixStyle = TextStyle(
-  //     color: Colors.pink[500],
-  //     fontSize: 10.0,
-  //   );
+  testMongolWidgets('MongolTextField with specified suffixStyle',
+      (tester) async {
+    final TextStyle suffixStyle = TextStyle(
+      color: Colors.pink[500],
+      fontSize: 10.0,
+    );
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         decoration: InputDecoration(
-  //           suffixText: '.com',
-  //           suffixStyle: suffixStyle,
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          decoration: InputDecoration(
+            suffixText: '.com',
+            suffixStyle: suffixStyle,
+          ),
+        ),
+      ),
+    );
 
-  //   final Text suffixText = tester.widget(find.text('.com'));
-  //   expect(suffixText.style, suffixStyle);
-  // });
+    final MongolText suffixText = tester.widget(findMongol.text('.com'));
+    expect(suffixText.style, suffixStyle);
+  });
 
-  // testMongolWidgets('MongolTextField prefix and suffix appear correctly with no hint or label', (tester) async {
-  //   final Key secondKey = UniqueKey();
+  testMongolWidgets(
+      'MongolTextField prefix and suffix appear correctly with no hint or label',
+      (tester) async {
+    final Key secondKey = UniqueKey();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Column(
-  //         children: <Widget>[
-  //           const MongolTextField(
-  //             decoration: InputDecoration(
-  //               labelText: 'First',
-  //             ),
-  //           ),
-  //           TextField(
-  //             key: secondKey,
-  //             decoration: const InputDecoration(
-  //               prefixText: 'Prefix',
-  //               suffixText: 'Suffix',
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Row(
+          children: <Widget>[
+            const MongolTextField(
+              decoration: InputDecoration(
+                labelText: 'First',
+              ),
+            ),
+            MongolTextField(
+              key: secondKey,
+              decoration: const InputDecoration(
+                prefixText: 'Prefix',
+                suffixText: 'Suffix',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
-  //   expect(find.text('Prefix'), findsOneWidget);
-  //   expect(find.text('Suffix'), findsOneWidget);
+    expect(findMongol.text('Prefix'), findsOneWidget);
+    expect(findMongol.text('Suffix'), findsOneWidget);
 
-  //   // Focus the Input. The prefix should still display.
-  //   await tester.tap(find.byKey(secondKey));
-  //   await tester.pump();
+    // Focus the Input. The prefix should still display.
+    await tester.tap(find.byKey(secondKey));
+    await tester.pump();
 
-  //   expect(find.text('Prefix'), findsOneWidget);
-  //   expect(find.text('Suffix'), findsOneWidget);
+    expect(findMongol.text('Prefix'), findsOneWidget);
+    expect(findMongol.text('Suffix'), findsOneWidget);
 
-  //   // Enter some text, and the prefix should still display.
-  //   await tester.enterText(find.byKey(secondKey), 'Hi');
-  //   await tester.pump();
-  //   await tester.pump(const Duration(seconds: 1));
+    // Enter some text, and the prefix should still display.
+    await tester.enterText(find.byKey(secondKey), 'Hi');
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
 
-  //   expect(find.text('Prefix'), findsOneWidget);
-  //   expect(find.text('Suffix'), findsOneWidget);
-  // });
+    expect(findMongol.text('Prefix'), findsOneWidget);
+    expect(findMongol.text('Suffix'), findsOneWidget);
+  });
 
-  // testMongolWidgets('MongolTextField prefix and suffix appear correctly with hint text', (tester) async {
-  //   final TextStyle hintStyle = TextStyle(
-  //     inherit: false,
-  //     color: Colors.pink[500],
-  //     fontSize: 10.0,
-  //   );
-  //   final Key secondKey = UniqueKey();
+  testMongolWidgets(
+      'MongolTextField prefix and suffix appear correctly with hint text',
+      (tester) async {
+    final TextStyle hintStyle = TextStyle(
+      inherit: false,
+      color: Colors.pink[500],
+      fontSize: 10.0,
+    );
+    final Key secondKey = UniqueKey();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Column(
-  //         children: <Widget>[
-  //           const MongolTextField(
-  //             decoration: InputDecoration(
-  //               labelText: 'First',
-  //             ),
-  //           ),
-  //           TextField(
-  //             key: secondKey,
-  //             decoration: InputDecoration(
-  //               hintText: 'Hint',
-  //               hintStyle: hintStyle,
-  //               prefixText: 'Prefix',
-  //               suffixText: 'Suffix',
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Row(
+          children: <Widget>[
+            const MongolTextField(
+              decoration: InputDecoration(
+                labelText: 'First',
+              ),
+            ),
+            MongolTextField(
+              key: secondKey,
+              decoration: InputDecoration(
+                hintText: 'Hint',
+                hintStyle: hintStyle,
+                prefixText: 'Prefix',
+                suffixText: 'Suffix',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
-  //   // Neither the prefix or the suffix should initially be visible, only the hint.
-  //   expect(getOpacity(tester, find.text('Prefix')), 0.0);
-  //   expect(getOpacity(tester, find.text('Suffix')), 0.0);
-  //   expect(getOpacity(tester, find.text('Hint')), 1.0);
+    // Neither the prefix or the suffix should initially be visible, only the hint.
+    expect(getOpacity(tester, findMongol.text('Prefix')), 0.0);
+    expect(getOpacity(tester, findMongol.text('Suffix')), 0.0);
+    expect(getOpacity(tester, findMongol.text('Hint')), 1.0);
 
-  //   await tester.tap(find.byKey(secondKey));
-  //   await tester.pumpAndSettle();
+    await tester.tap(find.byKey(secondKey));
+    await tester.pumpAndSettle();
 
-  //   // Focus the Input. The hint, prefix, and suffix should appear
-  //   expect(getOpacity(tester, find.text('Prefix')), 1.0);
-  //   expect(getOpacity(tester, find.text('Suffix')), 1.0);
-  //   expect(getOpacity(tester, find.text('Hint')), 1.0);
+    // Focus the Input. The hint, prefix, and suffix should appear
+    expect(getOpacity(tester, findMongol.text('Prefix')), 1.0);
+    expect(getOpacity(tester, findMongol.text('Suffix')), 1.0);
+    expect(getOpacity(tester, findMongol.text('Hint')), 1.0);
 
-  //   // Enter some text, and the hint should disappear and the prefix and suffix
-  //   // should continue to be visible
-  //   await tester.enterText(find.byKey(secondKey), 'Hi');
-  //   await tester.pumpAndSettle();
+    // Enter some text, and the hint should disappear and the prefix and suffix
+    // should continue to be visible
+    await tester.enterText(find.byKey(secondKey), 'Hi');
+    await tester.pumpAndSettle();
 
-  //   expect(getOpacity(tester, find.text('Prefix')), 1.0);
-  //   expect(getOpacity(tester, find.text('Suffix')), 1.0);
-  //   expect(getOpacity(tester, find.text('Hint')), 0.0);
+    expect(getOpacity(tester, findMongol.text('Prefix')), 1.0);
+    expect(getOpacity(tester, findMongol.text('Suffix')), 1.0);
+    expect(getOpacity(tester, findMongol.text('Hint')), 0.0);
 
-  //   // Check and make sure that the right styles were applied.
-  //   final Text prefixText = tester.widget(find.text('Prefix'));
-  //   expect(prefixText.style, hintStyle);
-  //   final Text suffixText = tester.widget(find.text('Suffix'));
-  //   expect(suffixText.style, hintStyle);
-  // });
+    // Check and make sure that the right styles were applied.
+    final MongolText prefixText = tester.widget(findMongol.text('Prefix'));
+    expect(prefixText.style, hintStyle);
+    final MongolText suffixText = tester.widget(findMongol.text('Suffix'));
+    expect(suffixText.style, hintStyle);
+  });
 
-  // testMongolWidgets('MongolTextField prefix and suffix appear correctly with label text', (tester) async {
-  //   final TextStyle prefixStyle = TextStyle(
-  //     color: Colors.pink[500],
-  //     fontSize: 10.0,
-  //   );
-  //   final TextStyle suffixStyle = TextStyle(
-  //     color: Colors.green[500],
-  //     fontSize: 12.0,
-  //   );
-  //   final Key secondKey = UniqueKey();
+  testMongolWidgets(
+      'MongolTextField prefix and suffix appear correctly with label text',
+      (tester) async {
+    final TextStyle prefixStyle = TextStyle(
+      color: Colors.pink[500],
+      fontSize: 10.0,
+    );
+    final TextStyle suffixStyle = TextStyle(
+      color: Colors.green[500],
+      fontSize: 12.0,
+    );
+    final Key secondKey = UniqueKey();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Column(
-  //         children: <Widget>[
-  //           const MongolTextField(
-  //             decoration: InputDecoration(
-  //               labelText: 'First',
-  //             ),
-  //           ),
-  //           TextField(
-  //             key: secondKey,
-  //             decoration: InputDecoration(
-  //               labelText: 'Label',
-  //               prefixText: 'Prefix',
-  //               prefixStyle: prefixStyle,
-  //               suffixText: 'Suffix',
-  //               suffixStyle: suffixStyle,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Row(
+          children: <Widget>[
+            const MongolTextField(
+              decoration: InputDecoration(
+                labelText: 'First',
+              ),
+            ),
+            MongolTextField(
+              key: secondKey,
+              decoration: InputDecoration(
+                labelText: 'Label',
+                prefixText: 'Prefix',
+                prefixStyle: prefixStyle,
+                suffixText: 'Suffix',
+                suffixStyle: suffixStyle,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
-  //   // Not focused. The prefix and suffix should not appear, but the label should.
-  //   expect(getOpacity(tester, find.text('Prefix')), 0.0);
-  //   expect(getOpacity(tester, find.text('Suffix')), 0.0);
-  //   expect(find.text('Label'), findsOneWidget);
+    // Not focused. The prefix and suffix should not appear, but the label should.
+    expect(getOpacity(tester, findMongol.text('Prefix')), 0.0);
+    expect(getOpacity(tester, findMongol.text('Suffix')), 0.0);
+    expect(findMongol.text('Label'), findsOneWidget);
 
-  //   // Focus the input. The label, prefix, and suffix should appear.
-  //   await tester.tap(find.byKey(secondKey));
-  //   await tester.pumpAndSettle();
+    // Focus the input. The label, prefix, and suffix should appear.
+    await tester.tap(find.byKey(secondKey));
+    await tester.pumpAndSettle();
 
-  //   expect(getOpacity(tester, find.text('Prefix')), 1.0);
-  //   expect(getOpacity(tester, find.text('Suffix')), 1.0);
-  //   expect(find.text('Label'), findsOneWidget);
+    expect(getOpacity(tester, findMongol.text('Prefix')), 1.0);
+    expect(getOpacity(tester, findMongol.text('Suffix')), 1.0);
+    expect(findMongol.text('Label'), findsOneWidget);
 
-  //   // Enter some text. The label, prefix, and suffix should remain visible.
-  //   await tester.enterText(find.byKey(secondKey), 'Hi');
-  //   await tester.pumpAndSettle();
+    // Enter some text. The label, prefix, and suffix should remain visible.
+    await tester.enterText(find.byKey(secondKey), 'Hi');
+    await tester.pumpAndSettle();
 
-  //   expect(getOpacity(tester, find.text('Prefix')), 1.0);
-  //   expect(getOpacity(tester, find.text('Suffix')), 1.0);
-  //   expect(find.text('Label'), findsOneWidget);
+    expect(getOpacity(tester, findMongol.text('Prefix')), 1.0);
+    expect(getOpacity(tester, findMongol.text('Suffix')), 1.0);
+    expect(findMongol.text('Label'), findsOneWidget);
 
-  //   // Check and make sure that the right styles were applied.
-  //   final Text prefixText = tester.widget(find.text('Prefix'));
-  //   expect(prefixText.style, prefixStyle);
-  //   final Text suffixText = tester.widget(find.text('Suffix'));
-  //   expect(suffixText.style, suffixStyle);
-  // });
+    // Check and make sure that the right styles were applied.
+    final MongolText prefixText = tester.widget(findMongol.text('Prefix'));
+    expect(prefixText.style, prefixStyle);
+    final MongolText suffixText = tester.widget(findMongol.text('Suffix'));
+    expect(suffixText.style, suffixStyle);
+  });
 
-  // testMongolWidgets('MongolTextField label text animates', (tester) async {
-  //   final Key secondKey = UniqueKey();
+  testMongolWidgets('MongolTextField label text animates', (tester) async {
+    final Key secondKey = UniqueKey();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Column(
-  //         children: <Widget>[
-  //           const MongolTextField(
-  //             decoration: InputDecoration(
-  //               labelText: 'First',
-  //             ),
-  //           ),
-  //           TextField(
-  //             key: secondKey,
-  //             decoration: const InputDecoration(
-  //               labelText: 'Second',
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Row(
+          children: <Widget>[
+            const MongolTextField(
+              decoration: InputDecoration(
+                labelText: 'First',
+              ),
+            ),
+            MongolTextField(
+              key: secondKey,
+              decoration: const InputDecoration(
+                labelText: 'Second',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
 
-  //   Offset pos = tester.getTopLeft(find.text('Second'));
+    Offset pos = tester.getTopLeft(findMongol.text('Second'));
 
-  //   // Focus the Input. The label should start animating upwards.
-  //   await tester.tap(find.byKey(secondKey));
-  //   await tester.idle();
-  //   await tester.pump();
-  //   await tester.pump(const Duration(milliseconds: 50));
+    // Focus the Input. The label should start animating upwards.
+    await tester.tap(find.byKey(secondKey));
+    await tester.idle();
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
 
-  //   Offset newPos = tester.getTopLeft(find.text('Second'));
-  //   expect(newPos.dy, lessThan(pos.dy));
+    Offset newPos = tester.getTopLeft(findMongol.text('Second'));
+    expect(newPos.dx, lessThan(pos.dx));
 
-  //   // Label should still be sliding upward.
-  //   await tester.pump(const Duration(milliseconds: 50));
-  //   pos = newPos;
-  //   newPos = tester.getTopLeft(find.text('Second'));
-  //   expect(newPos.dy, lessThan(pos.dy));
-  // });
+    // Label should still be sliding upward.
+    await tester.pump(const Duration(milliseconds: 50));
+    pos = newPos;
+    newPos = tester.getTopLeft(findMongol.text('Second'));
+    expect(newPos.dx, lessThan(pos.dx));
+  });
 
   // testMongolWidgets('Icon is separated from input/label by 16+12', (tester) async {
   //   await tester.pumpWidget(
@@ -3123,7 +3211,7 @@ void main() {
   //   // There's a 16 dps gap between the right edge of the icon and the text field's
   //   // container, and the 12dps more padding between the left edge of the container
   //   // and the left edge of the input and label.
-  //   expect(iconRight + 28.0, equals(tester.getTopLeft(find.text('label')).dx));
+  //   expect(iconRight + 28.0, equals(tester.getTopLeft(findMongol.text('label')).dx));
   //   expect(iconRight + 28.0, equals(tester.getTopLeft(find.byType(MongolEditableText)).dx));
   // });
 
@@ -3139,16 +3227,16 @@ void main() {
   //     ),
   //   );
 
-  //   expect(tester.getTopLeft(find.text('hint')), equals(tester.getTopLeft(find.byType(MongolEditableText))));
+  //   expect(tester.getTopLeft(findMongol.text('hint')), equals(tester.getTopLeft(find.byType(MongolEditableText))));
   // });
 
   // testMongolWidgets('Can align to center', (tester) async {
   //   await tester.pumpWidget(
   //     overlay(
   //       child: Container(
-  //         width: 300.0,
+  //         height: 300.0,
   //         child: const MongolTextField(
-  //           textAlign: TextAlign.center,
+  //           textAlign: MongolTextAlign.center,
   //           decoration: null,
   //         ),
   //       ),
@@ -3160,10 +3248,7 @@ void main() {
   //     editable.getLocalRectForCaret(const TextPosition(offset: 0)).topLeft,
   //   );
 
-  //   // The overlay() function centers its child within a 800x600 window.
-  //   // Default cursorWidth is 2.0, test windowWidth is 800
-  //   // Centered cursor topLeft.dx: 399 == windowWidth/2 - cursorWidth/2
-  //   expect(topLeft.dx, equals(399.0));
+  //   expect(topLeft.dy, equals(399.0));
 
   //   await tester.enterText(find.byType(MongolTextField), 'abcd');
   //   await tester.pump();
@@ -3173,7 +3258,7 @@ void main() {
   //   );
 
   //   // TextPosition(offset: 2) - center of 'abcd'
-  //   expect(topLeft.dx, equals(399.0));
+  //   expect(topLeft.dy, equals(399.0));
   // });
 
   // testMongolWidgets('Can align to center within center', (tester) async {
@@ -3212,196 +3297,199 @@ void main() {
   //   expect(topLeft.dx, equals(399.0));
   // });
 
-  // testMongolWidgets('Controller can update server', (tester) async {
-  //   final TextEditingController controller1 = TextEditingController(
-  //     text: 'Initial Text',
-  //   );
-  //   final TextEditingController controller2 = TextEditingController(
-  //     text: 'More Text',
-  //   );
+  testMongolWidgets('Controller can update server', (tester) async {
+    final TextEditingController controller1 = TextEditingController(
+      text: 'Initial Text',
+    );
+    final TextEditingController controller2 = TextEditingController(
+      text: 'More Text',
+    );
 
-  //   TextEditingController? currentController;
-  //   late StateSetter setState;
+    TextEditingController? currentController;
+    late StateSetter setState;
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: StatefulBuilder(
-  //         builder: (BuildContext context, StateSetter setter) {
-  //           setState = setter;
-  //           return TextField(controller: currentController);
-  //         }
-  //       ),
-  //     ),
-  //   );
-  //   expect(tester.testTextInput.editingState, isNull);
+    await tester.pumpWidget(
+      overlay(
+        child: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setter) {
+          setState = setter;
+          return MongolTextField(controller: currentController);
+        }),
+      ),
+    );
+    expect(tester.testTextInput.editingState, isNull);
 
-  //   // Initial state with null controller.
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pump();
-  //   expect(tester.testTextInput.editingState!['text'], isEmpty);
+    // Initial state with null controller.
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pump();
+    expect(tester.testTextInput.editingState!['text'], isEmpty);
 
-  //   // Update the controller from null to controller1.
-  //   setState(() {
-  //     currentController = controller1;
-  //   });
-  //   await tester.pump();
-  //   expect(tester.testTextInput.editingState!['text'], equals('Initial Text'));
+    // Update the controller from null to controller1.
+    setState(() {
+      currentController = controller1;
+    });
+    await tester.pump();
+    expect(tester.testTextInput.editingState!['text'], equals('Initial Text'));
 
-  //   // Verify that updates to controller1 are handled.
-  //   controller1.text = 'Updated Text';
-  //   await tester.idle();
-  //   expect(tester.testTextInput.editingState!['text'], equals('Updated Text'));
+    // Verify that updates to controller1 are handled.
+    controller1.text = 'Updated Text';
+    await tester.idle();
+    expect(tester.testTextInput.editingState!['text'], equals('Updated Text'));
 
-  //   // Verify that switching from controller1 to controller2 is handled.
-  //   setState(() {
-  //     currentController = controller2;
-  //   });
-  //   await tester.pump();
-  //   expect(tester.testTextInput.editingState!['text'], equals('More Text'));
+    // Verify that switching from controller1 to controller2 is handled.
+    setState(() {
+      currentController = controller2;
+    });
+    await tester.pump();
+    expect(tester.testTextInput.editingState!['text'], equals('More Text'));
 
-  //   // Verify that updates to controller1 are ignored.
-  //   controller1.text = 'Ignored Text';
-  //   await tester.idle();
-  //   expect(tester.testTextInput.editingState!['text'], equals('More Text'));
+    // Verify that updates to controller1 are ignored.
+    controller1.text = 'Ignored Text';
+    await tester.idle();
+    expect(tester.testTextInput.editingState!['text'], equals('More Text'));
 
-  //   // Verify that updates to controller text are handled.
-  //   controller2.text = 'Additional Text';
-  //   await tester.idle();
-  //   expect(tester.testTextInput.editingState!['text'], equals('Additional Text'));
+    // Verify that updates to controller text are handled.
+    controller2.text = 'Additional Text';
+    await tester.idle();
+    expect(
+        tester.testTextInput.editingState!['text'], equals('Additional Text'));
 
-  //   // Verify that updates to controller selection are handled.
-  //   controller2.selection = const TextSelection(baseOffset: 0, extentOffset: 5);
-  //   await tester.idle();
-  //   expect(tester.testTextInput.editingState!['selectionBase'], equals(0));
-  //   expect(tester.testTextInput.editingState!['selectionExtent'], equals(5));
+    // Verify that updates to controller selection are handled.
+    controller2.selection = const TextSelection(baseOffset: 0, extentOffset: 5);
+    await tester.idle();
+    expect(tester.testTextInput.editingState!['selectionBase'], equals(0));
+    expect(tester.testTextInput.editingState!['selectionExtent'], equals(5));
 
-  //   // Verify that calling clear() clears the text.
-  //   controller2.clear();
-  //   await tester.idle();
-  //   expect(tester.testTextInput.editingState!['text'], equals(''));
+    // Verify that calling clear() clears the text.
+    controller2.clear();
+    await tester.idle();
+    expect(tester.testTextInput.editingState!['text'], equals(''));
 
-  //   // Verify that switching from controller2 to null preserves current text.
-  //   controller2.text = 'The Final Cut';
-  //   await tester.idle();
-  //   expect(tester.testTextInput.editingState!['text'], equals('The Final Cut'));
-  //   setState(() {
-  //     currentController = null;
-  //   });
-  //   await tester.pump();
-  //   expect(tester.testTextInput.editingState!['text'], equals('The Final Cut'));
+    // Verify that switching from controller2 to null preserves current text.
+    controller2.text = 'The Final Cut';
+    await tester.idle();
+    expect(tester.testTextInput.editingState!['text'], equals('The Final Cut'));
+    setState(() {
+      currentController = null;
+    });
+    await tester.pump();
+    expect(tester.testTextInput.editingState!['text'], equals('The Final Cut'));
 
-  //   // Verify that changes to controller2 are ignored.
-  //   controller2.text = 'Goodbye Cruel World';
-  //   expect(tester.testTextInput.editingState!['text'], equals('The Final Cut'));
-  // });
+    // Verify that changes to controller2 are ignored.
+    controller2.text = 'Goodbye Cruel World';
+    expect(tester.testTextInput.editingState!['text'], equals('The Final Cut'));
+  });
 
-  // testMongolWidgets('Cannot enter new lines onto single line TextField', (tester) async {
-  //   final TextEditingController textController = TextEditingController();
+  testMongolWidgets('Cannot enter new lines onto single line TextField',
+      (tester) async {
+    final TextEditingController textController = TextEditingController();
 
-  //   await tester.pumpWidget(boilerplate(
-  //     child: MongolTextField(controller: textController, decoration: null),
-  //   ));
+    await tester.pumpWidget(boilerplate(
+      child: MongolTextField(controller: textController, decoration: null),
+    ));
 
-  //   await tester.enterText(find.byType(MongolTextField), 'abc\ndef');
+    await tester.enterText(find.byType(MongolTextField), 'abc\ndef');
 
-  //   expect(textController.text, 'abcdef');
-  // });
+    expect(textController.text, 'abcdef');
+  });
 
-  // testMongolWidgets('Injected formatters are chained', (tester) async {
-  //   final TextEditingController textController = TextEditingController();
+  testMongolWidgets('Injected formatters are chained', (tester) async {
+    final TextEditingController textController = TextEditingController();
 
-  //   await tester.pumpWidget(boilerplate(
-  //     child: MongolTextField(
-  //       controller: textController,
-  //       decoration: null,
-  //       inputFormatters: <TextInputFormatter> [
-  //         FilteringTextInputFormatter.deny(
-  //           RegExp(r'[a-z]'),
-  //           replacementString: '#',
-  //         ),
-  //       ],
-  //     ),
-  //   ));
+    await tester.pumpWidget(boilerplate(
+      child: MongolTextField(
+        controller: textController,
+        decoration: null,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.deny(
+            RegExp(r'[a-z]'),
+            replacementString: '#',
+          ),
+        ],
+      ),
+    ));
 
-  //   await tester.enterText(find.byType(MongolTextField), 'a一b二c三\nd四e五f六');
-  //   // The default single line formatter replaces \n with empty string.
-  //   expect(textController.text, '#一#二#三#四#五#六');
-  // });
+    await tester.enterText(find.byType(MongolTextField), 'a一b二c三\nd四e五f六');
+    // The default single line formatter replaces \n with empty string.
+    expect(textController.text, '#一#二#三#四#五#六');
+  });
 
-  // testMongolWidgets('Injected formatters are chained (deprecated names)', (tester) async {
-  //   final TextEditingController textController = TextEditingController();
+  testMongolWidgets('Injected formatters are chained (deprecated names)',
+      (tester) async {
+    final TextEditingController textController = TextEditingController();
 
-  //   await tester.pumpWidget(boilerplate(
-  //     child: MongolTextField(
-  //       controller: textController,
-  //       decoration: null,
-  //       inputFormatters: <TextInputFormatter> [
-  //         FilteringTextInputFormatter.deny(
-  //           RegExp(r'[a-z]'),
-  //           replacementString: '#',
-  //         ),
-  //       ],
-  //     ),
-  //   ));
+    await tester.pumpWidget(boilerplate(
+      child: MongolTextField(
+        controller: textController,
+        decoration: null,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.deny(
+            RegExp(r'[a-z]'),
+            replacementString: '#',
+          ),
+        ],
+      ),
+    ));
 
-  //   await tester.enterText(find.byType(MongolTextField), 'a一b二c三\nd四e五f六');
-  //   // The default single line formatter replaces \n with empty string.
-  //   expect(textController.text, '#一#二#三#四#五#六');
-  // });
+    await tester.enterText(find.byType(MongolTextField), 'a一b二c三\nd四e五f六');
+    // The default single line formatter replaces \n with empty string.
+    expect(textController.text, '#一#二#三#四#五#六');
+  });
 
-  // testMongolWidgets('Chained formatters are in sequence', (tester) async {
-  //   final TextEditingController textController = TextEditingController();
+  testMongolWidgets('Chained formatters are in sequence', (tester) async {
+    final TextEditingController textController = TextEditingController();
 
-  //   await tester.pumpWidget(boilerplate(
-  //     child: MongolTextField(
-  //       controller: textController,
-  //       decoration: null,
-  //       maxLines: 2,
-  //       inputFormatters: <TextInputFormatter> [
-  //         FilteringTextInputFormatter.deny(
-  //           RegExp(r'[a-z]'),
-  //           replacementString: '12\n',
-  //         ),
-  //         FilteringTextInputFormatter.allow(RegExp(r'\n[0-9]')),
-  //       ],
-  //     ),
-  //   ));
+    await tester.pumpWidget(boilerplate(
+      child: MongolTextField(
+        controller: textController,
+        decoration: null,
+        maxLines: 2,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.deny(
+            RegExp(r'[a-z]'),
+            replacementString: '12\n',
+          ),
+          FilteringTextInputFormatter.allow(RegExp(r'\n[0-9]')),
+        ],
+      ),
+    ));
 
-  //   await tester.enterText(find.byType(MongolTextField), 'a1b2c3');
-  //   // The first formatter turns it into
-  //   // 12\n112\n212\n3
-  //   // The second formatter turns it into
-  //   // \n1\n2\n3
-  //   // Multiline is allowed since maxLine != 1.
-  //   expect(textController.text, '\n1\n2\n3');
-  // });
+    await tester.enterText(find.byType(MongolTextField), 'a1b2c3');
+    // The first formatter turns it into
+    // 12\n112\n212\n3
+    // The second formatter turns it into
+    // \n1\n2\n3
+    // Multiline is allowed since maxLine != 1.
+    expect(textController.text, '\n1\n2\n3');
+  });
 
-  // testMongolWidgets('Chained formatters are in sequence (deprecated names)', (tester) async {
-  //   final TextEditingController textController = TextEditingController();
+  testMongolWidgets('Chained formatters are in sequence (deprecated names)',
+      (tester) async {
+    final TextEditingController textController = TextEditingController();
 
-  //   await tester.pumpWidget(boilerplate(
-  //     child: MongolTextField(
-  //       controller: textController,
-  //       decoration: null,
-  //       maxLines: 2,
-  //       inputFormatters: <TextInputFormatter> [
-  //         FilteringTextInputFormatter.deny(
-  //           RegExp(r'[a-z]'),
-  //           replacementString: '12\n',
-  //         ),
-  //         FilteringTextInputFormatter.allow(RegExp(r'\n[0-9]')),
-  //       ],
-  //     ),
-  //   ));
+    await tester.pumpWidget(boilerplate(
+      child: MongolTextField(
+        controller: textController,
+        decoration: null,
+        maxLines: 2,
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.deny(
+            RegExp(r'[a-z]'),
+            replacementString: '12\n',
+          ),
+          FilteringTextInputFormatter.allow(RegExp(r'\n[0-9]')),
+        ],
+      ),
+    ));
 
-  //   await tester.enterText(find.byType(MongolTextField), 'a1b2c3');
-  //   // The first formatter turns it into
-  //   // 12\n112\n212\n3
-  //   // The second formatter turns it into
-  //   // \n1\n2\n3
-  //   // Multiline is allowed since maxLine != 1.
-  //   expect(textController.text, '\n1\n2\n3');
-  // });
+    await tester.enterText(find.byType(MongolTextField), 'a1b2c3');
+    // The first formatter turns it into
+    // 12\n112\n212\n3
+    // The second formatter turns it into
+    // \n1\n2\n3
+    // Multiline is allowed since maxLine != 1.
+    expect(textController.text, '\n1\n2\n3');
+  });
 
   // testMongolWidgets('Pasted values are formatted', (tester) async {
   //   final TextEditingController textController = TextEditingController();
@@ -3435,7 +3523,7 @@ void main() {
   //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
 
   //   Clipboard.setData(const ClipboardData(text: '一4二\n5三6'));
-  //   await tester.tap(find.text('Paste'));
+  //   await tester.tap(findMongol.text('Paste'));
   //   await tester.pump();
   //   // Puts 456 before the 2 in 123.
   //   expect(textController.text, '145623');
@@ -3473,93 +3561,101 @@ void main() {
   //   await tester.pump(const Duration(milliseconds: 200)); // skip past the frame where the opacity is zero
 
   //   Clipboard.setData(const ClipboardData(text: '一4二\n5三6'));
-  //   await tester.tap(find.text('Paste'));
+  //   await tester.tap(findMongol.text('Paste'));
   //   await tester.pump();
   //   // Puts 456 before the 2 in 123.
   //   expect(textController.text, '145623');
   // });
 
-  // testMongolWidgets('Do not add LengthLimiting formatter to the user supplied list', (tester) async {
-  //   final List<TextInputFormatter> formatters = <TextInputFormatter>[];
+  testMongolWidgets(
+      'Do not add LengthLimiting formatter to the user supplied list',
+      (tester) async {
+    final List<TextInputFormatter> formatters = <TextInputFormatter>[];
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: MongolTextField(
-  //         decoration: null,
-  //         maxLength: 5,
-  //         inputFormatters: formatters,
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: MongolTextField(
+          decoration: null,
+          maxLength: 5,
+          inputFormatters: formatters,
+        ),
+      ),
+    );
 
-  //   expect(formatters.isEmpty, isTrue);
-  // });
+    expect(formatters.isEmpty, isTrue);
+  });
 
-  // testMongolWidgets('Text field scrolls the caret into view', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Text field scrolls the caret into view', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Container(
-  //         width: 100.0,
-  //         child: MongolTextField(
-  //           controller: controller,
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Container(
+          height: 100.0,
+          child: MongolTextField(
+            controller: controller,
+          ),
+        ),
+      ),
+    );
 
-  //   final String longText = 'a' * 20;
-  //   await tester.enterText(find.byType(MongolTextField), longText);
-  //   await skipPastScrollingAnimation(tester);
+    final String longText = 'a' * 20;
+    await tester.enterText(find.byType(MongolTextField), longText);
+    await skipPastScrollingAnimation(tester);
 
-  //   ScrollableState scrollableState = tester.firstState(find.byType(Scrollable));
-  //   expect(scrollableState.position.pixels, equals(0.0));
+    ScrollableState scrollableState =
+        tester.firstState(find.byType(Scrollable));
+    expect(scrollableState.position.pixels, equals(0.0));
 
-  //   // Move the caret to the end of the text and check that the text field
-  //   // scrolls to make the caret visible.
-  //   controller.selection = TextSelection.collapsed(offset: longText.length);
-  //   await tester.pump(); // TODO(ianh): Figure out why this extra pump is needed.
-  //   await skipPastScrollingAnimation(tester);
+    // Move the caret to the end of the text and check that the text field
+    // scrolls to make the caret visible.
+    controller.selection = TextSelection.collapsed(offset: longText.length);
+    await tester
+        .pump(); // TODO(ianh): Figure out why this extra pump is needed.
+    await skipPastScrollingAnimation(tester);
 
-  //   scrollableState = tester.firstState(find.byType(Scrollable));
-  //   // For a horizontal input, scrolls to the exact position of the caret.
-  //   expect(scrollableState.position.pixels, equals(222.0));
-  // });
+    scrollableState = tester.firstState(find.byType(Scrollable));
+    // For a horizontal input, scrolls to the exact position of the caret.
+    expect(scrollableState.position.pixels, equals(222.0));
+  });
 
-  // testMongolWidgets('Multiline text field scrolls the caret into view', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Multiline text field scrolls the caret into view',
+      (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Container(
-  //         child: MongolTextField(
-  //           controller: controller,
-  //           maxLines: 6,
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Container(
+          child: MongolTextField(
+            controller: controller,
+            maxLines: 6,
+          ),
+        ),
+      ),
+    );
 
-  //   const String tallText = 'a\nb\nc\nd\ne\nf\ng'; // One line over max
-  //   await tester.enterText(find.byType(MongolTextField), tallText);
-  //   await skipPastScrollingAnimation(tester);
+    const String tallText = 'a\nb\nc\nd\ne\nf\ng'; // One line over max
+    await tester.enterText(find.byType(MongolTextField), tallText);
+    await skipPastScrollingAnimation(tester);
 
-  //   ScrollableState scrollableState = tester.firstState(find.byType(Scrollable));
-  //   expect(scrollableState.position.pixels, equals(0.0));
+    ScrollableState scrollableState =
+        tester.firstState(find.byType(Scrollable));
+    expect(scrollableState.position.pixels, equals(0.0));
 
-  //   // Move the caret to the end of the text and check that the text field
-  //   // scrolls to make the caret visible.
-  //   controller.selection = const TextSelection.collapsed(offset: tallText.length);
-  //   await tester.pump();
-  //   await skipPastScrollingAnimation(tester);
+    // Move the caret to the end of the text and check that the text field
+    // scrolls to make the caret visible.
+    controller.selection =
+        const TextSelection.collapsed(offset: tallText.length);
+    await tester.pump();
+    await skipPastScrollingAnimation(tester);
 
-  //   // Should have scrolled down exactly one line height (7 lines of text in 6
-  //   // line text field).
-  //   final double lineHeight = findRenderEditable(tester).preferredLineHeight;
-  //   scrollableState = tester.firstState(find.byType(Scrollable));
-  //   expect(scrollableState.position.pixels, moreOrLessEquals(lineHeight, epsilon: 0.1));
-  // });
+    // Should have scrolled down exactly one line height (7 lines of text in 6
+    // line text field).
+    final double lineWidth = findRenderEditable(tester).preferredLineWidth;
+    scrollableState = tester.firstState(find.byType(Scrollable));
+    expect(scrollableState.position.pixels,
+        moreOrLessEquals(lineWidth, epsilon: 0.1));
+  });
 
   // testMongolWidgets('haptic feedback', (tester) async {
   //   final FeedbackTester feedback = FeedbackTester();
@@ -3589,89 +3685,92 @@ void main() {
   //   feedback.dispose();
   // });
 
-  // testMongolWidgets('Text field drops selection when losing focus', (tester) async {
-  //   final Key key1 = UniqueKey();
-  //   final TextEditingController controller1 = TextEditingController();
-  //   final Key key2 = UniqueKey();
+  testMongolWidgets('Text field drops selection when losing focus',
+      (tester) async {
+    final Key key1 = UniqueKey();
+    final TextEditingController controller1 = TextEditingController();
+    final Key key2 = UniqueKey();
 
-  //   await tester.pumpWidget(
-  //     overlay(
-  //       child: Column(
-  //         children: <Widget>[
-  //           TextField(
-  //             key: key1,
-  //             controller: controller1,
-  //           ),
-  //           TextField(key: key2),
-  //         ],
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      overlay(
+        child: Row(
+          children: <Widget>[
+            MongolTextField(
+              key: key1,
+              controller: controller1,
+            ),
+            MongolTextField(key: key2),
+          ],
+        ),
+      ),
+    );
 
-  //   await tester.tap(find.byKey(key1));
-  //   await tester.enterText(find.byKey(key1), 'abcd');
-  //   await tester.pump();
-  //   controller1.selection = const TextSelection(baseOffset: 0, extentOffset: 3);
-  //   await tester.pump();
-  //   expect(controller1.selection, isNot(equals(TextRange.empty)));
+    await tester.tap(find.byKey(key1));
+    await tester.enterText(find.byKey(key1), 'abcd');
+    await tester.pump();
+    controller1.selection = const TextSelection(baseOffset: 0, extentOffset: 3);
+    await tester.pump();
+    expect(controller1.selection, isNot(equals(TextRange.empty)));
 
-  //   await tester.tap(find.byKey(key2));
-  //   await tester.pump();
-  //   expect(controller1.selection, equals(TextRange.empty));
-  // });
+    await tester.tap(find.byKey(key2));
+    await tester.pump();
+    expect(controller1.selection, equals(TextRange.empty));
+  });
 
-  // testMongolWidgets('Selection is consistent with text length', (tester) async {
-  //   final TextEditingController controller = TextEditingController();
+  testMongolWidgets('Selection is consistent with text length', (tester) async {
+    final TextEditingController controller = TextEditingController();
 
-  //   controller.text = 'abcde';
-  //   controller.selection = const TextSelection.collapsed(offset: 5);
+    controller.text = 'abcde';
+    controller.selection = const TextSelection.collapsed(offset: 5);
 
-  //   controller.text = '';
-  //   expect(controller.selection.start, lessThanOrEqualTo(0));
-  //   expect(controller.selection.end, lessThanOrEqualTo(0));
+    controller.text = '';
+    expect(controller.selection.start, lessThanOrEqualTo(0));
+    expect(controller.selection.end, lessThanOrEqualTo(0));
 
-  //   late FlutterError error;
-  //   try {
-  //     controller.selection = const TextSelection.collapsed(offset: 10);
-  //   } on FlutterError catch (e) {
-  //     error = e;
-  //   } finally {
-  //     expect(error.diagnostics.length, 1);
-  //     expect(
-  //       error.toStringDeep(),
-  //       equalsIgnoringHashCodes(
-  //         'FlutterError\n'
-  //         '   invalid text selection: TextSelection(baseOffset: 10,\n'
-  //         '   extentOffset: 10, affinity: TextAffinity.downstream,\n'
-  //         '   isDirectional: false)\n',
-  //       ),
-  //     );
-  //   }
-  // });
+    late FlutterError error;
+    try {
+      controller.selection = const TextSelection.collapsed(offset: 10);
+    } on FlutterError catch (e) {
+      error = e;
+    } finally {
+      expect(error.diagnostics.length, 1);
+      expect(
+        error.toStringDeep(),
+        equalsIgnoringHashCodes(
+          'FlutterError\n'
+          '   invalid text selection: TextSelection(baseOffset: 10,\n'
+          '   extentOffset: 10, affinity: TextAffinity.downstream,\n'
+          '   isDirectional: false)\n',
+        ),
+      );
+    }
+  });
 
-  // // Regression test for https://github.com/flutter/flutter/issues/35848
-  // testMongolWidgets('Clearing text field with suffixIcon does not cause text selection exception', (tester) async {
-  //   final TextEditingController controller = TextEditingController(
-  //     text: 'Prefilled text.',
-  //   );
+  // Regression test for https://github.com/flutter/flutter/issues/35848
+  testMongolWidgets(
+      'Clearing text field with suffixIcon does not cause text selection exception',
+      (tester) async {
+    final TextEditingController controller = TextEditingController(
+      text: 'Prefilled text.',
+    );
 
-  //   await tester.pumpWidget(
-  //     boilerplate(
-  //       child: MongolTextField(
-  //         controller: controller,
-  //         decoration: InputDecoration(
-  //           suffixIcon: IconButton(
-  //             icon: const Icon(Icons.close),
-  //             onPressed: controller.clear,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      boilerplate(
+        child: MongolTextField(
+          controller: controller,
+          decoration: InputDecoration(
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: controller.clear,
+            ),
+          ),
+        ),
+      ),
+    );
 
-  //   await tester.tap(find.byType(IconButton));
-  //   expect(controller.text, '');
-  // });
+    await tester.tap(find.byType(IconButton));
+    expect(controller.text, '');
+  });
 
   // testMongolWidgets('maxLength limits input.', (tester) async {
   //   final TextEditingController textController = TextEditingController();
@@ -3831,16 +3930,16 @@ void main() {
   //   await tester.pump();
 
   //   expect(textController.text, '0123456789101112');
-  //   expect(find.text('16/10'), findsOneWidget);
-  //   Text counterTextWidget = tester.widget(find.text('16/10'));
+  //   expect(findMongol.text('16/10'), findsOneWidget);
+  //   MongolText counterTextWidget = tester.widget(findMongol.text('16/10'));
   //   expect(counterTextWidget.style!.color, equals(Colors.deepPurpleAccent));
 
   //   await tester.enterText(find.byType(MongolTextField), '0123456789');
   //   await tester.pump();
 
   //   expect(textController.text, '0123456789');
-  //   expect(find.text('10/10'), findsOneWidget);
-  //   counterTextWidget = tester.widget(find.text('10/10'));
+  //   expect(findMongol.text('10/10'), findsOneWidget);
+  //   counterTextWidget = tester.widget(findMongol.text('10/10'));
   //   expect(counterTextWidget.style!.color, isNot(equals(Colors.deepPurpleAccent)));
   // });
 
@@ -3861,16 +3960,16 @@ void main() {
   //   await tester.pump();
 
   //   expect(textController.text, '😆012345678910111');
-  //   expect(find.text('16/10'), findsOneWidget);
-  //   Text counterTextWidget = tester.widget(find.text('16/10'));
+  //   expect(findMongol.text('16/10'), findsOneWidget);
+  //   MongolText counterTextWidget = tester.widget(findMongol.text('16/10'));
   //   expect(counterTextWidget.style!.color, equals(Colors.deepPurpleAccent));
 
   //   await tester.enterText(find.byType(MongolTextField), '😆012345678');
   //   await tester.pump();
 
   //   expect(textController.text, '😆012345678');
-  //   expect(find.text('10/10'), findsOneWidget);
-  //   counterTextWidget = tester.widget(find.text('10/10'));
+  //   expect(findMongol.text('10/10'), findsOneWidget);
+  //   counterTextWidget = tester.widget(findMongol.text('10/10'));
   //   expect(counterTextWidget.style!.color, isNot(equals(Colors.deepPurpleAccent)));
   // });
 
@@ -3891,16 +3990,16 @@ void main() {
   //   await tester.pump();
 
   //   expect(textController.text, '👨‍👩‍👦012345678910111');
-  //   expect(find.text('16/10'), findsOneWidget);
-  //   Text counterTextWidget = tester.widget(find.text('16/10'));
+  //   expect(findMongol.text('16/10'), findsOneWidget);
+  //   MongolText counterTextWidget = tester.widget(findMongol.text('16/10'));
   //   expect(counterTextWidget.style!.color, equals(Colors.deepPurpleAccent));
 
   //   await tester.enterText(find.byType(MongolTextField), '👨‍👩‍👦012345678');
   //   await tester.pump();
 
   //   expect(textController.text, '👨‍👩‍👦012345678');
-  //   expect(find.text('10/10'), findsOneWidget);
-  //   counterTextWidget = tester.widget(find.text('10/10'));
+  //   expect(findMongol.text('10/10'), findsOneWidget);
+  //   counterTextWidget = tester.widget(findMongol.text('10/10'));
   //   expect(counterTextWidget.style!.color, isNot(equals(Colors.deepPurpleAccent)));
   // });
 
@@ -3946,12 +4045,12 @@ void main() {
   //     ),
   //   );
 
-  //   expect(find.text('0/10'), findsOneWidget);
+  //   expect(findMongol.text('0/10'), findsOneWidget);
 
   //   await tester.enterText(find.byType(MongolTextField), '01234');
   //   await tester.pump();
 
-  //   expect(find.text('5/10'), findsOneWidget);
+  //   expect(findMongol.text('5/10'), findsOneWidget);
   // });
 
   // testMongolWidgets('maxLength counter measures surrogate pairs as one character', (tester) async {
@@ -3966,13 +4065,13 @@ void main() {
   //     ),
   //   );
 
-  //   expect(find.text('0/10'), findsOneWidget);
+  //   expect(findMongol.text('0/10'), findsOneWidget);
 
   //   const String surrogatePair = '😆';
   //   await tester.enterText(find.byType(MongolTextField), surrogatePair);
   //   await tester.pump();
 
-  //   expect(find.text('1/10'), findsOneWidget);
+  //   expect(findMongol.text('1/10'), findsOneWidget);
   // });
 
   // testMongolWidgets('maxLength counter measures grapheme clusters as one character', (tester) async {
@@ -3987,13 +4086,13 @@ void main() {
   //     ),
   //   );
 
-  //   expect(find.text('0/10'), findsOneWidget);
+  //   expect(findMongol.text('0/10'), findsOneWidget);
 
   //   const String familyEmoji = '👨‍👩‍👦';
   //   await tester.enterText(find.byType(MongolTextField), familyEmoji);
   //   await tester.pump();
 
-  //   expect(find.text('1/10'), findsOneWidget);
+  //   expect(findMongol.text('1/10'), findsOneWidget);
   // });
 
   // testMongolWidgets('setting maxLength to TextField.noMaxLength shows only entered length', (tester) async {
@@ -4008,12 +4107,12 @@ void main() {
   //     ),
   //   );
 
-  //   expect(find.text('0'), findsOneWidget);
+  //   expect(findMongol.text('0'), findsOneWidget);
 
   //   await tester.enterText(find.byType(MongolTextField), '01234');
   //   await tester.pump();
 
-  //   expect(find.text('5'), findsOneWidget);
+  //   expect(findMongol.text('5'), findsOneWidget);
   // });
 
   // testMongolWidgets('passing a buildCounter shows returned widget', (tester) async {
@@ -4031,75 +4130,85 @@ void main() {
   //     ),
   //   );
 
-  //   expect(find.text('0 of 10'), findsOneWidget);
+  //   expect(findMongol.text('0 of 10'), findsOneWidget);
 
   //   await tester.enterText(find.byType(MongolTextField), '01234');
   //   await tester.pump();
 
-  //   expect(find.text('5 of 10'), findsOneWidget);
+  //   expect(findMongol.text('5 of 10'), findsOneWidget);
   // });
 
-  // testMongolWidgets('MongolTextField identifies as text field in semantics', (tester) async {
-  //   final SemanticsTester semantics = SemanticsTester(tester);
+  testMongolWidgets('MongolTextField identifies as text field in semantics',
+      (tester) async {
+    final SemanticsTester semantics = SemanticsTester(tester);
 
-  //   await tester.pumpWidget(
-  //     const MaterialApp(
-  //       home: Material(
-  //         child: Center(
-  //             child: MongolTextField(
-  //               maxLength: 10,
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //   );
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              maxLength: 10,
+            ),
+          ),
+        ),
+      ),
+    );
 
-  //   expect(semantics, includesNodeWith(flags: <SemanticsFlag>[SemanticsFlag.isTextField]));
+    expect(semantics,
+        includesNodeWith(flags: <SemanticsFlag>[SemanticsFlag.isTextField]));
 
-  //   semantics.dispose();
-  // });
+    semantics.dispose();
+  });
 
-  // testMongolWidgets('Disabled text field does not have tap action', (tester) async {
-  //   final SemanticsTester semantics = SemanticsTester(tester);
+  testMongolWidgets('Disabled text field does not have tap action',
+      (tester) async {
+    final SemanticsTester semantics = SemanticsTester(tester);
 
-  //   await tester.pumpWidget(
-  //     const MaterialApp(
-  //       home: Material(
-  //         child: Center(
-  //           child: MongolTextField(
-  //             maxLength: 10,
-  //             enabled: false,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              maxLength: 10,
+              enabled: false,
+            ),
+          ),
+        ),
+      ),
+    );
 
-  //   expect(semantics, isNot(includesNodeWith(actions: <SemanticsAction>[SemanticsAction.tap])));
+    expect(
+        semantics,
+        isNot(
+            includesNodeWith(actions: <SemanticsAction>[SemanticsAction.tap])));
 
-  //   semantics.dispose();
-  // });
+    semantics.dispose();
+  });
 
-  // testMongolWidgets('Readonly text field does not have tap action', (tester) async {
-  //   final SemanticsTester semantics = SemanticsTester(tester);
+  testMongolWidgets('Readonly text field does not have tap action',
+      (tester) async {
+    final SemanticsTester semantics = SemanticsTester(tester);
 
-  //   await tester.pumpWidget(
-  //     const MaterialApp(
-  //       home: Material(
-  //         child: Center(
-  //           child: MongolTextField(
-  //             maxLength: 10,
-  //             readOnly: true,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              maxLength: 10,
+              readOnly: true,
+            ),
+          ),
+        ),
+      ),
+    );
 
-  //   expect(semantics, isNot(includesNodeWith(actions: <SemanticsAction>[SemanticsAction.tap])));
+    expect(
+        semantics,
+        isNot(
+            includesNodeWith(actions: <SemanticsAction>[SemanticsAction.tap])));
 
-  //   semantics.dispose();
-  // });
+    semantics.dispose();
+  });
 
   // testMongolWidgets('Disabled text field hides helper and counter', (tester) async {
   //   const String helperText = 'helper text';
@@ -4124,712 +4233,753 @@ void main() {
   //   }
 
   //   await tester.pumpWidget(buildFrame(true, false));
-  //   Text helperWidget = tester.widget(find.text(helperText));
-  //   Text counterWidget = tester.widget(find.text(counterText));
+  //   MongolText helperWidget = tester.widget(findMongol.text(helperText));
+  //   MongolText counterWidget = tester.widget(findMongol.text(counterText));
   //   expect(helperWidget.style!.color, isNot(equals(Colors.transparent)));
   //   expect(counterWidget.style!.color, isNot(equals(Colors.transparent)));
   //   await tester.pumpWidget(buildFrame(true, true));
-  //   counterWidget = tester.widget(find.text(counterText));
-  //   Text errorWidget = tester.widget(find.text(errorText));
+  //   counterWidget = tester.widget(findMongol.text(counterText));
+  //   MongolText errorWidget = tester.widget(findMongol.text(errorText));
   //   expect(helperWidget.style!.color, isNot(equals(Colors.transparent)));
   //   expect(errorWidget.style!.color, isNot(equals(Colors.transparent)));
 
   //   // When enabled is false, the helper/error and counter are not visible.
   //   await tester.pumpWidget(buildFrame(false, false));
-  //   helperWidget = tester.widget(find.text(helperText));
-  //   counterWidget = tester.widget(find.text(counterText));
+  //   helperWidget = tester.widget(findMongol.text(helperText));
+  //   counterWidget = tester.widget(findMongol.text(counterText));
   //   expect(helperWidget.style!.color, equals(Colors.transparent));
   //   expect(counterWidget.style!.color, equals(Colors.transparent));
   //   await tester.pumpWidget(buildFrame(false, true));
-  //   errorWidget = tester.widget(find.text(errorText));
-  //   counterWidget = tester.widget(find.text(counterText));
+  //   errorWidget = tester.widget(findMongol.text(errorText));
+  //   counterWidget = tester.widget(findMongol.text(counterText));
   //   expect(counterWidget.style!.color, equals(Colors.transparent));
   //   expect(errorWidget.style!.color, equals(Colors.transparent));
   // });
 
-  // testMongolWidgets('currentValueLength/maxValueLength are in the tree', (tester) async {
-  //   final SemanticsTester semantics = SemanticsTester(tester);
-  //   final TextEditingController controller = TextEditingController();
-
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: Center(
-  //           child: MongolTextField(
-  //             controller: controller,
-  //             maxLength: 10,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-
-  //   expect(semantics, includesNodeWith(
-  //     flags: <SemanticsFlag>[SemanticsFlag.isTextField],
-  //     maxValueLength: 10,
-  //     currentValueLength: 0,
-  //   ));
-
-  //   await tester.showKeyboard(find.byType(MongolTextField));
-  //   const String testValue = '123';
-  //   tester.testTextInput.updateEditingValue(const TextEditingValue(
-  //     text: testValue,
-  //     selection: TextSelection.collapsed(offset: 3),
-  //     composing: TextRange(start: 0, end: testValue.length),
-  //   ));
-  //   await tester.pump();
-
-  //   expect(semantics, includesNodeWith(
-  //     flags: <SemanticsFlag>[SemanticsFlag.isTextField, SemanticsFlag.isFocused],
-  //     maxValueLength: 10,
-  //     currentValueLength: 3,
-  //   ));
-
-  //   semantics.dispose();
-  // });
-
-  // testMongolWidgets('Read only TextField identifies as read only text field in semantics', (tester) async {
-  //   final SemanticsTester semantics = SemanticsTester(tester);
-
-  //   await tester.pumpWidget(
-  //     const MaterialApp(
-  //       home: Material(
-  //         child: Center(
-  //           child: MongolTextField(
-  //             maxLength: 10,
-  //             readOnly: true,
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-
-  //   expect(
-  //     semantics,
-  //     includesNodeWith(flags: <SemanticsFlag>[SemanticsFlag.isTextField, SemanticsFlag.isReadOnly]),
-  //   );
-
-  //   semantics.dispose();
-  // });
-
-  // testMongolWidgets("Disabled TextField can't be traversed to when disabled.", (tester) async {
-  //   final FocusNode focusNode1 = FocusNode(debugLabel: 'MongolTextField 1');
-  //   final FocusNode focusNode2 = FocusNode(debugLabel: 'MongolTextField 2');
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: Center(
-  //           child: Column(
-  //             children: <Widget>[
-  //               TextField(
-  //                 focusNode: focusNode1,
-  //                 autofocus: true,
-  //                 maxLength: 10,
-  //                 enabled: true,
-  //               ),
-  //               TextField(
-  //                 focusNode: focusNode2,
-  //                 maxLength: 10,
-  //                 enabled: false,
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-
-  //   await tester.pump();
-  //   expect(focusNode1.hasPrimaryFocus, isTrue);
-  //   expect(focusNode2.hasPrimaryFocus, isFalse);
-
-  //   expect(focusNode1.nextFocus(), isTrue);
-  //   await tester.pump();
-
-  //   expect(focusNode1.hasPrimaryFocus, isTrue);
-  //   expect(focusNode2.hasPrimaryFocus, isFalse);
-  // });
-
-  // group('Keyboard Tests', () {
-  //   late TextEditingController controller;
-
-  //   setUp( () {
-  //     controller = TextEditingController();
-  //   });
-
-  //   Future<void> setupWidget(tester) async {
-  //     final FocusNode focusNode = FocusNode();
-  //     controller = TextEditingController();
-
-  //     await tester.pumpWidget(
-  //       MaterialApp(
-  //         home: Material(
-  //           child: RawKeyboardListener(
-  //             focusNode: focusNode,
-  //             onKey: null,
-  //             child: MongolTextField(
-  //               controller: controller,
-  //               maxLines: 3,
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //     );
-  //     await tester.pump();
-  //   }
-
-  //   testMongolWidgets('Shift test 1', (tester) async {
-  //     await setupWidget(tester);
-  //     const String testValue = 'a big house';
-  //     await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //     await tester.idle();
-  //     // Need to wait for selection to catch up.
-  //     await tester.pump();
-  //     await tester.tap(find.byType(MongolTextField));
-  //     await tester.pumpAndSettle();
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, -1);
-  //   });
-
-  //   testMongolWidgets('Shift test 2', (tester) async {
-  //     await setupWidget(tester);
-
-  //     const String testValue = 'abcdefghi';
-  //     await tester.showKeyboard(find.byType(MongolTextField));
-  //     tester.testTextInput.updateEditingValue(const TextEditingValue(
-  //       text: testValue,
-  //       selection: TextSelection.collapsed(offset: 3),
-  //       composing: TextRange(start: 0, end: testValue.length),
-  //     ));
-  //     await tester.pump();
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, 1);
-  //   });
-
-  //   testMongolWidgets('Control Shift test', (tester) async {
-  //     await setupWidget(tester);
-  //     const String testValue = 'their big house';
-  //     await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //     await tester.idle();
-  //     await tester.tap(find.byType(MongolTextField));
-  //     await tester.pumpAndSettle();
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, 5);
-  //   });
-
-  //   testMongolWidgets('Down and up test', (tester) async {
-  //     await setupWidget(tester);
-  //     const String testValue = 'a big house';
-  //     await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //     await tester.idle();
-  //     // Need to wait for selection to catch up.
-  //     await tester.pump();
-  //     await tester.tap(find.byType(MongolTextField));
-  //     await tester.pumpAndSettle();
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowUp);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, -11);
-
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowUp);
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, 0);
-  //   });
-
-  //   testMongolWidgets('Down and up test 2', (tester) async {
-  //     await setupWidget(tester);
-  //     const String testValue = 'a big house\njumped over a mouse\nOne more line yay'; // 11 \n 19
-  //     await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //     await tester.idle();
-  //     await tester.tap(find.byType(MongolTextField));
-  //     await tester.pumpAndSettle();
-
-  //     for (int i = 0; i < 5; i += 1) {
-  //       await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowRight);
-  //       await tester.pumpAndSettle();
-  //       await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowRight);
-  //       await tester.pumpAndSettle();
-  //     }
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, 12);
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, 32);
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, 12);
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, 0);
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, -5);
-  //   });
-
-  //   testMongolWidgets('Read only keyboard selection test', (tester) async {
-  //     final TextEditingController controller = TextEditingController(text: 'readonly');
-  //     await tester.pumpWidget(
-  //         overlay(
-  //           child: MongolTextField(
-  //             controller: controller,
-  //             readOnly: true,
-  //           ),
-  //         ),
-  //     );
-
-  //     await tester.idle();
-  //     await tester.tap(find.byType(MongolTextField));
-  //     await tester.pumpAndSettle();
-
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowLeft);
-  //     expect(controller.selection.extentOffset - controller.selection.baseOffset, -1);
-  //   });
-  // });
-
-  // testMongolWidgets('Copy paste test', (tester) async {
-  //   final FocusNode focusNode = FocusNode();
-  //   final TextEditingController controller = TextEditingController();
-  //   final MongolTextField textField =
-  //     TextField(
-  //       controller: controller,
-  //       maxLines: 3,
-  //     );
-
-  //   String clipboardContent = '';
-  //   SystemChannels.platform
-  //     .setMockMethodCallHandler((MethodCall methodCall) async {
-  //       if (methodCall.method == 'Clipboard.setData')
-  //         clipboardContent = methodCall.arguments['text'] as String;
-  //       else if (methodCall.method == 'Clipboard.getData')
-  //         return <String, dynamic>{'text': clipboardContent};
-  //       return null;
-  //     });
-
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: RawKeyboardListener(
-  //           focusNode: focusNode,
-  //           onKey: null,
-  //           child: textField,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   focusNode.requestFocus();
-  //   await tester.pump();
-
-  //   const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //   await tester.idle();
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pumpAndSettle();
-
-  //   // Select the first 5 characters
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //   for (int i = 0; i < 5; i += 1) {
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-  //   }
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-
-  //   // Copy them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
-  //   await tester.pumpAndSettle();
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   expect(clipboardContent, 'a big');
-
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //   await tester.pumpAndSettle();
-
-  //   // Paste them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-  //   await tester.pumpAndSettle();
-  //   await tester.pump(const Duration(milliseconds: 200));
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   const String expected = 'a biga big house\njumped over a mouse';
-  //   expect(find.text(expected), findsOneWidget, reason: 'Because text contains ${controller.text}');
-  // });
-
-  // testMongolWidgets('Copy paste obscured text test', (tester) async {
-  //   final FocusNode focusNode = FocusNode();
-  //   final TextEditingController controller = TextEditingController();
-  //   final MongolTextField textField =
-  //     TextField(
-  //       controller: controller,
-  //       obscureText: true,
-  //     );
-
-  //   String clipboardContent = '';
-  //   SystemChannels.platform
-  //     .setMockMethodCallHandler((MethodCall methodCall) async {
-  //       if (methodCall.method == 'Clipboard.setData')
-  //         clipboardContent = methodCall.arguments['text'] as String;
-  //       else if (methodCall.method == 'Clipboard.getData')
-  //         return <String, dynamic>{'text': clipboardContent};
-  //       return null;
-  //     });
-
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: RawKeyboardListener(
-  //           focusNode: focusNode,
-  //           onKey: null,
-  //           child: textField,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   focusNode.requestFocus();
-  //   await tester.pump();
-
-  //   const String testValue = 'a big house jumped over a mouse';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //   await tester.idle();
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pumpAndSettle();
-
-  //   // Select the first 5 characters
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //   for (int i = 0; i < 5; i += 1) {
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-  //   }
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-
-  //   // Copy them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
-  //   await tester.pumpAndSettle();
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   expect(clipboardContent, 'a big');
-
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //   await tester.pumpAndSettle();
-
-  //   // Paste them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-  //   await tester.pumpAndSettle();
-  //   await tester.pump(const Duration(milliseconds: 200));
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   const String expected = 'a biga big house jumped over a mouse';
-  //   expect(find.text(expected), findsOneWidget, reason: 'Because text contains ${controller.text}');
-  // });
-
-  // testMongolWidgets('Cut test', (tester) async {
-  //   final FocusNode focusNode = FocusNode();
-  //   final TextEditingController controller = TextEditingController();
-  //   final MongolTextField textField =
-  //     TextField(
-  //       controller: controller,
-  //       maxLines: 3,
-  //     );
-  //   String clipboardContent = '';
-  //   SystemChannels.platform
-  //     .setMockMethodCallHandler((MethodCall methodCall) async {
-  //       if (methodCall.method == 'Clipboard.setData')
-  //         clipboardContent = methodCall.arguments['text'] as String;
-  //       else if (methodCall.method == 'Clipboard.getData')
-  //         return <String, dynamic>{'text': clipboardContent};
-  //       return null;
-  //     });
-
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: RawKeyboardListener(
-  //           focusNode: focusNode,
-  //           onKey: null,
-  //           child: textField,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   focusNode.requestFocus();
-  //   await tester.pump();
-
-  //   const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //   await tester.idle();
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pumpAndSettle();
-
-  //   // Select the first 5 characters
-  //   for (int i = 0; i < 5; i += 1) {
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-  //   }
-
-  //   // Cut them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
-  //   await tester.pumpAndSettle();
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   expect(clipboardContent, 'a big');
-
-  //   for (int i = 0; i < 5; i += 1) {
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-  //   }
-
-  //   // Paste them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-  //   await tester.pumpAndSettle();
-  //   await tester.pump(const Duration(milliseconds: 200));
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   const String expected = ' housa bige\njumped over a mouse';
-  //   expect(find.text(expected), findsOneWidget);
-  // });
-
-  // testMongolWidgets('Cut obscured text test', (tester) async {
-  //   final FocusNode focusNode = FocusNode();
-  //   final TextEditingController controller = TextEditingController();
-  //   final MongolTextField textField = TextField(
-  //     controller: controller,
-  //     obscureText: true,
-  //   );
-  //   String clipboardContent = '';
-  //   SystemChannels.platform
-  //     .setMockMethodCallHandler((MethodCall methodCall) async {
-  //       if (methodCall.method == 'Clipboard.setData')
-  //         clipboardContent = methodCall.arguments['text'] as String;
-  //       else if (methodCall.method == 'Clipboard.getData')
-  //         return <String, dynamic>{'text': clipboardContent};
-  //       return null;
-  //     });
-
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: RawKeyboardListener(
-  //           focusNode: focusNode,
-  //           onKey: null,
-  //           child: textField,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   focusNode.requestFocus();
-  //   await tester.pump();
-
-  //   const String testValue = 'a big house jumped over a mouse';
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //   await tester.idle();
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pumpAndSettle();
-
-  //   // Select the first 5 characters
-  //   for (int i = 0; i < 5; i += 1) {
-  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-  //     await tester.pumpAndSettle();
-  //   }
-
-  //   // Cut them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
-  //   await tester.pumpAndSettle();
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   expect(clipboardContent, 'a big');
-
-  //   for (int i = 0; i < 5; i += 1) {
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-  //     await tester.pumpAndSettle();
-  //   }
-
-  //   // Paste them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-  //   await tester.pumpAndSettle();
-  //   await tester.pump(const Duration(milliseconds: 200));
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-  //   await tester.pumpAndSettle();
-
-  //   const String expected = ' housa bige jumped over a mouse';
-  //   expect(find.text(expected), findsOneWidget);
-  // });
-
-  // testMongolWidgets('Select all test', (tester) async {
-  //   final FocusNode focusNode = FocusNode();
-  //   final TextEditingController controller = TextEditingController();
-  //   final MongolTextField textField =
-  //     TextField(
-  //       controller: controller,
-  //       maxLines: 3,
-  //     );
-
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: RawKeyboardListener(
-  //           focusNode: focusNode,
-  //           onKey: null,
-  //           child: textField,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   focusNode.requestFocus();
-  //   await tester.pump();
-
-  //   const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //   await tester.idle();
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pumpAndSettle();
-
-  //   // Select All
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
-  //   await tester.pumpAndSettle();
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
-  //   await tester.pumpAndSettle();
-
-  //   // Delete them
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.delete);
-  //   await tester.pumpAndSettle();
-  //   await tester.pump(const Duration(milliseconds: 200));
-
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.delete);
-  //   await tester.pumpAndSettle();
-
-  //   const String expected = '';
-  //   expect(find.text(expected), findsOneWidget);
-  // });
-
-  // testMongolWidgets('Delete test', (tester) async {
-  //   final FocusNode focusNode = FocusNode();
-  //   final TextEditingController controller = TextEditingController();
-  //   final MongolTextField textField =
-  //     TextField(
-  //       controller: controller,
-  //       maxLines: 3,
-  //     );
-
-  //   await tester.pumpWidget(
-  //     MaterialApp(
-  //       home: Material(
-  //         child: RawKeyboardListener(
-  //           focusNode: focusNode,
-  //           onKey: null,
-  //           child: textField,
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  //   focusNode.requestFocus();
-  //   await tester.pump();
-
-  //   const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
-  //   await tester.enterText(find.byType(MongolTextField), testValue);
-
-  //   await tester.idle();
-  //   await tester.tap(find.byType(MongolTextField));
-  //   await tester.pumpAndSettle();
-
-  //   // Delete
-  //   for (int i = 0; i < 6; i += 1) {
-  //     await tester.sendKeyEvent(LogicalKeyboardKey.delete);
-  //     await tester.pumpAndSettle();
-  //   }
-
-  //   const String expected = 'house\njumped over a mouse';
-  //   expect(find.text(expected), findsOneWidget);
-
-  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
-  //   await tester.pumpAndSettle();
-  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
-  //   await tester.pumpAndSettle();
-
-  //   await tester.sendKeyEvent(LogicalKeyboardKey.delete);
-  //   await tester.pumpAndSettle();
-
-  //   const String expected2 = '';
-  //   expect(find.text(expected2), findsOneWidget);
-  // });
-
+  testMongolWidgets('currentValueLength/maxValueLength are in the tree',
+      (tester) async {
+    final SemanticsTester semantics = SemanticsTester(tester);
+    final TextEditingController controller = TextEditingController();
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              controller: controller,
+              maxLength: 10,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+        semantics,
+        includesNodeWith(
+          flags: <SemanticsFlag>[SemanticsFlag.isTextField],
+          maxValueLength: 10,
+          currentValueLength: 0,
+        ));
+
+    await tester.showKeyboard(find.byType(MongolTextField));
+    const String testValue = '123';
+    tester.testTextInput.updateEditingValue(const TextEditingValue(
+      text: testValue,
+      selection: TextSelection.collapsed(offset: 3),
+      composing: TextRange(start: 0, end: testValue.length),
+    ));
+    await tester.pump();
+
+    expect(
+        semantics,
+        includesNodeWith(
+          flags: <SemanticsFlag>[
+            SemanticsFlag.isTextField,
+            SemanticsFlag.isFocused
+          ],
+          maxValueLength: 10,
+          currentValueLength: 3,
+        ));
+
+    semantics.dispose();
+  });
+
+  testMongolWidgets(
+      'Read only MongolTextField identifies as read only text field in semantics',
+      (tester) async {
+    final SemanticsTester semantics = SemanticsTester(tester);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              maxLength: 10,
+              readOnly: true,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      semantics,
+      includesNodeWith(flags: <SemanticsFlag>[
+        SemanticsFlag.isTextField,
+        SemanticsFlag.isReadOnly
+      ]),
+    );
+
+    semantics.dispose();
+  });
+
+  testMongolWidgets(
+      "Disabled MongolTextField can't be traversed to when disabled.",
+      (tester) async {
+    final FocusNode focusNode1 = FocusNode(debugLabel: 'MongolTextField 1');
+    final FocusNode focusNode2 = FocusNode(debugLabel: 'MongolTextField 2');
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: Center(
+            child: Column(
+              children: <Widget>[
+                TextField(
+                  focusNode: focusNode1,
+                  autofocus: true,
+                  maxLength: 10,
+                  enabled: true,
+                ),
+                TextField(
+                  focusNode: focusNode2,
+                  maxLength: 10,
+                  enabled: false,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    expect(focusNode1.hasPrimaryFocus, isTrue);
+    expect(focusNode2.hasPrimaryFocus, isFalse);
+
+    expect(focusNode1.nextFocus(), isTrue);
+    await tester.pump();
+
+    expect(focusNode1.hasPrimaryFocus, isTrue);
+    expect(focusNode2.hasPrimaryFocus, isFalse);
+  });
+
+  group('Keyboard Tests', () {
+    late TextEditingController controller;
+
+    setUp(() {
+      controller = TextEditingController();
+    });
+
+    Future<void> setupWidget(MongolWidgetTester tester) async {
+      final FocusNode focusNode = FocusNode();
+      controller = TextEditingController();
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Material(
+            child: RawKeyboardListener(
+              focusNode: focusNode,
+              onKey: null,
+              child: MongolTextField(
+                controller: controller,
+                maxLines: 3,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+    }
+
+    testMongolWidgets('Shift test 1', (tester) async {
+      await setupWidget(tester);
+      const String testValue = 'a big house';
+      await tester.enterText(find.byType(MongolTextField), testValue);
+
+      await tester.idle();
+      // Need to wait for selection to catch up.
+      await tester.pump();
+      await tester.tap(find.byType(MongolTextField));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          -1);
+    });
+
+    testMongolWidgets('Shift test 2', (tester) async {
+      await setupWidget(tester);
+
+      const String testValue = 'abcdefghi';
+      await tester.showKeyboard(find.byType(MongolTextField));
+      tester.testTextInput.updateEditingValue(const TextEditingValue(
+        text: testValue,
+        selection: TextSelection.collapsed(offset: 3),
+        composing: TextRange(start: 0, end: testValue.length),
+      ));
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          1);
+    });
+
+    testMongolWidgets('Control Shift test', (tester) async {
+      await setupWidget(tester);
+      const String testValue = 'their big house';
+      await tester.enterText(find.byType(MongolTextField), testValue);
+
+      await tester.idle();
+      await tester.tap(find.byType(MongolTextField));
+      await tester.pumpAndSettle();
+      await tester.pumpAndSettle();
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          5);
+    });
+
+    testMongolWidgets('Right and left test', (tester) async {
+      await setupWidget(tester);
+      const String testValue = 'a big house';
+      await tester.enterText(find.byType(MongolTextField), testValue);
+
+      await tester.idle();
+      // Need to wait for selection to catch up.
+      await tester.pump();
+      await tester.tap(find.byType(MongolTextField));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          -11);
+
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          0);
+    });
+
+    testMongolWidgets('Right and left test 2', (tester) async {
+      await setupWidget(tester);
+      const String testValue =
+          'a big house\njumped over a mouse\nOne more line yay'; // 11 \n 19
+      await tester.enterText(find.byType(MongolTextField), testValue);
+
+      await tester.idle();
+      await tester.tap(find.byType(MongolTextField));
+      await tester.pumpAndSettle();
+
+      for (int i = 0; i < 5; i += 1) {
+        await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+        await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pumpAndSettle();
+      }
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          12);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          32);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          12);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          0);
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          -5);
+    });
+
+    testMongolWidgets('Read only keyboard selection test', (tester) async {
+      final TextEditingController controller =
+          TextEditingController(text: 'readonly');
+      await tester.pumpWidget(
+        overlay(
+          child: MongolTextField(
+            controller: controller,
+            readOnly: true,
+          ),
+        ),
+      );
+
+      await tester.idle();
+      await tester.tap(find.byType(MongolTextField));
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowUp);
+      expect(
+          controller.selection.extentOffset - controller.selection.baseOffset,
+          -1);
+    });
+  });
+
+  testMongolWidgets('Copy paste test', (tester) async {
+    final FocusNode focusNode = FocusNode();
+    final TextEditingController controller = TextEditingController();
+    final MongolTextField textField = MongolTextField(
+      controller: controller,
+      maxLines: 3,
+    );
+
+    String clipboardContent = '';
+    SystemChannels.platform
+        .setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'Clipboard.setData') {
+        clipboardContent = methodCall.arguments['text'] as String;
+      } else if (methodCall.method == 'Clipboard.getData') {
+        return <String, dynamic>{'text': clipboardContent};
+      }
+      return null;
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: RawKeyboardListener(
+            focusNode: focusNode,
+            onKey: null,
+            child: textField,
+          ),
+        ),
+      ),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+
+    const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
+    await tester.enterText(find.byType(MongolTextField), testValue);
+
+    await tester.idle();
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pumpAndSettle();
+
+    // Select the first 5 characters
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+    for (int i = 0; i < 5; i += 1) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+    }
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+
+    // Copy them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    expect(clipboardContent, 'a big');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    // Paste them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    const String expected = 'a biga big house\njumped over a mouse';
+    expect(findMongol.text(expected), findsOneWidget,
+        reason: 'Because text contains ${controller.text}');
+  });
+
+  testMongolWidgets('Copy paste obscured text test', (tester) async {
+    final FocusNode focusNode = FocusNode();
+    final TextEditingController controller = TextEditingController();
+    final MongolTextField textField = MongolTextField(
+      controller: controller,
+      obscureText: true,
+    );
+
+    String clipboardContent = '';
+    SystemChannels.platform
+        .setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'Clipboard.setData') {
+        clipboardContent = methodCall.arguments['text'] as String;
+      } else if (methodCall.method == 'Clipboard.getData') {
+        return <String, dynamic>{'text': clipboardContent};
+      }
+      return null;
+    });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: RawKeyboardListener(
+            focusNode: focusNode,
+            onKey: null,
+            child: textField,
+          ),
+        ),
+      ),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+
+    const String testValue = 'a big house jumped over a mouse';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+
+    await tester.idle();
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pumpAndSettle();
+
+    // Select the first 5 characters
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+    for (int i = 0; i < 5; i += 1) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+    }
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+
+    // Copy them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    expect(clipboardContent, 'a big');
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+    await tester.pumpAndSettle();
+
+    // Paste them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    const String expected = 'a biga big house jumped over a mouse';
+    expect(findMongol.text(expected), findsOneWidget,
+        reason: 'Because text contains ${controller.text}');
+  });
+
+  testMongolWidgets('Cut test', (tester) async {
+    final FocusNode focusNode = FocusNode();
+    final TextEditingController controller = TextEditingController();
+    final MongolTextField textField =
+      MongolTextField(
+        controller: controller,
+        maxLines: 3,
+      );
+    String clipboardContent = '';
+    SystemChannels.platform
+      .setMockMethodCallHandler((MethodCall methodCall) async {
+        if (methodCall.method == 'Clipboard.setData')
+          {clipboardContent = methodCall.arguments['text'] as String;}
+        else if (methodCall.method == 'Clipboard.getData')
+          {return <String, dynamic>{'text': clipboardContent};}
+        return null;
+      });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: RawKeyboardListener(
+            focusNode: focusNode,
+            onKey: null,
+            child: textField,
+          ),
+        ),
+      ),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+
+    const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
+    await tester.enterText(find.byType(MongolTextField), testValue);
+
+    await tester.idle();
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pumpAndSettle();
+
+    // Select the first 5 characters
+    for (int i = 0; i < 5; i += 1) {
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+    }
+
+    // Cut them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    expect(clipboardContent, 'a big');
+
+    for (int i = 0; i < 5; i += 1) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+    }
+
+    // Paste them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    const String expected = ' housa bige\njumped over a mouse';
+    expect(findMongol.text(expected), findsOneWidget);
+  });
+
+  testMongolWidgets('Cut obscured text test', (tester) async {
+    final FocusNode focusNode = FocusNode();
+    final TextEditingController controller = TextEditingController();
+    final MongolTextField textField = MongolTextField(
+      controller: controller,
+      obscureText: true,
+    );
+    String clipboardContent = '';
+    SystemChannels.platform
+      .setMockMethodCallHandler((MethodCall methodCall) async {
+        if (methodCall.method == 'Clipboard.setData')
+          {clipboardContent = methodCall.arguments['text'] as String;}
+        else if (methodCall.method == 'Clipboard.getData')
+          {return <String, dynamic>{'text': clipboardContent};}
+        return null;
+      });
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: RawKeyboardListener(
+            focusNode: focusNode,
+            onKey: null,
+            child: textField,
+          ),
+        ),
+      ),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+
+    const String testValue = 'a big house jumped over a mouse';
+    await tester.enterText(find.byType(MongolTextField), testValue);
+
+    await tester.idle();
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pumpAndSettle();
+
+    // Select the first 5 characters
+    for (int i = 0; i < 5; i += 1) {
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+      await tester.pumpAndSettle();
+    }
+
+    // Cut them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    expect(clipboardContent, 'a big');
+
+    for (int i = 0; i < 5; i += 1) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+    }
+
+    // Paste them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 200));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+    await tester.pumpAndSettle();
+
+    const String expected = ' housa bige jumped over a mouse';
+    expect(findMongol.text(expected), findsOneWidget);
+  });
+
+  testMongolWidgets('Select all test', (tester) async {
+    final FocusNode focusNode = FocusNode();
+    final TextEditingController controller = TextEditingController();
+    final MongolTextField textField =
+      MongolTextField(
+        controller: controller,
+        maxLines: 3,
+      );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: RawKeyboardListener(
+            focusNode: focusNode,
+            onKey: null,
+            child: textField,
+          ),
+        ),
+      ),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+
+    const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
+    await tester.enterText(find.byType(MongolTextField), testValue);
+
+    await tester.idle();
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pumpAndSettle();
+
+    // Select All
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+    await tester.pumpAndSettle();
+
+    // Delete them
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.delete);
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.delete);
+    await tester.pumpAndSettle();
+
+    const String expected = '';
+    expect(findMongol.text(expected), findsOneWidget);
+  });
+
+  testMongolWidgets('Delete test', (tester) async {
+    final FocusNode focusNode = FocusNode();
+    final TextEditingController controller = TextEditingController();
+    final MongolTextField textField =
+      MongolTextField(
+        controller: controller,
+        maxLines: 3,
+      );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: RawKeyboardListener(
+            focusNode: focusNode,
+            onKey: null,
+            child: textField,
+          ),
+        ),
+      ),
+    );
+    focusNode.requestFocus();
+    await tester.pump();
+
+    const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
+    await tester.enterText(find.byType(MongolTextField), testValue);
+
+    await tester.idle();
+    await tester.tap(find.byType(MongolTextField));
+    await tester.pumpAndSettle();
+
+    // Delete
+    for (int i = 0; i < 6; i += 1) {
+      await tester.sendKeyEvent(LogicalKeyboardKey.delete);
+      await tester.pumpAndSettle();
+    }
+
+    const String expected = 'house\njumped over a mouse';
+    expect(findMongol.text(expected), findsOneWidget);
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+    await tester.pumpAndSettle();
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.control);
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.delete);
+    await tester.pumpAndSettle();
+
+    const String expected2 = '';
+    expect(findMongol.text(expected2), findsOneWidget);
+  });
+// asdf finished to here
   // testMongolWidgets('Changing positions of text fields', (tester) async {
 
   //   final FocusNode focusNode = FocusNode();
@@ -4921,7 +5071,6 @@ void main() {
 
   //   expect(c1.selection.extentOffset - c1.selection.baseOffset, -10);
   // });
-
 
   // testMongolWidgets('Changing focus test', (tester) async {
   //   final FocusNode focusNode = FocusNode();
@@ -5072,7 +5221,7 @@ void main() {
 
   //   final double rowBottomY = tester.getBottomLeft(find.byType(Row)).dy;
   //   expect(tester.getBottomLeft(find.byKey(keyA)).dy, moreOrLessEquals(rowBottomY - 4.0, epsilon: 0.001));
-  //   expect(tester.getBottomLeft(find.text('abc')).dy, moreOrLessEquals(rowBottomY - 2.0, epsilon: 0.001));
+  //   expect(tester.getBottomLeft(findMongol.text('abc')).dy, moreOrLessEquals(rowBottomY - 2.0, epsilon: 0.001));
   //   expect(tester.getBottomLeft(find.byKey(keyB)).dy, rowBottomY);
   // });
 
@@ -5124,7 +5273,7 @@ void main() {
   //   final double rowBottomY = tester.getBottomLeft(find.byType(Row)).dy;
   //   // The values here should match the version with strut disabled ('MongolTextField baseline alignment no-strut')
   //   expect(tester.getBottomLeft(find.byKey(keyA)).dy, moreOrLessEquals(rowBottomY - 4.0, epsilon: 0.001));
-  //   expect(tester.getBottomLeft(find.text('abc')).dy, moreOrLessEquals(rowBottomY - 2.0, epsilon: 0.001));
+  //   expect(tester.getBottomLeft(findMongol.text('abc')).dy, moreOrLessEquals(rowBottomY - 2.0, epsilon: 0.001));
   //   expect(tester.getBottomLeft(find.byKey(keyB)).dy, rowBottomY);
   // });
 
@@ -5577,7 +5726,7 @@ void main() {
   //   semantics.dispose();
   // });
 
-  // testMongolWidgets('Can activate TextField with explicit controller via semantics ', (tester) async {
+  // testMongolWidgets('Can activate MongolTextField with explicit controller via semantics ', (tester) async {
   //   // Regression test for https://github.com/flutter/flutter/issues/17801
 
   //   const String textInTextField = 'Hello';
@@ -6043,8 +6192,8 @@ void main() {
   //   );
 
   //   await tester.tap(find.byType(MongolTextField));
-  //   final Rect labelRect = tester.getRect(find.text('Label'));
-  //   final Rect fieldRect = tester.getRect(find.text('Just some text'));
+  //   final Rect labelRect = tester.getRect(findMongol.text('Label'));
+  //   final Rect fieldRect = tester.getRect(findMongol.text('Just some text'));
   //   expect(labelRect.bottom, lessThanOrEqualTo(fieldRect.top));
   // });
 
@@ -6263,7 +6412,7 @@ void main() {
   //     );
   //   }
 
-  //   // A cursor of default size doesn't cause the TextField to increase its
+  //   // A cursor of default size doesn't cause the MongolTextField to increase its
   //   // width.
   //   const String text = '1234';
   //   double? stepWidth = 80.0;
@@ -6277,7 +6426,7 @@ void main() {
   //   expect(tester.getSize(find.byType(MongolTextField)).width, stepWidth);
 
   //   // A wide cursor is counted in the width of the text and causes the
-  //   // TextField to increase to twice the stepWidth.
+  //   // MongolTextField to increase to twice the stepWidth.
   //   await tester.pumpWidget(buildFrame(
   //     stepWidth: stepWidth,
   //     cursorWidth: 18.0,
@@ -6287,7 +6436,7 @@ void main() {
   //   await tester.pumpAndSettle();
   //   expect(tester.getSize(find.byType(MongolTextField)).width, 2 * stepWidth);
 
-  //   // A null stepWidth causes the TextField to perfectly wrap the text plus
+  //   // A null stepWidth causes the MongolTextField to perfectly wrap the text plus
   //   // the cursor regardless of alignment.
   //   stepWidth = null;
   //   const double WIDTH_OF_CHAR = 16.0;
@@ -6764,14 +6913,14 @@ void main() {
   //     await tester.pump(const Duration(milliseconds: 50));
   //     await tester.tapAt(textOffsetToPosition(tester, 0));
   //     await tester.pumpAndSettle();
-  //     expect(find.text('Paste'), findsOneWidget);
+  //     expect(findMongol.text('Paste'), findsOneWidget);
 
   //     // Double tap again keeps the selection menu visible.
   //     await tester.tapAt(textOffsetToPosition(tester, 0));
   //     await tester.pump(const Duration(milliseconds: 50));
   //     await tester.tapAt(textOffsetToPosition(tester, 0));
   //     await tester.pumpAndSettle();
-  //     expect(find.text('Paste'), findsOneWidget);
+  //     expect(findMongol.text('Paste'), findsOneWidget);
   //   },
   // );
 
@@ -6796,12 +6945,12 @@ void main() {
   //     // Long press shows the selection menu.
   //     await tester.longPressAt(textOffsetToPosition(tester, 0));
   //     await tester.pumpAndSettle();
-  //     expect(find.text('Paste'), findsOneWidget);
+  //     expect(findMongol.text('Paste'), findsOneWidget);
 
   //     // Long press again keeps the selection menu visible.
   //     await tester.longPressAt(textOffsetToPosition(tester, 0));
   //     await tester.pump();
-  //     expect(find.text('Paste'), findsOneWidget);
+  //     expect(findMongol.text('Paste'), findsOneWidget);
   //   },
   // );
 
@@ -6826,12 +6975,12 @@ void main() {
   //     // Long press shows the selection menu.
   //     await tester.longPress(find.byType(MongolTextField));
   //     await tester.pumpAndSettle();
-  //     expect(find.text('Paste'), findsOneWidget);
+  //     expect(findMongol.text('Paste'), findsOneWidget);
 
   //     // Tap hides the selection menu.
   //     await tester.tap(find.byType(MongolTextField));
   //     await tester.pump();
-  //     expect(find.text('Paste'), findsNothing);
+  //     expect(findMongol.text('Paste'), findsNothing);
   //   },
   // );
 
@@ -6858,10 +7007,10 @@ void main() {
   //     await tester.pump();
 
   //     // Long press shows the selection menu.
-  //     expect(find.text('Paste'), findsNothing);
+  //     expect(findMongol.text('Paste'), findsNothing);
   //     await tester.longPress(find.byType(MongolTextField));
   //     await tester.pumpAndSettle();
-  //     expect(find.text('Paste'), findsOneWidget);
+  //     expect(findMongol.text('Paste'), findsOneWidget);
   //   },
   // );
 
@@ -7849,7 +7998,7 @@ void main() {
   //   // https://github.com/flutter/flutter/issues/43445
   // }, variant: TargetPlatformVariant.only(TargetPlatform.iOS));
 
-  // testMongolWidgets('default TextField debugFillProperties', (tester) async {
+  // testMongolWidgets('default MongolTextField debugFillProperties', (tester) async {
   //   final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
 
   //   const MongolTextField().debugFillProperties(builder);
@@ -7937,7 +8086,7 @@ void main() {
 
   //     expect(
   //       tester.getSize(find.byType(MongolTextField)),
-  //       // The TextField will be as tall as the decoration (24) plus the metrics
+  //       // The MongolTextField will be as tall as the decoration (24) plus the metrics
   //       // from the default TextStyle of the theme (16), or 40 altogether.
   //       // Because this is less than the kMinInteractiveDimension, it will be
   //       // increased to that value (48).
@@ -8149,7 +8298,6 @@ void main() {
 
   //   await tester.enterText(find.byType(MongolTextField), 'abcd');
   //   await tester.pump();
-
 
   //   Offset topLeft = editable.localToGlobal(
   //     editable.getLocalRectForCaret(const TextPosition(offset: 4)).topLeft,
@@ -8608,7 +8756,7 @@ void main() {
   //   expect(editableText.selectionOverlay!.toolbarIsVisible, isFalse);
   // });
 
-  // testMongolWidgets('when TextField would be blocked by keyboard, it is shown with enough space for the selection handle', (tester) async {
+  // testMongolWidgets('when MongolTextField would be blocked by keyboard, it is shown with enough space for the selection handle', (tester) async {
   //   final ScrollController scrollController = ScrollController();
 
   //   await tester.pumpWidget(MaterialApp(
@@ -8627,18 +8775,18 @@ void main() {
   //     ),
   //   ));
 
-  //   // Tap the TextField to put the cursor into it and bring it into view.
+  //   // Tap the MongolTextField to put the cursor into it and bring it into view.
   //   expect(scrollController.offset, 0.0);
   //   await tester.tapAt(tester.getTopLeft(find.byType(MongolTextField)));
   //   await tester.pumpAndSettle();
 
-  //   // The ListView has scrolled to keep the TextField and cursor handle
+  //   // The ListView has scrolled to keep the MongolTextField and cursor handle
   //   // visible.
   //   expect(scrollController.offset, 48.0);
   // });
 
   // group('height', () {
-  //   testMongolWidgets('By default, TextField is at least kMinInteractiveDimension high', (tester) async {
+  //   testMongolWidgets('By default, MongolTextField is at least kMinInteractiveDimension high', (tester) async {
   //     await tester.pumpWidget(MaterialApp(
   //       theme: ThemeData(),
   //       home: const Scaffold(
@@ -8652,7 +8800,7 @@ void main() {
   //     expect(renderBox.size.height, greaterThanOrEqualTo(kMinInteractiveDimension));
   //   });
 
-  //   testMongolWidgets("When text is very small, TextField still doesn't go below kMinInteractiveDimension height", (tester) async {
+  //   testMongolWidgets("When text is very small, MongolTextField still doesn't go below kMinInteractiveDimension height", (tester) async {
   //     await tester.pumpWidget(MaterialApp(
   //       theme: ThemeData(),
   //       home: const Scaffold(
@@ -8668,7 +8816,7 @@ void main() {
   //     expect(renderBox.size.height, kMinInteractiveDimension);
   //   });
 
-  //   testMongolWidgets('When isDense, TextField can go below kMinInteractiveDimension height', (tester) async {
+  //   testMongolWidgets('When isDense, MongolTextField can go below kMinInteractiveDimension height', (tester) async {
   //     await tester.pumpWidget(MaterialApp(
   //       theme: ThemeData(),
   //       home: const Scaffold(
@@ -9124,12 +9272,12 @@ void main() {
 
   //   await tester.pumpWidget(textFieldBuilder(behavior: FloatingLabelBehavior.auto));
   //   // The label will be positioned within the content when unfocused.
-  //   expect(tester.getTopLeft(find.text('Label')).dy, 20.0);
+  //   expect(tester.getTopLeft(findMongol.text('Label')).dy, 20.0);
 
   //   focusNode.requestFocus();
   //   await tester.pumpAndSettle(); // label animation.
   //   // The label will float above the content when focused.
-  //   expect(tester.getTopLeft(find.text('Label')).dy, 12.0);
+  //   expect(tester.getTopLeft(findMongol.text('Label')).dy, 12.0);
 
   //   focusNode.unfocus();
   //   await tester.pumpAndSettle(); // label animation.
@@ -9137,43 +9285,43 @@ void main() {
   //   await tester.pumpWidget(textFieldBuilder(behavior: FloatingLabelBehavior.never));
   //   await tester.pumpAndSettle(); // theme animation.
   //   // The label will be positioned within the content.
-  //   expect(tester.getTopLeft(find.text('Label')).dy, 20.0);
+  //   expect(tester.getTopLeft(findMongol.text('Label')).dy, 20.0);
 
   //   focusNode.requestFocus();
   //   await tester.pumpAndSettle(); // label animation.
   //   // The label will always be positioned within the content.
-  //   expect(tester.getTopLeft(find.text('Label')).dy, 20.0);
+  //   expect(tester.getTopLeft(findMongol.text('Label')).dy, 20.0);
 
   //   await tester.pumpWidget(textFieldBuilder(behavior: FloatingLabelBehavior.always));
   //   await tester.pumpAndSettle(); // theme animation.
   //   // The label will always float above the content.
-  //   expect(tester.getTopLeft(find.text('Label')).dy, 12.0);
+  //   expect(tester.getTopLeft(findMongol.text('Label')).dy, 12.0);
 
   //   focusNode.unfocus();
   //   await tester.pumpAndSettle(); // label animation.
   //   // The label will always float above the content.
-  //   expect(tester.getTopLeft(find.text('Label')).dy, 12.0);
+  //   expect(tester.getTopLeft(findMongol.text('Label')).dy, 12.0);
   // });
 
   // group('MaxLengthEnforcement', () {
   //   const int maxLength = 5;
 
-  //   Future<void> setupWidget(
-  //     WidgetTester tester,
-  //     MaxLengthEnforcement? enforcement,
-  //   ) async {
-  //     final Widget widget = MaterialApp(
-  //       home: Material(
-  //         child: MongolTextField(
-  //           maxLength: maxLength,
-  //           maxLengthEnforcement: enforcement,
-  //         ),
+  // Future<void> setupWidget(
+  //   MongolWidgetTester tester,
+  //   MaxLengthEnforcement? enforcement,
+  // ) async {
+  //   final Widget widget = MaterialApp(
+  //     home: Material(
+  //       child: MongolTextField(
+  //         maxLength: maxLength,
+  //         maxLengthEnforcement: enforcement,
   //       ),
-  //     );
+  //     ),
+  //   );
 
-  //     await tester.pumpWidget(widget);
-  //     await tester.pumpAndSettle();
-  //   }
+  //   await tester.pumpWidget(widget);
+  //   await tester.pumpAndSettle();
+  // }
 
   //   testMongolWidgets('using none enforcement.', (tester) async {
   //     const MaxLengthEnforcement enforcement = MaxLengthEnforcement.none;
