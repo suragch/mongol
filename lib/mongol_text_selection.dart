@@ -336,6 +336,7 @@ class MongolTextSelectionOverlay {
           endpoints,
           selectionDelegate!,
           clipboardStatus!,
+          renderObject.lastSecondaryTapDownPosition,
         ),
       ),
     );

@@ -6941,38 +6941,38 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    // Regression test for https://github.com/flutter/flutter/issues/65374.
-    testMongolWidgets(
-        'will not cause crash while the TextEditingValue is composing',
-        (tester) async {
-      await setupWidget(
-        tester,
-        LengthLimitingTextInputFormatter(
-          maxLength,
-        ),
-      );
+    // // Regression test for https://github.com/flutter/flutter/issues/65374.
+    // testMongolWidgets(
+    //     'will not cause crash while the TextEditingValue is composing',
+    //     (tester) async {
+    //   await setupWidget(
+    //     tester,
+    //     LengthLimitingTextInputFormatter(
+    //       maxLength,
+    //     ),
+    //   );
 
-      final MongolEditableTextState state = tester
-          .state<MongolEditableTextState>(find.byType(MongolEditableText));
-      state.updateEditingValue(const TextEditingValue(text: 'abcde'));
-      expect(state.currentTextEditingValue.composing, TextRange.empty);
-      state.updateEditingValue(const TextEditingValue(
-          text: 'abcde', composing: TextRange(start: 2, end: 4)));
-      expect(state.currentTextEditingValue.composing,
-          const TextRange(start: 2, end: 4));
+    //   final MongolEditableTextState state = tester
+    //       .state<MongolEditableTextState>(find.byType(MongolEditableText));
+    //   state.updateEditingValue(const TextEditingValue(text: 'abcde'));
+    //   expect(state.currentTextEditingValue.composing, TextRange.empty);
+    //   state.updateEditingValue(const TextEditingValue(
+    //       text: 'abcde', composing: TextRange(start: 2, end: 4)));
+    //   expect(state.currentTextEditingValue.composing,
+    //       const TextRange(start: 2, end: 4));
 
-      // Formatter will not update format while the editing value is composing.
-      state.updateEditingValue(const TextEditingValue(
-          text: 'abcdef', composing: TextRange(start: 2, end: 5)));
-      expect(state.currentTextEditingValue.text, 'abcdef');
-      expect(state.currentTextEditingValue.composing,
-          const TextRange(start: 2, end: 5));
+    //   // Formatter will not update format while the editing value is composing.
+    //   state.updateEditingValue(const TextEditingValue(
+    //       text: 'abcdef', composing: TextRange(start: 2, end: 5)));
+    //   expect(state.currentTextEditingValue.text, 'abcdef');
+    //   expect(state.currentTextEditingValue.composing,
+    //       const TextRange(start: 2, end: 5));
 
-      // After composing ends, formatter will update.
-      state.updateEditingValue(const TextEditingValue(text: 'abcdef'));
-      expect(state.currentTextEditingValue.text, 'abcde');
-      expect(state.currentTextEditingValue.composing, TextRange.empty);
-    });
+    //   // After composing ends, formatter will update.
+    //   state.updateEditingValue(const TextEditingValue(text: 'abcdef'));
+    //   expect(state.currentTextEditingValue.text, 'abcde');
+    //   expect(state.currentTextEditingValue.composing, TextRange.empty);
+    // });
 
     testMongolWidgets('handles composing text correctly, continued',
         (tester) async {
@@ -7470,7 +7470,7 @@ class MockTextSelectionControls extends Fake implements TextSelectionControls {
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
     ClipboardStatusNotifier clipboardStatus,
-    //Offset? lastSecondaryTapDownPosition,
+    Offset? lastSecondaryTapDownPosition,
   ) {
     return Container();
   }
