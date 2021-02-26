@@ -4,6 +4,7 @@ import 'demos/alert_dialog_demo.dart';
 import 'demos/emoji_cjk_demo.dart';
 import 'demos/gesture_detector_demo.dart';
 import 'demos/max_lines_demo.dart';
+import 'demos/mongol_text_field_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/keyboard_demo.dart';
 import 'demos/text_field_demo.dart';
@@ -63,6 +64,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'Maxlines demo',
           destination: MaxLinesDemo(),
+        ),
+        DemoTile(
+          title: 'MongolTextField demo',
+          destination: MongolTextFieldDemo(),
         ),
       ],
     );
