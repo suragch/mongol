@@ -4,7 +4,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/cupertino.dart' show CupertinoTheme;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
@@ -23,7 +23,6 @@ import 'package:flutter/material.dart'
         TextSelectionThemeData,
         TextSelectionTheme,
         iOSHorizontalOffset,
-        materialTextSelectionControls,
         MaterialStateProperty,
         MaterialStateMouseCursor,
         MaterialState;
@@ -33,6 +32,7 @@ import 'mongol_editable_text.dart';
 import 'mongol_input_decorator.dart';
 import 'mongol_text_painter.dart';
 import 'mongol_text_selection.dart';
+import 'mongol_text_selection_controls.dart';
 
 /// Signature for the [MongolTextField.buildCounter] callback.
 // typedef InputCounterWidgetBuilder = Widget? Function(
@@ -1544,20 +1544,17 @@ class _TextFieldState extends State<MongolTextField>
     ];
 
     var textSelectionControls = widget.selectionControls;
-    final bool paintCursorAboveText;
     final bool cursorOpacityAnimates;
     Offset? cursorOffset;
     var cursorColor = widget.cursorColor;
     final Color selectionColor;
-    Color? autocorrectionTextRectColor;
     var cursorRadius = widget.cursorRadius;
 
     switch (theme.platform) {
       case TargetPlatform.iOS:
         final cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = true;
-        textSelectionControls ??= cupertinoTextSelectionControls;
-        paintCursorAboveText = true;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
         cursorColor ??=
             selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
@@ -1566,15 +1563,12 @@ class _TextFieldState extends State<MongolTextField>
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
-        autocorrectionTextRectColor = selectionColor;
         break;
 
       case TargetPlatform.macOS:
         final cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = false;
-        textSelectionControls ??=
-            materialTextSelectionControls; // TODO: nonstandard
-        paintCursorAboveText = true;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
         cursorColor ??=
             selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
@@ -1588,8 +1582,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
-        textSelectionControls ??= materialTextSelectionControls;
-        paintCursorAboveText = false;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
         cursorColor ??= selectionTheme.cursorColor ?? theme.colorScheme.primary;
         selectionColor = selectionTheme.selectionColor ??
@@ -1599,9 +1592,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.linux:
       case TargetPlatform.windows:
         forcePressEnabled = false;
-        textSelectionControls ??=
-            materialTextSelectionControls; // TODO: nonstandard
-        paintCursorAboveText = false;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
         cursorColor ??= selectionTheme.cursorColor ?? theme.colorScheme.primary;
         selectionColor = selectionTheme.selectionColor ??

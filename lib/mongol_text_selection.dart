@@ -301,18 +301,16 @@ class MongolTextSelectionOverlay {
 
     // Find the vertical midpoint, just to the left of the selected text.
     final endpoints = renderObject.getEndpointsForSelection(_selection);
-
     final editingRegion = Rect.fromPoints(
       renderObject.localToGlobal(Offset.zero),
       renderObject.localToGlobal(renderObject.size.bottomRight(Offset.zero)),
     );
-
     final isMultiline = endpoints.last.point.dx - endpoints.first.point.dx >
         renderObject.preferredLineWidth / 2;
 
     // If the selected text spans more than 1 line, vertically center the toolbar.
     // Derived from both iOS and Android.
-    final midY = isMultiline
+    final midY = (isMultiline)
         ? editingRegion.height / 2
         : (endpoints.first.point.dy + endpoints.last.point.dy) / 2;
 
