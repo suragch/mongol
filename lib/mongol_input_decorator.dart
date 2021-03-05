@@ -23,12 +23,6 @@ import 'input_border.dart';
 import 'mongol_text.dart';
 import 'mongol_text_painter.dart';
 
-// import 'colors.dart';
-// import 'constants.dart';
-// import 'input_border.dart';
-// import 'theme.dart';
-// import 'theme_data.dart';
-
 const Duration _kTransitionDuration = Duration(milliseconds: 200);
 const Curve _kTransitionCurve = Curves.fastOutSlowIn;
 const double _kFinalLabelScale = 0.75;
@@ -900,7 +894,6 @@ class _RenderDecoration extends RenderBox {
   EdgeInsets get contentPadding => decoration.contentPadding as EdgeInsets;
 
   // Lay out the given box if needed, and return its baseline.
-  // TODO: how does this need to be changed? Is this needed?
   double _layoutLineBox(RenderBox? box, BoxConstraints constraints) {
     if (box == null) {
       return 0.0;
@@ -2275,7 +2268,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     // The _Decoration widget and _RenderDecoration assume that contentPadding
     // has been resolved to EdgeInsets.
     final textDirection = TextDirection.ltr;
-    final EdgeInsets? decorationContentPadding =
+    final decorationContentPadding =
         decoration!.contentPadding?.resolve(textDirection);
 
     final EdgeInsets contentPadding;

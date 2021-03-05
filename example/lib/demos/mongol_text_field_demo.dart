@@ -42,7 +42,7 @@ class _SearchBodyState extends State<SearchBody> {
             controller: controller,
             maxLines: null,
             decoration: InputDecoration(
-              hintText: 'hint text',
+              //hintText: 'hint text', // TODO: fix input allignment
               border: OutlineInputBorder(),
             ),
             //scrollPadding: EdgeInsets.zero,
