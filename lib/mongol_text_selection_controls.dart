@@ -26,7 +26,7 @@ const double _kToolbarContentDistance = 8.0;
 /// In order to avoid Mongolian Unicode and font issues, the text editing
 /// controls use icons rather than text for the copy/cut/past/select buttons.
 class MongolTextSelectionControls extends TextSelectionControls {
-  /// Returns the size of the Material handle.
+  /// Returns the size of the handle.
   @override
   Size getHandleSize(double textLineWidth) =>
       const Size(_kHandleSize, _kHandleSize);
@@ -79,18 +79,15 @@ class MongolTextSelectionControls extends TextSelectionControls {
 
     // [handle] is a circle, with a rectangle in the top left quadrant of that
     // circle (an onion pointing to 10:30). We rotate [handle] to point
-    // down-right, right, or up-right depending on the handle type.
+    // down-right, right, or up-left depending on the handle type.
     switch (type) {
       case TextSelectionHandleType.left: // points down-right
         return Transform.rotate(
           angle: math.pi,
           child: handle,
         );
-      case TextSelectionHandleType.right: // points up-right
-        return Transform.rotate(
-          angle: math.pi / 2.0,
-          child: handle,
-        );
+      case TextSelectionHandleType.right: // points up-left
+        return handle;
       case TextSelectionHandleType.collapsed: // points right
         return Transform.rotate(
           angle: 3.0 * math.pi / 4.0,
@@ -106,7 +103,8 @@ class MongolTextSelectionControls extends TextSelectionControls {
   Offset getHandleAnchor(TextSelectionHandleType type, double textLineWidth) {
     switch (type) {
       case TextSelectionHandleType.left:
-        return const Offset(0, _kHandleSize);
+        //return const Offset(0, 0);
+        return const Offset(_kHandleSize, _kHandleSize);
       case TextSelectionHandleType.right:
         return Offset.zero;
       default:

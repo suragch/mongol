@@ -491,13 +491,13 @@ class _TextSelectionHandleOverlayState
     switch (widget.position) {
       case _TextSelectionHandlePosition.start:
         layerLink = widget.startHandleLayerLink;
-        type = _chooseType();
+        type = _chooseType(TextSelectionHandleType.left);
         break;
       case _TextSelectionHandlePosition.end:
         // For collapsed selections, we shouldn't be building the [end] handle.
         assert(!widget.selection.isCollapsed);
         layerLink = widget.endHandleLayerLink;
-        type = _chooseType();
+        type = _chooseType(TextSelectionHandleType.right);
         break;
     }
 
@@ -563,11 +563,11 @@ class _TextSelectionHandleOverlayState
     );
   }
 
-  TextSelectionHandleType _chooseType() {
+  TextSelectionHandleType _chooseType(TextSelectionHandleType type) {
     if (widget.selection.isCollapsed) {
       return TextSelectionHandleType.collapsed;
     }
-    return TextSelectionHandleType.left;
+    return type;
   }
 }
 

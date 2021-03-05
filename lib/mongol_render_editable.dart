@@ -1554,7 +1554,7 @@ class MongolRenderEditable extends RenderBox
       final start = Offset(preferredLineWidth, 0.0) + caretOffset + paintOffset;
       return <TextSelectionPoint>[TextSelectionPoint(start, TextDirection.ltr)];
     } else {
-      final start = Offset(boxes.first.left, boxes.first.bottom) + paintOffset;
+      final start = Offset(boxes.first.left, boxes.first.top) + paintOffset;
       final end = Offset(boxes.last.right, boxes.last.bottom) + paintOffset;
       return <TextSelectionPoint>[
         TextSelectionPoint(start, TextDirection.ltr),
@@ -2106,6 +2106,8 @@ class MongolRenderEditable extends RenderBox
         super.paint,
         Offset.zero,
       );
+      print('start: $startPoint');
+      print('end: $endPoint');
     }
   }
 
