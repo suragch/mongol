@@ -433,8 +433,6 @@ class MongolEditableText extends StatefulWidget {
   ///    [MongolEditableText], which shows the selection toolbar upon
   ///    appropriate user events based on the user's platform set in
   ///    [ThemeData.platform].
-  ///
-  // TODO: do we need to add vertical version?
   final TextSelectionControls? selectionControls;
 
   /// The type of keyboard to use for editing the text.
@@ -2084,44 +2082,46 @@ class MongolEditableTextState extends State<MongolEditableText>
               onCopy: _semanticsOnCopy(controls),
               onCut: _semanticsOnCut(controls),
               onPaste: _semanticsOnPaste(controls),
-              child: _MongolEditable(
-                key: _editableKey,
-                startHandleLayerLink: _startHandleLayerLink,
-                endHandleLayerLink: _endHandleLayerLink,
-                textSpan: buildTextSpan(),
-                value: _value,
-                cursorColor: _cursorColor,
-                showCursor: MongolEditableText.debugDeterministicCursor
-                    ? ValueNotifier<bool>(widget.showCursor)
-                    : _cursorVisibilityNotifier,
-                forceLine: widget.forceLine,
-                readOnly: widget.readOnly,
-                hasFocus: _hasFocus,
-                maxLines: widget.maxLines,
-                minLines: widget.minLines,
-                expands: widget.expands,
-                selectionColor: widget.selectionColor,
-                textScaleFactor: widget.textScaleFactor ??
-                    MediaQuery.textScaleFactorOf(context),
-                textAlign: widget.textAlign,
-                obscuringCharacter: widget.obscuringCharacter,
-                obscureText: widget.obscureText,
-                autocorrect: widget.autocorrect,
-                enableSuggestions: widget.enableSuggestions,
-                offset: offset,
-                onSelectionChanged: _handleSelectionChanged,
-                onCaretChanged: _handleCaretChanged,
-                rendererIgnoresPointer: widget.rendererIgnoresPointer,
-                cursorWidth: widget.cursorWidth,
-                cursorHeight: widget.cursorHeight,
-                cursorRadius: widget.cursorRadius,
-                cursorOffset: widget.cursorOffset ?? Offset.zero,
-                enableInteractiveSelection: widget.enableInteractiveSelection,
-                textSelectionDelegate: this,
-                devicePixelRatio: _devicePixelRatio,
-                // promptRectRange: _currentPromptRectRange,
-                // promptRectColor: widget.autocorrectionTextRectColor,
-                clipBehavior: widget.clipBehavior,
+              child: Container(
+                child: _MongolEditable(
+                  key: _editableKey,
+                  startHandleLayerLink: _startHandleLayerLink,
+                  endHandleLayerLink: _endHandleLayerLink,
+                  textSpan: buildTextSpan(),
+                  value: _value,
+                  cursorColor: _cursorColor,
+                  showCursor: MongolEditableText.debugDeterministicCursor
+                      ? ValueNotifier<bool>(widget.showCursor)
+                      : _cursorVisibilityNotifier,
+                  forceLine: widget.forceLine,
+                  readOnly: widget.readOnly,
+                  hasFocus: _hasFocus,
+                  maxLines: widget.maxLines,
+                  minLines: widget.minLines,
+                  expands: widget.expands,
+                  selectionColor: widget.selectionColor,
+                  textScaleFactor: widget.textScaleFactor ??
+                      MediaQuery.textScaleFactorOf(context),
+                  textAlign: widget.textAlign,
+                  obscuringCharacter: widget.obscuringCharacter,
+                  obscureText: widget.obscureText,
+                  autocorrect: widget.autocorrect,
+                  enableSuggestions: widget.enableSuggestions,
+                  offset: offset,
+                  onSelectionChanged: _handleSelectionChanged,
+                  onCaretChanged: _handleCaretChanged,
+                  rendererIgnoresPointer: widget.rendererIgnoresPointer,
+                  cursorWidth: widget.cursorWidth,
+                  cursorHeight: widget.cursorHeight,
+                  cursorRadius: widget.cursorRadius,
+                  cursorOffset: widget.cursorOffset ?? Offset.zero,
+                  enableInteractiveSelection: widget.enableInteractiveSelection,
+                  textSelectionDelegate: this,
+                  devicePixelRatio: _devicePixelRatio,
+                  // promptRectRange: _currentPromptRectRange,
+                  // promptRectColor: widget.autocorrectionTextRectColor,
+                  clipBehavior: widget.clipBehavior,
+                ),
               ),
             ),
           );

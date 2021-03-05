@@ -45,6 +45,7 @@ class _SearchBodyState extends State<SearchBody> {
               hintText: 'hint text',
               border: OutlineInputBorder(),
             ),
+            //scrollPadding: EdgeInsets.zero,
           ),
         ),
       ),

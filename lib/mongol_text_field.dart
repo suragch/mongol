@@ -1536,11 +1536,6 @@ class _TextFieldState extends State<MongolTextField>
     final focusNode = _effectiveFocusNode;
     final formatters = <TextInputFormatter>[
       ...?widget.inputFormatters,
-      // if (widget.maxLength != null && widget.maxLengthEnforced)
-      //   LengthLimitingTextInputFormatter(
-      //     widget.maxLength,
-      //     maxLengthEnforcement: _effectiveMaxLengthEnforcement,
-      //   ),
     ];
 
     var textSelectionControls = widget.selectionControls;

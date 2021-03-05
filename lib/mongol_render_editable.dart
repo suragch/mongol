@@ -1308,7 +1308,7 @@ class MongolRenderEditable extends RenderBox
   double get maxScrollExtent => _maxScrollExtent;
   double _maxScrollExtent = 0;
 
-  double get _caretMargin => _kCaretGap + cursorWidth;
+  double get _caretMargin => _kCaretGap + cursorHeight;
 
   /// Defaults to [Clip.hardEdge], and must not be null.
   Clip get clipBehavior => _clipBehavior;
