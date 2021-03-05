@@ -2106,8 +2106,6 @@ class MongolRenderEditable extends RenderBox
         super.paint,
         Offset.zero,
       );
-      print('start: $startPoint');
-      print('end: $endPoint');
     }
   }
 

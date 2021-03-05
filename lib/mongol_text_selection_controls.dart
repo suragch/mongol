@@ -79,7 +79,7 @@ class MongolTextSelectionControls extends TextSelectionControls {
 
     // [handle] is a circle, with a rectangle in the top left quadrant of that
     // circle (an onion pointing to 10:30). We rotate [handle] to point
-    // down-right, right, or up-left depending on the handle type.
+    // down-right, up-left, or left depending on the handle type.
     switch (type) {
       case TextSelectionHandleType.left: // points down-right
         return Transform.rotate(
@@ -88,9 +88,9 @@ class MongolTextSelectionControls extends TextSelectionControls {
         );
       case TextSelectionHandleType.right: // points up-left
         return handle;
-      case TextSelectionHandleType.collapsed: // points right
+      case TextSelectionHandleType.collapsed: // points left
         return Transform.rotate(
-          angle: 3.0 * math.pi / 4.0,
+          angle: -math.pi / 4.0,
           child: handle,
         );
     }
