@@ -117,6 +117,10 @@ You can use `MongolTextField` to receive and edit text from the system keyboard.
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field.gif)
 
+Here is it on iOS and Android interacting with a system keyboard:
+
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field_large.gif)
+
 There are a few known issues with `MongolTextField`:
 
 - The cursor shows up on the right side of hint text.
