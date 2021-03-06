@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mongol/mongol_input_decorator.dart';
 import 'package:mongol/mongol_text_field.dart';
 
 class MongolTextFieldDemo extends StatelessWidget {
@@ -38,47 +37,18 @@ class _SearchBodyState extends State<SearchBody> {
         child: SizedBox(
           width: 200,
           height: 200,
+
           child: MongolTextField(
+            style: TextStyle(fontSize: 24),
             controller: controller,
             maxLines: null,
             decoration: InputDecoration(
-              //hintText: 'hint text', // TODO: fix input allignment
               border: OutlineInputBorder(),
             ),
-            //scrollPadding: EdgeInsets.zero,
           ),
+
         ),
       ),
     );
   }
 }
-
-final sampleText = [
-  'ᠨᠢᠭᠡ',
-  'ᠬᠣᠶᠠᠷ',
-  'ᠭᠤᠷᠪᠠ',
-  'ᠳᠦᠷᠪᠡ',
-  'ᠲᠠᠪᠤ',
-  'ᠵᠢᠷᠭᠤᠭ᠎ᠠ',
-  'ᠨᠠᠢᠮ',
-  'ᠶᠢᠰᠦ',
-  'ᠠᠷᠪᠠ',
-  'ᠨᠢᠭᠡ',
-  'ᠬᠣᠶᠠᠷ',
-  'ᠭᠤᠷᠪᠠ',
-  'ᠳᠦᠷᠪᠡ',
-  'ᠲᠠᠪᠤ',
-  'ᠵᠢᠷᠭᠤᠭ᠎ᠠ',
-  'ᠨᠠᠢᠮ',
-  'ᠶᠢᠰᠦ',
-  'ᠠᠷᠪᠠ',
-  'ᠨᠢᠭᠡ',
-  'ᠬᠣᠶᠠᠷ',
-  'ᠭᠤᠷᠪᠠ',
-  'ᠳᠦᠷᠪᠡ',
-  'ᠲᠠᠪᠤ',
-  'ᠵᠢᠷᠭᠤᠭ᠎ᠠ',
-  'ᠨᠠᠢᠮ',
-  'ᠶᠢᠰᠦ',
-  'ᠠᠷᠪᠠ',
-];
