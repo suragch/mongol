@@ -115,7 +115,7 @@ You may also consider using [mongol_code](https://pub.dev/packages/mongol_code) 
 
 You can use `MongolTextField` to receive and edit text from the system keyboard. This widget includes most of the functionality of the standard Flutter `TextField` widget.
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field.png)
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field.gif)
 
 There are a few known issues with `MongolTextField`:
 
