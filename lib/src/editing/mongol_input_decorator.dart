@@ -4,24 +4,30 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+// ignore_for_file: omit_local_variable_types
+
 import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show
-        InputBorder, InputDecoration,
+        InputBorder,
+        InputDecoration,
         Colors,
         VisualDensity,
         kMinInteractiveDimension,
-        FloatingLabelBehavior, Theme, ThemeData, Brightness, InputDecorationTheme;
+        FloatingLabelBehavior,
+        Theme,
+        ThemeData,
+        Brightness;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:mongol/alignment.dart';
 
+import '../text/mongol_text.dart';
+import '../base/mongol_text_painter.dart';
+import 'alignment.dart';
 import 'input_border.dart';
-import 'mongol_text.dart';
-import 'mongol_text_painter.dart';
 
 const Duration _kTransitionDuration = Duration(milliseconds: 200);
 const Curve _kTransitionCurve = Curves.fastOutSlowIn;
@@ -476,18 +482,6 @@ class _HelperErrorState extends State<_HelperError>
   }
 }
 
-/// Defines the behavior of the floating label.
-// enum FloatingLabelBehavior {
-//   /// The label will always be positioned within the content, or hidden.
-//   never,
-
-//   /// The label will float when the input is focused, or has content.
-//   auto,
-
-//   /// The label will always float above the content.
-//   always,
-// }
-
 // Identifies the children of a _RenderDecorationElement.
 enum _DecorationSlot {
   icon,
@@ -753,7 +747,6 @@ class _RenderDecoration extends RenderBox {
   TextBaseline get textBaseline => _textBaseline;
   TextBaseline _textBaseline;
   set textBaseline(TextBaseline value) {
-    assert(value != null);
     if (_textBaseline == value) return;
     _textBaseline = value;
     markNeedsLayout();
@@ -1045,8 +1038,10 @@ class _RenderDecoration extends RenderBox {
     );
 
     // Calculate the width of the input text container.
-    final double prefixIconWidth = prefixIcon == null ? 0 : prefixIcon!.size.width;
-    final double suffixIconWidth = suffixIcon == null ? 0 : suffixIcon!.size.width;
+    final double prefixIconWidth =
+        prefixIcon == null ? 0 : prefixIcon!.size.width;
+    final double suffixIconWidth =
+        suffixIcon == null ? 0 : suffixIcon!.size.width;
     final double fixIconWidth = math.max(prefixIconWidth, suffixIconWidth);
     final double contentWidth = math.max(
       fixIconWidth,
@@ -1809,8 +1804,8 @@ class MongolInputDecorator extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(
-        DiagnosticsProperty<InputDecoration>('decoration', decoration));
+    properties
+        .add(DiagnosticsProperty<InputDecoration>('decoration', decoration));
     properties.add(DiagnosticsProperty<TextStyle>('baseStyle', baseStyle,
         defaultValue: null));
     properties.add(DiagnosticsProperty<bool>('isFocused', isFocused));
@@ -1889,17 +1884,18 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     if (widget.decoration != old.decoration) _effectiveDecoration = null;
 
     final floatBehaviorChanged = widget.decoration.floatingLabelBehavior !=
-            old.decoration.floatingLabelBehavior;
+        old.decoration.floatingLabelBehavior;
 
     if (widget._labelShouldWithdraw != old._labelShouldWithdraw ||
         floatBehaviorChanged) {
       if (_floatingLabelEnabled &&
           (widget._labelShouldWithdraw ||
               widget.decoration.floatingLabelBehavior ==
-                  FloatingLabelBehavior.always))
-        {_floatingLabelController.forward();}
-      else
-        {_floatingLabelController.reverse();}
+                  FloatingLabelBehavior.always)) {
+        _floatingLabelController.forward();
+      } else {
+        _floatingLabelController.reverse();
+      }
     }
 
     final String? errorText = decoration!.errorText;
@@ -1938,8 +1934,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     if (decoration!.filled!) {
       return themeData.hintColor;
     }
-    final enabledColor =
-        themeData.colorScheme.onSurface.withOpacity(0.38);
+    final enabledColor = themeData.colorScheme.onSurface.withOpacity(0.38);
     if (isHovering) {
       final hoverColor = decoration!.hoverColor ??
           themeData.inputDecorationTheme.hoverColor ??
@@ -1951,7 +1946,9 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
   Color _getFillColor(ThemeData themeData) {
     if (decoration!.filled != true) // filled == null same as filled == false
-      {return Colors.transparent;}
+    {
+      return Colors.transparent;
+    }
     if (decoration!.fillColor != null) return decoration!.fillColor!;
 
     // dark theme: 10% white (enabled), 5% white (disabled)
@@ -2016,10 +2013,9 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     final Color color = decoration!.errorText != null
         ? decoration!.errorStyle?.color ?? themeData.errorColor
         : _getActiveColor(themeData);
-    final style =
-        themeData.textTheme.subtitle1!.merge(widget.baseStyle);
+    final style = themeData.textTheme.subtitle1!.merge(widget.baseStyle);
     // Temporary opt-in fix for https://github.com/flutter/flutter/issues/54028
-    // Setting TextStyle.height to 1 ensures that the label's width (in 
+    // Setting TextStyle.height to 1 ensures that the label's width (in
     // vertical orientation) will equal its font size.
     return themeData.fixTextFieldOutlineLabel
         ? style
@@ -2069,13 +2065,13 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     final double borderWeight;
     if (decoration!.isCollapsed ||
         decoration?.border == InputBorder.none ||
-        !decoration!.enabled)
-      {borderWeight = 0.0;}
-    else
-      {borderWeight = isFocused ? 2.0 : 1.0;}
+        !decoration!.enabled) {
+      borderWeight = 0.0;
+    } else {
+      borderWeight = isFocused ? 2.0 : 1.0;
+    }
 
-    final border =
-        decoration!.border ?? const SidelineInputBorder();
+    final border = decoration!.border ?? const SidelineInputBorder();
     return border.copyWith(
         borderSide: BorderSide(color: borderColor, width: borderWeight));
   }
@@ -2105,13 +2101,14 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
     final isError = decoration!.errorText != null;
     InputBorder? border;
-    if (!decoration!.enabled)
-      {border = isError ? decoration!.errorBorder : decoration!.disabledBorder;}
-    else if (isFocused)
-      {border =
-          isError ? decoration!.focusedErrorBorder : decoration!.focusedBorder;}
-    else
-      {border = isError ? decoration!.errorBorder : decoration!.enabledBorder;}
+    if (!decoration!.enabled) {
+      border = isError ? decoration!.errorBorder : decoration!.disabledBorder;
+    } else if (isFocused) {
+      border =
+          isError ? decoration!.focusedErrorBorder : decoration!.focusedBorder;
+    } else {
+      border = isError ? decoration!.errorBorder : decoration!.enabledBorder;
+    }
     border ??= _getDefaultBorder(themeData);
 
     final Widget container = _BorderContainer(
@@ -2176,8 +2173,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     final decorationIsDense =
         decoration!.isDense == true; // isDense == null, same as false
     final iconSize = decorationIsDense ? 18.0 : 24.0;
-    final iconColor =
-        isFocused ? activeColor : _getDefaultIconColor(themeData);
+    final iconColor = isFocused ? activeColor : _getDefaultIconColor(themeData);
 
     final Widget? icon = decoration!.icon == null
         ? null

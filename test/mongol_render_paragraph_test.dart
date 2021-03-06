@@ -12,30 +12,30 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/mongol.dart';
-import 'package:mongol/mongol_render_paragraph.dart';
+import 'package:mongol/src/text/mongol_render_paragraph.dart';
 
 import 'rendering_tester.dart';
 
-// const String _kText = "I polished up that handle so carefullee\nThat now I am the Ruler of the Queen's Navee!";
+const String _kText = "I polished up that handle so carefullee\nThat now I am the Ruler of the Queen's Navee!";
 
-// // A subclass of RenderParagraph that returns an empty list in getBoxesForSelection
+// // A subclass of MongolRenderParagraph that returns an empty list in getBoxesForSelection
 // // for a given TextSelection.
 // // This is intended to simulate SkParagraph's implementation of Paragraph.getBoxesForRange,
 // // which may return an empty list in some situations where Libtxt would return a list
 // // containing an empty box.
-// class RenderParagraphWithEmptySelectionBoxList extends RenderParagraph {
+// class RenderParagraphWithEmptySelectionBoxList extends MongolRenderParagraph {
 //   RenderParagraphWithEmptySelectionBoxList(
-//     InlineSpan text, {
+//     TextSpan text, {
 //     required TextDirection textDirection,
 //     required this.emptyListSelection,
-//   }) : super(text, textDirection: textDirection);
+//   }) : super(text);
 
 //   TextSelection emptyListSelection;
 
 //   @override
-//   List<ui.TextBox> getBoxesForSelection(TextSelection selection) {
+//   List<Rect> getBoxesForSelection(TextSelection selection) {
 //     if (selection == emptyListSelection) {
-//       return <ui.TextBox>[];
+//       return <Rect>[];
 //     }
 //     return super.getBoxesForSelection(selection);
 //   }
@@ -65,7 +65,7 @@ void main() {
 
   testWidgets('MongolRenderParagraph has correct instrinsic width',
       (WidgetTester tester) async {
-    final MongolRenderParagraph paragraph = MongolRenderParagraph(TextSpan(text: 'A string'));
+    final paragraph = MongolRenderParagraph(TextSpan(text: 'A string'));
 
     final textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
     final oneLineTextWidth = paragraph.getMinIntrinsicWidth(double.infinity);

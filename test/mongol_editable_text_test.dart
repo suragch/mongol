@@ -15,9 +15,9 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' hide Finder;
-import 'package:mongol/mongol_editable_text.dart';
-import 'package:mongol/mongol_render_editable.dart';
-import 'package:mongol/mongol_text_painter.dart';
+import 'package:mongol/src/editing/mongol_editable_text.dart';
+import 'package:mongol/src/editing/mongol_render_editable.dart';
+import 'package:mongol/src/base/mongol_text_painter.dart';
 
 // Using custom tester to enable testing Mongol widgets
 // The default testing framework assumes EditableText instead of
@@ -1571,8 +1571,12 @@ void main() {
           textDirection: TextDirection.ltr,
           children: <Widget>[
             TextButton(
-                child: Text('Previous Widget', key: previousKey),
-                onPressed: () {}),
+              onPressed: () {},
+              child: Text(
+                'Previous Widget',
+                key: previousKey,
+              ),
+            ),
             MongolEditableText(
               controller: TextEditingController(),
               focusNode: focusNode,
@@ -1585,7 +1589,9 @@ void main() {
               autofocus: true,
             ),
             TextButton(
-                child: Text('Next Widget', key: nextKey), onPressed: () {}),
+              onPressed: () {},
+              child: Text('Next Widget', key: nextKey),
+            ),
           ],
         ),
       );

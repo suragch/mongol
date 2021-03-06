@@ -34,24 +34,20 @@ class _BodyWidgetState extends State<BodyWidget> {
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(30.0),
-            child: RotatedBox(
-              quarterTurns: 1,
-              child: TextField(
-                controller: _textEditingController,
-                autofocus: true,
-                textAlignVertical: TextAlignVertical.top,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    hintText: 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
-                style: TextStyle(
-                  //fontFamily: MongolFont.defaultFont,
-                  fontSize: 24,
+            child: MongolTextField(
+              controller: _textEditingController,
+              autofocus: true,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(3),
                 ),
-                showCursor: true,
-                readOnly: true,
+                // hintText: 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ',
               ),
+              style: TextStyle(
+                fontSize: 24,
+              ),
+              showCursor: true,
+              readOnly: true,
             ),
           ),
         ),

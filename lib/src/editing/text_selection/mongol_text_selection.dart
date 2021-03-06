@@ -13,8 +13,8 @@ import 'package:flutter/scheduler.dart' show SchedulerBinding, SchedulerPhase;
 export 'package:flutter/services.dart' show TextSelectionDelegate;
 import 'package:flutter/widgets.dart';
 
-import 'mongol_editable_text.dart';
-import 'mongol_render_editable.dart';
+import '../mongol_editable_text.dart';
+import '../mongol_render_editable.dart';
 
 
 /// The text position that a give selection handle manipulates. Dragging the

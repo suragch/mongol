@@ -48,8 +48,8 @@ void main() {
 
     await tester.pumpWidget(const AnimatedDefaultTextStyle(
       style: s1,
-      child: textWidget,
       duration: Duration(milliseconds: 1000),
+      child: textWidget,
     ));
 
     final text1 =
@@ -72,8 +72,8 @@ void main() {
       textWidthBasis: TextWidthBasis.longestLine,
       textHeightBehavior:
           ui.TextHeightBehavior(applyHeightToFirstAscent: false),
-      child: textWidget,
       duration: Duration(milliseconds: 1000),
+      child: textWidget,
     ));
 
     final text2 =

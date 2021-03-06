@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mongol/mongol_paragraph.dart';
+import 'package:mongol/src/base/mongol_paragraph.dart';
 
 void main() {
   test('BreakSegments is empty for empty string', () {

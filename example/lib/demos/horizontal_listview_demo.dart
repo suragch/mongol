@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
-class TextFieldDemo extends StatelessWidget {
+class HorizontalListviewDemo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,13 +24,9 @@ class SearchBody extends StatelessWidget {
             ),
             child: Container(
               //width: 30,
-              child: RotatedBox(
-                quarterTurns: 1,
-                child: TextField(
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Search',
-                  ),
+              child: MongolTextField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
                 ),
               ),
             ),
@@ -60,6 +56,7 @@ final sampleText = [
   'ᠳᠦᠷᠪᠡ',
   'ᠲᠠᠪᠤ',
   'ᠵᠢᠷᠭᠤᠭ᠎ᠠ',
+  'ᠳᠣᠯᠣᠭ᠎ᠠ',
   'ᠨᠠᠢᠮ',
   'ᠶᠢᠰᠦ',
   'ᠠᠷᠪᠠ',
@@ -69,6 +66,7 @@ final sampleText = [
   'ᠳᠦᠷᠪᠡ',
   'ᠲᠠᠪᠤ',
   'ᠵᠢᠷᠭᠤᠭ᠎ᠠ',
+  'ᠳᠣᠯᠣᠭ᠎ᠠ',
   'ᠨᠠᠢᠮ',
   'ᠶᠢᠰᠦ',
   'ᠠᠷᠪᠠ',
@@ -78,6 +76,7 @@ final sampleText = [
   'ᠳᠦᠷᠪᠡ',
   'ᠲᠠᠪᠤ',
   'ᠵᠢᠷᠭᠤᠭ᠎ᠠ',
+  'ᠳᠣᠯᠣᠭ᠎ᠠ',
   'ᠨᠠᠢᠮ',
   'ᠶᠢᠰᠦ',
   'ᠠᠷᠪᠠ',

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:mongol_demo_app/demos/horizontal_listview_demo.dart';
 
 import 'demos/alert_dialog_demo.dart';
 import 'demos/emoji_cjk_demo.dart';
-import 'demos/gesture_detector_demo.dart';
 import 'demos/max_lines_demo.dart';
 import 'demos/mongol_text_field_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/keyboard_demo.dart';
-import 'demos/text_field_demo.dart';
 import 'demos/text_span_demo.dart';
 
 void main() {
@@ -18,6 +17,7 @@ class DemoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'mongol',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'MenksoftQagan'),
       home: Scaffold(
@@ -38,16 +38,16 @@ class HomeScreen extends StatelessWidget {
           destination: TextDemo(),
         ),
         DemoTile(
-          title: 'MongolRichText',
+          title: 'MongolText.rich',
           destination: RichTextDemo(),
+        ),
+        DemoTile(
+          title: 'MongolTextField',
+          destination: MongolTextFieldDemo(),
         ),
         DemoTile(
           title: 'Emoji and CJK',
           destination: EmojiCjkDemo(),
-        ),
-        DemoTile(
-          title: 'MongolText with GestureDetector',
-          destination: GestureDetectorDemo(),
         ),
         DemoTile(
           title: 'MongolAlertDialog',
@@ -58,16 +58,12 @@ class HomeScreen extends StatelessWidget {
           destination: KeyboardDemo(),
         ),
         DemoTile(
-          title: 'Vertical TextField',
-          destination: TextFieldDemo(),
+          title: 'Horizontal Listview',
+          destination: HorizontalListviewDemo(),
         ),
         DemoTile(
           title: 'Maxlines demo',
           destination: MaxLinesDemo(),
-        ),
-        DemoTile(
-          title: 'MongolTextField demo',
-          destination: MongolTextFieldDemo(),
         ),
       ],
     );

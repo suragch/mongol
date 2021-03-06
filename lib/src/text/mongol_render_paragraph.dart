@@ -10,7 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import 'mongol_text_painter.dart';
+import '../base/mongol_text_painter.dart';
 
 // TODO: This is a horizontal elipsis. Should we use a Mongolian elipsis U+1801?
 const String _kEllipsis = '\u2026';
@@ -154,9 +154,7 @@ class MongolRenderParagraph extends RenderBox
     final heightMatters = softWrap || overflow == TextOverflow.ellipsis;
     _textPainter.layout(
       minHeight: minHeight,
-      maxHeight: heightMatters ?
-        maxHeight :
-        double.infinity,
+      maxHeight: heightMatters ? maxHeight : double.infinity,
     );
   }
 
@@ -234,7 +232,7 @@ class MongolRenderParagraph extends RenderBox
     // calculations are destructive. Other _textPainter state will also be
     // affected. See also MongolRenderEditable which has a similar issue.
     final textSize = _textPainter.size;
-    final bool textDidExceedMaxLines = _textPainter.didExceedMaxLines;
+    final textDidExceedMaxLines = _textPainter.didExceedMaxLines;
     size = constraints.constrain(textSize);
 
     final didOverflowWidth =
@@ -333,15 +331,13 @@ class MongolRenderParagraph extends RenderBox
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign));
-    properties.add(
-      FlagProperty(
-        'softWrap',
-        value: softWrap,
-        ifTrue: 'wrapping at box height',
-        ifFalse: 'no wrapping except at line break characters',
-        showName: true,
-      )
-    );
+    properties.add(FlagProperty(
+      'softWrap',
+      value: softWrap,
+      ifTrue: 'wrapping at box height',
+      ifFalse: 'no wrapping except at line break characters',
+      showName: true,
+    ));
     properties.add(EnumProperty<TextOverflow>('overflow', overflow));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));

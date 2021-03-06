@@ -30,7 +30,7 @@ packages:
     source: hosted
     version: "1.2.0"
   clock:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: clock
       url: "https://pub.dartlang.org"
@@ -44,7 +44,7 @@ packages:
     source: hosted
     version: "1.15.0"
   fake_async:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: fake_async
       url: "https://pub.dartlang.org"
@@ -68,14 +68,14 @@ packages:
     source: hosted
     version: "0.12.10"
   meta:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: meta
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.0"
   path:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: path
       url: "https://pub.dartlang.org"
@@ -87,7 +87,7 @@ packages:
       name: pedantic
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.10.0"
+    version: "1.11.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -101,7 +101,7 @@ packages:
     source: hosted
     version: "1.8.0"
   stack_trace:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: stack_trace
       url: "https://pub.dartlang.org"
@@ -129,7 +129,7 @@ packages:
     source: hosted
     version: "1.2.0"
   test_api:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: test_api
       url: "https://pub.dartlang.org"
@@ -150,4 +150,4 @@ packages:
     source: hosted
     version: "2.1.0"
 sdks:
-  dart: ">=2.12.0-29.10.beta <3.0.0"
+  dart: ">=2.12.0 <3.0.0"

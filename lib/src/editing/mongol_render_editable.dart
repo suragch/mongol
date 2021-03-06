@@ -12,7 +12,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:mongol/mongol_text_painter.dart';
+import 'package:mongol/src/base/mongol_text_painter.dart';
 
 const double _kCaretGap = 1.0; // pixels
 const double _kCaretWidthOffset = 2.0; // pixels
@@ -26,11 +26,6 @@ typedef MongolSelectionChangedHandler = void Function(
   MongolRenderEditable renderObject,
   SelectionChangedCause cause,
 );
-
-// /// Signature for the callback that reports when the caret location changes.
-// ///
-// /// Used by [MongolRenderEditable.onCaretChanged].
-// typedef CaretChangedHandler = void Function(Rect caretRect);
 
 // Check if the given code unit is a white space or separator
 // character.

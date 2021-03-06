@@ -19,8 +19,6 @@ class EmojiCjkDemo extends StatelessWidget {
   }
 }
 
-//const text = 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ';
-
 const text = TextSpan(
   children: [
     TextSpan(

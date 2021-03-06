@@ -48,7 +48,7 @@ class MongolButtonBar extends StatelessWidget {
 
   /// The buttons to arrange horizontally.
   ///
-  /// Typically [RaisedButton] or [FlatButton] widgets using [MongolText].
+  /// Typically [ElevatedButton] or [TextButton] widgets using [MongolText].
   final List<Widget> children;
 
   @override

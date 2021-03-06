@@ -231,7 +231,7 @@ class _TextSelectionToolbarTrailingEdgeAlign
   @override
   void updateRenderObject(BuildContext context,
       _TextSelectionToolbarTrailingEdgeAlignRenderBox renderObject) {
-    renderObject..overflowOpen = overflowOpen;
+    renderObject.overflowOpen = overflowOpen;
   }
 }
 

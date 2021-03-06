@@ -1,3 +1,10 @@
+## [1.0.0] - 2021.3.6
+
+- Null safe
+- Added `MongolTextField` and supporting classes
+- Since `MongolTextField` fills in the largest missing gap for Mongolian text rendering, this library will now be marked as 1.0.0. This signifies feature completeness though there are some known bugs and it would be good for another version to include some keyboards.
+- Filled in missing functionality in `MongolParagraph` and `MongolTextPainter`.
+
 ## [0.8.0-nullsafety.0] - 2020.11.27
 
 - Migrated to sound null safety

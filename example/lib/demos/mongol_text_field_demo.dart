@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mongol/mongol_text_field.dart';
+import 'package:mongol/mongol.dart';
 
 class MongolTextFieldDemo extends StatelessWidget {
   @override
@@ -37,7 +37,6 @@ class _SearchBodyState extends State<SearchBody> {
         child: SizedBox(
           width: 200,
           height: 200,
-
           child: MongolTextField(
             style: TextStyle(fontSize: 24),
             controller: controller,
@@ -46,7 +45,6 @@ class _SearchBodyState extends State<SearchBody> {
               border: OutlineInputBorder(),
             ),
           ),
-
         ),
       ),
     );

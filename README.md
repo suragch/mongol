@@ -1,26 +1,26 @@
 # mongol
 
-This library is a collection of Flutter widgets for displaying traditional Mongolian vertical text.
+This library is a collection of Flutter widgets for displaying and editing traditional Mongolian vertical text.
 
-## Vertical text
+## Displaying vertical text
 
 `MongolText` is a vertical text version of Flutter's `Text` widget. Left-to-right line wrapping is supported. 
 
 ```dart
-MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ'),
+MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ'),
 ```
 
 The library supports mobile, web, and desktop.
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text.gif)
 
-## Emoji and CJK characters
+### Emoji and CJK characters
 
 The library rotates emoji and CJK (Chinese, Japanese, and Korean) characters for proper orientation.
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/emoji_cjk.png)
 
-## Text styling
+### Text styling
 
 You add styling using `TextSpan` and/or `TextStyle`, just as you would for a `Text` widget.
 
@@ -67,7 +67,7 @@ This all assumes you've added one or more Mongolian fonts to your app assets.
 
 ## Adding a Mongolian font
 
-Previous versions of this library included a Mongolian font. However, as of version 0.6.0, the font is removed. This allows the library to be smaller and also gives developers the freedom to choose any Mongolian font they like.
+The library does not include a Mongolian font. This allows the library to be smaller and also gives developers the freedom to choose any Mongolian font they like.
 
 Since it's likely that some of your users' devices won't have a Mongolian font installed, you should include at least one Mongolian font with your project. Here is what you need to do:
 
@@ -78,8 +78,6 @@ You can find a font from the following companies:
 - [Menksoft](http://www.menksoft.com/site/alias__menkcms/2805/Default.aspx)
 - [Delehi](http://www.delehi.com/cn/2693.html)
 - [One BolorSoft font](https://www.mngl.net/downloads/fonts/MongolianScript.ttf)
-
-[This one](http://www.menksoft.com/Portals/_MenkCms/Products/Fonts/MenksoftOpenType1.02/MQG8F02.ttf) from Menksoft is the one that used to be included in the library.
 
 ### 2. Add the font to your project
 
@@ -113,23 +111,37 @@ Now you won't have to manually set the font for every Mongolian text widget. If 
 
 You may also consider using [mongol_code](https://pub.dev/packages/mongol_code) with a Menksoft font if your users have devices that don't support OpenType Unicode font rendering. `mongol_code` converts Unicode to Menksoft code, which a Menksoft font can display without any special rendering requirements.
 
-## MongolAlertDialog
+## Editing vertical text
+
+You can use `MongolTextField` to receive and edit text from the system keyboard. This widget includes most of the functionality of the standard Flutter `TextField` widget.
+
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field.png)
+
+There are a few known issues with `MongolTextField`:
+
+- The cursor shows up on the right side of hint text.
+- The gesture detection region for the left text selection handle does not appear directly on the handle.
+- Some of the features are untested.
+  
+If you discover any other problems please open an issue. And if you have time to find the source of the known issues, that would be very helpful.
+
+## Other widgets
+
+### MongolAlertDialog
 
 This alert dialog works mostly the same as the Flutter `AlertDialog`.
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_alert_dialog.png)
 
-## Keyboard and vertical TextField
+### Keyboard
 
-These are not part of `mongol` library yet, but you can see an example of how to make a custom in-app keyboard and a vertical `TextField` in the example app that's included with this library. Here is a screenshot from the demo app:
+This are not part of `mongol` library yet, but you can see an example of how to make a custom in-app keyboard in the example app that's included with this library. Here is a screenshot from the demo app:
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/keyboard.png)
 
-The text field is just a standard `TextField` rotated by 90 degrees. For that reason, it only supports single line input.
-
 ### TODO
 
-- Multiline `MongolTextField` class
-- Improved keyboard
+- Improve keyboard
 - Various other text based widgets
 - Support `WidgetSpan`.
+- Add missing tests (currently commented out)

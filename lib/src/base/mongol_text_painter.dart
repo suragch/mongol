@@ -7,9 +7,8 @@
 import 'dart:math';
 import 'dart:ui' as ui show ParagraphStyle;
 
-//import 'package:flutter/painting.dart' as painting;
 import 'package:flutter/widgets.dart';
-import 'package:mongol/mongol_paragraph.dart';
+import 'package:mongol/src/base/mongol_paragraph.dart';
 
 // The default font size if none is specified. This should be kept in
 // sync with the default values in text_style.dart, as well as the

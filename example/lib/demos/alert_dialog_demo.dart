@@ -7,7 +7,7 @@ class AlertDialogDemo extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(),
       body: Center(
-        child: RaisedButton(
+        child: ElevatedButton(
           child: Text('Show Dialog'),
           onPressed: () {
             showAlertDialog(context);
@@ -20,7 +20,7 @@ class AlertDialogDemo extends StatelessWidget {
 
 void showAlertDialog(BuildContext context) {
   // set up the buttons
-  Widget actionButton = FlatButton(
+  Widget actionButton = TextButton(
     child: MongolText('ᠮᠡᠳᠡᠭᠰᠡᠨ'),
     onPressed: () {
       Navigator.pop(context);

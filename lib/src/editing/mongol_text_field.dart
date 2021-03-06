@@ -30,22 +30,9 @@ import 'package:flutter/material.dart'
 import 'alignment.dart';
 import 'mongol_editable_text.dart';
 import 'mongol_input_decorator.dart';
-import 'mongol_text_painter.dart';
-import 'mongol_text_selection.dart';
-import 'mongol_text_selection_controls.dart';
-
-/// Signature for the [MongolTextField.buildCounter] callback.
-// typedef InputCounterWidgetBuilder = Widget? Function(
-//   /// The build context for the MongolTextField.
-//   BuildContext context, {
-//   /// The length of the string currently in the input.
-//   required int currentLength,
-//   /// The maximum string length that can be entered into the MongolTextField.
-//   required int? maxLength,
-//   /// Whether or not the MongolTextField is currently focused.  Mainly provided for
-//   /// the [liveRegion] parameter in the [Semantics] widget for accessibility.
-//   required bool isFocused,
-// });
+import '../base/mongol_text_painter.dart';
+import 'text_selection/mongol_text_selection.dart';
+import 'text_selection/mongol_text_selection_controls.dart';
 
 class _TextFieldSelectionGestureDetectorBuilder
     extends MongolTextSelectionGestureDetectorBuilder {
@@ -938,7 +925,6 @@ class MongolTextField extends StatefulWidget {
   ///    appropriate user events based on the user's platform set in
   ///    [ThemeData.platform].
   ///
-  // TODO: do we need to add vertical version?
   final TextSelectionControls? selectionControls;
 
   /// Determines the way that drag start behavior is handled.
@@ -1721,13 +1707,12 @@ class _TextFieldState extends State<MongolTextField>
       ),
     );
 
-    // TODO: add this back in when in stable
-    // if (kIsWeb) {
-    //   return Shortcuts(
-    //     shortcuts: scrollShortcutOverrides,
-    //     child: child,
-    //   );
-    // }
+    if (kIsWeb) {
+      return Shortcuts(
+        shortcuts: scrollShortcutOverrides,
+        child: child,
+      );
+    }
     return child;
   }
 }

@@ -20,7 +20,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mongol/mongol_editable_text.dart';
+import 'package:mongol/src/editing/mongol_editable_text.dart';
 import 'package:stack_trace/stack_trace.dart' as stack_trace;
 import '_binding_io.dart' if (dart.library.html) '_binding_web.dart' as binding;
 import 'package:fake_async/fake_async.dart';

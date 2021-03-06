@@ -9,7 +9,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/painting.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mongol/mongol_text_painter.dart';
+import 'package:mongol/src/base/mongol_text_painter.dart';
 
 void main() {
   test('TextPainter returns correct offset for short one-line TextSpan', () {

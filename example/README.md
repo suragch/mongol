@@ -39,3 +39,5 @@ class DemoApp extends StatelessWidget {
   }
 }
 ```
+
+See the example app for more.

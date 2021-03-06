@@ -116,9 +116,9 @@ class MongolAlertDialog extends StatelessWidget {
               dialogTheme.titleTextStyle ??
               theme.textTheme.headline6!,
           child: Semantics(
-            child: title,
             namesRoute: true,
             container: true,
+            child: title,
           ),
         ),
       );

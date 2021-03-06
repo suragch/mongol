@@ -8,8 +8,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:mongol/mongol_editable_text.dart';
-import 'package:mongol/mongol_render_editable.dart';
+import 'package:mongol/src/editing/mongol_editable_text.dart';
+import 'package:mongol/src/editing/mongol_render_editable.dart';
 
 import 'mongol_widget_tester.dart';
 

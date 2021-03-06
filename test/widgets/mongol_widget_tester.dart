@@ -17,7 +17,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
-import 'package:mongol/mongol_editable_text.dart';
+import 'package:mongol/src/editing/mongol_editable_text.dart';
 
 // ignore: deprecated_member_use
 import 'package:test_api/test_api.dart' as test_package;
@@ -26,22 +26,6 @@ import 'binding.dart';
 
 /// Keep users from needing multiple imports to test semantics.
 export 'package:flutter/rendering.dart' show SemanticsHandle;
-
-// ignore: deprecated_member_use
-/// Hide these imports so that they do not conflict with our own implementations in
-/// test_compat.dart. This handles setting up a declarer when one is not defined, which
-/// can happen when a test is executed via flutter_run.
-export 'package:test_api/test_api.dart'
-    hide
-        test,
-        group,
-        setUpAll,
-        tearDownAll,
-        setUp,
-        tearDown,
-        expect, // we have our own wrapper below
-        TypeMatcher, // matcher's TypeMatcher conflicts with the one in the Flutter framework
-        isInstanceOf; // we have our own wrapper in matchers.dart
 
 /// Signature for callback to [testWidgets] and [benchmarkWidgets].
 typedef WidgetTesterCallback = Future<void> Function(

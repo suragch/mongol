@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'mongol_rich_text.dart';
-import 'mongol_text_painter.dart';
+import '../base/mongol_text_painter.dart';
 
 /// A run of vertical text with a single style.
 ///
