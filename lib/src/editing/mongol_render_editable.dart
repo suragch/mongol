@@ -12,6 +12,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/base/mongol_text_painter.dart';
 
 const double _kCaretGap = 1.0; // pixels

@@ -17,6 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_editable_text.dart';
 import 'package:mongol/src/editing/mongol_input_decorator.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';

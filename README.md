@@ -149,3 +149,4 @@ This are not part of `mongol` library yet, but you can see an example of how to 
 - Various other text based widgets
 - Support `WidgetSpan`.
 - Add missing tests (currently commented out)
+- For MongolTextAlign.bottom don't count final space in line height

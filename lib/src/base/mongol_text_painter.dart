@@ -10,6 +10,8 @@ import 'dart:ui' as ui show ParagraphStyle;
 import 'package:flutter/widgets.dart';
 import 'package:mongol/src/base/mongol_paragraph.dart';
 
+import 'mongol_text_align.dart';
+
 // The default font size if none is specified. This should be kept in
 // sync with the default values in text_style.dart, as well as the
 // defaults set in the engine (eg, LibTxt's text_style.h, paragraph_style.h).
@@ -29,28 +31,6 @@ class _CaretMetrics {
   ///
   /// Orientation is a vertical paragraph with horizontal caret.
   final double? fullWidth;
-}
-
-/// Whether and how to align text vertically.
-///
-/// This is only used at the MongolTextPainter level and above. Below that the
-/// more primitive [TextAlign] enum is used and top is mapped to left and
-/// bottom is mapped to right.
-enum MongolTextAlign {
-  /// Align the text on the top edge of the container.
-  top,
-
-  /// Align the text on the bottom edge of the container.
-  bottom,
-
-  /// Align the text in the center of the container.
-  center,
-
-  /// Stretch lines of text that end with a soft line break to fill the height
-  /// of the container.
-  ///
-  /// Lines that end with hard line breaks are aligned towards the [top] edge.
-  justify,
 }
 
 /// A convenience method for converting MongolTextAlign to TextAlign
@@ -383,6 +363,7 @@ class MongolTextPainter {
     if (_paragraph == null) {
       final builder = MongolParagraphBuilder(
         _createParagraphStyle(),
+        textAlign: _textAlign,
         textScaleFactor: _textScaleFactor,
         maxLines: _maxLines,
         ellipsis: _ellipsis,

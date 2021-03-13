@@ -1,3 +1,8 @@
+## [1.1.0] - 2021.3.13
+
+- Implemented MongolTextAlign (supports top, center, bottom, justify)
+- Known issue: Spaces after words are included in the measurements so MongolTextAlign.bottom aligns the space to the bottom and not the text itself.
+
 ## [1.0.0] - 2021.3.6
 
 - Null safe

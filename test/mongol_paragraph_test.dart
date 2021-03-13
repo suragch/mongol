@@ -3,17 +3,23 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/src/base/mongol_paragraph.dart';
+import 'package:mongol/src/base/mongol_text_align.dart';
 
 void main() {
   MongolParagraph _getParagraph(
     String text,
     double height, {
+    MongolTextAlign? textAlign,
     int? maxLines,
     String? ellipsis,
   }) {
     final paragraphStyle = ui.ParagraphStyle(ellipsis: ellipsis);
-    final paragraphBuilder = MongolParagraphBuilder(paragraphStyle,
-        maxLines: maxLines, ellipsis: ellipsis);
+    final paragraphBuilder = MongolParagraphBuilder(
+      paragraphStyle,
+      textAlign: textAlign ?? MongolTextAlign.top,
+      maxLines: maxLines,
+      ellipsis: ellipsis,
+    );
     paragraphBuilder.addText(text);
     final constraints = MongolParagraphConstraints(height: height);
     final paragraph = paragraphBuilder.build();
@@ -462,7 +468,7 @@ void main() {
       expect(width, 42);
     });
 
-    // // temporarily deleting this test. The ellipsis currently doesn't 
+    // // temporarily deleting this test. The ellipsis currently doesn't
     // // affect the intrinsic size.
     // test('last run has ellipsis when exceeding max lines', () {
     //   const text = 'this is some long text that should break over 3 lines';

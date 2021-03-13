@@ -24,8 +24,8 @@ import 'package:flutter/material.dart'
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
+import '../base/mongol_text_align.dart';
 import '../text/mongol_text.dart';
-import '../base/mongol_text_painter.dart';
 import 'alignment.dart';
 import 'input_border.dart';
 

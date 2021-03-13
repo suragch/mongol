@@ -15,6 +15,7 @@ import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart' hide Finder;
+import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_editable_text.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
 import 'package:mongol/src/base/mongol_text_painter.dart';

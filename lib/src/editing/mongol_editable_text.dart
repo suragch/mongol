@@ -15,6 +15,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
+import 'package:mongol/src/base/mongol_text_align.dart';
 
 import 'package:mongol/src/editing/mongol_render_editable.dart';
 import 'package:mongol/src/base/mongol_text_painter.dart';

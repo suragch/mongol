@@ -26,6 +26,7 @@ import 'package:flutter/material.dart'
         MaterialStateProperty,
         MaterialStateMouseCursor,
         MaterialState;
+import 'package:mongol/src/base/mongol_text_align.dart';
 
 import 'alignment.dart';
 import 'mongol_editable_text.dart';

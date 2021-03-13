@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' as rendering;
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
 import 'package:mongol/src/base/mongol_text_painter.dart';
 

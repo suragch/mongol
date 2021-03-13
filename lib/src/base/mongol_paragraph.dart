@@ -11,6 +11,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/painting.dart';
 import 'package:characters/characters.dart';
 
+import 'mongol_text_align.dart';
+
 /// A paragraph of vertical Mongolian layout text.
 ///
 /// This class is a replacement for the Paragraph class. Since Paragraph hands
@@ -33,12 +35,14 @@ class MongolParagraph {
     this._text,
     this._maxLines,
     this._ellipsis,
+    this._textAlign,
   );
 
   final String _text;
   final List<_TextRun> _runs;
   final int? _maxLines;
   final _TextRun? _ellipsis;
+  final MongolTextAlign _textAlign;
 
   double? _width;
   double? _height;
@@ -295,26 +299,55 @@ class MongolParagraph {
       final dy = -line.bounds.height;
       canvas.translate(0, dy);
 
-      // draw each run in the current line
-      canvas.save();
-      final startIndex = line.textRunStart;
-      final endIndex = line.textRunEnd - 1;
+      // draw line
       final isLastLine = i == _lines.length - 1;
-      for (var j = startIndex; j <= endIndex; j++) {
-        if (shouldDrawEllipsis && isLastLine && j == endIndex) {
-          if (maxIntrinsicHeight + _ellipsis!.height < height) {
-            final run = _runs[j];
-            run.draw(canvas, Offset(0, 0));
-            canvas.translate(run.width, 0);
-          }
-          _ellipsis!.draw(canvas, Offset(0, 0));
-        } else {
+      _drawEachRunInCurrentLine(canvas, line, shouldDrawEllipsis, isLastLine);
+    }
+
+    canvas.restore();
+  }
+
+  void _drawEachRunInCurrentLine(
+      Canvas canvas, _LineInfo line, bool shouldDrawEllipsis, bool isLastLine) {
+    canvas.save();
+
+    var runSpacing = 0.0;
+    switch (_textAlign) {
+      case MongolTextAlign.top:
+        break;
+      case MongolTextAlign.center:
+        final offset = (_height! - line.bounds.width) / 2;
+        canvas.translate(offset, 0);
+        break;
+      case MongolTextAlign.bottom:
+        final offset = _height! - line.bounds.width;
+        canvas.translate(offset, 0);
+        break;
+      case MongolTextAlign.justify:
+        if (isLastLine) break;
+        final extraSpace = _height! - line.bounds.width;
+        final runsInLine = line.textRunEnd - line.textRunStart;
+        if (runsInLine <= 1) break;
+        runSpacing = extraSpace / (runsInLine - 1);
+        break;
+    }
+
+    final startIndex = line.textRunStart;
+    final endIndex = line.textRunEnd - 1;
+    for (var j = startIndex; j <= endIndex; j++) {
+      if (shouldDrawEllipsis && isLastLine && j == endIndex) {
+        if (maxIntrinsicHeight + _ellipsis!.height < height) {
           final run = _runs[j];
           run.draw(canvas, Offset(0, 0));
           canvas.translate(run.width, 0);
         }
+        _ellipsis!.draw(canvas, Offset(0, 0));
+      } else {
+        final run = _runs[j];
+        run.draw(canvas, Offset(0, 0));
+        canvas.translate(run.width, 0);
       }
-      canvas.restore();
+      canvas.translate(runSpacing, 0);
     }
 
     canvas.restore();
@@ -602,15 +635,18 @@ class MongolParagraphConstraints {
 class MongolParagraphBuilder {
   MongolParagraphBuilder(
     ui.ParagraphStyle style, {
+    MongolTextAlign textAlign = MongolTextAlign.top,
     double textScaleFactor = 1.0,
     int? maxLines,
     String? ellipsis,
   })  : _paragraphStyle = style,
+        _textAlign = textAlign,
         _textScaleFactor = textScaleFactor,
         _maxLines = maxLines,
         _ellipsis = ellipsis;
 
   ui.ParagraphStyle? _paragraphStyle;
+  final MongolTextAlign _textAlign;
   final double _textScaleFactor;
   final int? _maxLines;
   final String? _ellipsis;
@@ -706,6 +742,7 @@ class MongolParagraphBuilder {
       _plainText.toString(),
       _maxLines,
       _ellipsisRun(style),
+      _textAlign,
     );
   }
 
