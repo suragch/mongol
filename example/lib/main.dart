@@ -8,6 +8,7 @@ import 'demos/mongol_text_field_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/keyboard_demo.dart';
 import 'demos/text_span_demo.dart';
+import 'demos/resizable_text_demo.dart';
 
 void main() {
   runApp(DemoApp());
@@ -64,6 +65,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'Maxlines demo',
           destination: MaxLinesDemo(),
+        ),
+        DemoTile(
+          title: 'Resizable text',
+          destination: ResizableTextDemo(),
         ),
       ],
     );
