@@ -4,6 +4,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'dart:collection';
 import 'dart:math' as math;
 
 import 'package:characters/characters.dart';
@@ -22,6 +23,11 @@ const double _kCaretWidthOffset = 2.0; // pixels
 /// (including the cursor location).
 ///
 /// Used by [MongolRenderEditable.onSelectionChanged].
+@Deprecated(
+  'Signature of a deprecated class method, '
+  'textSelectionDelegate.userUpdateTextEditingValue. '
+  'This feature was deprecated after v1.26.0-17.2.pre.',
+)
 typedef MongolSelectionChangedHandler = void Function(
   TextSelection selection,
   MongolRenderEditable renderObject,
@@ -85,10 +91,6 @@ bool _isWhitespace(int codeUnit) {
 /// If, when the render object paints, the caret is found to have changed
 /// location, [onCaretChanged] is called.
 ///
-/// The user may interact with the render object by tapping or long-pressing.
-/// When the user does so, the selection is updated, and [onSelectionChanged] is
-/// called.
-///
 /// Keyboard handling, IME handling, scrolling, toggling the [showCursor] value
 /// to actually blink the cursor, and other features not mentioned above are the
 /// responsibility of higher layers and not handled by this object.
@@ -122,7 +124,11 @@ class MongolRenderEditable extends RenderBox
     double textScaleFactor = 1.0,
     TextSelection? selection,
     required ViewportOffset offset,
-    this.onSelectionChanged,
+    @Deprecated(
+      'Uses the textSelectionDelegate.userUpdateTextEditingValue instead. '
+      'This feature was deprecated after v1.26.0-17.2.pre.',
+    )
+        this.onSelectionChanged,
     this.onCaretChanged,
     this.ignorePointer = false,
     bool readOnly = false,
@@ -291,6 +297,10 @@ class MongolRenderEditable extends RenderBox
   /// Called when the selection changes.
   ///
   /// If this is null, then selection changes will be ignored.
+  @Deprecated(
+    'Uses the textSelectionDelegate.userUpdateTextEditingValue instead. '
+    'This feature was deprecated after v1.26.0-17.2.pre.',
+  )
   MongolSelectionChangedHandler? onSelectionChanged;
 
   double? _textLayoutLastMaxHeight;
@@ -430,7 +440,35 @@ class MongolRenderEditable extends RenderBox
   // right in a multiline text field when selecting using the keyboard.
   bool _wasSelectingHorizontallyWithKeyboard = false;
 
-  // Call through to onSelectionChanged.
+  void _setTextEditingValue(
+      TextEditingValue newValue, SelectionChangedCause cause) {
+    textSelectionDelegate.textEditingValue = newValue;
+    textSelectionDelegate.userUpdateTextEditingValue(newValue, cause);
+  }
+
+  void _setSelection(TextSelection nextSelection, SelectionChangedCause cause) {
+    if (nextSelection.isValid) {
+      // The nextSelection is calculated based on _plainText, which can be out
+      // of sync with the textSelectionDelegate.textEditingValue by one frame.
+      // This is due to the render editable and editable text handle pointer
+      // event separately. If the editable text changes the text during the
+      // event handler, the render editable will use the outdated text stored in
+      // the _plainText when handling the pointer event.
+      //
+      // If this happens, we need to make sure the new selection is still valid.
+      final textLength = textSelectionDelegate.textEditingValue.text.length;
+      nextSelection = nextSelection.copyWith(
+        baseOffset: math.min(nextSelection.baseOffset, textLength),
+        extentOffset: math.min(nextSelection.extentOffset, textLength),
+      );
+    }
+    _handleSelectionChange(nextSelection, cause);
+    _setTextEditingValue(
+      textSelectionDelegate.textEditingValue.copyWith(selection: nextSelection),
+      cause,
+    );
+  }
+
   void _handleSelectionChange(
     TextSelection nextSelection,
     SelectionChangedCause cause,
@@ -447,9 +485,7 @@ class MongolRenderEditable extends RenderBox
         !focusingEmpty) {
       return;
     }
-    if (onSelectionChanged != null) {
-      onSelectionChanged!(nextSelection, this, cause);
-    }
+    onSelectionChanged?.call(nextSelection, this, cause);
   }
 
   static final Set<LogicalKeyboardKey> _movementKeys = <LogicalKeyboardKey>{
@@ -498,7 +534,7 @@ class MongolRenderEditable extends RenderBox
       return;
     }
 
-    if (keyEvent is! RawKeyDownEvent || onSelectionChanged == null) return;
+    if (keyEvent is! RawKeyDownEvent) return;
     final keysPressed =
         LogicalKeyboardKey.collapseSynonyms(RawKeyboard.instance.keysPressed);
     final key = keyEvent.logicalKey;
@@ -520,18 +556,9 @@ class MongolRenderEditable extends RenderBox
     // all the keyboard handling functions assume it is not.
     assert(selection != null);
 
-    final isWordModifierPressed =
-        isMacOS ? keyEvent.isAltPressed : keyEvent.isControlPressed;
-    final isLineModifierPressed =
-        isMacOS ? keyEvent.isMetaPressed : keyEvent.isAltPressed;
     final isShortcutModifierPressed =
         isMacOS ? keyEvent.isMetaPressed : keyEvent.isControlPressed;
-    if (_movementKeys.contains(key)) {
-      _handleMovement(key,
-          wordModifier: isWordModifierPressed,
-          lineModifier: isLineModifierPressed,
-          shift: keyEvent.isShiftPressed);
-    } else if (isShortcutModifierPressed && _shortcutKeys.contains(key)) {
+    if (isShortcutModifierPressed && _shortcutKeys.contains(key)) {
       // _handleShortcuts depends on being started in the same stack invocation
       // as the _handleKeyEvent method
       _handleShortcuts(key);
@@ -610,214 +637,1480 @@ class MongolRenderEditable extends RenderBox
     return 0;
   }
 
-  void _handleMovement(
-    LogicalKeyboardKey key, {
-    required bool wordModifier,
-    required bool lineModifier,
-    required bool shift,
-  }) {
-    if (wordModifier && lineModifier) {
-      // If both modifiers are down, nothing happens on any of the platforms.
+  // Return a new selection that has been moved up once.
+  //
+  // If it can't be moved up, the original TextSelection is returned.
+  static TextSelection _moveGivenSelectionUp(
+      TextSelection selection, String text) {
+    // If the selection is already all the way up, there is nothing to do.
+    if (selection.isCollapsed && selection.extentOffset <= 0) {
+      return selection;
+    }
+
+    int previousExtent;
+    if (selection.start != selection.end) {
+      previousExtent = selection.start;
+    } else {
+      previousExtent = previousCharacter(selection.extentOffset, text);
+    }
+    final newSelection = selection.copyWith(
+      extentOffset: previousExtent,
+    );
+
+    final newOffset = newSelection.extentOffset;
+    return TextSelection.fromPosition(TextPosition(offset: newOffset));
+  }
+
+  // Return a new selection that has been moved down once.
+  //
+  // If it can't be moved down, the original TextSelection is returned.
+  static TextSelection _moveGivenSelectionDown(
+      TextSelection selection, String text) {
+    // If the selection is already all the way down, there is nothing to do.
+    if (selection.isCollapsed && selection.extentOffset >= text.length) {
+      return selection;
+    }
+
+    int nextExtent;
+    if (selection.start != selection.end) {
+      nextExtent = selection.end;
+    } else {
+      nextExtent = nextCharacter(selection.extentOffset, text);
+    }
+    final nextSelection = selection.copyWith(extentOffset: nextExtent);
+
+    var newOffset = nextSelection.extentOffset;
+    newOffset = nextSelection.baseOffset > nextSelection.extentOffset
+        ? nextSelection.baseOffset
+        : nextSelection.extentOffset;
+    return TextSelection.fromPosition(TextPosition(offset: newOffset));
+  }
+
+  // Return the offset at the start of the nearest word above the given
+  // offset.
+  static int _getAboveByWord(MongolTextPainter textPainter, int offset,
+      [bool includeWhitespace = true]) {
+    // If the offset is already all the way at the top, there is nothing to do.
+    if (offset <= 0) {
+      return offset;
+    }
+
+    // If we can just return the start of the text without checking for a word.
+    if (offset == 1) {
+      return 0;
+    }
+
+    final text = textPainter.text!.toPlainText();
+    final startPoint = previousCharacter(offset, text, includeWhitespace);
+    final word = textPainter.getWordBoundary(TextPosition(offset: startPoint));
+    return word.start;
+  }
+
+  // Return the offset at the end of the nearest word below the given
+  // offset.
+  static int _getBelowByWord(MongolTextPainter textPainter, int offset,
+      [bool includeWhitespace = true]) {
+    // If the selection is already all the way at the bottom, there is nothing to do.
+    final text = textPainter.text!.toPlainText();
+    if (offset == text.length) {
+      return offset;
+    }
+
+    // If we can just return the end of the text without checking for a word.
+    if (offset == text.length - 1 || offset == text.length) {
+      return text.length;
+    }
+
+    final startPoint =
+        includeWhitespace || !_isWhitespace(text.codeUnitAt(offset))
+            ? offset
+            : nextCharacter(offset, text, includeWhitespace);
+    final nextWord =
+        textPainter.getWordBoundary(TextPosition(offset: startPoint));
+    return nextWord.end;
+  }
+
+  // Return the given TextSelection extended up to the beginning of the
+  // nearest word.
+  //
+  // See extendSelectionUpByWord for a detailed explanation of the two
+  // optional parameters.
+  static TextSelection _extendGivenSelectionUpByWord(
+    MongolTextPainter textPainter,
+    TextSelection selection, [
+    bool includeWhitespace = true,
+    bool stopAtReversal = false,
+  ]) {
+    // If the selection is already all the way at the top, there is nothing to do.
+    if (selection.isCollapsed && selection.extentOffset <= 0) {
+      return selection;
+    }
+
+    final leftOffset =
+        _getAboveByWord(textPainter, selection.extentOffset, includeWhitespace);
+
+    if (stopAtReversal &&
+        selection.extentOffset > selection.baseOffset &&
+        leftOffset < selection.baseOffset) {
+      return selection.copyWith(
+        extentOffset: selection.baseOffset,
+      );
+    }
+
+    return selection.copyWith(
+      extentOffset: leftOffset,
+    );
+  }
+
+  // Return the given TextSelection extended down to the end of the nearest
+  // word.
+  //
+  // See extendSelectionDownByWord for a detailed explanation of the two
+  // optional parameters.
+  static TextSelection _extendGivenSelectionDownByWord(
+    MongolTextPainter textPainter,
+    TextSelection selection, [
+    bool includeWhitespace = true,
+    bool stopAtReversal = false,
+  ]) {
+    // If the selection is already all the way down, there is nothing to do.
+    final text = textPainter.text!.toPlainText();
+    if (selection.isCollapsed && selection.extentOffset == text.length) {
+      return selection;
+    }
+
+    final rightOffset =
+        _getBelowByWord(textPainter, selection.extentOffset, includeWhitespace);
+
+    if (stopAtReversal &&
+        selection.baseOffset > selection.extentOffset &&
+        rightOffset > selection.baseOffset) {
+      return selection.copyWith(
+        extentOffset: selection.baseOffset,
+      );
+    }
+
+    return selection.copyWith(
+      extentOffset: rightOffset,
+    );
+  }
+
+  // Return the given TextSelection moved up to the end of the nearest word.
+  //
+  // A TextSelection that isn't collapsed will be collapsed and moved from the
+  // extentOffset.
+  static TextSelection _moveGivenSelectionUpByWord(
+    MongolTextPainter textPainter,
+    TextSelection selection, [
+    bool includeWhitespace = true,
+  ]) {
+    // If the selection is already all the way at the top, there is nothing to do.
+    if (selection.isCollapsed && selection.extentOffset <= 0) {
+      return selection;
+    }
+
+    final leftOffset =
+        _getAboveByWord(textPainter, selection.extentOffset, includeWhitespace);
+    return selection.copyWith(
+      baseOffset: leftOffset,
+      extentOffset: leftOffset,
+    );
+  }
+
+  // Return the given TextSelection moved down to the end of the nearest word.
+  //
+  // A TextSelection that isn't collapsed will be collapsed and moved from the
+  // extentOffset.
+  static TextSelection _moveGivenSelectionDownByWord(
+    MongolTextPainter textPainter,
+    TextSelection selection, [
+    bool includeWhitespace = true,
+  ]) {
+    // If the selection is already all the way at the bottom, there is nothing to do.
+    final text = textPainter.text!.toPlainText();
+    if (selection.isCollapsed && selection.extentOffset == text.length) {
+      return selection;
+    }
+
+    final rightOffset =
+        _getBelowByWord(textPainter, selection.extentOffset, includeWhitespace);
+    return selection.copyWith(
+      baseOffset: rightOffset,
+      extentOffset: rightOffset,
+    );
+  }
+
+  static TextSelection _extendGivenSelectionUp(
+    TextSelection selection,
+    String text, [
+    bool includeWhitespace = true,
+  ]) {
+    // If the selection is already all the way at the top, there is nothing to do.
+    if (selection.extentOffset <= 0) {
+      return selection;
+    }
+    final previousExtent =
+        previousCharacter(selection.extentOffset, text, includeWhitespace);
+    return selection.copyWith(extentOffset: previousExtent);
+  }
+
+  static TextSelection _extendGivenSelectionDown(
+    TextSelection selection,
+    String text, [
+    bool includeWhitespace = true,
+  ]) {
+    // If the selection is already all the way at the bottom, there is nothing to do.
+    if (selection.extentOffset >= text.length) {
+      return selection;
+    }
+    final nextExtent =
+        nextCharacter(selection.extentOffset, text, includeWhitespace);
+    return selection.copyWith(extentOffset: nextExtent);
+  }
+
+  // Extend the current selection to the end of the field.
+  //
+  // If selectionEnabled is false, keeps the selection collapsed and moves it to
+  // the end.
+  //
+  // The given [SelectionChangedCause] indicates the cause of this change and
+  // will be passed to [onSelectionChanged].
+  //
+  // See also:
+  //
+  //   * _extendSelectionToStart
+  void _extendSelectionToEnd(SelectionChangedCause cause) {
+    if (selection!.extentOffset == _plainText.length) {
       return;
     }
+    if (!selectionEnabled) {
+      return moveSelectionToEnd(cause);
+    }
+
+    final nextSelection = selection!.copyWith(
+      extentOffset: _plainText.length,
+    );
+    _setSelection(nextSelection, cause);
+  }
+
+  // Extend the current selection to the start of the field.
+  //
+  // If selectionEnabled is false, keeps the selection collapsed and moves it to
+  // the start.
+  //
+  // The given [SelectionChangedCause] indicates the cause of this change and
+  // will be passed to [onSelectionChanged].
+  //
+  // See also:
+  //
+  //   * _expandSelectionToEnd
+  void _extendSelectionToStart(SelectionChangedCause cause) {
+    if (selection!.extentOffset == 0) {
+      return;
+    }
+    if (!selectionEnabled) {
+      return moveSelectionToStart(cause);
+    }
+
+    final nextSelection = selection!.copyWith(
+      extentOffset: 0,
+    );
+    _setSelection(nextSelection, cause);
+  }
+
+  // Returns the TextPosition to the left or right of the given offset.
+  TextPosition _getTextPositionHorizontal(
+      int textOffset, double horizontalOffset) {
+    final caretOffset = _textPainter.getOffsetForCaret(
+        TextPosition(offset: textOffset), _caretPrototype);
+    final caretOffsetTranslated = caretOffset.translate(horizontalOffset, 0.0);
+    return _textPainter.getPositionForOffset(caretOffsetTranslated);
+  }
+
+  // Returns the TextPosition left of the given offset into _plainText.
+  //
+  // If the offset is already on the first line, the given offset will be
+  // returned.
+  TextPosition _getTextPositionLeft(int offset) {
+    // The caret offset gives a location in the upper left hand corner of
+    // the caret so the middle of the line to the left is a half line to the left of that
+    // point and the line to the right is 1.5 lines to the right of that point.
+    final preferredLineWidth = _textPainter.preferredLineWidth;
+    final horizontalOffset = -0.5 * preferredLineWidth;
+    return _getTextPositionHorizontal(offset, horizontalOffset);
+  }
+
+  // Returns the TextPosition to the right of the given offset into _plainText.
+  //
+  // If the offset is already on the last line, the given offset will be
+  // returned.
+  TextPosition _getTextPositionRight(int offset) {
+    // The caret offset gives a location in the upper left hand corner of
+    // the caret so the middle of the line to the left is a half line to the left of that
+    // point and the line to the right is 1.5 lines to the right of that point.
+    final preferredLineWidth = _textPainter.preferredLineWidth;
+    final horizontalOffset = 1.5 * preferredLineWidth;
+    return _getTextPositionHorizontal(offset, horizontalOffset);
+  }
+
+  // Deletes the text within `selection` if it's non-empty.
+  void _deleteSelection(TextSelection selection, SelectionChangedCause cause) {
+    assert(!selection.isCollapsed);
+
+    if (_readOnly || !selection.isValid || selection.isCollapsed) {
+      return;
+    }
+
+    final text = textSelectionDelegate.textEditingValue.text;
+    final textBefore = selection.textBefore(text);
+    final textAfter = selection.textAfter(text);
+    final cursorPosition = math.min(selection.start, selection.end);
+    final newSelection = TextSelection.collapsed(offset: cursorPosition);
+    _setTextEditingValue(
+      TextEditingValue(text: textBefore + textAfter, selection: newSelection),
+      cause,
+    );
+  }
+
+  // Deletes the current non-empty selection.
+  //
+  // Operates on the text/selection contained in textSelectionDelegate, and does
+  // not depend on `MongolRenderEditable.selection`.
+  //
+  // If the selection is currently non-empty, this method deletes the selected
+  // text and returns true. Otherwise this method does nothing and returns
+  // false.
+  bool _deleteNonEmptySelection(SelectionChangedCause cause) {
+    // TODO(LongCatIsLooong): remove this method from `RenderEditable`
+    // https://github.com/flutter/flutter/issues/80226.
+    assert(!readOnly);
+    final controllerValue = textSelectionDelegate.textEditingValue;
+    final selection = controllerValue.selection;
+    assert(selection.isValid);
+
+    if (selection.isCollapsed) {
+      return false;
+    }
+
+    final textBefore = selection.textBefore(controllerValue.text);
+    final textAfter = selection.textAfter(controllerValue.text);
+    final newSelection = TextSelection.collapsed(offset: selection.start);
+    final composing = controllerValue.composing;
+    final newComposingRange = !composing.isValid || composing.isCollapsed
+      ? TextRange.empty
+      : TextRange(
+        start: composing.start - (composing.start - selection.start).clamp(0, selection.end - selection.start),
+        end: composing.end - (composing.end - selection.start).clamp(0, selection.end - selection.start),
+      );
+
+    _setTextEditingValue(
+      TextEditingValue(
+        text: textBefore + textAfter,
+        selection: newSelection,
+        composing: newComposingRange,
+      ),
+      cause,
+    );
+    return true;
+  }
+
+  // Deletes the from the current collapsed selection to the start of the field.
+  //
+  // The given SelectionChangedCause indicates the cause of this change and
+  // will be passed to onSelectionChanged.
+  //
+  // See also:
+  //   * _deleteToEnd
+  void _deleteToStart(TextSelection selection, SelectionChangedCause cause) {
+    assert(selection.isCollapsed);
+
+    if (_readOnly || !selection.isValid) {
+      return;
+    }
+
+    final text = textSelectionDelegate.textEditingValue.text;
+    final textBefore = selection.textBefore(text);
+
+    if (textBefore.isEmpty) {
+      return;
+    }
+
+    final textAfter = selection.textAfter(text);
+    const newSelection = TextSelection.collapsed(offset: 0);
+    _setTextEditingValue(
+      TextEditingValue(text: textAfter, selection: newSelection),
+      cause,
+    );
+  }
+
+  // Deletes the from the current collapsed selection to the end of the field.
+  //
+  // The given SelectionChangedCause indicates the cause of this change and
+  // will be passed to onSelectionChanged.
+  //
+  // See also:
+  //   * _deleteToStart
+  void _deleteToEnd(TextSelection selection, SelectionChangedCause cause) {
+    assert(selection.isCollapsed);
+
+    if (_readOnly || !selection.isValid) {
+      return;
+    }
+
+    final text = textSelectionDelegate.textEditingValue.text;
+    final textAfter = selection.textAfter(text);
+
+    if (textAfter.isEmpty) {
+      return;
+    }
+
+    final textBefore = selection.textBefore(text);
+    final newSelection = TextSelection.collapsed(offset: textBefore.length);
+    _setTextEditingValue(
+      TextEditingValue(text: textBefore, selection: newSelection),
+      cause,
+    );
+  }
+
+  /// Deletes backwards from the selection in [textSelectionDelegate].
+  ///
+  /// This method operates on the text/selection contained in
+  /// [textSelectionDelegate], and does not depend on [selection].
+  ///
+  /// If the selection is collapsed, deletes a single character before the
+  /// cursor.
+  ///
+  /// If the selection is not collapsed, deletes the selection.
+  ///
+  /// The given [SelectionChangedCause] indicates the cause of this change and
+  /// will be passed to [onSelectionChanged].
+  ///
+  /// See also:
+  ///
+  ///   * [deleteForward], which is same but in the opposite direction.
+  void delete(SelectionChangedCause cause) {
+    // `delete` does not depend on the text layout, and the boundary analysis is
+    // done using the `previousCharacter` method instead of ICU, we can keep
+    // deleting without having to layout the text. For this reason, we can
+    // directly delete the character before the caret in the controller.
+    //
+    // TODO(LongCatIsLooong): remove this method from RenderEditable.
+    // https://github.com/flutter/flutter/issues/80226.
+    final controllerValue = textSelectionDelegate.textEditingValue;
+    final selection = controllerValue.selection;
+
+    if (!selection.isValid || readOnly || _deleteNonEmptySelection(cause)) {
+      return;
+    }
+
+    assert(selection.isCollapsed);
+    final textBefore = selection.textBefore(controllerValue.text);
+    if (textBefore.isEmpty) {
+      return;
+    }
+
+    final textAfter = selection.textAfter(controllerValue.text);
+
+    final characterBoundary = previousCharacter(textBefore.length, textBefore);
+    final newSelection = TextSelection.collapsed(offset: characterBoundary);
+    final composing = controllerValue.composing;
+    assert(textBefore.length >= characterBoundary);
+    final newComposingRange = !composing.isValid || composing.isCollapsed
+      ? TextRange.empty
+      : TextRange(
+        start: composing.start - (composing.start - characterBoundary).clamp(0, textBefore.length - characterBoundary),
+        end: composing.end - (composing.end - characterBoundary).clamp(0, textBefore.length - characterBoundary),
+      );
+
+    _setTextEditingValue(
+      TextEditingValue(
+        text: textBefore.substring(0, characterBoundary) + textAfter,
+        selection: newSelection,
+        composing: newComposingRange,
+      ),
+      cause,
+    );
+  }
+
+  /// Deletes a word backwards from the current selection.
+  ///
+  /// If the [selection] is collapsed, deletes a word before the cursor.
+  ///
+  /// If the [selection] is not collapsed, deletes the selection.
+  ///
+  /// If [obscureText] is true, it treats the whole text content as
+  /// a single word.
+  ///
+  /// By default, includeWhitespace is set to true, meaning that whitespace can
+  /// be considered a word in itself.  If set to false, the selection will be
+  /// extended past any whitespace and the first word following the whitespace.
+  ///
+  /// See also:
+  ///
+  ///   * [deleteForwardByWord], which is same but in the opposite direction.
+  void deleteByWord(SelectionChangedCause cause, [bool includeWhitespace = true]) {
+    assert(_selection != null);
+
+    if (_readOnly || !_selection!.isValid) {
+      return;
+    }
+
+    if (!_selection!.isCollapsed) {
+      return _deleteSelection(_selection!, cause);
+    }
+
+    // When the text is obscured, the whole thing is treated as one big line.
+    if (obscureText) {
+      return _deleteToStart(_selection!, cause);
+    }
+
+    final text = textSelectionDelegate.textEditingValue.text;
+    var textBefore = _selection!.textBefore(text);
+    if (textBefore.isEmpty) {
+      return;
+    }
+
+    final characterBoundary = _getAboveByWord(_textPainter, textBefore.length, includeWhitespace);
+    textBefore = textBefore.trimRight().substring(0, characterBoundary);
+
+    final textAfter = _selection!.textAfter(text);
+    final  newSelection = TextSelection.collapsed(offset: characterBoundary);
+    _setTextEditingValue(
+      TextEditingValue(text: textBefore + textAfter, selection: newSelection),
+      cause,
+    );
+  }
+
+  /// Deletes a line backwards from the current selection.
+  ///
+  /// If the [selection] is collapsed, deletes a line before the cursor.
+  ///
+  /// If the [selection] is not collapsed, deletes the selection.
+  ///
+  /// If [obscureText] is true, it treats the whole text content as
+  /// a single word.
+  ///
+  /// See also:
+  ///
+  ///   * [deleteForwardByLine], which is same but in the opposite direction.
+  void deleteByLine(SelectionChangedCause cause) {
+    assert(_selection != null);
+
+    if (_readOnly || !_selection!.isValid) {
+      return;
+    }
+
+    if (!_selection!.isCollapsed) {
+      return _deleteSelection(_selection!, cause);
+    }
+
+    // When the text is obscured, the whole thing is treated as one big line.
+    if (obscureText) {
+      return _deleteToStart(_selection!, cause);
+    }
+
+    final text = textSelectionDelegate.textEditingValue.text;
+    var textBefore = _selection!.textBefore(text);
+    if (textBefore.isEmpty) {
+      return;
+    }
+
+    // When there is a line break, line delete shouldn't do anything
+    final isPreviousCharacterBreakLine = textBefore.codeUnitAt(textBefore.length - 1) == 0x0A;
+    if (isPreviousCharacterBreakLine) {
+      return;
+    }
+
+    final line = _getLineAtOffset(TextPosition(offset: textBefore.length - 1));
+    textBefore = textBefore.substring(0, line.start);
+
+    final textAfter = _selection!.textAfter(text);
+    final newSelection = TextSelection.collapsed(offset: textBefore.length);
+    _setTextEditingValue(
+      TextEditingValue(text: textBefore + textAfter, selection: newSelection),
+      cause,
+    );
+  }
+
+  /// Deletes in the foward direction, from the current selection in
+  /// [textSelectionDelegate].
+  ///
+  /// This method operates on the text/selection contained in
+  /// [textSelectionDelegate], and does not depend on [selection].
+  ///
+  /// If the selection is collapsed, deletes a single character after the
+  /// cursor.
+  ///
+  /// If the selection is not collapsed, deletes the selection.
+  ///
+  /// See also:
+  ///
+  ///   * [delete], which is same but in the opposite direction.
+  void deleteForward(SelectionChangedCause cause) {
+    // TODO(LongCatIsLooong): remove this method from RenderEditable.
+    // https://github.com/flutter/flutter/issues/80226.
+    final controllerValue = textSelectionDelegate.textEditingValue;
+    final selection = controllerValue.selection;
+
+    if (!selection.isValid || _readOnly || _deleteNonEmptySelection(cause)) {
+      return;
+    }
+
+    assert(selection.isCollapsed);
+    final textAfter = selection.textAfter(controllerValue.text);
+    if (textAfter.isEmpty) {
+      return;
+    }
+
+    final textBefore = selection.textBefore(controllerValue.text);
+    final characterBoundary = nextCharacter(0, textAfter);
+    final composing = controllerValue.composing;
+    final newComposingRange = !composing.isValid || composing.isCollapsed
+      ? TextRange.empty
+      : TextRange(
+        start: composing.start - (composing.start - textBefore.length).clamp(0, characterBoundary),
+        end: composing.end - (composing.end - textBefore.length).clamp(0, characterBoundary),
+      );
+    _setTextEditingValue(
+      TextEditingValue(
+        text: textBefore + textAfter.substring(characterBoundary),
+        selection: selection,
+        composing: newComposingRange,
+      ),
+      cause,
+    );
+  }
+
+  /// Deletes a word in the foward direction from the current selection.
+  ///
+  /// If the [selection] is collapsed, deletes a word after the cursor.
+  ///
+  /// If the [selection] is not collapsed, deletes the selection.
+  ///
+  /// If [obscureText] is true, it treats the whole text content as
+  /// a single word.
+  ///
+  /// See also:
+  ///
+  ///   * [deleteByWord], which is same but in the opposite direction.
+  void deleteForwardByWord(SelectionChangedCause cause, [bool includeWhitespace = true]) {
+    assert(_selection != null);
+
+    if (_readOnly || !_selection!.isValid) {
+      return;
+    }
+
+    if (!_selection!.isCollapsed) {
+      return _deleteSelection(_selection!, cause);
+    }
+
+    // When the text is obscured, the whole thing is treated as one big word.
+    if (obscureText) {
+      return _deleteToEnd(_selection!, cause);
+    }
+
+    final text = textSelectionDelegate.textEditingValue.text;
+    var textAfter = _selection!.textAfter(text);
+
+    if (textAfter.isEmpty) {
+      return;
+    }
+
+    final textBefore = _selection!.textBefore(text);
+    final characterBoundary = _getBelowByWord(_textPainter, textBefore.length, includeWhitespace);
+    textAfter = textAfter.substring(characterBoundary - textBefore.length);
+
+    _setTextEditingValue(
+      TextEditingValue(text: textBefore + textAfter, selection: _selection!),
+      cause,
+    );
+  }
+
+  /// Deletes a line in the foward direction from the current selection.
+  ///
+  /// If the [selection] is collapsed, deletes a line after the cursor.
+  ///
+  /// If the [selection] is not collapsed, deletes the selection.
+  ///
+  /// If [obscureText] is true, it treats the whole text content as
+  /// a single word.
+  ///
+  /// See also:
+  ///
+  ///   * [deleteByLine], which is same but in the opposite direction.
+  void deleteForwardByLine(SelectionChangedCause cause) {
+    assert(_selection != null);
+
+    if (_readOnly || !_selection!.isValid) {
+      return;
+    }
+
+    if (!_selection!.isCollapsed) {
+      return _deleteSelection(_selection!, cause);
+    }
+
+    // When the text is obscured, the whole thing is treated as one big line.
+    if (obscureText) {
+      return _deleteToEnd(_selection!, cause);
+    }
+
+    final text = textSelectionDelegate.textEditingValue.text;
+    var textAfter = _selection!.textAfter(text);
+    if (textAfter.isEmpty) {
+      return;
+    }
+
+    // When there is a line break, it shouldn't do anything.
+    final isNextCharacterBreakLine = textAfter.codeUnitAt(0) == 0x0A;
+    if (isNextCharacterBreakLine) {
+      return;
+    }
+
+    final textBefore = _selection!.textBefore(text);
+    final line = _getLineAtOffset(TextPosition(offset: textBefore.length));
+    textAfter = textAfter.substring(line.end - textBefore.length, textAfter.length);
+
+    _setTextEditingValue(
+      TextEditingValue(text: textBefore + textAfter, selection: _selection!),
+      cause,
+    );
+  }
+
+  /// Keeping [selection]'s [TextSelection.baseOffset] fixed, move the
+  /// [TextSelection.extentOffset] right by one line.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and just
+  /// moves it right.
+  ///
+  /// The given [SelectionChangedCause] indicates the cause of this change and
+  /// will be passed to [onSelectionChanged].
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionUp], which is same but in the opposite direction.
+  void extendSelectionRight(SelectionChangedCause cause) {
     assert(selection != null);
 
-    var newSelection = selection!;
-
-    final rightArrow = key == LogicalKeyboardKey.arrowRight;
-    final leftArrow = key == LogicalKeyboardKey.arrowLeft;
-    final upArrow = key == LogicalKeyboardKey.arrowUp;
-    final downArrow = key == LogicalKeyboardKey.arrowDown;
-
-    if ((upArrow || downArrow) && !(upArrow && downArrow)) {
-      // Jump to begin/end of word.
-      if (wordModifier) {
-        // If control/option is pressed, we will decide which way to look for a
-        // word based on which arrow is pressed.
-        if (upArrow) {
-          // When going up, we want to skip over any whitespace before the word,
-          // so we go back to the first non-whitespace before asking for the word
-          // boundary, since _selectWordAtOffset finds the word boundaries without
-          // including whitespace.
-          final startPoint =
-              previousCharacter(newSelection.extentOffset, _plainText, false);
-          final textSelection =
-              _selectWordAtOffset(TextPosition(offset: startPoint));
-          newSelection =
-              newSelection.copyWith(extentOffset: textSelection.baseOffset);
-        } else {
-          // When going down, we want to skip over any whitespace after the word,
-          // so we go forward to the first non-whitespace character before asking
-          // for the word bounds, since _selectWordAtOffset finds the word
-          // boundaries without including whitespace.
-          final startPoint =
-              nextCharacter(newSelection.extentOffset, _plainText, false);
-          final textSelection =
-              _selectWordAtOffset(TextPosition(offset: startPoint));
-          newSelection =
-              newSelection.copyWith(extentOffset: textSelection.extentOffset);
-        }
-      } else if (lineModifier) {
-        // If control/command is pressed, we will decide which way to expand to
-        // the beginning/end of the line based on which arrow is pressed.
-        if (upArrow) {
-          // When going up, we want to skip over any whitespace before the line,
-          // so we go back to the first non-whitespace before asking for the line
-          // bounds, since _selectLineAtOffset finds the line boundaries without
-          // including whitespace (like the newline).
-          final startPoint =
-              previousCharacter(newSelection.extentOffset, _plainText, false);
-          final textSelection =
-              _selectLineAtOffset(TextPosition(offset: startPoint));
-          newSelection =
-              newSelection.copyWith(extentOffset: textSelection.baseOffset);
-        } else {
-          // When going down, we want to skip over any whitespace after the line,
-          // so we go forward to the first non-whitespace character before asking
-          // for the line bounds, since _selectLineAtOffset finds the line
-          // boundaries without including whitespace (like the newline).
-          final startPoint =
-              nextCharacter(newSelection.extentOffset, _plainText, false);
-          final textSelection =
-              _selectLineAtOffset(TextPosition(offset: startPoint));
-          newSelection =
-              newSelection.copyWith(extentOffset: textSelection.extentOffset);
-        }
-      } else {
-        // The directional arrows move the TextSelection.extentOffset, while the
-        // base remains fixed.
-        if (downArrow && newSelection.extentOffset < _plainText.length) {
-          int nextExtent;
-          if (!shift &&
-              !wordModifier &&
-              !lineModifier &&
-              newSelection.start != newSelection.end) {
-            nextExtent = newSelection.end;
-          } else {
-            nextExtent = nextCharacter(newSelection.extentOffset, _plainText);
-          }
-          final distance = nextExtent - newSelection.extentOffset;
-          newSelection = newSelection.copyWith(extentOffset: nextExtent);
-          if (shift) {
-            _cursorResetLocation += distance;
-          }
-        } else if (upArrow && newSelection.extentOffset > 0) {
-          int previousExtent;
-          if (!shift &&
-              !wordModifier &&
-              !lineModifier &&
-              newSelection.start != newSelection.end) {
-            previousExtent = newSelection.start;
-          } else {
-            previousExtent =
-                previousCharacter(newSelection.extentOffset, _plainText);
-          }
-          final distance = newSelection.extentOffset - previousExtent;
-          newSelection = newSelection.copyWith(extentOffset: previousExtent);
-          if (shift) {
-            _cursorResetLocation -= distance;
-          }
-        }
-      }
+    // If the selection is collapsed at the end of the field already, then
+    // nothing happens.
+    if (selection!.isCollapsed &&
+        selection!.extentOffset >= _plainText.length) {
+      return;
+    }
+    if (!selectionEnabled) {
+      return moveSelectionRight(cause);
     }
 
-    // Handles moving the cursor horizontally as well as taking care of the
-    // case where the user moves the cursor to the end or beginning of the text
-    // and then back left or right.
-    if (rightArrow || leftArrow) {
-      if (lineModifier) {
-        if (leftArrow) {
-          // Extend the selection to the beginning of the field.
-          final upperOffset = math.max(
-              0,
-              math.max(
-                newSelection.baseOffset,
-                newSelection.extentOffset,
-              ));
-          newSelection = TextSelection(
-            baseOffset: shift ? upperOffset : 0,
-            extentOffset: 0,
-          );
-        } else {
-          // Extend the selection to the end of the field.
-          final lowerOffset = math.max(
-              0,
-              math.min(
-                newSelection.baseOffset,
-                newSelection.extentOffset,
-              ));
-          newSelection = TextSelection(
-            baseOffset: shift ? lowerOffset : _plainText.length,
-            extentOffset: _plainText.length,
-          );
-        }
-      } else {
-        // The caret offset gives a location in the upper left hand corner of
-        // the caret so the middle of the line to the left is a half line before
-        // that point and the line to the right is 1.5 lines after that point.
-        final preferredLineWidth = _textPainter.preferredLineWidth;
-        final horizontalOffset =
-            leftArrow ? -0.5 * preferredLineWidth : 1.5 * preferredLineWidth;
-
-        final caretOffset = _textPainter.getOffsetForCaret(
-            TextPosition(offset: newSelection.extentOffset), _caretPrototype);
-        final caretOffsetTranslated =
-            caretOffset.translate(horizontalOffset, 0.0);
-        final position =
-            _textPainter.getPositionForOffset(caretOffsetTranslated);
-
-        // To account for the possibility where the user horizontally highlights
-        // all the way to the first or last line of the text, we hold the previous
-        // cursor location. This allows us to restore to this position in the
-        // case that the user wants to unhighlight some text.
-        if (position.offset == newSelection.extentOffset) {
-          if (rightArrow) {
-            newSelection =
-                newSelection.copyWith(extentOffset: _plainText.length);
-          } else if (leftArrow) {
-            newSelection = newSelection.copyWith(extentOffset: 0);
-          }
-          _wasSelectingHorizontallyWithKeyboard = shift;
-        } else if (_wasSelectingHorizontallyWithKeyboard && shift) {
-          newSelection =
-              newSelection.copyWith(extentOffset: _cursorResetLocation);
-          _wasSelectingHorizontallyWithKeyboard = false;
-        } else {
-          newSelection = newSelection.copyWith(extentOffset: position.offset);
-          _cursorResetLocation = newSelection.extentOffset;
-        }
-      }
+    final positionBelow = _getTextPositionRight(selection!.extentOffset);
+    late final TextSelection nextSelection;
+    if (positionBelow.offset == selection!.extentOffset) {
+      nextSelection = selection!.copyWith(
+        extentOffset: _plainText.length,
+      );
+      _wasSelectingHorizontallyWithKeyboard = true;
+    } else if (_wasSelectingHorizontallyWithKeyboard) {
+      nextSelection = selection!.copyWith(
+        extentOffset: _cursorResetLocation,
+      );
+      _wasSelectingHorizontallyWithKeyboard = false;
+    } else {
+      nextSelection = selection!.copyWith(
+        extentOffset: positionBelow.offset,
+      );
+      _cursorResetLocation = nextSelection.extentOffset;
     }
 
-    // Just place the collapsed selection at the end or beginning of the region
-    // if shift isn't down or selection isn't enabled.
-    if (!shift || !selectionEnabled) {
-      // We want to put the cursor at the correct location depending on which
-      // arrow is used while there is a selection.
-      var newOffset = newSelection.extentOffset;
-      if (!selection!.isCollapsed) {
-        if (upArrow) {
-          newOffset = newSelection.baseOffset < newSelection.extentOffset
-              ? newSelection.baseOffset
-              : newSelection.extentOffset;
-        } else if (downArrow) {
-          newOffset = newSelection.baseOffset > newSelection.extentOffset
-              ? newSelection.baseOffset
-              : newSelection.extentOffset;
-        }
-      }
-      newSelection =
-          TextSelection.fromPosition(TextPosition(offset: newOffset));
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Expand the current [selection] to the end of the field.
+  ///
+  /// The selection will never shrink. The [TextSelection.extentOffset] will
+  // always be at the end of the field, regardless of the original order of
+  /// [TextSelection.baseOffset] and [TextSelection.extentOffset].
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// to the end.
+  ///
+  /// See also:
+  ///
+  ///   * [expandSelectionToStart], which is same but in the opposite direction.
+  void expandSelectionToEnd(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (selection!.extentOffset == _plainText.length) {
+      return;
+    }
+    if (!selectionEnabled) {
+      return moveSelectionToEnd(cause);
     }
 
-    _handleSelectionChange(
-      newSelection,
-      SelectionChangedCause.keyboard,
+    final firstOffset = math.max(
+        0,
+        math.min(
+          selection!.baseOffset,
+          selection!.extentOffset,
+        ));
+    final nextSelection = TextSelection(
+      baseOffset: firstOffset,
+      extentOffset: _plainText.length,
     );
-    // Update the text selection delegate so that the engine knows what we did.
-    textSelectionDelegate.textEditingValue = textSelectionDelegate
-        .textEditingValue
-        .copyWith(selection: newSelection);
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Keeping [selection]'s [TextSelection.baseOffset] fixed, move the
+  /// [TextSelection.extentOffset] up.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// up.
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionDown], which is same but in the opposite direction.
+  void extendSelectionUp(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (!selectionEnabled) {
+      return moveSelectionUp(cause);
+    }
+
+    final nextSelection = _extendGivenSelectionUp(
+      selection!,
+      _plainText,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    final distance = selection!.extentOffset - nextSelection.extentOffset;
+    _cursorResetLocation -= distance;
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Extend the current [selection] to the start of
+  /// [TextSelection.extentOffset]'s line.
+  ///
+  /// Uses [TextSelection.baseOffset] as a pivot point and doesn't change it.
+  /// If [TextSelection.extentOffset] is below [TextSelection.baseOffset],
+  /// then collapses the selection.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// up by line.
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionDownByLine], which is same but in the opposite
+  ///     direction.
+  ///   * [expandSelectionDownByLine], which strictly grows the selection
+  ///     regardless of the order.
+  void extendSelectionUpByLine(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (!selectionEnabled) {
+      return moveSelectionUpByLine(cause);
+    }
+
+    // When going up, we want to skip over any whitespace before the line,
+    // so we go back to the first non-whitespace before asking for the line
+    // bounds, since _getLineAtOffset finds the line boundaries without
+    // including whitespace (like the newline).
+    final startPoint =
+        previousCharacter(selection!.extentOffset, _plainText, false);
+    final selectedLine = _getLineAtOffset(TextPosition(offset: startPoint));
+
+    late final TextSelection nextSelection;
+    if (selection!.extentOffset > selection!.baseOffset) {
+      nextSelection = selection!.copyWith(
+        extentOffset: selection!.baseOffset,
+      );
+    } else {
+      nextSelection = selection!.copyWith(
+        extentOffset: selectedLine.baseOffset,
+      );
+    }
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Keeping [selection]'s [TextSelection.baseOffset] fixed, move the
+  /// [TextSelection.extentOffset] down.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// down.
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionUp], which is same but in the opposite direction.
+  void extendSelectionDown(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (!selectionEnabled) {
+      return moveSelectionDown(cause);
+    }
+
+    final nextSelection = _extendGivenSelectionDown(
+      selection!,
+      _plainText,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    final distance = nextSelection.extentOffset - selection!.extentOffset;
+    _cursorResetLocation += distance;
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Extend the current [selection] to the end of [TextSelection.extentOffset]'s
+  /// line.
+  ///
+  /// Uses [TextSelection.baseOffset] as a pivot point and doesn't change it. If
+  /// [TextSelection.extentOffset] is above [TextSelection.baseOffset], then
+  /// collapses the selection.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// down by line.
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionUpByLine], which is same but in the opposite
+  ///     direction.
+  ///   * [expandSelectionDownByLine], which strictly grows the selection
+  ///     regardless of the order.
+  void extendSelectionDownByLine(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (!selectionEnabled) {
+      return moveSelectionDownByLine(cause);
+    }
+
+    final startPoint =
+        nextCharacter(selection!.extentOffset, _plainText, false);
+    final selectedLine = _getLineAtOffset(TextPosition(offset: startPoint));
+
+    late final TextSelection nextSelection;
+    if (selection!.extentOffset < selection!.baseOffset) {
+      nextSelection = selection!.copyWith(
+        extentOffset: selection!.baseOffset,
+      );
+    } else {
+      nextSelection = selection!.copyWith(
+        extentOffset: selectedLine.extentOffset,
+      );
+    }
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Keeping [selection]'s [TextSelection.baseOffset] fixed, move the
+  /// [TextSelection.extentOffset] left by one
+  /// line.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// left.
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionLeft], which is the same but in the opposite
+  ///     direction.
+  void extendSelectionLeft(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    // If the selection is collapsed at the beginning of the field already, then
+    // nothing happens.
+    if (selection!.isCollapsed && selection!.extentOffset <= 0.0) {
+      return;
+    }
+    if (!selectionEnabled) {
+      return moveSelectionLeft(cause);
+    }
+
+    final positionLeft = _getTextPositionLeft(selection!.extentOffset);
+    late final TextSelection nextSelection;
+    if (positionLeft.offset == selection!.extentOffset) {
+      nextSelection = selection!.copyWith(
+        extentOffset: 0,
+      );
+      _wasSelectingHorizontallyWithKeyboard = true;
+    } else if (_wasSelectingHorizontallyWithKeyboard) {
+      nextSelection = selection!.copyWith(
+        baseOffset: selection!.baseOffset,
+        extentOffset: _cursorResetLocation,
+      );
+      _wasSelectingHorizontallyWithKeyboard = false;
+    } else {
+      nextSelection = selection!.copyWith(
+        baseOffset: selection!.baseOffset,
+        extentOffset: positionLeft.offset,
+      );
+      _cursorResetLocation = nextSelection.extentOffset;
+    }
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Expand the current [selection] to the start of the field.
+  ///
+  /// The selection will never shrink. The [TextSelection.extentOffset] will
+  /// always be at the start of the field, regardless of the original order of
+  /// [TextSelection.baseOffset] and [TextSelection.extentOffset].
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// to the start.
+  ///
+  /// See also:
+  ///
+  ///   * [expandSelectionToEnd], which is the same but in the opposite
+  ///     direction.
+  void expandSelectionToStart(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (selection!.extentOffset == 0) {
+      return;
+    }
+    if (!selectionEnabled) {
+      return moveSelectionToStart(cause);
+    }
+
+    final lastOffset = math.max(
+        0,
+        math.max(
+          selection!.baseOffset,
+          selection!.extentOffset,
+        ));
+    final nextSelection = TextSelection(
+      baseOffset: lastOffset,
+      extentOffset: 0,
+    );
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Expand the current [selection] to the start of the line.
+  ///
+  /// The selection will never shrink. The upper offset will be expanded to the
+  /// beginning of its line, and the original order of baseOffset and
+  /// [TextSelection.extentOffset] will be preserved.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// left by line.
+  ///
+  /// See also:
+  ///
+  ///   * [expandSelectionDownByLine], which is the same but in the opposite
+  ///     direction.
+  void expandSelectionUpByLine(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (!selectionEnabled) {
+      return moveSelectionUpByLine(cause);
+    }
+
+    final firstOffset =
+        math.min(selection!.baseOffset, selection!.extentOffset);
+    final startPoint = previousCharacter(firstOffset, _plainText, false);
+    final selectedLine = _getLineAtOffset(TextPosition(offset: startPoint));
+
+    late final TextSelection nextSelection;
+    if (selection!.extentOffset <= selection!.baseOffset) {
+      nextSelection = selection!.copyWith(
+        extentOffset: selectedLine.baseOffset,
+      );
+    } else {
+      nextSelection = selection!.copyWith(
+        baseOffset: selectedLine.baseOffset,
+      );
+    }
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Extend the current [selection] to the previous start of a word.
+  ///
+  /// By default, `includeWhitespace` is set to true, meaning that whitespace
+  /// can be considered a word in itself.  If set to false, the selection will
+  /// be extended past any whitespace and the first word following the
+  /// whitespace.
+  ///
+  /// The `stopAtReversal` parameter is false by default, meaning that it's
+  /// ok for the base and extent to flip their order here. If set to true, then
+  /// the selection will collapse when it would otherwise reverse its order. A
+  /// selection that is already collapsed is not affected by this parameter.
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionDownByWord], which is the same but in the opposite
+  ///     direction.
+  void extendSelectionUpByWord(
+    SelectionChangedCause cause, [
+    bool includeWhitespace = true,
+    bool stopAtReversal = false,
+  ]) {
+    assert(selection != null);
+
+    // When the text is obscured, the whole thing is treated as one big word.
+    if (obscureText) {
+      return _extendSelectionToStart(cause);
+    }
+
+    assert(
+      _textLayoutLastMaxHeight == constraints.maxHeight &&
+          _textLayoutLastMinHeight == constraints.minHeight,
+      'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).',
+    );
+    final nextSelection = _extendGivenSelectionUpByWord(
+      _textPainter,
+      selection!,
+      includeWhitespace,
+      stopAtReversal,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Extend the current [selection] to the next end of a word.
+  ///
+  /// By default, `includeWhitespace` is set to true, meaning that whitespace
+  /// can be considered a word in itself.  If set to false, the selection will
+  /// be extended past any whitespace and the first word following the
+  /// whitespace.
+  ///
+  /// See also:
+  ///
+  ///   * [extendSelectionUpByWord], which is the same but in the opposite
+  ///     direction.
+  void extendSelectionDownByWord(
+    SelectionChangedCause cause, [
+    bool includeWhitespace = true,
+    bool stopAtReversal = false,
+  ]) {
+    assert(selection != null);
+
+    // When the text is obscured, the whole thing is treated as one big word.
+    if (obscureText) {
+      return _extendSelectionToEnd(cause);
+    }
+
+    assert(
+      _textLayoutLastMaxHeight == constraints.maxHeight &&
+          _textLayoutLastMinHeight == constraints.minHeight,
+      'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).',
+    );
+    final nextSelection = _extendGivenSelectionDownByWord(
+      _textPainter,
+      selection!,
+      includeWhitespace,
+      stopAtReversal,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Expand the current [selection] to the end of the line.
+  ///
+  /// The selection will never shrink. The lower offset will be expanded to the
+  /// end of its line and the original order of [TextSelection.baseOffset] and
+  /// [TextSelection.extentOffset] will be preserved.
+  ///
+  /// If [selectionEnabled] is false, keeps the selection collapsed and moves it
+  /// down by line.
+  ///
+  /// See also:
+  ///
+  ///   * [expandSelectionUpByLine], which is the same but in the opposite
+  ///     direction.
+  void expandSelectionDownByLine(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (!selectionEnabled) {
+      return moveSelectionDownByLine(cause);
+    }
+
+    final lastOffset = math.max(selection!.baseOffset, selection!.extentOffset);
+    final startPoint = nextCharacter(lastOffset, _plainText, false);
+    final selectedLine = _getLineAtOffset(TextPosition(offset: startPoint));
+
+    late final TextSelection nextSelection;
+    if (selection!.extentOffset >= selection!.baseOffset) {
+      nextSelection = selection!.copyWith(
+        extentOffset: selectedLine.extentOffset,
+      );
+    } else {
+      nextSelection = selection!.copyWith(
+        baseOffset: selectedLine.extentOffset,
+      );
+    }
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] to the next line.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionLeft], which is the same but in the opposite direction.
+  void moveSelectionRight(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    // If the selection is collapsed at the end of the field already, then
+    // nothing happens.
+    if (selection!.isCollapsed &&
+        selection!.extentOffset >= _plainText.length) {
+      return;
+    }
+
+    final positionRight = _getTextPositionRight(selection!.extentOffset);
+
+    late final TextSelection nextSelection;
+    if (positionRight.offset == selection!.extentOffset) {
+      nextSelection = selection!.copyWith(
+        baseOffset: _plainText.length,
+        extentOffset: _plainText.length,
+      );
+      _wasSelectingHorizontallyWithKeyboard = false;
+    } else {
+      nextSelection = TextSelection.fromPosition(positionRight);
+      _cursorResetLocation = nextSelection.extentOffset;
+    }
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] up by one character.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionDown], which is the same but in the opposite direction.
+  void moveSelectionUp(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    final nextSelection = _moveGivenSelectionUp(
+      selection!,
+      _plainText,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    _cursorResetLocation -=
+        selection!.extentOffset - nextSelection.extentOffset;
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] to the top of the current line.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionDownByLine], which is the same but in the opposite
+  ///     direction.
+  void moveSelectionUpByLine(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    // If the previous character is the edge of a line, don't do anything.
+    final previousPoint =
+        previousCharacter(selection!.extentOffset, _plainText, true);
+    final line = _getLineAtOffset(TextPosition(offset: previousPoint));
+    if (line.extentOffset == previousPoint) {
+      return;
+    }
+
+    // When going up, we want to skip over any whitespace before the line,
+    // so we go back to the first non-whitespace before asking for the line
+    // bounds, since _getLineAtOffset finds the line boundaries without
+    // including whitespace (like the newline).
+    final startPoint =
+        previousCharacter(selection!.extentOffset, _plainText, false);
+    final selectedLine = _getLineAtOffset(TextPosition(offset: startPoint));
+    final nextSelection = TextSelection.collapsed(
+      offset: selectedLine.baseOffset,
+    );
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] to the previous start of a word.
+  ///
+  /// By default, includeWhitespace is set to true, meaning that whitespace can
+  /// be considered a word in itself.  If set to false, the selection will be
+  /// moved past any whitespace and the first word following the whitespace.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionDownByWord], which is the same but in the opposite
+  ///     direction.
+  void moveSelectionUpByWord(SelectionChangedCause cause,
+      [bool includeWhitespace = true]) {
+    assert(selection != null);
+
+    // When the text is obscured, the whole thing is treated as one big word.
+    if (obscureText) {
+      return moveSelectionToStart(cause);
+    }
+
+    assert(
+      _textLayoutLastMaxHeight == constraints.maxHeight &&
+          _textLayoutLastMinHeight == constraints.minHeight,
+      'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).',
+    );
+    final nextSelection = _moveGivenSelectionUpByWord(
+      _textPainter,
+      selection!,
+      includeWhitespace,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] down by one character.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionUp], which is the same but in the opposite direction.
+  void moveSelectionDown(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    final nextSelection = _moveGivenSelectionDown(
+      selection!,
+      _plainText,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] to the bottommost point of the current line.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionUpByLine], which is the same but in the opposite
+  ///     direction.
+  void moveSelectionDownByLine(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    // If already at the bottom edge of the line, do nothing.
+    final currentLine = _getLineAtOffset(TextPosition(
+      offset: selection!.extentOffset,
+    ));
+    if (currentLine.extentOffset == selection!.extentOffset) {
+      return;
+    }
+
+    // When going down, we want to skip over any whitespace after the line,
+    // so we go forward to the first non-whitespace character before asking
+    // for the line bounds, since _getLineAtOffset finds the line
+    // boundaries without including whitespace (like the newline).
+    final startPoint =
+        nextCharacter(selection!.extentOffset, _plainText, false);
+    final selectedLine = _getLineAtOffset(TextPosition(offset: startPoint));
+    final nextSelection = TextSelection.collapsed(
+      offset: selectedLine.extentOffset,
+    );
+
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] to the next end of a word.
+  ///
+  /// By default, includeWhitespace is set to true, meaning that whitespace can
+  /// be considered a word in itself.  If set to false, the selection will be
+  /// moved past any whitespace and the first word following the whitespace.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionUpByWord], which is the same but in the opposite
+  ///     direction.
+  void moveSelectionDownByWord(
+    SelectionChangedCause cause, [
+    bool includeWhitespace = true,
+  ]) {
+    assert(selection != null);
+
+    // When the text is obscured, the whole thing is treated as one big word.
+    if (obscureText) {
+      return moveSelectionToEnd(cause);
+    }
+
+    assert(
+      _textLayoutLastMaxHeight == constraints.maxHeight &&
+          _textLayoutLastMinHeight == constraints.minHeight,
+      'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).',
+    );
+    final nextSelection = _moveGivenSelectionDownByWord(
+      _textPainter,
+      selection!,
+      includeWhitespace,
+    );
+    if (nextSelection == selection) {
+      return;
+    }
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] to the end of the field.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionToStart], which is the same but in the opposite
+  ///     direction.
+  void moveSelectionToEnd(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (selection!.isCollapsed &&
+        selection!.extentOffset == _plainText.length) {
+      return;
+    }
+    final nextSelection = TextSelection.collapsed(
+      offset: _plainText.length,
+    );
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] to the start of the field.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionToEnd], which is the same but in the opposite direction.
+  void moveSelectionToStart(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    if (selection!.isCollapsed && selection!.extentOffset == 0) {
+      return;
+    }
+    const nextSelection = TextSelection.collapsed(offset: 0);
+    _setSelection(nextSelection, cause);
+  }
+
+  /// Move the current [selection] left by one line.
+  ///
+  /// See also:
+  ///
+  ///   * [moveSelectionRight], which is the same but in the opposite direction.
+  void moveSelectionLeft(SelectionChangedCause cause) {
+    assert(selection != null);
+
+    // If the selection is collapsed at the beginning of the field already, then
+    // nothing happens.
+    if (selection!.isCollapsed && selection!.extentOffset <= 0.0) {
+      return;
+    }
+
+    final positionLeft = _getTextPositionLeft(selection!.extentOffset);
+    late final TextSelection nextSelection;
+    if (positionLeft.offset == selection!.extentOffset) {
+      nextSelection = selection!.copyWith(baseOffset: 0, extentOffset: 0);
+      _wasSelectingHorizontallyWithKeyboard = false;
+    } else {
+      nextSelection = selection!.copyWith(
+        baseOffset: positionLeft.offset,
+        extentOffset: positionLeft.offset,
+      );
+      _cursorResetLocation = nextSelection.extentOffset;
+    }
+
+    _setSelection(nextSelection, cause);
   }
 
   // Handles shortcut functionality including cut, copy, paste and select all
@@ -869,13 +2162,10 @@ class MongolRenderEditable extends RenderBox
       );
     }
     if (value != null) {
-      if (textSelectionDelegate.textEditingValue.selection != value.selection) {
-        _handleSelectionChange(
-          value.selection,
-          SelectionChangedCause.keyboard,
-        );
-      }
-      textSelectionDelegate.textEditingValue = value;
+      _setTextEditingValue(
+        value,
+        SelectionChangedCause.keyboard,
+      );
     }
   }
 
@@ -903,15 +2193,12 @@ class MongolRenderEditable extends RenderBox
       }
     }
     final newSelection = TextSelection.collapsed(offset: cursorPosition);
-    if (selection != newSelection) {
-      _handleSelectionChange(
-        newSelection,
-        SelectionChangedCause.keyboard,
-      );
-    }
-    textSelectionDelegate.textEditingValue = TextEditingValue(
-      text: textBefore + textAfter,
-      selection: newSelection,
+    _setTextEditingValue(
+      TextEditingValue(
+        text: textBefore + textAfter,
+        selection: newSelection,
+      ),
+      SelectionChangedCause.keyboard,
     );
   }
 
@@ -948,7 +2235,8 @@ class MongolRenderEditable extends RenderBox
   // Returns the obscured text when [obscureText] is true. See
   // [obscureText] and [obscuringCharacter].
   String get _plainText {
-    _cachedPlainText ??= _textPainter.text!.toPlainText();
+    _cachedPlainText ??=
+        _textPainter.text!.toPlainText(includeSemanticsLabels: false);
     return _cachedPlainText!;
   }
 
@@ -1003,16 +2291,26 @@ class MongolRenderEditable extends RenderBox
   set hasFocus(bool value) {
     if (_hasFocus == value) return;
     _hasFocus = value;
+    markNeedsSemanticsUpdate();
+
+    if (!attached) {
+      assert(!_listenerAttached);
+      return;
+    }
+
     if (_hasFocus) {
       assert(!_listenerAttached);
+      // TODO(justinmc): This listener should be ported to Actions and removed.
+      // https://github.com/flutter/flutter/issues/75004
       RawKeyboard.instance.addListener(_handleKeyEvent);
       _listenerAttached = true;
     } else {
       assert(_listenerAttached);
+      // TODO(justinmc): This listener should be ported to Actions and removed.
+      // https://github.com/flutter/flutter/issues/75004
       RawKeyboard.instance.removeListener(_handleKeyEvent);
       _listenerAttached = false;
     }
-    markNeedsSemanticsUpdate();
   }
 
   /// Whether this rendering object will take a full line regardless the
@@ -1317,10 +2615,35 @@ class MongolRenderEditable extends RenderBox
     }
   }
 
+  /// Collected during [describeSemanticsConfiguration], used by
+  /// [assembleSemanticsNode] and [_combineSemanticsInfo].
+  List<InlineSpanSemanticsInformation>? _semanticsInfo;
+
+  // Caches [SemanticsNode]s created during [assembleSemanticsNode] so they
+  // can be re-used when [assembleSemanticsNode] is called again. This ensures
+  // stable ids for the [SemanticsNode]s of [TextSpan]s across
+  // [assembleSemanticsNode] invocations.
+  Queue<SemanticsNode>? _cachedChildNodes;
+
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
-
+    _semanticsInfo = _textPainter.text!.getSemanticsInformation();
+    // TODO(chunhtai): the macOS does not provide a public API to support text
+    // selections across multiple semantics nodes. Remove this platform check
+    // once we can support it.
+    // https://github.com/flutter/flutter/issues/77957
+    if (_semanticsInfo!.any(
+            (InlineSpanSemanticsInformation info) => info.recognizer != null) &&
+        defaultTargetPlatform != TargetPlatform.macOS) {
+      assert(readOnly && !obscureText);
+      // For Selectable rich text with recognizer, we need to create a semantics
+      // node for each text fragment.
+      config
+        ..isSemanticBoundary = true
+        ..explicitChildNodes = true;
+      return;
+    }
     config
       ..value =
           obscureText ? obscuringCharacter * _plainText.length : _plainText
@@ -1334,6 +2657,8 @@ class MongolRenderEditable extends RenderBox
     if (hasFocus && selectionEnabled) {
       config.onSetSelection = _handleSetSelection;
     }
+
+    if (hasFocus && !readOnly) config.onSetText = _handleSetText;
 
     if (selectionEnabled && selection?.isValid == true) {
       config.textSelection = selection;
@@ -1350,6 +2675,94 @@ class MongolRenderEditable extends RenderBox
               _handleMoveCursorForwardByCharacter;
       }
     }
+  }
+
+  void _handleSetText(String text) {
+    textSelectionDelegate.userUpdateTextEditingValue(
+      TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      ),
+      SelectionChangedCause.keyboard,
+    );
+  }
+
+  @override
+  void assembleSemanticsNode(SemanticsNode node, SemanticsConfiguration config,
+      Iterable<SemanticsNode> children) {
+    assert(_semanticsInfo != null && _semanticsInfo!.isNotEmpty);
+    final newChildren = <SemanticsNode>[];
+    Rect currentRect;
+    var ordinal = 0.0;
+    var start = 0;
+    final newChildCache = Queue<SemanticsNode>();
+    for (final info in combineSemanticsInfo(_semanticsInfo!)) {
+      assert(!info.isPlaceholder);
+      final selection = TextSelection(
+        baseOffset: start,
+        extentOffset: start + info.text.length,
+      );
+      start += info.text.length;
+
+      final rects = _textPainter.getBoxesForSelection(selection);
+      if (rects.isEmpty) {
+        continue;
+      }
+      var rect = rects.first;
+      for (final textBox in rects.skip(1)) {
+        rect = rect.expandToInclude(textBox);
+      }
+      // Any of the text boxes may have had infinite dimensions.
+      // We shouldn't pass infinite dimensions up to the bridges.
+      rect = Rect.fromLTWH(
+        math.max(0.0, rect.left),
+        math.max(0.0, rect.top),
+        math.min(rect.width, constraints.maxWidth),
+        math.min(rect.height, constraints.maxHeight),
+      );
+      // Round the current rectangle to make this API testable and add some
+      // padding so that the accessibility rects do not overlap with the text.
+      currentRect = Rect.fromLTRB(
+        rect.left.floorToDouble() - 4.0,
+        rect.top.floorToDouble() - 4.0,
+        rect.right.ceilToDouble() + 4.0,
+        rect.bottom.ceilToDouble() + 4.0,
+      );
+      final configuration = SemanticsConfiguration()
+        ..sortKey = OrdinalSortKey(ordinal++)
+        ..textDirection = TextDirection.ltr
+        ..label = info.semanticsLabel ?? info.text;
+      final recognizer = info.recognizer;
+      if (recognizer != null) {
+        if (recognizer is TapGestureRecognizer) {
+          if (recognizer.onTap != null) {
+            configuration.onTap = recognizer.onTap;
+            configuration.isLink = true;
+          }
+        } else if (recognizer is DoubleTapGestureRecognizer) {
+          if (recognizer.onDoubleTap != null) {
+            configuration.onTap = recognizer.onDoubleTap;
+            configuration.isLink = true;
+          }
+        } else if (recognizer is LongPressGestureRecognizer) {
+          if (recognizer.onLongPress != null) {
+            configuration.onLongPress = recognizer.onLongPress;
+          }
+        } else {
+          assert(false, '${recognizer.runtimeType} is not supported.');
+        }
+      }
+      final newChild = (_cachedChildNodes?.isNotEmpty == true)
+          ? _cachedChildNodes!.removeFirst()
+          : SemanticsNode();
+      newChild
+        ..updateWith(config: configuration)
+        ..rect = currentRect;
+      newChildCache.addLast(newChild);
+      newChildren.add(newChild);
+    }
+    _cachedChildNodes = newChildCache;
+    node.updateWith(config: config, childrenInInversePaintOrder: newChildren);
   }
 
   void _handleSetSelection(TextSelection selection) {
@@ -1457,6 +2870,11 @@ class MongolRenderEditable extends RenderBox
     _offset.addListener(markNeedsPaint);
     _showHideCursor();
     _showCursor.addListener(_showHideCursor);
+    assert(!_listenerAttached);
+    if (_hasFocus) {
+      RawKeyboard.instance.addListener(_handleKeyEvent);
+      _listenerAttached = true;
+    }
   }
 
   @override
@@ -1465,7 +2883,12 @@ class MongolRenderEditable extends RenderBox
     _longPress.dispose();
     _offset.removeListener(markNeedsPaint);
     _showCursor.removeListener(_showHideCursor);
-    if (_listenerAttached) RawKeyboard.instance.removeListener(_handleKeyEvent);
+    // TODO(justinmc): This listener should be ported to Actions and removed.
+    // https://github.com/flutter/flutter/issues/75004
+    if (_listenerAttached) {
+      RawKeyboard.instance.removeListener(_handleKeyEvent);
+      _listenerAttached = false;
+    }
     super.detach();
     _foregroundRenderObject?.detach();
     _backgroundRenderObject?.detach();
@@ -1707,16 +3130,8 @@ class MongolRenderEditable extends RenderBox
     assert(debugHandleEvent(event, entry));
     if (event is PointerDownEvent) {
       assert(!debugNeedsLayout);
-      // Checks if there is any gesture recognizer in the text span.
-      final offset = entry.localPosition;
-      final position = _textPainter.getPositionForOffset(offset);
-      final span = _textPainter.text!.getSpanForPosition(position);
-      if (span != null && span is TextSpan) {
-        final textSpan = span;
-        textSpan.recognizer?.addPointer(event);
-      }
 
-      if (!ignorePointer && onSelectionChanged != null) {
+      if (!ignorePointer) {
         // Propagates the pointer event to selection handlers.
         _tap.addPointer(event);
         _longPress.addPointer(event);
@@ -1817,9 +3232,6 @@ class MongolRenderEditable extends RenderBox
       required SelectionChangedCause cause}) {
     _layoutText(
         minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
-    if (onSelectionChanged == null) {
-      return;
-    }
     final fromPosition =
         _textPainter.getPositionForOffset(globalToLocal(from - _paintOffset));
     final toPosition = (to == null)
@@ -1834,8 +3246,7 @@ class MongolRenderEditable extends RenderBox
       extentOffset: extentOffset,
       affinity: fromPosition.affinity,
     );
-    // Call [onSelectionChanged] only when the selection actually changed.
-    _handleSelectionChange(newSelection, cause);
+    _setSelection(newSelection, cause);
   }
 
   /// Select a word around the location of the last tap down.
@@ -1853,9 +3264,6 @@ class MongolRenderEditable extends RenderBox
       required SelectionChangedCause cause}) {
     _layoutText(
         minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
-    if (onSelectionChanged == null) {
-      return;
-    }
     final firstPosition =
         _textPainter.getPositionForOffset(globalToLocal(from - _paintOffset));
     final firstWord = _selectWordAtOffset(firstPosition);
@@ -1864,7 +3272,7 @@ class MongolRenderEditable extends RenderBox
         : _selectWordAtOffset(_textPainter
             .getPositionForOffset(globalToLocal(to - _paintOffset)));
 
-    _handleSelectionChange(
+    _setSelection(
       TextSelection(
         baseOffset: firstWord.base.offset,
         extentOffset: lastWord.extent.offset,
@@ -1879,9 +3287,6 @@ class MongolRenderEditable extends RenderBox
     _layoutText(
         minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
     assert(_lastTapDownPosition != null);
-    if (onSelectionChanged == null) {
-      return;
-    }
     final position = _textPainter.getPositionForOffset(
         globalToLocal(_lastTapDownPosition! - _paintOffset));
     final word = _textPainter.getWordBoundary(position);
@@ -1913,22 +3318,42 @@ class MongolRenderEditable extends RenderBox
     // If text is obscured, the entire sentence should be treated as one word.
     if (obscureText) {
       return TextSelection(baseOffset: 0, extentOffset: _plainText.length);
-      // If the word is a space, on iOS try to select the previous word instead.
-      // On Android try to select the previous word instead only if the text is read only.
-    } else if (text?.toPlainText() != null &&
-        _isWhitespace(text!.toPlainText().codeUnitAt(position.offset)) &&
+      // On iOS, select the previous word if there is a previous word, or select
+      // to the end of the next word if there is a next word. Select nothing if
+      // there is neither a previous word nor a next word.
+      //
+      // If the platform is Android and the text is read only, try to select the
+      // previous word if there is one; otherwise, select the single whitespace at
+      // the position.
+    } else if (_isWhitespace(_plainText.codeUnitAt(position.offset)) &&
         position.offset > 0) {
       final previousWord = _getPreviousWord(word.start);
       switch (defaultTargetPlatform) {
         case TargetPlatform.iOS:
+          if (previousWord == null) {
+            final nextWord = _getNextWord(word.start);
+            if (nextWord == null) {
+              return TextSelection.collapsed(offset: position.offset);
+            }
+            return TextSelection(
+              baseOffset: position.offset,
+              extentOffset: nextWord.end,
+            );
+          }
           return TextSelection(
-            baseOffset: previousWord!.start,
+            baseOffset: previousWord.start,
             extentOffset: position.offset,
           );
         case TargetPlatform.android:
           if (readOnly) {
+            if (previousWord == null) {
+              return TextSelection(
+                baseOffset: position.offset,
+                extentOffset: position.offset + 1,
+              );
+            }
             return TextSelection(
-              baseOffset: previousWord!.start,
+              baseOffset: previousWord.start,
               extentOffset: position.offset,
             );
           }
@@ -1944,7 +3369,7 @@ class MongolRenderEditable extends RenderBox
     return TextSelection(baseOffset: word.start, extentOffset: word.end);
   }
 
-  TextSelection _selectLineAtOffset(TextPosition position) {
+  TextSelection _getLineAtOffset(TextPosition position) {
     assert(
         _textLayoutLastMaxHeight == constraints.maxHeight &&
             _textLayoutLastMinHeight == constraints.minHeight,
@@ -2019,7 +3444,9 @@ class MongolRenderEditable extends RenderBox
     final height = forceLine
         ? constraints.maxHeight
         : constraints.constrainHeight(_textPainter.size.height + _caretMargin);
-    return Size(constraints.constrainWidth(_preferredWidth(constraints.maxHeight)), height);
+    return Size(
+        constraints.constrainWidth(_preferredWidth(constraints.maxHeight)),
+        height);
   }
 
   @override
@@ -2111,8 +3538,13 @@ class MongolRenderEditable extends RenderBox
         minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
     if (_hasVisualOverflow && clipBehavior != Clip.none) {
       _clipRectLayer = context.pushClipRect(
-          needsCompositing, offset, Offset.zero & size, _paintContents,
-          clipBehavior: clipBehavior, oldLayer: _clipRectLayer);
+        needsCompositing,
+        offset,
+        Offset.zero & size,
+        _paintContents,
+        clipBehavior: clipBehavior,
+        oldLayer: _clipRectLayer,
+      );
     } else {
       _clipRectLayer = null;
       _paintContents(context, offset);

@@ -9,11 +9,17 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart' show Theme, TextSelectionTheme, Icons;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show TextSelectionDelegate;
 import 'package:flutter/widgets.dart';
 
 import 'mongol_text_selection_toolbar.dart';
 import 'mongol_text_selection_toolbar_button.dart';
+
+// https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/text_selection.dart
+// This file builds the Copy/Paste toolbar that pops up when you long click, etc.
+// If you want a different style you can replace this class with another one.
+// That's what Flutter does to give a different style for Material, Cupertino
+// and others.
 
 const double _kHandleSize = 22.0;
 

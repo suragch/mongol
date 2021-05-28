@@ -39,7 +39,7 @@ class _TextFieldSelectionGestureDetectorBuilder
     extends MongolTextSelectionGestureDetectorBuilder {
   _TextFieldSelectionGestureDetectorBuilder({
     required _TextFieldState state,
-  })   : _state = state,
+  })  : _state = state,
         super(delegate: state);
 
   final _TextFieldState _state;
@@ -1666,16 +1666,13 @@ class _TextFieldState extends State<MongolTextField>
     );
 
     final int? semanticsMaxValueLength;
-    if (
-        // widget.maxLengthEnforced &&
-        //   _effectiveMaxLengthEnforcement != MaxLengthEnforcement.none &&
-        widget.maxLength != null && widget.maxLength! > 0) {
+    if (widget.maxLength != null && widget.maxLength! > 0) {
       semanticsMaxValueLength = widget.maxLength;
     } else {
       semanticsMaxValueLength = null;
     }
 
-    child = MouseRegion(
+    return MouseRegion(
       cursor: effectiveMouseCursor,
       onEnter: (PointerEnterEvent event) => _handleHover(true),
       onExit: (PointerExitEvent event) => _handleHover(false),
@@ -1707,13 +1704,5 @@ class _TextFieldState extends State<MongolTextField>
         ),
       ),
     );
-
-    if (kIsWeb) {
-      return Shortcuts(
-        shortcuts: scrollShortcutOverrides,
-        child: child,
-      );
-    }
-    return child;
   }
 }

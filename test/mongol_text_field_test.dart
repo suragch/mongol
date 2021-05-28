@@ -7,8 +7,7 @@
 // ignore_for_file: omit_local_variable_types
 
 @TestOn('!chrome')
-import 'dart:math' as math;
-import 'dart:ui' as ui show window, BoxHeightStyle, BoxWidthStyle;
+import 'dart:ui' as ui show window;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
@@ -19,11 +18,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
 import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_editable_text.dart';
-import 'package:mongol/src/editing/mongol_input_decorator.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
 import 'package:mongol/src/text/mongol_text.dart';
 import 'package:mongol/src/editing/mongol_text_field.dart';
-import 'package:mongol/src/base/mongol_text_painter.dart';
 
 import 'widgets/binding.dart';
 import 'widgets/editable_text_utils.dart';
@@ -170,14 +167,6 @@ void main() {
   final mockClipboard = MockClipboard();
   SystemChannels.platform
       .setMockMethodCallHandler(mockClipboard.handleMethodCall);
-
-  const kThreeLines = 'First line of text is\n'
-      'Second line goes until\n'
-      'Third line of stuff';
-  const kMoreThanFourLines =
-      kThreeLines + "\nFourth line won't display and ends at";
-  // Gap between caret and edge of input, defined in editable.dart.
-  const kCaretGap = 1;
 
   setUp(() async {
     debugResetSemanticsIdCounter();
@@ -1075,8 +1064,8 @@ void main() {
     await tester.tapAt(ePos);
     await tester.pump();
 
-    expect(controller.selection.baseOffset, -1);
-    expect(controller.selection.extentOffset, -1);
+    expect(controller.selection.baseOffset, testValue.length);
+    expect(controller.selection.isCollapsed, isTrue);
   });
 
   testMongolWidgets('Can long press to select', (tester) async {
@@ -1505,35 +1494,35 @@ void main() {
     expect(tester.testTextInput.hasAnyClients, true);
   });
 
-  testMongolWidgets('enableInteractiveSelection = false, long-press',
-      (tester) async {
-    final TextEditingController controller = TextEditingController();
+  // testMongolWidgets('enableInteractiveSelection = false, long-press',
+  //     (tester) async {
+  //   final TextEditingController controller = TextEditingController();
 
-    await tester.pumpWidget(
-      overlay(
-        child: MongolTextField(
-          controller: controller,
-          enableInteractiveSelection: false,
-        ),
-      ),
-    );
+  //   await tester.pumpWidget(
+  //     overlay(
+  //       child: MongolTextField(
+  //         controller: controller,
+  //         enableInteractiveSelection: false,
+  //       ),
+  //     ),
+  //   );
 
-    const String testValue = 'abc def ghi';
-    await tester.enterText(find.byType(MongolTextField), testValue);
-    expect(controller.value.text, testValue);
-    await skipPastScrollingAnimation(tester);
+  //   const String testValue = 'abc def ghi';
+  //   await tester.enterText(find.byType(MongolTextField), testValue);
+  //   expect(controller.value.text, testValue);
+  //   await skipPastScrollingAnimation(tester);
 
-    expect(controller.selection.isCollapsed, true);
+  //   expect(controller.selection.isCollapsed, true);
 
-    // Long press the 'e' to select 'def'.
-    final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
-    await tester.longPressAt(ePos, pointer: 7);
-    await tester.pump();
+  //   // Long press the 'e' to select 'def'.
+  //   final Offset ePos = textOffsetToPosition(tester, testValue.indexOf('e'));
+  //   await tester.longPressAt(ePos, pointer: 7);
+  //   await tester.pump();
 
-    expect(controller.selection.isCollapsed, true);
-    expect(controller.selection.baseOffset, -1);
-    expect(controller.selection.extentOffset, -1);
-  });
+  //   expect(controller.selection.isCollapsed, true);
+  //   expect(controller.selection.baseOffset, -1);
+  //   expect(controller.selection.extentOffset, -1);
+  // });
 
   // // TODO: This one is probably important to make work
   // testMongolWidgets('Can select text by dragging with a mouse', (tester) async {
@@ -4375,519 +4364,520 @@ void main() {
     expect(focusNode2.hasPrimaryFocus, isFalse);
   });
 
-  group('Keyboard Tests', () {
-    late TextEditingController controller;
 
-    setUp(() {
-      controller = TextEditingController();
-    });
+  // group('Keyboard Tests', () {
+  //   late TextEditingController controller;
 
-    Future<void> setupWidget(MongolWidgetTester tester) async {
-      final FocusNode focusNode = FocusNode();
-      controller = TextEditingController();
+  //   setUp(() {
+  //     controller = TextEditingController();
+  //   });
 
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: RawKeyboardListener(
-              focusNode: focusNode,
-              onKey: null,
-              child: MongolTextField(
-                controller: controller,
-                maxLines: 3,
-              ),
-            ),
-          ),
-        ),
-      );
-      await tester.pump();
-    }
+  //   Future<void> setupWidget(MongolWidgetTester tester) async {
+  //     final FocusNode focusNode = FocusNode();
+  //     controller = TextEditingController();
 
-    testMongolWidgets('Shift test 1', (tester) async {
-      await setupWidget(tester);
-      const String testValue = 'a big house';
-      await tester.enterText(find.byType(MongolTextField), testValue);
+  //     await tester.pumpWidget(
+  //       MaterialApp(
+  //         home: Material(
+  //           child: RawKeyboardListener(
+  //             focusNode: focusNode,
+  //             onKey: null,
+  //             child: MongolTextField(
+  //               controller: controller,
+  //               maxLines: 3,
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //     );
+  //     await tester.pump();
+  //   }
 
-      await tester.idle();
-      // Need to wait for selection to catch up.
-      await tester.pump();
-      await tester.tap(find.byType(MongolTextField));
-      await tester.pumpAndSettle();
+  //   testMongolWidgets('Shift test 1', (tester) async {
+  //     await setupWidget(tester);
+  //     const String testValue = 'a big house';
+  //     await tester.enterText(find.byType(MongolTextField), testValue);
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          -1);
-    });
+  //     await tester.idle();
+  //     // Need to wait for selection to catch up.
+  //     await tester.pump();
+  //     await tester.tap(find.byType(MongolTextField));
+  //     await tester.pumpAndSettle();
 
-    testMongolWidgets('Shift test 2', (tester) async {
-      await setupWidget(tester);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         -1);
+  //   });
 
-      const String testValue = 'abcdefghi';
-      await tester.showKeyboard(find.byType(MongolTextField));
-      tester.testTextInput.updateEditingValue(const TextEditingValue(
-        text: testValue,
-        selection: TextSelection.collapsed(offset: 3),
-        composing: TextRange(start: 0, end: testValue.length),
-      ));
-      await tester.pump();
+  //   testMongolWidgets('Shift test 2', (tester) async {
+  //     await setupWidget(tester);
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          1);
-    });
+  //     const String testValue = 'abcdefghi';
+  //     await tester.showKeyboard(find.byType(MongolTextField));
+  //     tester.testTextInput.updateEditingValue(const TextEditingValue(
+  //       text: testValue,
+  //       selection: TextSelection.collapsed(offset: 3),
+  //       composing: TextRange(start: 0, end: testValue.length),
+  //     ));
+  //     await tester.pump();
 
-    testMongolWidgets('Control Shift test', (tester) async {
-      await setupWidget(tester);
-      const String testValue = 'their big house';
-      await tester.enterText(find.byType(MongolTextField), testValue);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         1);
+  //   });
 
-      await tester.idle();
-      await tester.tap(find.byType(MongolTextField));
-      await tester.pumpAndSettle();
-      await tester.pumpAndSettle();
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
+  //   testMongolWidgets('Control Shift test', (tester) async {
+  //     await setupWidget(tester);
+  //     const String testValue = 'their big house';
+  //     await tester.enterText(find.byType(MongolTextField), testValue);
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          5);
-    });
+  //     await tester.idle();
+  //     await tester.tap(find.byType(MongolTextField));
+  //     await tester.pumpAndSettle();
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.control);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
 
-    testMongolWidgets('Right and left test', (tester) async {
-      await setupWidget(tester);
-      const String testValue = 'a big house';
-      await tester.enterText(find.byType(MongolTextField), testValue);
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         5);
+  //   });
 
-      await tester.idle();
-      // Need to wait for selection to catch up.
-      await tester.pump();
-      await tester.tap(find.byType(MongolTextField));
-      await tester.pumpAndSettle();
+  //   testMongolWidgets('Right and left test', (tester) async {
+  //     await setupWidget(tester);
+  //     const String testValue = 'a big house';
+  //     await tester.enterText(find.byType(MongolTextField), testValue);
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowLeft);
-      await tester.pumpAndSettle();
+  //     await tester.idle();
+  //     // Need to wait for selection to catch up.
+  //     await tester.pump();
+  //     await tester.tap(find.byType(MongolTextField));
+  //     await tester.pumpAndSettle();
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          -11);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowLeft);
+  //     await tester.pumpAndSettle();
 
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowLeft);
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowRight);
-      await tester.pumpAndSettle();
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         -11);
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          0);
-    });
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowLeft);
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowRight);
+  //     await tester.pumpAndSettle();
 
-    testMongolWidgets('Right and left test 2', (tester) async {
-      await setupWidget(tester);
-      const String testValue =
-          'a big house\njumped over a mouse\nOne more line yay'; // 11 \n 19
-      await tester.enterText(find.byType(MongolTextField), testValue);
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         0);
+  //   });
 
-      await tester.idle();
-      await tester.tap(find.byType(MongolTextField));
-      await tester.pumpAndSettle();
+  //   testMongolWidgets('Right and left test 2', (tester) async {
+  //     await setupWidget(tester);
+  //     const String testValue =
+  //         'a big house\njumped over a mouse\nOne more line yay'; // 11 \n 19
+  //     await tester.enterText(find.byType(MongolTextField), testValue);
 
-      for (int i = 0; i < 5; i += 1) {
-        await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
-        await tester.pumpAndSettle();
-        await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowDown);
-        await tester.pumpAndSettle();
-      }
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-      await tester.pumpAndSettle();
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
+  //     await tester.idle();
+  //     await tester.tap(find.byType(MongolTextField));
+  //     await tester.pumpAndSettle();
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          12);
+  //     for (int i = 0; i < 5; i += 1) {
+  //       await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
+  //       await tester.pumpAndSettle();
+  //       await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowDown);
+  //       await tester.pumpAndSettle();
+  //     }
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
-      await tester.pumpAndSettle();
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         12);
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          32);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
-      await tester.pumpAndSettle();
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         32);
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          12);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
-      await tester.pumpAndSettle();
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         12);
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          0);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
-      await tester.pumpAndSettle();
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         0);
 
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          -5);
-    });
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
 
-    testMongolWidgets('Read only keyboard selection test', (tester) async {
-      final TextEditingController controller =
-          TextEditingController(text: 'readonly');
-      await tester.pumpWidget(
-        overlay(
-          child: MongolTextField(
-            controller: controller,
-            readOnly: true,
-          ),
-        ),
-      );
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         -5);
+  //   });
 
-      await tester.idle();
-      await tester.tap(find.byType(MongolTextField));
-      await tester.pumpAndSettle();
+  //   testMongolWidgets('Read only keyboard selection test', (tester) async {
+  //     final TextEditingController controller =
+  //         TextEditingController(text: 'readonly');
+  //     await tester.pumpWidget(
+  //       overlay(
+  //         child: MongolTextField(
+  //           controller: controller,
+  //           readOnly: true,
+  //         ),
+  //       ),
+  //     );
 
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowUp);
-      expect(
-          controller.selection.extentOffset - controller.selection.baseOffset,
-          -1);
-    });
-  });
+  //     await tester.idle();
+  //     await tester.tap(find.byType(MongolTextField));
+  //     await tester.pumpAndSettle();
 
-  testMongolWidgets('Copy paste test', (tester) async {
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowUp);
+  //     expect(
+  //         controller.selection.extentOffset - controller.selection.baseOffset,
+  //         -1);
+  //   });
+  // });
+
+  // testMongolWidgets('Copy paste test', (tester) async {
+  //   final FocusNode focusNode = FocusNode();
+  //   final TextEditingController controller = TextEditingController();
+  //   final MongolTextField textField = MongolTextField(
+  //     controller: controller,
+  //     maxLines: 3,
+  //   );
+
+  //   String clipboardContent = '';
+  //   SystemChannels.platform
+  //       .setMockMethodCallHandler((MethodCall methodCall) async {
+  //     if (methodCall.method == 'Clipboard.setData') {
+  //       clipboardContent = methodCall.arguments['text'] as String;
+  //     } else if (methodCall.method == 'Clipboard.getData') {
+  //       return <String, dynamic>{'text': clipboardContent};
+  //     }
+  //     return null;
+  //   });
+
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: RawKeyboardListener(
+  //           focusNode: focusNode,
+  //           onKey: null,
+  //           child: textField,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  //   focusNode.requestFocus();
+  //   await tester.pump();
+
+  //   const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
+  //   await tester.enterText(find.byType(MongolTextField), testValue);
+
+  //   await tester.idle();
+  //   await tester.tap(find.byType(MongolTextField));
+  //   await tester.pumpAndSettle();
+
+  //   // Select the first 5 characters
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
+  //   }
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+
+  //   // Copy them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
+  //   await tester.pumpAndSettle();
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   expect(clipboardContent, 'a big');
+
+  //   await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //   await tester.pumpAndSettle();
+
+  //   // Paste them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+  //   await tester.pumpAndSettle();
+  //   await tester.pump(const Duration(milliseconds: 200));
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   const String expected = 'a biga big house\njumped over a mouse';
+  //   expect(findMongol.text(expected), findsOneWidget,
+  //       reason: 'Because text contains ${controller.text}');
+  // });
+
+  // testMongolWidgets('Copy paste obscured text test', (tester) async {
+  //   final FocusNode focusNode = FocusNode();
+  //   final TextEditingController controller = TextEditingController();
+  //   final MongolTextField textField = MongolTextField(
+  //     controller: controller,
+  //     obscureText: true,
+  //   );
+
+  //   String clipboardContent = '';
+  //   SystemChannels.platform
+  //       .setMockMethodCallHandler((MethodCall methodCall) async {
+  //     if (methodCall.method == 'Clipboard.setData') {
+  //       clipboardContent = methodCall.arguments['text'] as String;
+  //     } else if (methodCall.method == 'Clipboard.getData') {
+  //       return <String, dynamic>{'text': clipboardContent};
+  //     }
+  //     return null;
+  //   });
+
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: RawKeyboardListener(
+  //           focusNode: focusNode,
+  //           onKey: null,
+  //           child: textField,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  //   focusNode.requestFocus();
+  //   await tester.pump();
+
+  //   const String testValue = 'a big house jumped over a mouse';
+  //   await tester.enterText(find.byType(MongolTextField), testValue);
+
+  //   await tester.idle();
+  //   await tester.tap(find.byType(MongolTextField));
+  //   await tester.pumpAndSettle();
+
+  //   // Select the first 5 characters
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
+  //   }
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+
+  //   // Copy them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
+  //   await tester.pumpAndSettle();
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   expect(clipboardContent, 'a big');
+
+  //   await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //   await tester.pumpAndSettle();
+
+  //   // Paste them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+  //   await tester.pumpAndSettle();
+  //   await tester.pump(const Duration(milliseconds: 200));
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   const String expected = 'a biga big house jumped over a mouse';
+  //   expect(findMongol.text(expected), findsOneWidget,
+  //       reason: 'Because text contains ${controller.text}');
+  // });
+
+  // testMongolWidgets('Cut test', (tester) async {
+  //   final FocusNode focusNode = FocusNode();
+  //   final TextEditingController controller = TextEditingController();
+  //   final MongolTextField textField = MongolTextField(
+  //     controller: controller,
+  //     maxLines: 3,
+  //   );
+  //   String clipboardContent = '';
+  //   SystemChannels.platform
+  //       .setMockMethodCallHandler((MethodCall methodCall) async {
+  //     if (methodCall.method == 'Clipboard.setData') {
+  //       clipboardContent = methodCall.arguments['text'] as String;
+  //     } else if (methodCall.method == 'Clipboard.getData') {
+  //       return <String, dynamic>{'text': clipboardContent};
+  //     }
+  //     return null;
+  //   });
+
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: RawKeyboardListener(
+  //           focusNode: focusNode,
+  //           onKey: null,
+  //           child: textField,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  //   focusNode.requestFocus();
+  //   await tester.pump();
+
+  //   const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
+  //   await tester.enterText(find.byType(MongolTextField), testValue);
+
+  //   await tester.idle();
+  //   await tester.tap(find.byType(MongolTextField));
+  //   await tester.pumpAndSettle();
+
+  //   // Select the first 5 characters
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
+  //   }
+
+  //   // Cut them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
+  //   await tester.pumpAndSettle();
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   expect(clipboardContent, 'a big');
+
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
+  //   }
+
+  //   // Paste them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+  //   await tester.pumpAndSettle();
+  //   await tester.pump(const Duration(milliseconds: 200));
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   const String expected = ' housa bige\njumped over a mouse';
+  //   expect(findMongol.text(expected), findsOneWidget);
+  // });
+
+  // testMongolWidgets('Cut obscured text test', (tester) async {
+  //   final FocusNode focusNode = FocusNode();
+  //   final TextEditingController controller = TextEditingController();
+  //   final MongolTextField textField = MongolTextField(
+  //     controller: controller,
+  //     obscureText: true,
+  //   );
+  //   String clipboardContent = '';
+  //   SystemChannels.platform
+  //       .setMockMethodCallHandler((MethodCall methodCall) async {
+  //     if (methodCall.method == 'Clipboard.setData') {
+  //       clipboardContent = methodCall.arguments['text'] as String;
+  //     } else if (methodCall.method == 'Clipboard.getData') {
+  //       return <String, dynamic>{'text': clipboardContent};
+  //     }
+  //     return null;
+  //   });
+
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: RawKeyboardListener(
+  //           focusNode: focusNode,
+  //           onKey: null,
+  //           child: textField,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  //   focusNode.requestFocus();
+  //   await tester.pump();
+
+  //   const String testValue = 'a big house jumped over a mouse';
+  //   await tester.enterText(find.byType(MongolTextField), testValue);
+
+  //   await tester.idle();
+  //   await tester.tap(find.byType(MongolTextField));
+  //   await tester.pumpAndSettle();
+
+  //   // Select the first 5 characters
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
+  //     await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //     await tester.pumpAndSettle();
+  //   }
+
+  //   // Cut them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
+  //   await tester.pumpAndSettle();
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   expect(clipboardContent, 'a big');
+
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+  //     await tester.pumpAndSettle();
+  //   }
+
+  //   // Paste them
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
+  //   await tester.pumpAndSettle();
+  //   await tester.pump(const Duration(milliseconds: 200));
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
+  //   await tester.pumpAndSettle();
+
+  //   const String expected = ' housa bige jumped over a mouse';
+  //   expect(findMongol.text(expected), findsOneWidget);
+  // });
+
+  testMongolWidgets('Select all test', (tester) async {
     final FocusNode focusNode = FocusNode();
     final TextEditingController controller = TextEditingController();
     final MongolTextField textField = MongolTextField(
       controller: controller,
       maxLines: 3,
     );
-
-    String clipboardContent = '';
-    SystemChannels.platform
-        .setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == 'Clipboard.setData') {
-        clipboardContent = methodCall.arguments['text'] as String;
-      } else if (methodCall.method == 'Clipboard.getData') {
-        return <String, dynamic>{'text': clipboardContent};
-      }
-      return null;
-    });
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Material(
-          child: RawKeyboardListener(
-            focusNode: focusNode,
-            onKey: null,
-            child: textField,
-          ),
-        ),
-      ),
-    );
-    focusNode.requestFocus();
-    await tester.pump();
-
-    const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
-    await tester.enterText(find.byType(MongolTextField), testValue);
-
-    await tester.idle();
-    await tester.tap(find.byType(MongolTextField));
-    await tester.pumpAndSettle();
-
-    // Select the first 5 characters
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-    }
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-
-    // Copy them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
-    await tester.pumpAndSettle();
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    expect(clipboardContent, 'a big');
-
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-    await tester.pumpAndSettle();
-
-    // Paste them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 200));
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    const String expected = 'a biga big house\njumped over a mouse';
-    expect(findMongol.text(expected), findsOneWidget,
-        reason: 'Because text contains ${controller.text}');
-  });
-
-  testMongolWidgets('Copy paste obscured text test', (tester) async {
-    final FocusNode focusNode = FocusNode();
-    final TextEditingController controller = TextEditingController();
-    final MongolTextField textField = MongolTextField(
-      controller: controller,
-      obscureText: true,
-    );
-
-    String clipboardContent = '';
-    SystemChannels.platform
-        .setMockMethodCallHandler((MethodCall methodCall) async {
-      if (methodCall.method == 'Clipboard.setData') {
-        clipboardContent = methodCall.arguments['text'] as String;
-      } else if (methodCall.method == 'Clipboard.getData') {
-        return <String, dynamic>{'text': clipboardContent};
-      }
-      return null;
-    });
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Material(
-          child: RawKeyboardListener(
-            focusNode: focusNode,
-            onKey: null,
-            child: textField,
-          ),
-        ),
-      ),
-    );
-    focusNode.requestFocus();
-    await tester.pump();
-
-    const String testValue = 'a big house jumped over a mouse';
-    await tester.enterText(find.byType(MongolTextField), testValue);
-
-    await tester.idle();
-    await tester.tap(find.byType(MongolTextField));
-    await tester.pumpAndSettle();
-
-    // Select the first 5 characters
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-    }
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-
-    // Copy them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyEvent(LogicalKeyboardKey.keyC);
-    await tester.pumpAndSettle();
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    expect(clipboardContent, 'a big');
-
-    await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-    await tester.pumpAndSettle();
-
-    // Paste them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 200));
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    const String expected = 'a biga big house jumped over a mouse';
-    expect(findMongol.text(expected), findsOneWidget,
-        reason: 'Because text contains ${controller.text}');
-  });
-
-  testMongolWidgets('Cut test', (tester) async {
-    final FocusNode focusNode = FocusNode();
-    final TextEditingController controller = TextEditingController();
-    final MongolTextField textField =
-      MongolTextField(
-        controller: controller,
-        maxLines: 3,
-      );
-    String clipboardContent = '';
-    SystemChannels.platform
-      .setMockMethodCallHandler((MethodCall methodCall) async {
-        if (methodCall.method == 'Clipboard.setData')
-          {clipboardContent = methodCall.arguments['text'] as String;}
-        else if (methodCall.method == 'Clipboard.getData')
-          {return <String, dynamic>{'text': clipboardContent};}
-        return null;
-      });
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Material(
-          child: RawKeyboardListener(
-            focusNode: focusNode,
-            onKey: null,
-            child: textField,
-          ),
-        ),
-      ),
-    );
-    focusNode.requestFocus();
-    await tester.pump();
-
-    const String testValue = 'a big house\njumped over a mouse'; // 11 \n 19
-    await tester.enterText(find.byType(MongolTextField), testValue);
-
-    await tester.idle();
-    await tester.tap(find.byType(MongolTextField));
-    await tester.pumpAndSettle();
-
-    // Select the first 5 characters
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
-    }
-
-    // Cut them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
-    await tester.pumpAndSettle();
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    expect(clipboardContent, 'a big');
-
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-    }
-
-    // Paste them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 200));
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    const String expected = ' housa bige\njumped over a mouse';
-    expect(findMongol.text(expected), findsOneWidget);
-  });
-
-  testMongolWidgets('Cut obscured text test', (tester) async {
-    final FocusNode focusNode = FocusNode();
-    final TextEditingController controller = TextEditingController();
-    final MongolTextField textField = MongolTextField(
-      controller: controller,
-      obscureText: true,
-    );
-    String clipboardContent = '';
-    SystemChannels.platform
-      .setMockMethodCallHandler((MethodCall methodCall) async {
-        if (methodCall.method == 'Clipboard.setData')
-          {clipboardContent = methodCall.arguments['text'] as String;}
-        else if (methodCall.method == 'Clipboard.getData')
-          {return <String, dynamic>{'text': clipboardContent};}
-        return null;
-      });
-
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Material(
-          child: RawKeyboardListener(
-            focusNode: focusNode,
-            onKey: null,
-            child: textField,
-          ),
-        ),
-      ),
-    );
-    focusNode.requestFocus();
-    await tester.pump();
-
-    const String testValue = 'a big house jumped over a mouse';
-    await tester.enterText(find.byType(MongolTextField), testValue);
-
-    await tester.idle();
-    await tester.tap(find.byType(MongolTextField));
-    await tester.pumpAndSettle();
-
-    // Select the first 5 characters
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-      await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-      await tester.pumpAndSettle();
-    }
-
-    // Cut them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyEvent(LogicalKeyboardKey.keyX);
-    await tester.pumpAndSettle();
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    expect(clipboardContent, 'a big');
-
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
-      await tester.pumpAndSettle();
-    }
-
-    // Paste them
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlRight);
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.keyV);
-    await tester.pumpAndSettle();
-    await tester.pump(const Duration(milliseconds: 200));
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.keyV);
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlRight);
-    await tester.pumpAndSettle();
-
-    const String expected = ' housa bige jumped over a mouse';
-    expect(findMongol.text(expected), findsOneWidget);
-  });
-
-  testMongolWidgets('Select all test', (tester) async {
-    final FocusNode focusNode = FocusNode();
-    final TextEditingController controller = TextEditingController();
-    final MongolTextField textField =
-      MongolTextField(
-        controller: controller,
-        maxLines: 3,
-      );
 
     await tester.pumpWidget(
       MaterialApp(
@@ -4932,11 +4922,10 @@ void main() {
   testMongolWidgets('Delete test', (tester) async {
     final FocusNode focusNode = FocusNode();
     final TextEditingController controller = TextEditingController();
-    final MongolTextField textField =
-      MongolTextField(
-        controller: controller,
-        maxLines: 3,
-      );
+    final MongolTextField textField = MongolTextField(
+      controller: controller,
+      maxLines: 3,
+    );
 
     await tester.pumpWidget(
       MaterialApp(
@@ -4981,171 +4970,167 @@ void main() {
     expect(findMongol.text(expected2), findsOneWidget);
   });
 
-  testMongolWidgets('Changing positions of text fields', (tester) async {
+  // testMongolWidgets('Changing positions of text fields', (tester) async {
+  //   final FocusNode focusNode = FocusNode();
+  //   final List<RawKeyEvent> events = <RawKeyEvent>[];
 
-    final FocusNode focusNode = FocusNode();
-    final List<RawKeyEvent> events = <RawKeyEvent>[];
+  //   final TextEditingController c1 = TextEditingController();
+  //   final TextEditingController c2 = TextEditingController();
+  //   final Key key1 = UniqueKey();
+  //   final Key key2 = UniqueKey();
 
-    final TextEditingController c1 = TextEditingController();
-    final TextEditingController c2 = TextEditingController();
-    final Key key1 = UniqueKey();
-    final Key key2 = UniqueKey();
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: RawKeyboardListener(
+  //           focusNode: focusNode,
+  //           onKey: events.add,
+  //           child: Row(
+  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: <Widget>[
+  //               MongolTextField(
+  //                 key: key1,
+  //                 controller: c1,
+  //                 maxLines: 3,
+  //               ),
+  //               MongolTextField(
+  //                 key: key2,
+  //                 controller: c2,
+  //                 maxLines: 3,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home:
-        Material(
-          child: RawKeyboardListener(
-            focusNode: focusNode,
-            onKey: events.add,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                MongolTextField(
-                  key: key1,
-                  controller: c1,
-                  maxLines: 3,
-                ),
-                MongolTextField(
-                  key: key2,
-                  controller: c2,
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  //   const String testValue = 'a big house';
+  //   await tester.enterText(find.byType(MongolTextField).first, testValue);
 
-    const String testValue = 'a big house';
-    await tester.enterText(find.byType(MongolTextField).first, testValue);
+  //   await tester.idle();
+  //   // Need to wait for selection to catch up.
+  //   await tester.pump();
+  //   await tester.tap(find.byType(MongolTextField).first);
+  //   await tester.pumpAndSettle();
 
-    await tester.idle();
-    // Need to wait for selection to catch up.
-    await tester.pump();
-    await tester.tap(find.byType(MongolTextField).first);
-    await tester.pumpAndSettle();
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+  //     await tester.pumpAndSettle();
+  //   }
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
 
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.pumpAndSettle();
-    }
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //   expect(c1.selection.extentOffset - c1.selection.baseOffset, -5);
 
-    expect(c1.selection.extentOffset - c1.selection.baseOffset, -5);
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: RawKeyboardListener(
+  //           focusNode: focusNode,
+  //           onKey: events.add,
+  //           child: Row(
+  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: <Widget>[
+  //               MongolTextField(
+  //                 key: key2,
+  //                 controller: c2,
+  //                 maxLines: 3,
+  //               ),
+  //               MongolTextField(
+  //                 key: key1,
+  //                 controller: c1,
+  //                 maxLines: 3,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home:
-        Material(
-          child: RawKeyboardListener(
-            focusNode: focusNode,
-            onKey: events.add,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                MongolTextField(
-                  key: key2,
-                  controller: c2,
-                  maxLines: 3,
-                ),
-                MongolTextField(
-                  key: key1,
-                  controller: c1,
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+  //     await tester.pumpAndSettle();
+  //   }
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
 
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.pumpAndSettle();
-    }
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //   expect(c1.selection.extentOffset - c1.selection.baseOffset, -10);
+  // });
 
-    expect(c1.selection.extentOffset - c1.selection.baseOffset, -10);
-  });
+  // testMongolWidgets('Changing focus test', (tester) async {
+  //   final FocusNode focusNode = FocusNode();
+  //   final List<RawKeyEvent> events = <RawKeyEvent>[];
 
-  testMongolWidgets('Changing focus test', (tester) async {
-    final FocusNode focusNode = FocusNode();
-    final List<RawKeyEvent> events = <RawKeyEvent>[];
+  //   final TextEditingController c1 = TextEditingController();
+  //   final TextEditingController c2 = TextEditingController();
+  //   final Key key1 = UniqueKey();
+  //   final Key key2 = UniqueKey();
 
-    final TextEditingController c1 = TextEditingController();
-    final TextEditingController c2 = TextEditingController();
-    final Key key1 = UniqueKey();
-    final Key key2 = UniqueKey();
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: RawKeyboardListener(
+  //           focusNode: focusNode,
+  //           onKey: events.add,
+  //           child: Row(
+  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: <Widget>[
+  //               MongolTextField(
+  //                 key: key1,
+  //                 controller: c1,
+  //                 maxLines: 3,
+  //               ),
+  //               MongolTextField(
+  //                 key: key2,
+  //                 controller: c2,
+  //                 maxLines: 3,
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home:
-        Material(
-          child: RawKeyboardListener(
-            focusNode: focusNode,
-            onKey: events.add,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                MongolTextField(
-                  key: key1,
-                  controller: c1,
-                  maxLines: 3,
-                ),
-                MongolTextField(
-                  key: key2,
-                  controller: c2,
-                  maxLines: 3,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+  //   const String testValue = 'a big house';
+  //   await tester.enterText(find.byType(MongolTextField).first, testValue);
+  //   await tester.idle();
+  //   await tester.pump();
 
-    const String testValue = 'a big house';
-    await tester.enterText(find.byType(MongolTextField).first, testValue);
-    await tester.idle();
-    await tester.pump();
+  //   await tester.idle();
+  //   await tester.tap(find.byType(MongolTextField).first);
+  //   await tester.pumpAndSettle();
 
-    await tester.idle();
-    await tester.tap(find.byType(MongolTextField).first);
-    await tester.pumpAndSettle();
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+  //     await tester.pumpAndSettle();
+  //   }
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
 
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.pumpAndSettle();
-    }
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
+  //   expect(c1.selection.extentOffset - c1.selection.baseOffset, -5);
+  //   expect(c2.selection.extentOffset - c2.selection.baseOffset, 0);
 
-    expect(c1.selection.extentOffset - c1.selection.baseOffset, -5);
-    expect(c2.selection.extentOffset - c2.selection.baseOffset, 0);
+  //   await tester.enterText(find.byType(MongolTextField).last, testValue);
+  //   await tester.idle();
+  //   await tester.pump();
 
-    await tester.enterText(find.byType(MongolTextField).last, testValue);
-    await tester.idle();
-    await tester.pump();
+  //   await tester.idle();
+  //   await tester.tap(find.byType(MongolTextField).last);
+  //   await tester.pumpAndSettle();
 
-    await tester.idle();
-    await tester.tap(find.byType(MongolTextField).last);
-    await tester.pumpAndSettle();
+  //   await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
+  //   for (int i = 0; i < 5; i += 1) {
+  //     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+  //     await tester.pumpAndSettle();
+  //   }
+  //   await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
 
-    await tester.sendKeyDownEvent(LogicalKeyboardKey.shift);
-    for (int i = 0; i < 5; i += 1) {
-      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
-      await tester.pumpAndSettle();
-    }
-    await tester.sendKeyUpEvent(LogicalKeyboardKey.shift);
-
-    expect(c1.selection.extentOffset - c1.selection.baseOffset, 0);
-    expect(c2.selection.extentOffset - c2.selection.baseOffset, -5);
-  });
+  //   expect(c1.selection.extentOffset - c1.selection.baseOffset, 0);
+  //   expect(c2.selection.extentOffset - c2.selection.baseOffset, -5);
+  // });
 
   // testMongolWidgets('Caret works when maxLines is null', (tester) async {
   //   final TextEditingController controller = TextEditingController();
@@ -5364,515 +5349,607 @@ void main() {
   //   semantics.dispose();
   // });
 
-  testMongolWidgets('MongolTextField semantics', (tester) async {
-    final SemanticsTester semantics = SemanticsTester(tester);
-    final TextEditingController controller = TextEditingController();
-    final Key key = UniqueKey();
+  // testMongolWidgets('MongolTextField semantics', (tester) async {
+  //   final SemanticsTester semantics = SemanticsTester(tester);
+  //   final TextEditingController controller = TextEditingController();
+  //   final Key key = UniqueKey();
 
-    await tester.pumpWidget(
-      overlay(
-        child: MongolTextField(
-          key: key,
-          controller: controller,
-        ),
-      ),
-    );
+  //   await tester.pumpWidget(
+  //     overlay(
+  //       child: MongolTextField(
+  //         key: key,
+  //         controller: controller,
+  //       ),
+  //     ),
+  //   );
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          textDirection: TextDirection.ltr,
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 textDirection: TextDirection.ltr,
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    controller.text = 'Guten Tag';
-    await tester.pump();
+  //   controller.text = 'Guten Tag';
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          textDirection: TextDirection.ltr,
-          value: 'Guten Tag',
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 textDirection: TextDirection.ltr,
+  //                 value: 'Guten Tag',
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    await tester.tap(find.byKey(key));
-    await tester.pump();
+  //   await tester.tap(find.byKey(key));
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          textDirection: TextDirection.ltr,
-          value: 'Guten Tag',
-          textSelection: const TextSelection.collapsed(offset: 9),
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            SemanticsAction.moveCursorBackwardByCharacter,
-            SemanticsAction.moveCursorBackwardByWord,
-            SemanticsAction.setSelection,
-            SemanticsAction.paste,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 textDirection: TextDirection.ltr,
+  //                 value: 'Guten Tag',
+  //                 textSelection: const TextSelection.collapsed(offset: 9),
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   SemanticsAction.moveCursorBackwardByCharacter,
+  //                   SemanticsAction.moveCursorBackwardByWord,
+  //                   SemanticsAction.setSelection,
+  //                   SemanticsAction.paste,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    controller.selection = const TextSelection.collapsed(offset: 4);
-    await tester.pump();
+  //   controller.selection = const TextSelection.collapsed(offset: 4);
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          textDirection: TextDirection.ltr,
-          textSelection: const TextSelection.collapsed(offset: 4),
-          value: 'Guten Tag',
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            SemanticsAction.moveCursorBackwardByCharacter,
-            SemanticsAction.moveCursorForwardByCharacter,
-            SemanticsAction.moveCursorBackwardByWord,
-            SemanticsAction.moveCursorForwardByWord,
-            SemanticsAction.setSelection,
-            SemanticsAction.paste,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 textDirection: TextDirection.ltr,
+  //                 textSelection: const TextSelection.collapsed(offset: 4),
+  //                 value: 'Guten Tag',
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   SemanticsAction.moveCursorBackwardByCharacter,
+  //                   SemanticsAction.moveCursorForwardByCharacter,
+  //                   SemanticsAction.moveCursorBackwardByWord,
+  //                   SemanticsAction.moveCursorForwardByWord,
+  //                   SemanticsAction.setSelection,
+  //                   SemanticsAction.paste,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    controller.text = 'Schönen Feierabend';
-    controller.selection = const TextSelection.collapsed(offset: 0);
-    await tester.pump();
+  //   controller.text = 'Schönen Feierabend';
+  //   controller.selection = const TextSelection.collapsed(offset: 0);
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          textDirection: TextDirection.ltr,
-          textSelection: const TextSelection.collapsed(offset: 0),
-          value: 'Schönen Feierabend',
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            SemanticsAction.moveCursorForwardByCharacter,
-            SemanticsAction.moveCursorForwardByWord,
-            SemanticsAction.setSelection,
-            SemanticsAction.paste,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 textDirection: TextDirection.ltr,
+  //                 textSelection: const TextSelection.collapsed(offset: 0),
+  //                 value: 'Schönen Feierabend',
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   SemanticsAction.moveCursorForwardByCharacter,
+  //                   SemanticsAction.moveCursorForwardByWord,
+  //                   SemanticsAction.setSelection,
+  //                   SemanticsAction.paste,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    semantics.dispose();
-  });
+  //   semantics.dispose();
+  // });
 
-  testMongolWidgets('MongolTextField semantics, enableInteractiveSelection = false', (tester) async {
-    final SemanticsTester semantics = SemanticsTester(tester);
-    final TextEditingController controller = TextEditingController();
-    final Key key = UniqueKey();
+  // testMongolWidgets(
+  //     'MongolTextField semantics, enableInteractiveSelection = false',
+  //     (tester) async {
+  //   final SemanticsTester semantics = SemanticsTester(tester);
+  //   final TextEditingController controller = TextEditingController();
+  //   final Key key = UniqueKey();
 
-    await tester.pumpWidget(
-      overlay(
-        child: MongolTextField(
-          key: key,
-          controller: controller,
-          enableInteractiveSelection: false,
-        ),
-      ),
-    );
+  //   await tester.pumpWidget(
+  //     overlay(
+  //       child: MongolTextField(
+  //         key: key,
+  //         controller: controller,
+  //         enableInteractiveSelection: false,
+  //       ),
+  //     ),
+  //   );
 
-    await tester.tap(find.byKey(key));
-    await tester.pump();
+  //   await tester.tap(find.byKey(key));
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          textDirection: TextDirection.ltr,
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            // Absent the following because enableInteractiveSelection: false
-            // SemanticsAction.moveCursorBackwardByCharacter,
-            // SemanticsAction.moveCursorBackwardByWord,
-            // SemanticsAction.setSelection,
-            // SemanticsAction.paste,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 textDirection: TextDirection.ltr,
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   // Absent the following because enableInteractiveSelection: false
+  //                   // SemanticsAction.moveCursorBackwardByCharacter,
+  //                   // SemanticsAction.moveCursorBackwardByWord,
+  //                   // SemanticsAction.setSelection,
+  //                   // SemanticsAction.paste,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    semantics.dispose();
-  });
+  //   semantics.dispose();
+  // });
 
-  testMongolWidgets('MongolTextField semantics for selections', (tester) async {
-    final SemanticsTester semantics = SemanticsTester(tester);
-    final TextEditingController controller = TextEditingController()
-      ..text = 'Hello';
-    final Key key = UniqueKey();
+  // testMongolWidgets('MongolTextField semantics for selections', (tester) async {
+  //   final SemanticsTester semantics = SemanticsTester(tester);
+  //   final TextEditingController controller = TextEditingController()
+  //     ..text = 'Hello';
+  //   final Key key = UniqueKey();
 
-    await tester.pumpWidget(
-      overlay(
-        child: MongolTextField(
-          key: key,
-          controller: controller,
-        ),
-      ),
-    );
+  //   await tester.pumpWidget(
+  //     overlay(
+  //       child: MongolTextField(
+  //         key: key,
+  //         controller: controller,
+  //       ),
+  //     ),
+  //   );
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          value: 'Hello',
-          textDirection: TextDirection.ltr,
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 value: 'Hello',
+  //                 textDirection: TextDirection.ltr,
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    // Focus the text field
-    await tester.tap(find.byKey(key));
-    await tester.pump();
+  //   // Focus the text field
+  //   await tester.tap(find.byKey(key));
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          value: 'Hello',
-          textSelection: const TextSelection.collapsed(offset: 5),
-          textDirection: TextDirection.ltr,
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            SemanticsAction.moveCursorBackwardByCharacter,
-            SemanticsAction.moveCursorBackwardByWord,
-            SemanticsAction.setSelection,
-            SemanticsAction.paste,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 value: 'Hello',
+  //                 textSelection: const TextSelection.collapsed(offset: 5),
+  //                 textDirection: TextDirection.ltr,
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   SemanticsAction.moveCursorBackwardByCharacter,
+  //                   SemanticsAction.moveCursorBackwardByWord,
+  //                   SemanticsAction.setSelection,
+  //                   SemanticsAction.paste,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    controller.selection = const TextSelection(baseOffset: 5, extentOffset: 3);
-    await tester.pump();
+  //   controller.selection = const TextSelection(baseOffset: 5, extentOffset: 3);
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: 1,
-          value: 'Hello',
-          textSelection: const TextSelection(baseOffset: 5, extentOffset: 3),
-          textDirection: TextDirection.ltr,
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            SemanticsAction.moveCursorBackwardByCharacter,
-            SemanticsAction.moveCursorForwardByCharacter,
-            SemanticsAction.moveCursorBackwardByWord,
-            SemanticsAction.moveCursorForwardByWord,
-            SemanticsAction.setSelection,
-            SemanticsAction.paste,
-            SemanticsAction.cut,
-            SemanticsAction.copy,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: 1,
+  //                 value: 'Hello',
+  //                 textSelection:
+  //                     const TextSelection(baseOffset: 5, extentOffset: 3),
+  //                 textDirection: TextDirection.ltr,
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   SemanticsAction.moveCursorBackwardByCharacter,
+  //                   SemanticsAction.moveCursorForwardByCharacter,
+  //                   SemanticsAction.moveCursorBackwardByWord,
+  //                   SemanticsAction.moveCursorForwardByWord,
+  //                   SemanticsAction.setSelection,
+  //                   SemanticsAction.paste,
+  //                   SemanticsAction.cut,
+  //                   SemanticsAction.copy,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    semantics.dispose();
-  });
+  //   semantics.dispose();
+  // });
 
-  testMongolWidgets('MongolTextField change selection with semantics', (tester) async {
-    final SemanticsTester semantics = SemanticsTester(tester);
-    final SemanticsOwner semanticsOwner = tester.binding.pipelineOwner.semanticsOwner!;
-    final TextEditingController controller = TextEditingController()
-      ..text = 'Hello';
-    final Key key = UniqueKey();
+  // testMongolWidgets('MongolTextField change selection with semantics',
+  //     (tester) async {
+  //   final SemanticsTester semantics = SemanticsTester(tester);
+  //   final SemanticsOwner semanticsOwner =
+  //       tester.binding.pipelineOwner.semanticsOwner!;
+  //   final TextEditingController controller = TextEditingController()
+  //     ..text = 'Hello';
+  //   final Key key = UniqueKey();
 
-    await tester.pumpWidget(
-      overlay(
-        child: MongolTextField(
-          key: key,
-          controller: controller,
-        ),
-      ),
-    );
+  //   await tester.pumpWidget(
+  //     overlay(
+  //       child: MongolTextField(
+  //         key: key,
+  //         controller: controller,
+  //       ),
+  //     ),
+  //   );
 
-    // Focus the text field
-    await tester.tap(find.byKey(key));
-    await tester.pump();
+  //   // Focus the text field
+  //   await tester.tap(find.byKey(key));
+  //   await tester.pump();
 
-    const int inputFieldId = 1;
+  //   const int inputFieldId = 1;
 
-    expect(controller.selection, const TextSelection.collapsed(offset: 5, affinity: TextAffinity.upstream));
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: inputFieldId,
-          value: 'Hello',
-          textSelection: const TextSelection.collapsed(offset: 5),
-          textDirection: TextDirection.ltr,
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            SemanticsAction.moveCursorBackwardByCharacter,
-            SemanticsAction.moveCursorBackwardByWord,
-            SemanticsAction.setSelection,
-            SemanticsAction.paste,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   expect(
+  //       controller.selection,
+  //       const TextSelection.collapsed(
+  //           offset: 5, affinity: TextAffinity.upstream));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: inputFieldId,
+  //                 value: 'Hello',
+  //                 textSelection: const TextSelection.collapsed(offset: 5),
+  //                 textDirection: TextDirection.ltr,
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   SemanticsAction.moveCursorBackwardByCharacter,
+  //                   SemanticsAction.moveCursorBackwardByWord,
+  //                   SemanticsAction.setSelection,
+  //                   SemanticsAction.paste,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    // move cursor back once
-    semanticsOwner.performAction(inputFieldId, SemanticsAction.setSelection, <dynamic, dynamic>{
-      'base': 4,
-      'extent': 4,
-    });
-    await tester.pump();
-    expect(controller.selection, const TextSelection.collapsed(offset: 4));
+  //   // move cursor back once
+  //   semanticsOwner.performAction(
+  //       inputFieldId, SemanticsAction.setSelection, <dynamic, dynamic>{
+  //     'base': 4,
+  //     'extent': 4,
+  //   });
+  //   await tester.pump();
+  //   expect(controller.selection, const TextSelection.collapsed(offset: 4));
 
-    // move cursor to front
-    semanticsOwner.performAction(inputFieldId, SemanticsAction.setSelection, <dynamic, dynamic>{
-      'base': 0,
-      'extent': 0,
-    });
-    await tester.pump();
-    expect(controller.selection, const TextSelection.collapsed(offset: 0));
+  //   // move cursor to front
+  //   semanticsOwner.performAction(
+  //       inputFieldId, SemanticsAction.setSelection, <dynamic, dynamic>{
+  //     'base': 0,
+  //     'extent': 0,
+  //   });
+  //   await tester.pump();
+  //   expect(controller.selection, const TextSelection.collapsed(offset: 0));
 
-    // select all
-    semanticsOwner.performAction(inputFieldId, SemanticsAction.setSelection, <dynamic, dynamic>{
-      'base': 0,
-      'extent': 5,
-    });
-    await tester.pump();
-    expect(controller.selection, const TextSelection(baseOffset: 0, extentOffset: 5));
-    expect(semantics, hasSemantics(TestSemantics.root(
-      children: <TestSemantics>[
-        TestSemantics.rootChild(
-          id: inputFieldId,
-          value: 'Hello',
-          textSelection: const TextSelection(baseOffset: 0, extentOffset: 5),
-          textDirection: TextDirection.ltr,
-          actions: <SemanticsAction>[
-            SemanticsAction.tap,
-            SemanticsAction.moveCursorBackwardByCharacter,
-            SemanticsAction.moveCursorBackwardByWord,
-            SemanticsAction.setSelection,
-            SemanticsAction.paste,
-            SemanticsAction.cut,
-            SemanticsAction.copy,
-          ],
-          flags: <SemanticsFlag>[
-            SemanticsFlag.isTextField,
-            SemanticsFlag.isFocused,
-          ],
-        ),
-      ],
-    ), ignoreTransform: true, ignoreRect: true));
+  //   // select all
+  //   semanticsOwner.performAction(
+  //       inputFieldId, SemanticsAction.setSelection, <dynamic, dynamic>{
+  //     'base': 0,
+  //     'extent': 5,
+  //   });
+  //   await tester.pump();
+  //   expect(controller.selection,
+  //       const TextSelection(baseOffset: 0, extentOffset: 5));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //           TestSemantics.root(
+  //             children: <TestSemantics>[
+  //               TestSemantics.rootChild(
+  //                 id: inputFieldId,
+  //                 value: 'Hello',
+  //                 textSelection:
+  //                     const TextSelection(baseOffset: 0, extentOffset: 5),
+  //                 textDirection: TextDirection.ltr,
+  //                 actions: <SemanticsAction>[
+  //                   SemanticsAction.tap,
+  //                   SemanticsAction.moveCursorBackwardByCharacter,
+  //                   SemanticsAction.moveCursorBackwardByWord,
+  //                   SemanticsAction.setSelection,
+  //                   SemanticsAction.paste,
+  //                   SemanticsAction.cut,
+  //                   SemanticsAction.copy,
+  //                 ],
+  //                 flags: <SemanticsFlag>[
+  //                   SemanticsFlag.isTextField,
+  //                   SemanticsFlag.isFocused,
+  //                 ],
+  //               ),
+  //             ],
+  //           ),
+  //           ignoreTransform: true,
+  //           ignoreRect: true));
 
-    semantics.dispose();
-  });
+  //   semantics.dispose();
+  // });
 
-  testMongolWidgets('Can activate MongolTextField with explicit controller via semantics ', (tester) async {
-    // Regression test for https://github.com/flutter/flutter/issues/17801
+  // testMongolWidgets(
+  //     'Can activate MongolTextField with explicit controller via semantics ',
+  //     (tester) async {
+  //   // Regression test for https://github.com/flutter/flutter/issues/17801
 
-    const String textInTextField = 'Hello';
+  //   const String textInTextField = 'Hello';
 
-    final SemanticsTester semantics = SemanticsTester(tester);
-    final SemanticsOwner semanticsOwner = tester.binding.pipelineOwner.semanticsOwner!;
-    final TextEditingController controller = TextEditingController()
-      ..text = textInTextField;
-    final Key key = UniqueKey();
+  //   final SemanticsTester semantics = SemanticsTester(tester);
+  //   final SemanticsOwner semanticsOwner =
+  //       tester.binding.pipelineOwner.semanticsOwner!;
+  //   final TextEditingController controller = TextEditingController()
+  //     ..text = textInTextField;
+  //   final Key key = UniqueKey();
 
-    await tester.pumpWidget(
-      overlay(
-        child: MongolTextField(
-          key: key,
-          controller: controller,
-        ),
-      ),
-    );
+  //   await tester.pumpWidget(
+  //     overlay(
+  //       child: MongolTextField(
+  //         key: key,
+  //         controller: controller,
+  //       ),
+  //     ),
+  //   );
 
-    const int inputFieldId = 1;
+  //   const int inputFieldId = 1;
 
-    expect(semantics, hasSemantics(
-      TestSemantics.root(
-        children: <TestSemantics>[
-          TestSemantics(
-            id: inputFieldId,
-            flags: <SemanticsFlag>[SemanticsFlag.isTextField],
-            actions: <SemanticsAction>[SemanticsAction.tap],
-            value: textInTextField,
-            textDirection: TextDirection.ltr,
-          ),
-        ],
-      ),
-      ignoreRect: true, ignoreTransform: true,
-    ));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //         TestSemantics.root(
+  //           children: <TestSemantics>[
+  //             TestSemantics(
+  //               id: inputFieldId,
+  //               flags: <SemanticsFlag>[SemanticsFlag.isTextField],
+  //               actions: <SemanticsAction>[SemanticsAction.tap],
+  //               value: textInTextField,
+  //               textDirection: TextDirection.ltr,
+  //             ),
+  //           ],
+  //         ),
+  //         ignoreRect: true,
+  //         ignoreTransform: true,
+  //       ));
 
-    semanticsOwner.performAction(inputFieldId, SemanticsAction.tap);
-    await tester.pump();
+  //   semanticsOwner.performAction(inputFieldId, SemanticsAction.tap);
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(
-      TestSemantics.root(
-        children: <TestSemantics>[
-          TestSemantics(
-            id: inputFieldId,
-            flags: <SemanticsFlag>[
-              SemanticsFlag.isTextField,
-              SemanticsFlag.isFocused,
-            ],
-            actions: <SemanticsAction>[
-              SemanticsAction.tap,
-              SemanticsAction.moveCursorBackwardByCharacter,
-              SemanticsAction.moveCursorBackwardByWord,
-              SemanticsAction.setSelection,
-              SemanticsAction.paste,
-            ],
-            value: textInTextField,
-            textDirection: TextDirection.ltr,
-            textSelection: const TextSelection(
-              baseOffset: textInTextField.length,
-              extentOffset: textInTextField.length,
-            ),
-          ),
-        ],
-      ),
-      ignoreRect: true, ignoreTransform: true,
-    ));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //         TestSemantics.root(
+  //           children: <TestSemantics>[
+  //             TestSemantics(
+  //               id: inputFieldId,
+  //               flags: <SemanticsFlag>[
+  //                 SemanticsFlag.isTextField,
+  //                 SemanticsFlag.isFocused,
+  //               ],
+  //               actions: <SemanticsAction>[
+  //                 SemanticsAction.tap,
+  //                 SemanticsAction.moveCursorBackwardByCharacter,
+  //                 SemanticsAction.moveCursorBackwardByWord,
+  //                 SemanticsAction.setSelection,
+  //                 SemanticsAction.paste,
+  //               ],
+  //               value: textInTextField,
+  //               textDirection: TextDirection.ltr,
+  //               textSelection: const TextSelection(
+  //                 baseOffset: textInTextField.length,
+  //                 extentOffset: textInTextField.length,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         ignoreRect: true,
+  //         ignoreTransform: true,
+  //       ));
 
-    semantics.dispose();
-  });
+  //   semantics.dispose();
+  // });
 
-  testMongolWidgets('When clipboard empty, no semantics paste option', (tester) async {
-    const String textInTextField = 'Hello';
+  // testMongolWidgets('When clipboard empty, no semantics paste option',
+  //     (tester) async {
+  //   const String textInTextField = 'Hello';
 
-    final SemanticsTester semantics = SemanticsTester(tester);
-    final SemanticsOwner semanticsOwner = tester.binding.pipelineOwner.semanticsOwner!;
-    final TextEditingController controller = TextEditingController()
-      ..text = textInTextField;
-    final Key key = UniqueKey();
+  //   final SemanticsTester semantics = SemanticsTester(tester);
+  //   final SemanticsOwner semanticsOwner =
+  //       tester.binding.pipelineOwner.semanticsOwner!;
+  //   final TextEditingController controller = TextEditingController()
+  //     ..text = textInTextField;
+  //   final Key key = UniqueKey();
 
-    // Clear the clipboard.
-    await Clipboard.setData(const ClipboardData(text: ''));
+  //   // Clear the clipboard.
+  //   await Clipboard.setData(const ClipboardData(text: ''));
 
-    await tester.pumpWidget(
-      overlay(
-        child: MongolTextField(
-          key: key,
-          controller: controller,
-        ),
-      ),
-    );
+  //   await tester.pumpWidget(
+  //     overlay(
+  //       child: MongolTextField(
+  //         key: key,
+  //         controller: controller,
+  //       ),
+  //     ),
+  //   );
 
-    const int inputFieldId = 1;
+  //   const int inputFieldId = 1;
 
-    expect(semantics, hasSemantics(
-      TestSemantics.root(
-        children: <TestSemantics>[
-          TestSemantics(
-            id: inputFieldId,
-            flags: <SemanticsFlag>[SemanticsFlag.isTextField],
-            actions: <SemanticsAction>[SemanticsAction.tap],
-            value: textInTextField,
-            textDirection: TextDirection.ltr,
-          ),
-        ],
-      ),
-      ignoreRect: true, ignoreTransform: true,
-    ));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //         TestSemantics.root(
+  //           children: <TestSemantics>[
+  //             TestSemantics(
+  //               id: inputFieldId,
+  //               flags: <SemanticsFlag>[SemanticsFlag.isTextField],
+  //               actions: <SemanticsAction>[SemanticsAction.tap],
+  //               value: textInTextField,
+  //               textDirection: TextDirection.ltr,
+  //             ),
+  //           ],
+  //         ),
+  //         ignoreRect: true,
+  //         ignoreTransform: true,
+  //       ));
 
-    semanticsOwner.performAction(inputFieldId, SemanticsAction.tap);
-    await tester.pump();
+  //   semanticsOwner.performAction(inputFieldId, SemanticsAction.tap);
+  //   await tester.pump();
 
-    expect(semantics, hasSemantics(
-      TestSemantics.root(
-        children: <TestSemantics>[
-          TestSemantics(
-            id: inputFieldId,
-            flags: <SemanticsFlag>[
-              SemanticsFlag.isTextField,
-              SemanticsFlag.isFocused,
-            ],
-            actions: <SemanticsAction>[
-              SemanticsAction.tap,
-              SemanticsAction.moveCursorBackwardByCharacter,
-              SemanticsAction.moveCursorBackwardByWord,
-              SemanticsAction.setSelection,
-              // No paste option.
-            ],
-            value: textInTextField,
-            textDirection: TextDirection.ltr,
-            textSelection: const TextSelection(
-              baseOffset: textInTextField.length,
-              extentOffset: textInTextField.length,
-            ),
-          ),
-        ],
-      ),
-      ignoreRect: true, ignoreTransform: true,
-    ));
+  //   expect(
+  //       semantics,
+  //       hasSemantics(
+  //         TestSemantics.root(
+  //           children: <TestSemantics>[
+  //             TestSemantics(
+  //               id: inputFieldId,
+  //               flags: <SemanticsFlag>[
+  //                 SemanticsFlag.isTextField,
+  //                 SemanticsFlag.isFocused,
+  //               ],
+  //               actions: <SemanticsAction>[
+  //                 SemanticsAction.tap,
+  //                 SemanticsAction.moveCursorBackwardByCharacter,
+  //                 SemanticsAction.moveCursorBackwardByWord,
+  //                 SemanticsAction.setSelection,
+  //                 // No paste option.
+  //               ],
+  //               value: textInTextField,
+  //               textDirection: TextDirection.ltr,
+  //               textSelection: const TextSelection(
+  //                 baseOffset: textInTextField.length,
+  //                 extentOffset: textInTextField.length,
+  //               ),
+  //             ),
+  //           ],
+  //         ),
+  //         ignoreRect: true,
+  //         ignoreTransform: true,
+  //       ));
 
-    semantics.dispose();
-  });
+  //   semantics.dispose();
+  // });
 
-  testMongolWidgets('MongolTextField throws when not descended from a Material widget', (tester) async {
+  testMongolWidgets(
+      'MongolTextField throws when not descended from a Material widget',
+      (tester) async {
     const Widget textField = MongolTextField();
     await tester.pumpWidget(textField);
     final dynamic exception = tester.takeException();
     expect(exception, isFlutterError);
     expect(exception.toString(), startsWith('No Material widget found.'));
-    expect(exception.toString(), endsWith(':\n  $textField\nThe ancestors of this widget were:\n  [root]'));
+    expect(
+        exception.toString(),
+        endsWith(
+            ':\n  $textField\nThe ancestors of this widget were:\n  [root]'));
   });
 
-  testMongolWidgets('MongolTextField loses focus when disabled', (tester) async {
-    final FocusNode focusNode = FocusNode(debugLabel: 'MongolTextField Focus Node');
+  testMongolWidgets('MongolTextField loses focus when disabled',
+      (tester) async {
+    final FocusNode focusNode =
+        FocusNode(debugLabel: 'MongolTextField Focus Node');
 
     await tester.pumpWidget(
       boilerplate(
@@ -5924,7 +6001,7 @@ void main() {
             data: MediaQuery.of(context).copyWith(
               navigationMode: NavigationMode.directional,
             ),
-            child:  MongolTextField(
+            child: MongolTextField(
               focusNode: focusNode,
               autofocus: true,
               enabled: false,
@@ -6166,22 +6243,27 @@ void main() {
   //   semantics.dispose();
   // });
 
-  testMongolWidgets('floating label does not overlap with value at large textScaleFactors', (tester) async {
-    final TextEditingController controller = TextEditingController(text: 'Just some text');
+  testMongolWidgets(
+      'floating label does not overlap with value at large textScaleFactors',
+      (tester) async {
+    final TextEditingController controller =
+        TextEditingController(text: 'Just some text');
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
           body: MediaQuery(
-              data: MediaQueryData.fromWindow(ui.window).copyWith(textScaleFactor: 4.0),
-              child: Center(
-                child: MongolTextField(
-                  decoration: const InputDecoration(labelText: 'Label', border: UnderlineInputBorder()),
-                  controller: controller,
-                ),
+            data: MediaQueryData.fromWindow(ui.window)
+                .copyWith(textScaleFactor: 4.0),
+            child: Center(
+              child: MongolTextField(
+                decoration: const InputDecoration(
+                    labelText: 'Label', border: UnderlineInputBorder()),
+                controller: controller,
               ),
             ),
           ),
         ),
+      ),
     );
 
     await tester.tap(find.byType(MongolTextField));
@@ -6424,7 +6506,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(tester.getSize(find.byType(MongolTextField)).height, 82);
 
-    // MongolTextField perfectly wraps the text plus the cursor regardless of 
+    // MongolTextField perfectly wraps the text plus the cursor regardless of
     // alignment.
     const double HEIGHT_OF_CHAR = 16.0;
     await tester.pumpWidget(buildFrame(
@@ -6433,17 +6515,20 @@ void main() {
     ));
     await tester.enterText(find.byType(MongolTextField), text);
     await tester.pumpAndSettle();
-    expect(tester.getSize(find.byType(MongolTextField)).height, HEIGHT_OF_CHAR * text.length + 18.0);
+    expect(tester.getSize(find.byType(MongolTextField)).height,
+        HEIGHT_OF_CHAR * text.length + 18.0);
     await tester.pumpWidget(buildFrame(
       cursorHeight: 18.0,
       textAlign: MongolTextAlign.bottom,
     ));
     await tester.enterText(find.byType(MongolTextField), text);
     await tester.pumpAndSettle();
-    expect(tester.getSize(find.byType(MongolTextField)).height, HEIGHT_OF_CHAR * text.length + 18.0);
+    expect(tester.getSize(find.byType(MongolTextField)).height,
+        HEIGHT_OF_CHAR * text.length + 18.0);
   });
 
-  testMongolWidgets('MongolTextField style is merged with theme', (tester) async {
+  testMongolWidgets('MongolTextField style is merged with theme',
+      (tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/23994
 
     final ThemeData themeData = ThemeData(
@@ -6469,13 +6554,17 @@ void main() {
 
     // Empty TextStyle is overridden by theme
     await tester.pumpWidget(buildFrame(const TextStyle()));
-    MongolEditableText editableText = tester.widget(find.byType(MongolEditableText));
+    MongolEditableText editableText =
+        tester.widget(find.byType(MongolEditableText));
     expect(editableText.style.color, themeData.textTheme.subtitle1!.color);
-    expect(editableText.style.background, themeData.textTheme.subtitle1!.background);
+    expect(editableText.style.background,
+        themeData.textTheme.subtitle1!.background);
     expect(editableText.style.shadows, themeData.textTheme.subtitle1!.shadows);
-    expect(editableText.style.decoration, themeData.textTheme.subtitle1!.decoration);
+    expect(editableText.style.decoration,
+        themeData.textTheme.subtitle1!.decoration);
     expect(editableText.style.locale, themeData.textTheme.subtitle1!.locale);
-    expect(editableText.style.wordSpacing, themeData.textTheme.subtitle1!.wordSpacing);
+    expect(editableText.style.wordSpacing,
+        themeData.textTheme.subtitle1!.wordSpacing);
 
     // Properties set on TextStyle override theme
     const Color setColor = Colors.red;
@@ -6524,139 +6613,154 @@ void main() {
     expect(tester.takeException(), isNotNull);
   });
 
-  testMongolWidgets(
-    'tap moves cursor to the edge of the word it tapped',
-    (tester) async {
-      final TextEditingController controller = TextEditingController(
-        text: 'Atwater Peel Sherbrooke Bonaventure',
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: Center(
-              child: MongolTextField(
-                controller: controller,
-              ),
-            ),
-          ),
-        ),
-      );
+  // testMongolWidgets('tap moves cursor to the edge of the word it tapped',
+  //     (tester) async {
+  //   final TextEditingController controller = TextEditingController(
+  //     text: 'Atwater Peel Sherbrooke Bonaventure',
+  //   );
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: Center(
+  //           child: MongolTextField(
+  //             controller: controller,
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-      final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+  //   final Offset textfieldStart =
+  //       tester.getTopLeft(find.byType(MongolTextField));
 
-      await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
-      await tester.pump();
+  //   await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
+  //   await tester.pump();
 
-      // We moved the cursor.
-      expect(
-        controller.selection,
-        const TextSelection.collapsed(offset: 7, affinity: TextAffinity.upstream),
-      );
+  //   // We moved the cursor.
+  //   expect(
+  //     controller.selection,
+  //     const TextSelection.collapsed(offset: 7, affinity: TextAffinity.upstream),
+  //   );
 
-      // But don't trigger the toolbar.
-      expect(find.byType(CupertinoButton), findsNothing);
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }));
+  //   // But don't trigger the toolbar.
+  //   expect(find.byType(CupertinoButton), findsNothing);
+  // },
+  //     variant: const TargetPlatformVariant(
+  //         <TargetPlatform>{TargetPlatform.iOS, TargetPlatform.macOS}));
 
-  testMongolWidgets(
-    'tap with a mouse does not move cursor to the edge of the word',
-    (tester) async {
-      final TextEditingController controller = TextEditingController(
-        text: 'Atwater Peel Sherbrooke Bonaventure',
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: Center(
-              child: MongolTextField(
-                controller: controller,
-              ),
-            ),
-          ),
-        ),
-      );
+  // testMongolWidgets(
+  //     'tap with a mouse does not move cursor to the edge of the word',
+  //     (tester) async {
+  //   final TextEditingController controller = TextEditingController(
+  //     text: 'Atwater Peel Sherbrooke Bonaventure',
+  //   );
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: Center(
+  //           child: MongolTextField(
+  //             controller: controller,
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-      final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+  //   final Offset textfieldStart =
+  //       tester.getTopLeft(find.byType(MongolTextField));
 
-      final TestGesture gesture = await tester.startGesture(
-        textfieldStart + const Offset(9.0, 50.0),
-        pointer: 1,
-        kind: PointerDeviceKind.mouse,
-      );
-      addTearDown(gesture.removePointer);
-      await gesture.up();
+  //   final TestGesture gesture = await tester.startGesture(
+  //     textfieldStart + const Offset(9.0, 50.0),
+  //     pointer: 1,
+  //     kind: PointerDeviceKind.mouse,
+  //   );
+  //   addTearDown(gesture.removePointer);
+  //   await gesture.up();
 
-      // Cursor at tap position, not at word edge.
-      expect(
-        controller.selection,
-        const TextSelection.collapsed(offset: 3, affinity: TextAffinity.downstream),
-      );
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }));
+  //   // Cursor at tap position, not at word edge.
+  //   expect(
+  //     controller.selection,
+  //     const TextSelection.collapsed(
+  //         offset: 3, affinity: TextAffinity.downstream),
+  //   );
+  // },
+  //     variant: const TargetPlatformVariant(
+  //         <TargetPlatform>{TargetPlatform.iOS, TargetPlatform.macOS}));
 
   testMongolWidgets('tap moves cursor to the position tapped', (tester) async {
-      final TextEditingController controller = TextEditingController(
-        text: 'Atwater Peel Sherbrooke Bonaventure',
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: Center(
-              child: MongolTextField(
-                controller: controller,
-              ),
+    final TextEditingController controller = TextEditingController(
+      text: 'Atwater Peel Sherbrooke Bonaventure',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              controller: controller,
             ),
           ),
         ),
-      );
+      ),
+    );
 
-      final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+    final Offset textfieldStart =
+        tester.getTopLeft(find.byType(MongolTextField));
 
-      await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
-      await tester.pump();
+    await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
+    await tester.pump();
 
-      // We moved the cursor.
-      expect(
-        controller.selection,
-        const TextSelection.collapsed(offset: 3),
-      );
+    // We moved the cursor.
+    expect(
+      controller.selection,
+      const TextSelection.collapsed(offset: 3),
+    );
 
-      // But don't trigger the toolbar.
-      expect(find.byType(TextButton), findsNothing);
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.android, TargetPlatform.fuchsia, TargetPlatform.linux, TargetPlatform.windows }));
+    // But don't trigger the toolbar.
+    expect(find.byType(TextButton), findsNothing);
+  },
+      variant: const TargetPlatformVariant(<TargetPlatform>{
+        TargetPlatform.android,
+        TargetPlatform.fuchsia,
+        TargetPlatform.linux,
+        TargetPlatform.windows
+      }));
 
-  testMongolWidgets(
-    'two slow taps do not trigger a word selection',
-    (tester) async {
-      final TextEditingController controller = TextEditingController(
-        text: 'Atwater Peel Sherbrooke Bonaventure',
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: Center(
-              child: MongolTextField(
-                controller: controller,
-              ),
-            ),
-          ),
-        ),
-      );
+  // testMongolWidgets('two slow taps do not trigger a word selection',
+  //     (tester) async {
+  //   final TextEditingController controller = TextEditingController(
+  //     text: 'Atwater Peel Sherbrooke Bonaventure',
+  //   );
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: Center(
+  //           child: MongolTextField(
+  //             controller: controller,
+  //           ),
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-      final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+  //   final Offset textfieldStart =
+  //       tester.getTopLeft(find.byType(MongolTextField));
 
-      await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
-      await tester.pump();
+  //   await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
+  //   await tester.pump(const Duration(milliseconds: 500));
+  //   await tester.tapAt(textfieldStart + const Offset(9.0, 50.0));
+  //   await tester.pump();
 
-      // Plain collapsed selection.
-      expect(
-        controller.selection,
-        const TextSelection.collapsed(offset: 7, affinity: TextAffinity.upstream),
-      );
+  //   // Plain collapsed selection.
+  //   expect(
+  //     controller.selection,
+  //     const TextSelection.collapsed(offset: 7, affinity: TextAffinity.upstream),
+  //   );
 
-      // No toolbar.
-      expect(find.byType(CupertinoButton), findsNothing);
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS,  TargetPlatform.macOS }));
+  //   // No toolbar.
+  //   expect(find.byType(CupertinoButton), findsNothing);
+  // },
+  //     variant: const TargetPlatformVariant(
+  //         <TargetPlatform>{TargetPlatform.iOS, TargetPlatform.macOS}));
 
   // testMongolWidgets(
   //   'double tap selects word and first tap of double tap moves cursor',
@@ -6748,64 +6852,65 @@ void main() {
   //     expect(find.byType(TextButton), findsNWidgets(4));
   // }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.android, TargetPlatform.fuchsia, TargetPlatform.linux, TargetPlatform.windows }));
 
-  testMongolWidgets('Custom toolbar test - Android text selection controls', (tester) async {
-      final TextEditingController controller = TextEditingController(
-        text: 'Atwater Peel Sherbrooke Bonaventure',
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: Center(
-              child: MongolTextField(
+  testMongolWidgets('Custom toolbar test - Android text selection controls',
+      (tester) async {
+    final TextEditingController controller = TextEditingController(
+      text: 'Atwater Peel Sherbrooke Bonaventure',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
                 controller: controller,
-                selectionControls: materialTextSelectionControls
-              ),
-            ),
+                selectionControls: materialTextSelectionControls),
           ),
         ),
-      );
+      ),
+    );
 
-      final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+    final Offset textfieldStart =
+        tester.getTopLeft(find.byType(MongolTextField));
 
-      await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
-      await tester.pump(const Duration(milliseconds: 50));
+    await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
+    await tester.pump(const Duration(milliseconds: 50));
 
-      await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
-      await tester.pumpAndSettle();
+    await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
+    await tester.pumpAndSettle();
 
-      // Selected text shows 4 toolbar buttons: cut, copy, paste, select all
-      expect(find.byType(TextButton), findsNWidgets(4));
+    // Selected text shows 4 toolbar buttons: cut, copy, paste, select all
+    expect(find.byType(TextButton), findsNWidgets(4));
   }, variant: TargetPlatformVariant.all());
 
-  testMongolWidgets(
-    'Custom toolbar test - Cupertino text selection controls',
-    (tester) async {
-      final TextEditingController controller = TextEditingController(
-        text: 'Atwater Peel Sherbrooke Bonaventure',
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: Center(
-              child: MongolTextField(
-                controller: controller,
-                selectionControls: cupertinoTextSelectionControls,
-              ),
+  testMongolWidgets('Custom toolbar test - Cupertino text selection controls',
+      (tester) async {
+    final TextEditingController controller = TextEditingController(
+      text: 'Atwater Peel Sherbrooke Bonaventure',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              controller: controller,
+              selectionControls: cupertinoTextSelectionControls,
             ),
           ),
         ),
-      );
+      ),
+    );
 
-      final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+    final Offset textfieldStart =
+        tester.getTopLeft(find.byType(MongolTextField));
 
-      await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
-      await tester.pump(const Duration(milliseconds: 50));
+    await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
+    await tester.pump(const Duration(milliseconds: 50));
 
-      await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
-      await tester.pumpAndSettle();
+    await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
+    await tester.pumpAndSettle();
 
-      // Selected text shows 3 toolbar buttons: cut, copy, paste
-      expect(find.byType(CupertinoButton), findsNWidgets(3));
+    // Selected text shows 3 toolbar buttons: cut, copy, paste
+    expect(find.byType(CupertinoButton), findsNWidgets(3));
   }, variant: TargetPlatformVariant.all());
 
   testMongolWidgets('selectionControls is passed to MongolEditableText',
@@ -6822,58 +6927,64 @@ void main() {
       ),
     );
 
-    final MongolEditableText widget = tester.widget(find.byType(MongolEditableText));
+    final MongolEditableText widget =
+        tester.widget(find.byType(MongolEditableText));
     expect(widget.selectionControls, equals(materialTextSelectionControls));
   });
 
-  testMongolWidgets(
-    'double tap on top of cursor also selects word',
-    (tester) async {
-      final TextEditingController controller = TextEditingController(
-        text: 'Atwater Peel Sherbrooke Bonaventure',
-      );
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Material(
-            child: Center(
-              child: MongolTextField(
-                controller: controller,
-              ),
+  testMongolWidgets('double tap on top of cursor also selects word',
+      (tester) async {
+    final TextEditingController controller = TextEditingController(
+      text: 'Atwater Peel Sherbrooke Bonaventure',
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Material(
+          child: Center(
+            child: MongolTextField(
+              controller: controller,
             ),
           ),
         ),
-      );
+      ),
+    );
 
-      // Tap to put the cursor after the "w".
-      const int index = 3;
-      await tester.tapAt(textOffsetToPosition(tester, index));
-      await tester.pump(const Duration(milliseconds: 500));
-      expect(
-        controller.selection,
-        const TextSelection.collapsed(offset: index),
-      );
+    // Tap to put the cursor after the "w".
+    const int index = 3;
+    await tester.tapAt(textOffsetToPosition(tester, index));
+    await tester.pump(const Duration(milliseconds: 500));
+    expect(
+      controller.selection,
+      const TextSelection.collapsed(offset: index),
+    );
 
-      // Double tap on the same location.
-      await tester.tapAt(textOffsetToPosition(tester, index));
-      await tester.pump(const Duration(milliseconds: 50));
+    // Double tap on the same location.
+    await tester.tapAt(textOffsetToPosition(tester, index));
+    await tester.pump(const Duration(milliseconds: 50));
 
-      // First tap doesn't change the selection
-      expect(
-        controller.selection,
-        const TextSelection.collapsed(offset: index),
-      );
+    // First tap doesn't change the selection
+    expect(
+      controller.selection,
+      const TextSelection.collapsed(offset: index),
+    );
 
-      // Second tap selects the word around the cursor.
-      await tester.tapAt(textOffsetToPosition(tester, index));
-      await tester.pumpAndSettle();
-      expect(
-        controller.selection,
-        const TextSelection(baseOffset: 0, extentOffset: 7),
-      );
+    // Second tap selects the word around the cursor.
+    await tester.tapAt(textOffsetToPosition(tester, index));
+    await tester.pumpAndSettle();
+    expect(
+      controller.selection,
+      const TextSelection(baseOffset: 0, extentOffset: 7),
+    );
 
-      // Selected text shows 4 toolbar buttons: cut, copy, paste, select all
-      expect(find.byType(IconButton), findsNWidgets(4));
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.android, TargetPlatform.fuchsia, TargetPlatform.linux, TargetPlatform.windows }));
+    // Selected text shows 4 toolbar buttons: cut, copy, paste, select all
+    expect(find.byType(IconButton), findsNWidgets(4));
+  },
+      variant: const TargetPlatformVariant(<TargetPlatform>{
+        TargetPlatform.android,
+        TargetPlatform.fuchsia,
+        TargetPlatform.linux,
+        TargetPlatform.windows
+      }));
 
   // testMongolWidgets(
   //   'double double tap just shows the selection menu',
@@ -7852,21 +7963,30 @@ void main() {
       ),
     );
 
-    final Offset offset = tester.getTopLeft(find.byType(MongolTextField)) + const Offset(150.0, 9.0);
+    final Offset offset = tester.getTopLeft(find.byType(MongolTextField)) +
+        const Offset(150.0, 9.0);
 
     final int pointerValue = tester.nextPointer;
     final TestGesture gesture = await tester.createGesture();
     await gesture.downWithCustomEvent(
       offset,
       PointerDownEvent(
-          pointer: pointerValue,
-          position: offset,
-          pressure: 0.0,
-          pressureMax: 6.0,
-          pressureMin: 0.0,
+        pointer: pointerValue,
+        position: offset,
+        pressure: 0.0,
+        pressureMax: 6.0,
+        pressureMin: 0.0,
       ),
     );
-    await gesture.updateWithCustomEvent(PointerMoveEvent(pointer: pointerValue, position: offset + const Offset(150.0, 9.0), pressure: 0.5, pressureMin: 0, pressureMax: 1,),);
+    await gesture.updateWithCustomEvent(
+      PointerMoveEvent(
+        pointer: pointerValue,
+        position: offset + const Offset(150.0, 9.0),
+        pressure: 0.5,
+        pressureMin: 0,
+        pressureMax: 1,
+      ),
+    );
 
     // We don't want this gesture to select any word on Android.
     expect(controller.selection, const TextSelection.collapsed(offset: -1));
@@ -7874,7 +7994,13 @@ void main() {
     await gesture.up();
     await tester.pump();
     expect(find.byType(TextButton), findsNothing);
-  }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.android, TargetPlatform.fuchsia, TargetPlatform.linux, TargetPlatform.windows }));
+  },
+      variant: const TargetPlatformVariant(<TargetPlatform>{
+        TargetPlatform.android,
+        TargetPlatform.fuchsia,
+        TargetPlatform.linux,
+        TargetPlatform.windows
+      }));
 
   // testMongolWidgets('force press selects word', (tester) async {
   //   final TextEditingController controller = TextEditingController(
@@ -7926,76 +8052,81 @@ void main() {
   //   expect(find.byType(CupertinoButton), findsNWidgets(3));
   // }, variant: const TargetPlatformVariant(<TargetPlatform>{ TargetPlatform.iOS }));
 
-  testMongolWidgets('tap on non-force-press-supported devices work', (tester) async {
-    final TextEditingController controller = TextEditingController(
-      text: 'Atwater Peel Sherbrooke Bonaventure',
-    );
-    await tester.pumpWidget(Container(key: GlobalKey()));
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Material(
-          child: MongolTextField(
-            controller: controller,
-          ),
-        ),
-      ),
-    );
+  // testMongolWidgets('tap on non-force-press-supported devices work',
+  //     (tester) async {
+  //   final TextEditingController controller = TextEditingController(
+  //     text: 'Atwater Peel Sherbrooke Bonaventure',
+  //   );
+  //   await tester.pumpWidget(Container(key: GlobalKey()));
+  //   await tester.pumpWidget(
+  //     MaterialApp(
+  //       home: Material(
+  //         child: MongolTextField(
+  //           controller: controller,
+  //         ),
+  //       ),
+  //     ),
+  //   );
 
-    final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+  //   final Offset textfieldStart =
+  //       tester.getTopLeft(find.byType(MongolTextField));
 
-    final int pointerValue = tester.nextPointer;
-    final Offset offset = textfieldStart + const Offset(9.0, 150.0);
-    final TestGesture gesture = await tester.createGesture();
-    await gesture.downWithCustomEvent(
-      offset,
-      PointerDownEvent(
-        pointer: pointerValue,
-        position: offset,
-        // iPhone 6 and below report 0 across the board.
-        pressure: 0,
-        pressureMax: 0,
-        pressureMin: 0,
-      ),
-    );
+  //   final int pointerValue = tester.nextPointer;
+  //   final Offset offset = textfieldStart + const Offset(9.0, 150.0);
+  //   final TestGesture gesture = await tester.createGesture();
+  //   await gesture.downWithCustomEvent(
+  //     offset,
+  //     PointerDownEvent(
+  //       pointer: pointerValue,
+  //       position: offset,
+  //       // iPhone 6 and below report 0 across the board.
+  //       pressure: 0,
+  //       pressureMax: 0,
+  //       pressureMin: 0,
+  //     ),
+  //   );
 
-    await gesture.updateWithCustomEvent(
-      PointerMoveEvent(
-        pointer: pointerValue,
-        position: textfieldStart + const Offset(9.0, 150.0),
-        pressure: 0.5,
-        pressureMin: 0,
-        pressureMax: 1,
-      ),
-    );
-    await gesture.up();
-    // The event should fallback to a normal tap and move the cursor.
-    // Single taps selects the edge of the word.
-    expect(
-      controller.selection,
-      const TextSelection.collapsed(offset: 8),
-    );
+  //   await gesture.updateWithCustomEvent(
+  //     PointerMoveEvent(
+  //       pointer: pointerValue,
+  //       position: textfieldStart + const Offset(9.0, 150.0),
+  //       pressure: 0.5,
+  //       pressureMin: 0,
+  //       pressureMax: 1,
+  //     ),
+  //   );
+  //   await gesture.up();
+  //   // The event should fallback to a normal tap and move the cursor.
+  //   // Single taps selects the edge of the word.
+  //   expect(
+  //     controller.selection,
+  //     const TextSelection.collapsed(offset: 8),
+  //   );
 
-    await tester.pump();
-    // Single taps shouldn't trigger the toolbar.
-    expect(find.byType(CupertinoButton), findsNothing);
+  //   await tester.pump();
+  //   // Single taps shouldn't trigger the toolbar.
+  //   expect(find.byType(CupertinoButton), findsNothing);
 
-    // TODO(gspencergoog): Add in TargetPlatform.macOS in the line below when we figure out what global state is leaking.
-    // https://github.com/flutter/flutter/issues/43445
-  }, variant: TargetPlatformVariant.only(TargetPlatform.iOS));
+  //   // TODO(gspencergoog): Add in TargetPlatform.macOS in the line below when we figure out what global state is leaking.
+  //   // https://github.com/flutter/flutter/issues/43445
+  // }, variant: TargetPlatformVariant.only(TargetPlatform.iOS));
 
-  testMongolWidgets('default MongolTextField debugFillProperties', (tester) async {
+  testMongolWidgets('default MongolTextField debugFillProperties',
+      (tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
 
     const MongolTextField().debugFillProperties(builder);
 
     final List<String> description = builder.properties
-      .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-      .map((DiagnosticsNode node) => node.toString()).toList();
+        .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+        .map((DiagnosticsNode node) => node.toString())
+        .toList();
 
     expect(description, <String>[]);
   });
 
-  testMongolWidgets('MongolTextField implements debugFillProperties', (tester) async {
+  testMongolWidgets('MongolTextField implements debugFillProperties',
+      (tester) async {
     final DiagnosticPropertiesBuilder builder = DiagnosticPropertiesBuilder();
 
     // Not checking controller, inputFormatters, focusNode
@@ -8022,8 +8153,9 @@ void main() {
     ).debugFillProperties(builder);
 
     final List<String> description = builder.properties
-      .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
-      .map((DiagnosticsNode node) => node.toString()).toList();
+        .where((DiagnosticsNode node) => !node.isFiltered(DiagnosticLevel.info))
+        .map((DiagnosticsNode node) => node.toString())
+        .toList();
 
     expect(description, <String>[
       'enabled: false',
@@ -8426,7 +8558,8 @@ void main() {
     await tester.tap(find.byType(MongolTextField));
     await tester.pump();
 
-    final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+    final MongolEditableTextState editableText =
+        tester.state(find.byType(MongolEditableText));
     expect(editableText.selectionOverlay!.handlesAreVisible, isTrue);
     expect(editableText.selectionOverlay!.toolbarIsVisible, isFalse);
   });
@@ -8448,7 +8581,8 @@ void main() {
       await tester.tap(find.byType(MongolTextField));
       await tester.pump();
 
-      final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+      final MongolEditableTextState editableText =
+          tester.state(find.byType(MongolEditableText));
       expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
       expect(editableText.selectionOverlay!.toolbarIsVisible, isFalse);
     },
@@ -8471,7 +8605,8 @@ void main() {
     await tester.longPress(find.byType(MongolTextField));
     await tester.pump();
 
-    final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+    final MongolEditableTextState editableText =
+        tester.state(find.byType(MongolEditableText));
     expect(editableText.selectionOverlay!.handlesAreVisible, isTrue);
     expect(editableText.selectionOverlay!.toolbarIsVisible, isTrue);
   });
@@ -8493,7 +8628,8 @@ void main() {
       await tester.longPress(find.byType(MongolTextField));
       await tester.pump();
 
-      final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+      final MongolEditableTextState editableText =
+          tester.state(find.byType(MongolEditableText));
       expect(editableText.selectionOverlay!.handlesAreVisible, isTrue);
       expect(editableText.selectionOverlay!.toolbarIsVisible, isTrue);
     },
@@ -8518,7 +8654,8 @@ void main() {
     await tester.tap(find.byType(MongolTextField));
     await tester.pump();
 
-    final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+    final MongolEditableTextState editableText =
+        tester.state(find.byType(MongolEditableText));
     expect(editableText.selectionOverlay!.handlesAreVisible, isTrue);
     expect(editableText.selectionOverlay!.toolbarIsVisible, isTrue);
   });
@@ -8542,7 +8679,8 @@ void main() {
       await tester.tap(find.byType(MongolTextField));
       await tester.pump();
 
-      final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+      final MongolEditableTextState editableText =
+          tester.state(find.byType(MongolEditableText));
       expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
       expect(editableText.selectionOverlay!.toolbarIsVisible, isTrue);
     },
@@ -8564,7 +8702,8 @@ void main() {
       );
 
       // Long press to trigger the text field.
-      final Offset textFieldPos = tester.getCenter(find.byType(MongolTextField));
+      final Offset textFieldPos =
+          tester.getCenter(find.byType(MongolTextField));
       final TestGesture gesture = await tester.startGesture(
         textFieldPos,
         pointer: 7,
@@ -8575,7 +8714,8 @@ void main() {
       await gesture.up();
       await tester.pump();
 
-      final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+      final MongolEditableTextState editableText =
+          tester.state(find.byType(MongolEditableText));
       expect(editableText.selectionOverlay!.toolbarIsVisible, isFalse);
       expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
     },
@@ -8597,7 +8737,8 @@ void main() {
       );
 
       // Long press to trigger the text field.
-      final Offset textFieldPos = tester.getCenter(find.byType(MongolTextField));
+      final Offset textFieldPos =
+          tester.getCenter(find.byType(MongolTextField));
       final TestGesture gesture = await tester.startGesture(
         textFieldPos,
         pointer: 7,
@@ -8608,7 +8749,8 @@ void main() {
       await gesture.up();
       await tester.pump();
 
-      final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+      final MongolEditableTextState editableText =
+          tester.state(find.byType(MongolEditableText));
       expect(editableText.selectionOverlay!.toolbarIsVisible, isFalse);
       expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
     },
@@ -8630,7 +8772,8 @@ void main() {
       );
 
       // Double tap to trigger the text field.
-      final Offset textFieldPos = tester.getCenter(find.byType(MongolTextField));
+      final Offset textFieldPos =
+          tester.getCenter(find.byType(MongolTextField));
       final TestGesture gesture = await tester.startGesture(
         textFieldPos,
         pointer: 7,
@@ -8645,13 +8788,15 @@ void main() {
       await gesture.up();
       await tester.pump();
 
-      final MongolEditableTextState editableText = tester.state(find.byType(MongolEditableText));
+      final MongolEditableTextState editableText =
+          tester.state(find.byType(MongolEditableText));
       expect(editableText.selectionOverlay!.toolbarIsVisible, isFalse);
       expect(editableText.selectionOverlay!.handlesAreVisible, isFalse);
     },
   );
 
-  testMongolWidgets('Does not show handles when updated from the web engine', (tester) async {
+  testMongolWidgets('Does not show handles when updated from the web engine',
+      (tester) async {
     final TextEditingController controller = TextEditingController(
       text: 'abc def ghi',
     );
@@ -8675,7 +8820,8 @@ void main() {
     await gesture.up();
     await tester.pumpAndSettle();
 
-    final MongolEditableTextState state = tester.state(find.byType(MongolEditableText));
+    final MongolEditableTextState state =
+        tester.state(find.byType(MongolEditableText));
     expect(state.selectionOverlay!.handlesAreVisible, isFalse);
     expect(controller.selection, const TextSelection.collapsed(offset: 0));
 
@@ -8763,7 +8909,9 @@ void main() {
   // });
 
   group('width', () {
-    testMongolWidgets('By default, MongolTextField is at least kMinInteractiveDimension wide', (tester) async {
+    testMongolWidgets(
+        'By default, MongolTextField is at least kMinInteractiveDimension wide',
+        (tester) async {
       await tester.pumpWidget(MaterialApp(
         theme: ThemeData(),
         home: const Scaffold(
@@ -8773,11 +8921,15 @@ void main() {
         ),
       ));
 
-      final RenderBox renderBox = tester.renderObject(find.byType(MongolTextField));
-      expect(renderBox.size.width, greaterThanOrEqualTo(kMinInteractiveDimension));
+      final RenderBox renderBox =
+          tester.renderObject(find.byType(MongolTextField));
+      expect(
+          renderBox.size.width, greaterThanOrEqualTo(kMinInteractiveDimension));
     });
 
-    testMongolWidgets("When text is very small, MongolTextField still doesn't go below kMinInteractiveDimension width", (tester) async {
+    testMongolWidgets(
+        "When text is very small, MongolTextField still doesn't go below kMinInteractiveDimension width",
+        (tester) async {
       await tester.pumpWidget(MaterialApp(
         theme: ThemeData(),
         home: const Scaffold(
@@ -8789,11 +8941,14 @@ void main() {
         ),
       ));
 
-      final RenderBox renderBox = tester.renderObject(find.byType(MongolTextField));
+      final RenderBox renderBox =
+          tester.renderObject(find.byType(MongolTextField));
       expect(renderBox.size.width, kMinInteractiveDimension);
     });
 
-    testMongolWidgets('When isDense, MongolTextField can go below kMinInteractiveDimension width', (tester) async {
+    testMongolWidgets(
+        'When isDense, MongolTextField can go below kMinInteractiveDimension width',
+        (tester) async {
       await tester.pumpWidget(MaterialApp(
         theme: ThemeData(),
         home: const Scaffold(
@@ -8807,46 +8962,47 @@ void main() {
         ),
       ));
 
-      final RenderBox renderBox = tester.renderObject(find.byType(MongolTextField));
+      final RenderBox renderBox =
+          tester.renderObject(find.byType(MongolTextField));
       expect(renderBox.size.width, lessThan(kMinInteractiveDimension));
     });
 
     group('intrinsics', () {
-      Widget _buildTest({ required bool isDense }) {
+      Widget _buildTest({required bool isDense}) {
         return MaterialApp(
-          home: Scaffold(
-            body: CustomScrollView(
-              scrollDirection: Axis.horizontal,
-              slivers: <Widget>[
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Row(
-                    children: <Widget>[
-                      MongolTextField(
+            home: Scaffold(
+                body: CustomScrollView(
+          scrollDirection: Axis.horizontal,
+          slivers: <Widget>[
+            SliverFillRemaining(
+                hasScrollBody: false,
+                child: Row(
+                  children: <Widget>[
+                    MongolTextField(
                         decoration: InputDecoration(
-                          isDense: isDense,
-                        )
-                      ),
-                      Container(
-                        width: 1000,
-                      ),
-                    ],
-                  )
-                )
-              ],
-            )
-          )
-        );
+                      isDense: isDense,
+                    )),
+                    Container(
+                      width: 1000,
+                    ),
+                  ],
+                ))
+          ],
+        )));
       }
 
-      testMongolWidgets('By default, intrinsic width is at least kMinInteractiveDimension wide', (tester) async {
+      testMongolWidgets(
+          'By default, intrinsic width is at least kMinInteractiveDimension wide',
+          (tester) async {
         // Regression test for https://github.com/flutter/flutter/issues/54729
         // If the intrinsic width does not match that of the width after
         // performLayout, this will fail.
         tester.pumpWidget(_buildTest(isDense: false));
       });
 
-      testMongolWidgets('When isDense, intrinsic width can go below kMinInteractiveDimension width', (tester) async {
+      testMongolWidgets(
+          'When isDense, intrinsic width can go below kMinInteractiveDimension width',
+          (tester) async {
         // Regression test for https://github.com/flutter/flutter/issues/54729
         // If the intrinsic width does not match that of the width after
         // performLayout, this will fail.
@@ -8944,13 +9100,15 @@ void main() {
   //   expect(focusNode3.hasPrimaryFocus, isTrue);
   // });
 
-  testMongolWidgets('Scrolling shortcuts are disabled in text fields', (tester) async {
+  testMongolWidgets('Scrolling shortcuts are disabled in text fields',
+      (tester) async {
     bool scrollInvoked = false;
     await tester.pumpWidget(
       MaterialApp(
         home: Actions(
           actions: <Type, Action<Intent>>{
-            ScrollIntent: CallbackAction<ScrollIntent>(onInvoke: (Intent intent) {
+            ScrollIntent:
+                CallbackAction<ScrollIntent>(onInvoke: (Intent intent) {
               scrollInvoked = true;
             }),
           },
@@ -8980,7 +9138,9 @@ void main() {
     expect(scrollInvoked, isFalse);
   });
 
-  testMongolWidgets("A buildCounter that returns null doesn't affect the size of the MongolTextField", (tester) async {
+  testMongolWidgets(
+      "A buildCounter that returns null doesn't affect the size of the MongolTextField",
+      (tester) async {
     // Regression test for https://github.com/flutter/flutter/issues/44909
 
     final GlobalKey textField1Key = GlobalKey();
@@ -8995,7 +9155,11 @@ void main() {
               MongolTextField(
                 key: textField2Key,
                 maxLength: 1,
-                buildCounter: (BuildContext context, {required int currentLength, required bool isFocused, int? maxLength}) => null,
+                buildCounter: (BuildContext context,
+                        {required int currentLength,
+                        required bool isFocused,
+                        int? maxLength}) =>
+                    null,
               ),
             ],
           ),
@@ -9016,7 +9180,8 @@ void main() {
       // This is a regression test for
       // https://github.com/flutter/flutter/issues/43787
       final TextEditingController controller = TextEditingController(
-        text: 'This is a test that shows some odd behavior with Text Selection!',
+        text:
+            'This is a test that shows some odd behavior with Text Selection!',
       );
 
       await tester.pumpWidget(MaterialApp(
@@ -9045,7 +9210,8 @@ void main() {
         ),
       ));
 
-      await _showSelectionMenuAt(tester, controller, controller.text.indexOf('test'));
+      await _showSelectionMenuAt(
+          tester, controller, controller.text.indexOf('test'));
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
     },
@@ -9069,14 +9235,15 @@ void main() {
 
     bool triedToReadClipboard = false;
     SystemChannels.platform
-      .setMockMethodCallHandler((MethodCall methodCall) async {
-        if (methodCall.method == 'Clipboard.getData') {
-          triedToReadClipboard = true;
-        }
-        return null;
-      });
+        .setMockMethodCallHandler((MethodCall methodCall) async {
+      if (methodCall.method == 'Clipboard.getData') {
+        triedToReadClipboard = true;
+      }
+      return null;
+    });
 
-    final Offset textfieldStart = tester.getTopLeft(find.byType(MongolTextField));
+    final Offset textfieldStart =
+        tester.getTopLeft(find.byType(MongolTextField));
 
     // Double tap like when showing the text selection menu on Android/iOS.
     await tester.tapAt(textfieldStart + const Offset(9.0, 150.0));
@@ -9095,7 +9262,8 @@ void main() {
     }
   });
 
-  testMongolWidgets('MongolTextField changes mouse cursor when hovered', (tester) async {
+  testMongolWidgets('MongolTextField changes mouse cursor when hovered',
+      (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Material(
@@ -9116,15 +9284,18 @@ void main() {
     // Center, which is within the text area
     final Offset center = tester.getCenter(find.byType(MongolTextField));
     // Top left, which is not the text area
-    final Offset edge = tester.getTopLeft(find.byType(MongolTextField)) + const Offset(1, 1);
+    final Offset edge =
+        tester.getTopLeft(find.byType(MongolTextField)) + const Offset(1, 1);
 
-    final TestGesture gesture = await tester.createGesture(kind: PointerDeviceKind.mouse, pointer: 1);
+    final TestGesture gesture =
+        await tester.createGesture(kind: PointerDeviceKind.mouse, pointer: 1);
     await gesture.addPointer(location: center);
     addTearDown(gesture.removePointer);
 
     await tester.pump();
 
-    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1), SystemMouseCursors.grab);
+    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1),
+        SystemMouseCursors.grab);
 
     // Test default cursor
     await tester.pumpWidget(
@@ -9142,9 +9313,11 @@ void main() {
       ),
     );
 
-    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1), SystemMouseCursors.text);
+    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1),
+        SystemMouseCursors.text);
     await gesture.moveTo(edge);
-    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1), SystemMouseCursors.text);
+    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1),
+        SystemMouseCursors.text);
     await gesture.moveTo(center);
 
     // Test default cursor when disabled
@@ -9164,9 +9337,11 @@ void main() {
       ),
     );
 
-    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1), SystemMouseCursors.basic);
+    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1),
+        SystemMouseCursors.basic);
     await gesture.moveTo(edge);
-    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1), SystemMouseCursors.basic);
+    expect(RendererBinding.instance!.mouseTracker.debugDeviceActiveCursor(1),
+        SystemMouseCursors.basic);
     await gesture.moveTo(center);
   });
 

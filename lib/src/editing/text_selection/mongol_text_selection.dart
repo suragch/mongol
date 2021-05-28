@@ -16,7 +16,6 @@ import 'package:flutter/widgets.dart';
 import '../mongol_editable_text.dart';
 import '../mongol_render_editable.dart';
 
-
 /// The text position that a give selection handle manipulates. Dragging the
 /// [start] handle always moves the [start]/[baseOffset] of the selection.
 enum _TextSelectionHandlePosition { start, end }
@@ -170,7 +169,10 @@ class MongolTextSelectionOverlay {
 
   /// Builds the handles by inserting them into the [context]'s overlay.
   void showHandles() {
-    assert(_handles == null);
+    if (_handles != null) {
+      return;
+    }
+
     _handles = <OverlayEntry>[
       OverlayEntry(
           builder: (BuildContext context) =>
@@ -274,12 +276,13 @@ class MongolTextSelectionOverlay {
 
   Widget _buildHandle(
       BuildContext context, _TextSelectionHandlePosition position) {
+    Widget handle;
     if ((_selection.isCollapsed &&
             position == _TextSelectionHandlePosition.end) ||
         selectionControls == null) {
-      return Container(); // hide the second handle when collapsed
-    }
-    return Visibility(
+      handle = Container(); // hide the second handle when collapsed
+    } else {
+      handle = Visibility(
         visible: handlesVisible,
         child: _TextSelectionHandleOverlay(
           onSelectionHandleChanged: (TextSelection newSelection) {
@@ -293,7 +296,12 @@ class MongolTextSelectionOverlay {
           selectionControls: selectionControls,
           position: position,
           dragStartBehavior: dragStartBehavior,
-        ));
+        ),
+      );
+    }
+    return ExcludeSemantics(
+      child: handle,
+    );
   }
 
   Widget _buildToolbar(BuildContext context) {
@@ -320,21 +328,24 @@ class MongolTextSelectionOverlay {
       midY,
     );
 
-    return FadeTransition(
-      opacity: _toolbarOpacity,
-      child: CompositedTransformFollower(
-        link: toolbarLayerLink,
-        showWhenUnlinked: false,
-        offset: -editingRegion.topLeft,
-        child: selectionControls!.buildToolbar(
-          context,
-          editingRegion,
-          renderObject.preferredLineWidth,
-          midpoint,
-          endpoints,
-          selectionDelegate!,
-          clipboardStatus!,
-          renderObject.lastSecondaryTapDownPosition,
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: FadeTransition(
+        opacity: _toolbarOpacity,
+        child: CompositedTransformFollower(
+          link: toolbarLayerLink,
+          showWhenUnlinked: false,
+          offset: -editingRegion.topLeft,
+          child: selectionControls!.buildToolbar(
+            context,
+            editingRegion,
+            renderObject.preferredLineWidth,
+            midpoint,
+            endpoints,
+            selectionDelegate!,
+            clipboardStatus!,
+            renderObject.lastSecondaryTapDownPosition,
+          ),
         ),
       ),
     );
@@ -351,8 +362,10 @@ class MongolTextSelectionOverlay {
         textPosition = newSelection.extent;
         break;
     }
-    selectionDelegate!.textEditingValue =
-        _value.copyWith(selection: newSelection, composing: TextRange.empty);
+    selectionDelegate!.userUpdateTextEditingValue(
+      _value.copyWith(selection: newSelection, composing: TextRange.empty),
+      SelectionChangedCause.drag,
+    );
     selectionDelegate!.bringIntoView(textPosition);
   }
 }
@@ -636,7 +649,8 @@ class MongolTextSelectionGestureDetectorBuilder {
   /// The [State] of the [EditableText] for which the builder will provide a
   /// [TextSelectionGestureDetector].
   @protected
-  MongolEditableTextState get editableText => delegate.editableTextKey.currentState!;
+  MongolEditableTextState get editableText =>
+      delegate.editableTextKey.currentState!;
 
   /// The [RenderObject] of the [MongolEditableText] for which the builder will
   /// provide a [TextSelectionGestureDetector].

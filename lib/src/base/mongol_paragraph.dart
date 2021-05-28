@@ -563,6 +563,15 @@ class MongolParagraph {
     return null;
   }
 
+  /// Returns the [TextRange] of the line at the given [TextPosition].
+  ///
+  /// The newline (if any) is NOT returned as part of the range.
+  /// https://github.com/flutter/flutter/issues/83392
+  ///
+  /// Not valid until after layout.
+  ///
+  /// This can potentially be expensive, since it needs to compute the line
+  /// metrics, so use it sparingly.
   TextRange getLineBoundary(TextPosition position) {
     final offset = position.offset;
     if (offset > _text.length) {
@@ -587,6 +596,10 @@ class MongolParagraph {
       } else {
         break;
       }
+    }
+    // exclude newline character
+    if (end > start && _text[end - 1] == '\n') {
+      end--;
     }
     return TextRange(start: start, end: end);
   }

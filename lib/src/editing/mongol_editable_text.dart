@@ -11,15 +11,16 @@ import 'dart:ui' as ui hide TextStyle;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart' show kMinInteractiveDimension;
-import 'package:flutter/rendering.dart';
+import 'package:flutter/rendering.dart' show RevealedOffset, ViewportOffset, CaretChangedHandler;
 import 'package:flutter/scheduler.dart' show SchedulerBinding;
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
-import 'package:mongol/src/base/mongol_text_align.dart';
 
+import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
-import 'package:mongol/src/base/mongol_text_painter.dart';
 import 'package:mongol/src/editing/text_selection/mongol_text_selection.dart';
+
+import 'mongol_text_editing_action.dart';
 
 // The time it takes for the cursor to fade from fully opaque to fully
 // transparent and vice versa. A full cursor blink, from transparent to opaque
@@ -167,6 +168,7 @@ class MongolEditableText extends StatefulWidget {
     this.autofillHints,
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
+    this.scrollBehavior,
   })  : assert(obscuringCharacter.length == 1),
         assert(maxLines == null || maxLines > 0),
         assert(minLines == null || minLines > 0),
@@ -716,6 +718,10 @@ class MongolEditableText extends StatefulWidget {
   /// If not specified, it will behave according to the current platform.
   ///
   /// See [Scrollable.physics].
+  ///
+  /// If an explicit [ScrollBehavior] is provided to [scrollBehavior], the
+  /// [ScrollPhysics] provided by that behavior will take precedence after
+  /// [scrollPhysics].
   final ScrollPhysics? scrollPhysics;
 
   /// Same as [enableInteractiveSelection].
@@ -816,6 +822,21 @@ class MongolEditableText extends StatefulWidget {
   ///  * [RestorationManager], which explains how state restoration works in
   ///    Flutter.
   final String? restorationId;
+
+  /// A [ScrollBehavior] that will be applied to this widget individually.
+  ///
+  /// Defaults to null, wherein the inherited [ScrollBehavior] is copied and
+  /// modified to alter the viewport decoration, like [Scrollbar]s.
+  ///
+  /// [ScrollBehavior]s also provide [ScrollPhysics]. If an explicit
+  /// [ScrollPhysics] is provided in [scrollPhysics], it will take precedence,
+  /// followed by [scrollBehavior], and then the inherited ancestor
+  /// [ScrollBehavior].
+  ///
+  /// The [ScrollBehavior] of the inherited [ScrollConfiguration] will be
+  /// modified by default to only apply a [Scrollbar] if [maxLines] is greater
+  /// than 1.
+  final ScrollBehavior? scrollBehavior;
 
   // Infer the keyboard type of a `MongolEditableText` if it's not specified.
   static TextInputType _inferKeyboardType({
@@ -1014,8 +1035,9 @@ class MongolEditableTextState extends State<MongolEditableText>
     with
         AutomaticKeepAliveClientMixin<MongolEditableText>,
         WidgetsBindingObserver,
-        TickerProviderStateMixin<MongolEditableText>
-    implements TextSelectionDelegate, TextInputClient, AutofillClient {
+        TickerProviderStateMixin<MongolEditableText>,
+        TextSelectionDelegate
+    implements TextInputClient, AutofillClient, MongolTextEditingActionTarget {
   Timer? _cursorTimer;
   bool _targetCursorVisibility = false;
   final ValueNotifier<bool> _cursorVisibilityNotifier =
@@ -1262,22 +1284,25 @@ class MongolEditableTextState extends State<MongolEditableText>
 
     if (value.text == _value.text && value.composing == _value.composing) {
       // `selection` is the only change.
-      _handleSelectionChanged(
-          value.selection, renderEditable, SelectionChangedCause.keyboard);
+      _handleSelectionChanged(value.selection, SelectionChangedCause.keyboard);
     } else {
       hideToolbar();
 
       if (_hasInputConnection) {
-        _showCaretOnScreen();
         if (widget.obscureText && value.text.length == _value.text.length + 1) {
           _obscureShowCharTicksPending = _kObscureShowLatestCharCursorTicks;
           _obscureLatestCharIndex = _value.selection.baseOffset;
         }
       }
 
-      _formatAndSetValue(value);
+      _formatAndSetValue(value, SelectionChangedCause.keyboard);
     }
 
+    // Wherever the value is changed by the user, schedule a showCaretOnScreen
+    // to make sure the user can see the changes they just made. Programmatical
+    // changes to `textEditingValue` do not trigger the behavior even if the
+    // text field is focused.
+    _scheduleShowCaretOnScreen();
     if (_hasInputConnection) {
       // To keep the cursor from blinking while typing, we want to restart the
       // cursor timer every time a new character is typed.
@@ -1325,7 +1350,8 @@ class MongolEditableTextState extends State<MongolEditableText>
   void updateFloatingCursor(RawFloatingCursorPoint point) {
     // unimplemented
   }
-
+  
+  @pragma('vm:notify-debugger-on-exception')
   void _finalizeEditing(TextInputAction action, {required bool shouldUnfocus}) {
     // Take any actions necessary now that the user has completed editing.
     if (widget.onEditingComplete != null) {
@@ -1584,9 +1610,10 @@ class MongolEditableTextState extends State<MongolEditableText>
       }
     }
   }
-
-  void _handleSelectionChanged(TextSelection selection,
-      MongolRenderEditable renderObject, SelectionChangedCause? cause) {
+  
+  @pragma('vm:notify-debugger-on-exception')
+  void _handleSelectionChanged(
+      TextSelection selection, SelectionChangedCause? cause) {
     // We return early if the selection is not valid. This can happen when the
     // text of [MongolEditableText] is updated at the same time as the selection is
     // changed by a gesture event.
@@ -1597,38 +1624,44 @@ class MongolEditableTextState extends State<MongolEditableText>
     // This will show the keyboard for all selection changes on the
     // editable widget, not just changes triggered by user gestures.
     requestKeyboard();
-
-    _selectionOverlay?.hide();
-    _selectionOverlay = null;
-
-    if (widget.selectionControls != null) {
-      _selectionOverlay = MongolTextSelectionOverlay(
-        clipboardStatus: _clipboardStatus,
-        context: context,
-        value: _value,
-        debugRequiredFor: widget,
-        toolbarLayerLink: _toolbarLayerLink,
-        startHandleLayerLink: _startHandleLayerLink,
-        endHandleLayerLink: _endHandleLayerLink,
-        renderObject: renderObject,
-        selectionControls: widget.selectionControls,
-        selectionDelegate: this,
-        dragStartBehavior: widget.dragStartBehavior,
-        onSelectionHandleTapped: widget.onSelectionHandleTapped,
-      );
+    if (widget.selectionControls == null) {
+      _selectionOverlay?.hide();
+      _selectionOverlay = null;
+    } else {
+      if (_selectionOverlay == null) {
+        _selectionOverlay = MongolTextSelectionOverlay(
+          clipboardStatus: _clipboardStatus,
+          context: context,
+          value: _value,
+          debugRequiredFor: widget,
+          toolbarLayerLink: _toolbarLayerLink,
+          startHandleLayerLink: _startHandleLayerLink,
+          endHandleLayerLink: _endHandleLayerLink,
+          renderObject: renderEditable,
+          selectionControls: widget.selectionControls,
+          selectionDelegate: this,
+          dragStartBehavior: widget.dragStartBehavior,
+          onSelectionHandleTapped: widget.onSelectionHandleTapped,
+        );
+      } else {
+        _selectionOverlay!.update(_value);
+      }
       _selectionOverlay!.handlesVisible = widget.showSelectionHandles;
       _selectionOverlay!.showHandles();
-      try {
-        widget.onSelectionChanged?.call(selection, cause);
-      } catch (exception, stack) {
-        FlutterError.reportError(FlutterErrorDetails(
-          exception: exception,
-          stack: stack,
-          library: 'widgets',
-          context:
-              ErrorDescription('while calling onSelectionChanged for $cause'),
-        ));
-      }
+    }
+    // TODO(chunhtai): we should make sure selection actually changed before
+    // we call the onSelectionChanged.
+    // https://github.com/flutter/flutter/issues/76349.
+    try {
+      widget.onSelectionChanged?.call(selection, cause);
+    } catch (exception, stack) {
+      FlutterError.reportError(FlutterErrorDetails(
+        exception: exception,
+        stack: stack,
+        library: 'widgets',
+        context:
+            ErrorDescription('while calling onSelectionChanged for $cause'),
+      ));
     }
 
     // To keep the cursor from blinking while it moves, restart the timer here.
@@ -1638,17 +1671,9 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
   }
 
-  bool _textChangedSinceLastCaretUpdate = false;
   Rect? _currentCaretRect;
-
   void _handleCaretChanged(Rect caretRect) {
     _currentCaretRect = caretRect;
-    // If the caret location has changed due to an update to the text or
-    // selection, then scroll the caret into view.
-    if (_textChangedSinceLastCaretUpdate) {
-      _textChangedSinceLastCaretUpdate = false;
-      _showCaretOnScreen();
-    }
   }
 
   // Animation configuration for scrolling the caret back on screen.
@@ -1657,7 +1682,7 @@ class MongolEditableTextState extends State<MongolEditableText>
 
   bool _showCaretOnScreenScheduled = false;
 
-  void _showCaretOnScreen() {
+  void _scheduleShowCaretOnScreen() {
     if (_showCaretOnScreenScheduled) {
       return;
     }
@@ -1716,12 +1741,14 @@ class MongolEditableTextState extends State<MongolEditableText>
   void didChangeMetrics() {
     if (_lastRightViewInset <
         WidgetsBinding.instance!.window.viewInsets.right) {
-      _showCaretOnScreen();
+      _scheduleShowCaretOnScreen();
     }
     _lastRightViewInset = WidgetsBinding.instance!.window.viewInsets.right;
   }
 
-  void _formatAndSetValue(TextEditingValue value) {
+  @pragma('vm:notify-debugger-on-exception')
+  void _formatAndSetValue(TextEditingValue value, SelectionChangedCause? cause,
+      {bool userInteraction = false}) {
     // Only apply input formatters if the text has changed (including uncommited
     // text in the composing region), or when the user committed the composing
     // text.
@@ -1747,6 +1774,16 @@ class MongolEditableTextState extends State<MongolEditableText>
     // sending multiple `TextInput.updateEditingValue` messages.
     beginBatchEdit();
     _value = value;
+    // Changes made by the keyboard can sometimes be "out of band" for listening
+    // components, so always send those events, even if we didn't think it
+    // changed. Also, the user long pressing should always send a selection change
+    // as well.
+    if (selectionChanged ||
+        (userInteraction &&
+            (cause == SelectionChangedCause.longPress ||
+                cause == SelectionChangedCause.keyboard))) {
+      _handleSelectionChanged(value.selection, cause);
+    }
     if (textChanged) {
       try {
         widget.onChanged?.call(value.text);
@@ -1756,19 +1793,6 @@ class MongolEditableTextState extends State<MongolEditableText>
           stack: stack,
           library: 'widgets',
           context: ErrorDescription('while calling onChanged'),
-        ));
-      }
-    }
-
-    if (selectionChanged) {
-      try {
-        widget.onSelectionChanged?.call(value.selection, null);
-      } catch (exception, stack) {
-        FlutterError.reportError(FlutterErrorDetails(
-          exception: exception,
-          stack: stack,
-          library: 'widgets',
-          context: ErrorDescription('while calling onSelectionChanged'),
         ));
       }
     }
@@ -1869,7 +1893,8 @@ class MongolEditableTextState extends State<MongolEditableText>
     _updateRemoteEditingValueIfNeeded();
     _startOrStopCursorTimerIfNeeded();
     _updateOrDisposeSelectionOverlayIfNeeded();
-    _textChangedSinceLastCaretUpdate = true;
+    // TODO(abarth): Teach RenderEditable about ValueNotifier<TextEditingValue>
+    // to avoid this setState().
     setState(() {/* We use widget.controller.value in build(). */});
   }
 
@@ -1881,13 +1906,13 @@ class MongolEditableTextState extends State<MongolEditableText>
       // Listen for changing viewInsets, which indicates keyboard showing up.
       WidgetsBinding.instance!.addObserver(this);
       _lastRightViewInset = WidgetsBinding.instance!.window.viewInsets.right;
-      _showCaretOnScreen();
+      if (!widget.readOnly) {
+        _scheduleShowCaretOnScreen();
+      }
       if (!_value.selection.isValid) {
         // Place cursor at the end if the selection is invalid when we receive focus.
         _handleSelectionChanged(
-            TextSelection.collapsed(offset: _value.text.length),
-            renderEditable,
-            null);
+            TextSelection.collapsed(offset: _value.text.length), null);
       }
     } else {
       WidgetsBinding.instance!.removeObserver(this);
@@ -1935,6 +1960,7 @@ class MongolEditableTextState extends State<MongolEditableText>
   ///
   /// This property is typically used to notify the renderer of input gestures
   /// when [MongolRenderEditable.ignorePointer] is true.
+  @override
   MongolRenderEditable get renderEditable =>
       _editableKey.currentContext!.findRenderObject()! as MongolRenderEditable;
 
@@ -1944,9 +1970,16 @@ class MongolEditableTextState extends State<MongolEditableText>
   double get _devicePixelRatio => MediaQuery.of(context).devicePixelRatio;
 
   @override
-  set textEditingValue(TextEditingValue value) {
-    _selectionOverlay?.update(value);
-    _formatAndSetValue(value);
+  void userUpdateTextEditingValue(
+      TextEditingValue value, SelectionChangedCause? cause) {
+    // Compare the current TextEditingValue with the pre-format new
+    // TextEditingValue value, in case the formatter would reject the change.
+    final shouldShowCaret =
+        widget.readOnly ? _value.selection != value.selection : _value != value;
+    if (shouldShowCaret) {
+      _scheduleShowCaretOnScreen();
+    }
+    _formatAndSetValue(value, cause, userInteraction: true);
   }
 
   @override
@@ -1980,8 +2013,14 @@ class MongolEditableTextState extends State<MongolEditableText>
   }
 
   @override
-  void hideToolbar() {
-    _selectionOverlay?.hide();
+  void hideToolbar([bool hideHandles = true]) {
+    if (hideHandles) {
+      // Hide the handles and the toolbar.
+      _selectionOverlay?.hide();
+    } else {
+      // Hide only the toolbar but not the handles.
+      _selectionOverlay?.hideToolbar();
+    }
   }
 
   /// Toggles the visibility of the toolbar.
@@ -2076,6 +2115,11 @@ class MongolEditableTextState extends State<MongolEditableText>
         physics: widget.scrollPhysics,
         dragStartBehavior: widget.dragStartBehavior,
         restorationId: widget.restorationId,
+        scrollBehavior: widget.scrollBehavior ??
+            // Remove scrollbars if only single line
+            (_isMultiline
+                ? null
+                : ScrollConfiguration.of(context).copyWith(scrollbars: false)),
         viewportBuilder: (BuildContext context, ViewportOffset offset) {
           return CompositedTransformTarget(
             link: _toolbarLayerLink,
@@ -2083,46 +2127,42 @@ class MongolEditableTextState extends State<MongolEditableText>
               onCopy: _semanticsOnCopy(controls),
               onCut: _semanticsOnCut(controls),
               onPaste: _semanticsOnPaste(controls),
-              child: Container(
-                child: _MongolEditable(
-                  key: _editableKey,
-                  startHandleLayerLink: _startHandleLayerLink,
-                  endHandleLayerLink: _endHandleLayerLink,
-                  textSpan: buildTextSpan(),
-                  value: _value,
-                  cursorColor: _cursorColor,
-                  showCursor: MongolEditableText.debugDeterministicCursor
-                      ? ValueNotifier<bool>(widget.showCursor)
-                      : _cursorVisibilityNotifier,
-                  forceLine: widget.forceLine,
-                  readOnly: widget.readOnly,
-                  hasFocus: _hasFocus,
-                  maxLines: widget.maxLines,
-                  minLines: widget.minLines,
-                  expands: widget.expands,
-                  selectionColor: widget.selectionColor,
-                  textScaleFactor: widget.textScaleFactor ??
-                      MediaQuery.textScaleFactorOf(context),
-                  textAlign: widget.textAlign,
-                  obscuringCharacter: widget.obscuringCharacter,
-                  obscureText: widget.obscureText,
-                  autocorrect: widget.autocorrect,
-                  enableSuggestions: widget.enableSuggestions,
-                  offset: offset,
-                  onSelectionChanged: _handleSelectionChanged,
-                  onCaretChanged: _handleCaretChanged,
-                  rendererIgnoresPointer: widget.rendererIgnoresPointer,
-                  cursorWidth: widget.cursorWidth,
-                  cursorHeight: widget.cursorHeight,
-                  cursorRadius: widget.cursorRadius,
-                  cursorOffset: widget.cursorOffset ?? Offset.zero,
-                  enableInteractiveSelection: widget.enableInteractiveSelection,
-                  textSelectionDelegate: this,
-                  devicePixelRatio: _devicePixelRatio,
-                  // promptRectRange: _currentPromptRectRange,
-                  // promptRectColor: widget.autocorrectionTextRectColor,
-                  clipBehavior: widget.clipBehavior,
-                ),
+              textDirection: TextDirection.ltr,
+              child: _MongolEditable(
+                key: _editableKey,
+                startHandleLayerLink: _startHandleLayerLink,
+                endHandleLayerLink: _endHandleLayerLink,
+                textSpan: buildTextSpan(),
+                value: _value,
+                cursorColor: _cursorColor,
+                showCursor: MongolEditableText.debugDeterministicCursor
+                    ? ValueNotifier<bool>(widget.showCursor)
+                    : _cursorVisibilityNotifier,
+                forceLine: widget.forceLine,
+                readOnly: widget.readOnly,
+                hasFocus: _hasFocus,
+                maxLines: widget.maxLines,
+                minLines: widget.minLines,
+                expands: widget.expands,
+                selectionColor: widget.selectionColor,
+                textScaleFactor: widget.textScaleFactor ??
+                    MediaQuery.textScaleFactorOf(context),
+                textAlign: widget.textAlign,
+                obscuringCharacter: widget.obscuringCharacter,
+                obscureText: widget.obscureText,
+                autocorrect: widget.autocorrect,
+                enableSuggestions: widget.enableSuggestions,
+                offset: offset,
+                onCaretChanged: _handleCaretChanged,
+                rendererIgnoresPointer: widget.rendererIgnoresPointer,
+                cursorWidth: widget.cursorWidth,
+                cursorHeight: widget.cursorHeight,
+                cursorRadius: widget.cursorRadius,
+                cursorOffset: widget.cursorOffset ?? Offset.zero,
+                enableInteractiveSelection: widget.enableInteractiveSelection,
+                textSelectionDelegate: this,
+                devicePixelRatio: _devicePixelRatio,
+                clipBehavior: widget.clipBehavior,
               ),
             ),
           );
@@ -2140,10 +2180,9 @@ class MongolEditableTextState extends State<MongolEditableText>
       var text = _value.text;
       text = widget.obscuringCharacter * text.length;
       // Reveal the latest character in an obscured field only on mobile.
-      if ((defaultTargetPlatform == TargetPlatform.android ||
-              defaultTargetPlatform == TargetPlatform.iOS ||
-              defaultTargetPlatform == TargetPlatform.fuchsia) &&
-          !kIsWeb) {
+      if (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.fuchsia) {
         final o =
             _obscureShowCharTicksPending > 0 ? _obscureLatestCharIndex : null;
         if (o != null && o >= 0 && o < text.length) {
@@ -2154,6 +2193,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
     // Read only mode should not paint text composing.
     return widget.controller.buildTextSpan(
+      context: context,
       style: widget.style,
       withComposing: !widget.readOnly,
     );
@@ -2183,7 +2223,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
     required this.autocorrect,
     required this.enableSuggestions,
     required this.offset,
-    this.onSelectionChanged,
     this.onCaretChanged,
     this.rendererIgnoresPointer = false,
     this.cursorWidth,
@@ -2216,7 +2255,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
   final bool autocorrect;
   final bool enableSuggestions;
   final ViewportOffset offset;
-  final MongolSelectionChangedHandler? onSelectionChanged;
   final CaretChangedHandler? onCaretChanged;
   final bool rendererIgnoresPointer;
   final double? cursorWidth;
@@ -2247,7 +2285,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
       textAlign: textAlign,
       selection: value.selection,
       offset: offset,
-      onSelectionChanged: onSelectionChanged,
       onCaretChanged: onCaretChanged,
       ignorePointer: rendererIgnoresPointer,
       obscuringCharacter: obscuringCharacter,
@@ -2283,7 +2320,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
       ..textAlign = textAlign
       ..selection = value.selection
       ..offset = offset
-      ..onSelectionChanged = onSelectionChanged
       ..onCaretChanged = onCaretChanged
       ..ignorePointer = rendererIgnoresPointer
       ..obscuringCharacter = obscuringCharacter

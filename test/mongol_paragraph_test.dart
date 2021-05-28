@@ -399,7 +399,7 @@ void main() {
       final range5 = paragraph.getLineBoundary(const TextPosition(offset: 5));
       expect(
         range5.textInside(text),
-        equals('I polished up that handle so carefullee\n'),
+        equals('I polished up that handle so carefullee'),
       );
 
       final range40 = paragraph.getLineBoundary(const TextPosition(offset: 40));
@@ -425,6 +425,59 @@ void main() {
           paragraph.getLineBoundary(const TextPosition(offset: 1000));
       expect(range1000, TextRange.empty);
     });
+
+    test('getLineBoundary does not include newline', () {
+      // test for https://github.com/flutter/flutter/issues/83392
+      const text = 'aaa\nbbb';
+
+      final paragraph = _getParagraph(text, 1000);
+
+      var range = paragraph.getLineBoundary(const TextPosition(offset: 0));
+      expect(
+        range.textInside(text),
+        equals('aaa'),
+      );
+      expect(range.start, 0);
+      expect(range.end, 3);
+
+      range = paragraph.getLineBoundary(const TextPosition(offset: 5));
+      expect(
+        range.textInside(text),
+        equals('bbb'),
+      );
+      expect(range.start, 4);
+      expect(range.end, 7);
+    });
+
+// https://github.com/flutter/flutter/issues/83392
+// test('getLineBoundary includes newline characters', () {
+//   const text = 'aaa\nbbb';
+
+//   final paragraphStyle = ui.ParagraphStyle(
+//     textDirection: ui.TextDirection.ltr,
+//   );
+//   final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
+//     ..addText(text);
+//   final constraints = ui.ParagraphConstraints(width: 1000);
+//   final paragraph = paragraphBuilder.build();
+//   paragraph.layout(constraints);
+
+//   var range = paragraph.getLineBoundary(const TextPosition(offset: 0));
+//   expect(
+//     range.textInside(text),
+//     equals('aaa\n'),
+//   );
+//   expect(range.start, 0);
+//   expect(range.end, 4);
+
+//   range = paragraph.getLineBoundary(const TextPosition(offset: 5));
+//   expect(
+//     range.textInside(text),
+//     equals('bbb'),
+//   );
+//   expect(range.start, 4);
+//   expect(range.end, 7);
+// });
 
     test('getPositionForOffset with empty content does not crash', () {
       const text = '';

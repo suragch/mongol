@@ -1,3 +1,10 @@
+## [2.0.0] - 2021.5.28
+
+- Flutter 2.2 broke some of the internal workings of this package. This update fixes those.
+- This update increases the major version to 2 because an automatic update for projects still on Flutter 2.0 would probably break things.
+- There are no significant new features with this release, but there are numerous internal changes to match changes made to the Flutter text editing widgets.
+- There are several known issues with this release. Please open a GitHub issue if they are affecting your app.
+
 ## [1.1.0] - 2021.3.13
 
 - Implemented MongolTextAlign (supports top, center, bottom, justify)
