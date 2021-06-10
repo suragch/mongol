@@ -1,6 +1,7 @@
 ## [2.0.1] - 2021.6.10
 
-- Fixed bug for range error when selecting past end of text in MongolTextField
+- Fixed bug for range error when selecting past end of text in `MongolTextField`
+- Fixed `MongolTextAlign` regression (#6)
 
 ## [2.0.0] - 2021.5.28
 

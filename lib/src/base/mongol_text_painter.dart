@@ -34,20 +34,6 @@ class _CaretMetrics {
 }
 
 /// A convenience method for converting MongolTextAlign to TextAlign
-TextAlign mapMongolToHorizontalTextAlign(MongolTextAlign textAlign) {
-  switch (textAlign) {
-    case MongolTextAlign.top:
-      return TextAlign.left;
-    case MongolTextAlign.bottom:
-      return TextAlign.right;
-    case MongolTextAlign.center:
-      return TextAlign.center;
-    case MongolTextAlign.justify:
-      return TextAlign.justify;
-  }
-}
-
-/// A convenience method for converting MongolTextAlign to TextAlign
 MongolTextAlign? mapHorizontalToMongolTextAlign(TextAlign? textAlign) {
   if (textAlign == null) return null;
   switch (textAlign) {
@@ -205,6 +191,7 @@ class MongolTextPainter {
   /// After this is set, you must call [layout] before the next call to [paint].
   int? get maxLines => _maxLines;
   int? _maxLines;
+
   /// The value may be null. If it is not null, then it must be greater than zero.
   set maxLines(int? value) {
     assert(value == null || value > 0);
@@ -218,8 +205,10 @@ class MongolTextPainter {
   MongolParagraph? _layoutTemplate;
 
   ui.ParagraphStyle _createParagraphStyle() {
+    // textAlign should always be `left` because this is the style for
+    // a single text run. MongolTextAlign is handled elsewhere.
     return _text!.style?.getParagraphStyle(
-          textAlign: mapMongolToHorizontalTextAlign(textAlign),
+          textAlign: TextAlign.left,
           textDirection: TextDirection.ltr,
           textScaleFactor: textScaleFactor,
           maxLines: maxLines,
@@ -228,7 +217,7 @@ class MongolTextPainter {
           strutStyle: null,
         ) ??
         ui.ParagraphStyle(
-          textAlign: mapMongolToHorizontalTextAlign(textAlign),
+          textAlign: TextAlign.left,
           textDirection: TextDirection.ltr,
           // Use the default font size to multiply by as RichText does not
           // perform inheriting [TextStyle]s and would otherwise
