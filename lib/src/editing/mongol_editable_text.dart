@@ -22,6 +22,8 @@ import 'package:mongol/src/editing/text_selection/mongol_text_selection.dart';
 
 import 'mongol_text_editing_action.dart';
 
+// ignore_for_file: todo
+
 // The time it takes for the cursor to fade from fully opaque to fully
 // transparent and vice versa. A full cursor blink, from transparent to opaque
 // to transparent, is twice this duration.

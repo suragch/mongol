@@ -31,7 +31,6 @@ import 'package:mongol/src/base/mongol_text_align.dart';
 import 'alignment.dart';
 import 'mongol_editable_text.dart';
 import 'mongol_input_decorator.dart';
-import '../base/mongol_text_painter.dart';
 import 'text_selection/mongol_text_selection.dart';
 import 'text_selection/mongol_text_selection_controls.dart';
 

@@ -5,6 +5,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: omit_local_variable_types
+// ignore_for_file: todo
 
 @TestOn('!chrome')
 import 'dart:ui' as ui show window;
@@ -175,23 +176,23 @@ void main() {
     await Clipboard.setData(const ClipboardData(text: 'Clipboard data'));
   });
 
-  final Key textFieldKey = UniqueKey();
-  Widget textFieldBuilder({
-    int? maxLines = 1,
-    int? minLines,
-  }) {
-    return boilerplate(
-      child: MongolTextField(
-        key: textFieldKey,
-        style: const TextStyle(color: Colors.black, fontSize: 34.0),
-        maxLines: maxLines,
-        minLines: minLines,
-        decoration: const InputDecoration(
-          hintText: 'Placeholder',
-        ),
-      ),
-    );
-  }
+  // final Key textFieldKey = UniqueKey();
+  // Widget textFieldBuilder({
+  //   int? maxLines = 1,
+  //   int? minLines,
+  // }) {
+  //   return boilerplate(
+  //     child: MongolTextField(
+  //       key: textFieldKey,
+  //       style: const TextStyle(color: Colors.black, fontSize: 34.0),
+  //       maxLines: maxLines,
+  //       minLines: minLines,
+  //       decoration: const InputDecoration(
+  //         hintText: 'Placeholder',
+  //       ),
+  //     ),
+  //   );
+  // }
 
   // testMongolWidgets('can use the desktop cut/copy/paste buttons on Mac', (MongolWidgetTester tester) async {
   //   final controller = TextEditingController(

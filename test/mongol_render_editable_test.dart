@@ -21,6 +21,8 @@ import 'rendering/mock_canvas.dart';
 import 'rendering/recording_canvas.dart';
 import 'rendering/rendering_tester.dart';
 
+// ignore_for_file: deprecated_member_use_from_same_package
+
 class FakeEditableTextState with TextSelectionDelegate {
   @override
   TextEditingValue textEditingValue = TextEditingValue.empty;

@@ -5,6 +5,7 @@
 // found in the LICENSE file.
 
 // ignore_for_file: omit_local_variable_types
+// ignore_for_file: todo
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -3935,681 +3936,681 @@ void main() {
     }
   }
 
-  Future<void> testTextEditing(MongolWidgetTester tester,
-      {required String platform}) async {
-    final TextEditingController controller =
-        TextEditingController(text: testText);
-    controller.selection = const TextSelection(
-      baseOffset: 0,
-      extentOffset: 0,
-      affinity: TextAffinity.upstream,
-    );
-    late TextSelection selection;
-    late SelectionChangedCause cause;
-    await tester.pumpWidget(MaterialApp(
-      home: Align(
-        alignment: Alignment.topLeft,
-        child: SizedBox(
-          height: 400,
-          child: MongolEditableText(
-            maxLines: 10,
-            controller: controller,
-            showSelectionHandles: true,
-            autofocus: true,
-            focusNode: FocusNode(),
-            style: Typography.material2018(platform: TargetPlatform.android)
-                .black
-                .subtitle1!,
-            cursorColor: Colors.blue,
-            selectionControls: materialTextSelectionControls,
-            keyboardType: TextInputType.text,
-            textAlign: MongolTextAlign.bottom,
-            onSelectionChanged:
-                (TextSelection newSelection, SelectionChangedCause? newCause) {
-              selection = newSelection;
-              cause = newCause!;
-            },
-          ),
-        ),
-      ),
-    ));
+  // Future<void> testTextEditing(MongolWidgetTester tester,
+  //     {required String platform}) async {
+  //   final TextEditingController controller =
+  //       TextEditingController(text: testText);
+  //   controller.selection = const TextSelection(
+  //     baseOffset: 0,
+  //     extentOffset: 0,
+  //     affinity: TextAffinity.upstream,
+  //   );
+  //   late TextSelection selection;
+  //   late SelectionChangedCause cause;
+  //   await tester.pumpWidget(MaterialApp(
+  //     home: Align(
+  //       alignment: Alignment.topLeft,
+  //       child: SizedBox(
+  //         height: 400,
+  //         child: MongolEditableText(
+  //           maxLines: 10,
+  //           controller: controller,
+  //           showSelectionHandles: true,
+  //           autofocus: true,
+  //           focusNode: FocusNode(),
+  //           style: Typography.material2018(platform: TargetPlatform.android)
+  //               .black
+  //               .subtitle1!,
+  //           cursorColor: Colors.blue,
+  //           selectionControls: materialTextSelectionControls,
+  //           keyboardType: TextInputType.text,
+  //           textAlign: MongolTextAlign.bottom,
+  //           onSelectionChanged:
+  //               (TextSelection newSelection, SelectionChangedCause? newCause) {
+  //             selection = newSelection;
+  //             cause = newCause!;
+  //           },
+  //         ),
+  //       ),
+  //     ),
+  //   ));
 
-    await tester.pump(); // Wait for autofocus to take effect.
+  //   await tester.pump(); // Wait for autofocus to take effect.
 
-    // Select a few characters using shift right arrow
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowDown,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Select a few characters using shift right arrow
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowDown,
+  //       LogicalKeyboardKey.arrowDown,
+  //       LogicalKeyboardKey.arrowDown,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(cause, equals(SelectionChangedCause.keyboard),
-        reason: 'on $platform');
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 3,
-          affinity: TextAffinity.upstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(cause, equals(SelectionChangedCause.keyboard),
+  //       reason: 'on $platform');
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 3,
+  //         affinity: TextAffinity.upstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select fewer characters using shift left arrow
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowUp,
-        LogicalKeyboardKey.arrowUp,
-        LogicalKeyboardKey.arrowUp,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Select fewer characters using shift left arrow
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowUp,
+  //       LogicalKeyboardKey.arrowUp,
+  //       LogicalKeyboardKey.arrowUp,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 0,
-          affinity: TextAffinity.upstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 0,
+  //         affinity: TextAffinity.upstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Try to select before the first character, nothing should change.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowUp,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Try to select before the first character, nothing should change.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowUp,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 0,
-          affinity: TextAffinity.upstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 0,
+  //         affinity: TextAffinity.upstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select the first two words.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowDown,
-      ],
-      shift: true,
-      wordModifier: true,
-      platform: platform,
-    );
+  //   // Select the first two words.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowDown,
+  //       LogicalKeyboardKey.arrowDown,
+  //     ],
+  //     shift: true,
+  //     wordModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 6,
-          affinity: TextAffinity.upstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 6,
+  //         affinity: TextAffinity.upstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Unselect the second word.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowUp,
-      ],
-      shift: true,
-      wordModifier: true,
-      platform: platform,
-    );
+  //   // Unselect the second word.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowUp,
+  //     ],
+  //     shift: true,
+  //     wordModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 4,
-          affinity: TextAffinity.upstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 4,
+  //         affinity: TextAffinity.upstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select the next line.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowRight,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Select the next line.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowRight,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 24,
-          affinity: TextAffinity.upstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 24,
+  //         affinity: TextAffinity.upstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowDown,
-      ],
-      platform: platform,
-    );
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowDown,
+  //     ],
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 24,
-          extentOffset: 24,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 24,
+  //         extentOffset: 24,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select the next line.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowRight,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Select the next line.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowRight,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 24,
-          extentOffset: 40,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 24,
+  //         extentOffset: 40,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select to the end of the string by going down.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowRight,
-        LogicalKeyboardKey.arrowRight,
-        LogicalKeyboardKey.arrowRight,
-        LogicalKeyboardKey.arrowRight,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Select to the end of the string by going down.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowRight,
+  //       LogicalKeyboardKey.arrowRight,
+  //       LogicalKeyboardKey.arrowRight,
+  //       LogicalKeyboardKey.arrowRight,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 24,
-          extentOffset: testText.length,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 24,
+  //         extentOffset: testText.length,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Go back left one line to set selection up to part of the last line.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowLeft,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Go back left one line to set selection up to part of the last line.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowLeft,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 24,
-          extentOffset: 53,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 24,
+  //         extentOffset: 53,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select to the end of the selection.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowDown,
-      ],
-      lineModifier: true,
-      shift: true,
-      platform: platform,
-    );
+  //   // Select to the end of the selection.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowDown,
+  //     ],
+  //     lineModifier: true,
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 24,
-          extentOffset: 72,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 24,
+  //         extentOffset: 72,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select to the beginning of the line.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowUp,
-      ],
-      lineModifier: true,
-      shift: true,
-      platform: platform,
-    );
+  //   // Select to the beginning of the line.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowUp,
+  //     ],
+  //     lineModifier: true,
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 20,
-          extentOffset: 55,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 20,
+  //         extentOffset: 55,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select All
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.keyA,
-      ],
-      shortcutModifier: true,
-      platform: platform,
-    );
+  //   // Select All
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.keyA,
+  //     ],
+  //     shortcutModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: testText.length,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: testText.length,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Jump to beginning of selection.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowUp,
-      ],
-      platform: platform,
-    );
+  //   // Jump to beginning of selection.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowUp,
+  //     ],
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 0,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 0,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Jump to end.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowRight,
-      ],
-      shift: false,
-      lineModifier: true,
-      platform: platform,
-    );
+  //   // Jump to end.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowRight,
+  //     ],
+  //     shift: false,
+  //     lineModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection.collapsed(
-          offset: testText.length,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
-    expect(controller.text, equals(testText), reason: 'on $platform');
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection.collapsed(
+  //         offset: testText.length,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(controller.text, equals(testText), reason: 'on $platform');
 
-    // Jump to start.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowLeft,
-      ],
-      shift: false,
-      lineModifier: true,
-      platform: platform,
-    );
+  //   // Jump to start.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowLeft,
+  //     ],
+  //     shift: false,
+  //     lineModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection.collapsed(
-          offset: 0,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
-    expect(controller.text, equals(testText), reason: 'on $platform');
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection.collapsed(
+  //         offset: 0,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(controller.text, equals(testText), reason: 'on $platform');
 
-    // Move forward a few letters
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowDown,
-      ],
-      shift: false,
-      lineModifier: false,
-      platform: platform,
-    );
+  //   // Move forward a few letters
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowDown,
+  //       LogicalKeyboardKey.arrowDown,
+  //       LogicalKeyboardKey.arrowDown,
+  //     ],
+  //     shift: false,
+  //     lineModifier: false,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection.collapsed(
-          offset: 3,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection.collapsed(
+  //         offset: 3,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select to end.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowRight,
-      ],
-      shift: true,
-      lineModifier: true,
-      platform: platform,
-    );
+  //   // Select to end.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowRight,
+  //     ],
+  //     shift: true,
+  //     lineModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 3,
-          extentOffset: testText.length,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 3,
+  //         extentOffset: testText.length,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select to start, which extends the selection.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowLeft,
-      ],
-      shift: true,
-      lineModifier: true,
-      platform: platform,
-    );
+  //   // Select to start, which extends the selection.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowLeft,
+  //     ],
+  //     shift: true,
+  //     lineModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: testText.length,
-          extentOffset: 0,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: testText.length,
+  //         extentOffset: 0,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Move to start again.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowLeft,
-      ],
-      shift: false,
-      lineModifier: false,
-      platform: platform,
-    );
+  //   // Move to start again.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowLeft,
+  //     ],
+  //     shift: false,
+  //     lineModifier: false,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection.collapsed(
-          offset: 0,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection.collapsed(
+  //         offset: 0,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Jump forward three words.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowDown,
-        LogicalKeyboardKey.arrowDown,
-      ],
-      wordModifier: true,
-      platform: platform,
-    );
+  //   // Jump forward three words.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowDown,
+  //       LogicalKeyboardKey.arrowDown,
+  //       LogicalKeyboardKey.arrowDown,
+  //     ],
+  //     wordModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 10,
-          extentOffset: 10,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 10,
+  //         extentOffset: 10,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select some characters backward.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowUp,
-        LogicalKeyboardKey.arrowUp,
-        LogicalKeyboardKey.arrowUp,
-      ],
-      shift: true,
-      platform: platform,
-    );
+  //   // Select some characters backward.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowUp,
+  //       LogicalKeyboardKey.arrowUp,
+  //       LogicalKeyboardKey.arrowUp,
+  //     ],
+  //     shift: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 10,
-          extentOffset: 7,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 10,
+  //         extentOffset: 7,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
 
-    // Select a word backward.
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.arrowUp,
-      ],
-      shift: true,
-      wordModifier: true,
-      platform: platform,
-    );
+  //   // Select a word backward.
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.arrowUp,
+  //     ],
+  //     shift: true,
+  //     wordModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 10,
-          extentOffset: 4,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
-    expect(controller.text, equals(testText), reason: 'on $platform');
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 10,
+  //         extentOffset: 4,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(controller.text, equals(testText), reason: 'on $platform');
 
-    // Cut
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.keyX,
-      ],
-      shortcutModifier: true,
-      platform: platform,
-    );
+  //   // Cut
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.keyX,
+  //     ],
+  //     shortcutModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 4,
-          extentOffset: 4,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
-    expect(
-      controller.text,
-      equals('Now  time for\n'
-          'all good people\n'
-          'to come to the aid\n'
-          'of their country.'),
-      reason: 'on $platform',
-    );
-    expect(
-      (await Clipboard.getData(Clipboard.kTextPlain))!.text,
-      equals('is the'),
-      reason: 'on $platform',
-    );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 4,
+  //         extentOffset: 4,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(
+  //     controller.text,
+  //     equals('Now  time for\n'
+  //         'all good people\n'
+  //         'to come to the aid\n'
+  //         'of their country.'),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(
+  //     (await Clipboard.getData(Clipboard.kTextPlain))!.text,
+  //     equals('is the'),
+  //     reason: 'on $platform',
+  //   );
 
-    // Paste
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.keyV,
-      ],
-      shortcutModifier: true,
-      platform: platform,
-    );
+  //   // Paste
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.keyV,
+  //     ],
+  //     shortcutModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 10,
-          extentOffset: 10,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
-    expect(controller.text, equals(testText), reason: 'on $platform');
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 10,
+  //         extentOffset: 10,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(controller.text, equals(testText), reason: 'on $platform');
 
-    // Copy All
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.keyA,
-        LogicalKeyboardKey.keyC,
-      ],
-      shortcutModifier: true,
-      platform: platform,
-    );
+  //   // Copy All
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.keyA,
+  //       LogicalKeyboardKey.keyC,
+  //     ],
+  //     shortcutModifier: true,
+  //     platform: platform,
+  //   );
 
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: testText.length,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
-    expect(controller.text, equals(testText), reason: 'on $platform');
-    expect((await Clipboard.getData(Clipboard.kTextPlain))!.text,
-        equals(testText));
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: testText.length,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(controller.text, equals(testText), reason: 'on $platform');
+  //   expect((await Clipboard.getData(Clipboard.kTextPlain))!.text,
+  //       equals(testText));
 
-    // Delete
-    await sendKeys(
-      tester,
-      <LogicalKeyboardKey>[
-        LogicalKeyboardKey.delete,
-      ],
-      platform: platform,
-    );
-    expect(
-      selection,
-      equals(
-        const TextSelection(
-          baseOffset: 0,
-          extentOffset: 0,
-          affinity: TextAffinity.downstream,
-        ),
-      ),
-      reason: 'on $platform',
-    );
-    expect(controller.text, isEmpty, reason: 'on $platform');
-  }
+  //   // Delete
+  //   await sendKeys(
+  //     tester,
+  //     <LogicalKeyboardKey>[
+  //       LogicalKeyboardKey.delete,
+  //     ],
+  //     platform: platform,
+  //   );
+  //   expect(
+  //     selection,
+  //     equals(
+  //       const TextSelection(
+  //         baseOffset: 0,
+  //         extentOffset: 0,
+  //         affinity: TextAffinity.downstream,
+  //       ),
+  //     ),
+  //     reason: 'on $platform',
+  //   );
+  //   expect(controller.text, isEmpty, reason: 'on $platform');
+  // }
 
   // TODO: get these tests to pass after I understand more about text movement
 
@@ -7685,20 +7686,4 @@ class SkipPainting extends SingleChildRenderObjectWidget {
 class SkipPaintingRenderObject extends RenderProxyBox {
   @override
   void paint(PaintingContext context, Offset offset) {}
-}
-
-class _AccentColorTextEditingController extends TextEditingController {
-  _AccentColorTextEditingController(String text) : super(text: text);
-
-  @override
-  TextSpan buildTextSpan(
-      {required BuildContext context,
-      TextStyle? style,
-      required bool withComposing}) {
-    final Color color = Theme.of(context).colorScheme.secondary;
-    return super.buildTextSpan(
-        context: context,
-        style: TextStyle(color: color),
-        withComposing: withComposing);
-  }
 }

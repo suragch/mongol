@@ -16,6 +16,9 @@ import 'package:flutter/services.dart';
 import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/base/mongol_text_painter.dart';
 
+// ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: todo
+
 const double _kCaretGap = 1.0; // pixels
 const double _kCaretWidthOffset = 2.0; // pixels
 

@@ -5,6 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/src/base/mongol_paragraph.dart';
 import 'package:mongol/src/base/mongol_text_align.dart';
 
+// ignore_for_file: todo
+
 void main() {
   MongolParagraph _getParagraph(
     String text,
