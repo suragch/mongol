@@ -342,8 +342,8 @@ void main() {
     });
   });
 
-  group('miscellaneous methods -', () {
-    test('getPositionForOffset control test', () {
+  group('getPositionForOffset -', () {
+    test('control test', () {
       const text = 'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
 
@@ -362,6 +362,24 @@ void main() {
       expect(positionRight.offset, greaterThan(position40.offset));
     });
 
+    test('empty content does not crash', () {
+      const text = '';
+      final paragraph = _getParagraph(text, 1000);
+      final position = paragraph.getPositionForOffset(Offset(400, 300));
+      expect(position,
+          TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
+    });
+
+    test('ending with new line does not crash', () {
+      const text = 'hello\n';
+      final paragraph = _getParagraph(text, 1000);
+      final position = paragraph.getPositionForOffset(Offset(400, 300));
+      expect(position,
+          TextPosition(offset: 5, affinity: ui.TextAffinity.downstream));
+    });
+  });
+
+  group('miscellaneous methods -', () {
     test('getWordBoundary control test', () {
       const text = 'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
@@ -478,14 +496,6 @@ void main() {
 //   expect(range.start, 4);
 //   expect(range.end, 7);
 // });
-
-    test('getPositionForOffset with empty content does not crash', () {
-      const text = '';
-      final paragraph = _getParagraph(text, 1000);
-      final position = paragraph.getPositionForOffset(Offset(400, 300));
-      expect(position,
-          TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
-    });
   });
 
   group('maxlines -', () {

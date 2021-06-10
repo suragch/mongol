@@ -1,3 +1,7 @@
+## [2.0.1] - 2021.6.10
+
+- Fixed bug for range error when selecting past end of text in MongolTextField
+
 ## [2.0.0] - 2021.5.28
 
 - Flutter 2.2 broke some of the internal workings of this package. This update fixes those.

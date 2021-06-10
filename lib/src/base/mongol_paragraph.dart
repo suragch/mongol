@@ -263,7 +263,14 @@ class MongolParagraph {
         break;
       }
     }
-    matchedRun ??= _runs[matchedLine.textRunEnd - 1];
+    if (matchedRun == null) {
+      final matchedRunIndex = matchedLine.textRunEnd - 1;
+      if (matchedRunIndex.isNegative) {
+        matchedRun = _runs.last;
+      } else {
+        matchedRun = _runs[matchedRunIndex];
+      }
+    }
 
     // find the offset
     final paragraphDx = dy - rotatedRunDy;
@@ -273,7 +280,7 @@ class MongolParagraph {
     final textOffset = matchedRun.start + runPosition.offset;
 
     // find the afinity
-    final lineEndCharOffset = _runs[matchedLine.textRunEnd - 1].end;
+    final lineEndCharOffset = matchedRun.end;
     final textAfinity =
         (textOffset == lineEndCharOffset) ? upstream : downstream;
     return [textOffset, textAfinity];
