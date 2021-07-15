@@ -1,3 +1,8 @@
+## [2.0.2] - 2021.7.15
+
+- Fixed `MongolTextField` tap selection not working on iOS (#12)
+- Switched to flutter_lints instead of pedantic
+
 ## [2.0.1] - 2021.6.10
 
 - Fixed bug for range error when selecting past end of text in `MongolTextField`
