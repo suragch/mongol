@@ -23,10 +23,10 @@ void main() {
     painter.text = TextSpan(text: null, children: children);
     painter.layout();
 
-    expect(painter.size, Size(14.0, 28.0));
+    expect(painter.size, const Size(14.0, 28.0));
 
     // before the first character
-    var offset = Offset(-1.0, -1.0);
+    var offset = const Offset(-1.0, -1.0);
     var position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
 
@@ -36,42 +36,42 @@ void main() {
     expect(position.offset, 0);
 
     // on the first character, but closer to the start of the character
-    offset = Offset(5.0, 5.0);
+    offset = const Offset(5.0, 5.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
 
     // on the first character, but closer to the end of the character
-    offset = Offset(5.0, 13.0);
+    offset = const Offset(5.0, 13.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
 
     // on the second character, but closer to the start of the character
-    offset = Offset(5.0, 15.0);
+    offset = const Offset(5.0, 15.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
 
     // on the second character, but closer to the end of the character
-    offset = Offset(5.0, 27.0);
+    offset = const Offset(5.0, 27.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 2);
 
     // to right of the line near vertical start
-    offset = Offset(100.0, 5.0);
+    offset = const Offset(100.0, 5.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
 
     // to right of the line close to index second char start
-    offset = Offset(100.0, 15.0);
+    offset = const Offset(100.0, 15.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
 
     // below the last character
-    offset = Offset(5.0, 30.0);
+    offset = const Offset(5.0, 30.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 2);
 
     // below and to the right of the last character
-    offset = Offset(100.0, 100.0);
+    offset = const Offset(100.0, 100.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 2);
   });
@@ -79,16 +79,16 @@ void main() {
   test('TextPainter returns correct offset for hard-wrap multi-line TextSpan',
       () {
     final painter = MongolTextPainter();
-    painter.text = TextSpan(
+    painter.text = const TextSpan(
       text: 'ABCDE FGHIJ\nKLMNO PQRST',
       style: TextStyle(fontSize: 30),
     );
     painter.layout();
 
-    expect(painter.size, Size(60.0, 330.0));
+    expect(painter.size, const Size(60.0, 330.0));
 
     // before the first character
-    var offset = Offset(-1.0, -1.0);
+    var offset = const Offset(-1.0, -1.0);
     var position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
 
@@ -98,32 +98,32 @@ void main() {
     expect(position.offset, 0);
 
     // on A closer to beginning of char
-    offset = Offset(10.0, 1.0);
+    offset = const Offset(10.0, 1.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
 
     // on B closer to beginning of char
-    offset = Offset(10.0, 40.0);
+    offset = const Offset(10.0, 40.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
 
     // on J closer to beginning of char
-    offset = Offset(10.0, 310.0);
+    offset = const Offset(10.0, 310.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 10);
 
     // on J closer to end of char
-    offset = Offset(10.0, 320.0);
+    offset = const Offset(10.0, 320.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 11);
 
     // on K closer to beginning of char
-    offset = Offset(40.0, 10.0);
+    offset = const Offset(40.0, 10.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 12);
 
     // on T closer to end of char
-    offset = Offset(40.0, 320.0);
+    offset = const Offset(40.0, 320.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 23);
   });
@@ -132,7 +132,7 @@ void main() {
       'MongolTextPainter returns correct offset and affinity for soft-wrap multi-line TextSpan',
       () {
     final painter = MongolTextPainter()
-      ..text = TextSpan(
+      ..text = const TextSpan(
           text: 'ABCDE FGHIJ',
           style: TextStyle(
             height: 1.0,
@@ -142,10 +142,10 @@ void main() {
       ..layout(maxHeight: 80);
 
     // FIXME: TextPainter returns 80 rather than 60 here.
-    expect(painter.size, Size(20.0, 60.0));
+    expect(painter.size, const Size(20.0, 60.0));
 
     // before the first character
-    var offset = Offset(-1.0, -1.0);
+    var offset = const Offset(-1.0, -1.0);
     var position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
     expect(position.affinity, TextAffinity.downstream);
@@ -157,61 +157,61 @@ void main() {
     expect(position.affinity, TextAffinity.downstream);
 
     // on A closer to beginning of char
-    offset = Offset(2.0, 2.0);
+    offset = const Offset(2.0, 2.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 0);
     expect(position.affinity, TextAffinity.downstream);
 
     // on B closer to beginning of char
-    offset = Offset(2.0, 12.0);
+    offset = const Offset(2.0, 12.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
     expect(position.affinity, TextAffinity.downstream);
 
     // left of B closer to beginning of char
-    offset = Offset(-2.0, 12.0);
+    offset = const Offset(-2.0, 12.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 1);
     expect(position.affinity, TextAffinity.downstream);
 
     // on J closer to beginning of char
-    offset = Offset(12.0, 42.0);
+    offset = const Offset(12.0, 42.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 10);
     expect(position.affinity, TextAffinity.downstream);
 
     // on J closer to end of char
-    offset = Offset(12.0, 48.0);
+    offset = const Offset(12.0, 48.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 11);
     expect(position.affinity, TextAffinity.upstream);
 
     // on final space of first line closer to end of char
-    offset = Offset(2.0, 58.0);
+    offset = const Offset(2.0, 58.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 6);
     expect(position.affinity, TextAffinity.upstream);
 
     // below final space of first line
-    offset = Offset(2.0, 70.0);
+    offset = const Offset(2.0, 70.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 6);
     expect(position.affinity, TextAffinity.upstream);
 
     // left of and below final space of first line
-    offset = Offset(-10.0, 4500.0);
+    offset = const Offset(-10.0, 4500.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 6);
     expect(position.affinity, TextAffinity.upstream);
 
     // below J
-    offset = Offset(12.0, 500.0);
+    offset = const Offset(12.0, 500.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 11);
     expect(position.affinity, TextAffinity.upstream);
 
     // right of and below J
-    offset = Offset(500.0, 500.0);
+    offset = const Offset(500.0, 500.0);
     position = painter.getPositionForOffset(offset);
     expect(position.offset, 11);
     expect(position.affinity, TextAffinity.upstream);
@@ -234,13 +234,13 @@ void main() {
     expect(caretOffset.dy, 0.0);
 
     caretOffset = painter.getOffsetForCaret(
-      ui.TextPosition(offset: -1),
+      const ui.TextPosition(offset: -1),
       ui.Rect.zero,
     );
     expect(caretOffset.dy, 0.0);
 
     caretOffset = painter.getOffsetForCaret(
-      ui.TextPosition(offset: 2),
+      const ui.TextPosition(offset: 2),
       ui.Rect.zero,
     );
     expect(caretOffset.dy, 0.0);
@@ -994,12 +994,15 @@ void main() {
     painter.text = TextSpan(text: text);
     painter.layout();
 
-    var wordRange = painter.getWordBoundary(TextPosition(offset: 14, affinity: TextAffinity.upstream));
-    expect(wordRange, TextRange(start: 14, end: 14));
-    wordRange = painter.getWordBoundary(TextPosition(offset: 14, affinity: TextAffinity.downstream));
-    expect(wordRange, TextRange(start: 14, end: 14));
-    wordRange = painter.getWordBoundary(TextPosition(offset: 20, affinity: TextAffinity.downstream));
-    expect(wordRange, TextRange(start: 14, end: 20));
+    var wordRange = painter.getWordBoundary(
+        const TextPosition(offset: 14, affinity: TextAffinity.upstream));
+    expect(wordRange, const TextRange(start: 14, end: 14));
+    wordRange = painter.getWordBoundary(
+        const TextPosition(offset: 14, affinity: TextAffinity.downstream));
+    expect(wordRange, const TextRange(start: 14, end: 14));
+    wordRange = painter.getWordBoundary(
+        const TextPosition(offset: 20, affinity: TextAffinity.downstream));
+    expect(wordRange, const TextRange(start: 14, end: 20));
   });
 
   // test('MongolTextPainter widget span', () {

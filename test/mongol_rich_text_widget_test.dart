@@ -16,7 +16,7 @@ void main() {
       as TestWidgetsFlutterBinding;
 
   testWidgets('MongolRichText has text', (WidgetTester tester) async {
-    await tester.pumpWidget(MongolRichText(
+    await tester.pumpWidget(const MongolRichText(
       text: TextSpan(text: 'T'),
     ));
 
@@ -29,7 +29,7 @@ void main() {
 
   testWidgets('MongolRichText has correct size for single word',
       (WidgetTester tester) async {
-    await tester.pumpWidget(Center(child: MongolText('Hello')));
+    await tester.pumpWidget(const Center(child: MongolText('Hello')));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -41,12 +41,12 @@ void main() {
 
   testWidgets('MongolRichText should not wrap when less than height constraint',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'A string that should not wrap';
     await tester.pumpWidget(
-      Center(child: MongolText(myString)),
+      const Center(child: MongolText(myString)),
     );
 
     final text = tester.firstWidget(find.byType(MongolRichText));
@@ -59,12 +59,12 @@ void main() {
   testWidgets('MongolRichText wraps text when taller than height constraint',
       (WidgetTester tester) async {
     // set the height of the surface so that the text will wrap
-    await binding.setSurfaceSize(Size(1000, 500));
+    await binding.setSurfaceSize(const Size(1000, 500));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'A long long long string that should wrap';
     await tester.pumpWidget(
-      Center(child: MongolText(myString)),
+      const Center(child: MongolText(myString)),
     );
 
     final text = tester.firstWidget(find.byType(MongolRichText));
@@ -77,12 +77,12 @@ void main() {
 
   testWidgets('MongolRichText wraps text for new line character',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'A string that\nshould wrap';
     await tester.pumpWidget(
-      Center(child: MongolText(myString)),
+      const Center(child: MongolText(myString)),
     );
 
     final text = tester.firstWidget(find.byType(MongolRichText));
@@ -95,12 +95,12 @@ void main() {
 
   testWidgets('MongolRichText wraps text for new line character before space',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'A string that\n should wrap';
     await tester.pumpWidget(
-      Center(child: MongolText(myString)),
+      const Center(child: MongolText(myString)),
     );
 
     final text = tester.firstWidget(find.byType(MongolRichText));
@@ -113,7 +113,7 @@ void main() {
 
   testWidgets('MongolRichText has correct instrinsic width',
       (WidgetTester tester) async {
-    final paragraph = MongolRenderParagraph(TextSpan(text: 'A string'));
+    final paragraph = MongolRenderParagraph(const TextSpan(text: 'A string'));
 
     final textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
     final oneLineTextWidth = paragraph.getMinIntrinsicWidth(double.infinity);
@@ -133,12 +133,12 @@ void main() {
 
   testWidgets('MongolText rotates emoji automatically',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = '🇲🇳';
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: MongolText(
           myString,
         ),
@@ -155,12 +155,12 @@ void main() {
 
   testWidgets('MongolText rotates and stacks two CJK character',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = '你好';
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: MongolText(
           myString,
         ),
@@ -177,12 +177,12 @@ void main() {
 
   testWidgets('MongolText handles mixed rotated and non-rotated text',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'ᠰᠠᠶᠢᠨ ᠪᠠᠶᠢᠨ᠎ᠠ ᠤᠤ︖ 👨‍👩‍👧🇭🇺22';
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: MongolText(
           myString,
         ),
@@ -199,12 +199,12 @@ void main() {
 
   testWidgets('MongolText handles embedded formatting characters',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'ᠨᠠ\u200dᠢᠮᠠ';
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: MongolText(
           myString,
         ),
@@ -221,12 +221,12 @@ void main() {
 
   testWidgets('MongolText handles normal and rotated mix without spaces',
       (WidgetTester tester) async {
-    await binding.setSurfaceSize(Size(1000, 1000));
+    await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'a你';
     await tester.pumpWidget(
-      Center(
+      const Center(
         child: MongolText(
           myString,
         ),

@@ -12,7 +12,7 @@ import 'package:mongol/mongol.dart';
 
 void main() {
   testWidgets('MongolText has text', (WidgetTester tester) async {
-    await tester.pumpWidget(MongolText('T'));
+    await tester.pumpWidget(const MongolText('T'));
 
     final finder = find.byType(MongolText);
     expect(finder, findsOneWidget);
@@ -23,7 +23,7 @@ void main() {
 
   testWidgets('MongolText able to set font', (WidgetTester tester) async {
     await tester.pumpWidget(
-      MongolText(
+      const MongolText(
         'T',
         style: TextStyle(fontFamily: 'Some Font'),
       ),

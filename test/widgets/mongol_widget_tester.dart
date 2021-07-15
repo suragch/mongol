@@ -31,7 +31,6 @@ export 'package:flutter/rendering.dart' show SemanticsHandle;
 typedef WidgetTesterCallback = Future<void> Function(
     MongolWidgetTester widgetTester);
 
-
 @isTest
 void testMongolWidgets(
   String description,
@@ -45,9 +44,8 @@ void testMongolWidgets(
 }) {
   assert(variant.values.isNotEmpty,
       'There must be at least on value to test in the testing variant');
-  final binding =
-      MongolTestWidgetsFlutterBinding.ensureInitialized()
-          as MongolTestWidgetsFlutterBinding;
+  final binding = MongolTestWidgetsFlutterBinding.ensureInitialized()
+      as MongolTestWidgetsFlutterBinding;
   final tester = MongolWidgetTester._(binding);
   for (final dynamic value in variant.values) {
     final variationDescription = variant.describeValue(value);
@@ -139,12 +137,11 @@ Future<void> mongolBenchmarkWidgets(
 }) {
   assert(() {
     if (mayRunWithAsserts) return true;
-    print(kDebugWarning);
+    debugPrint(kDebugWarning);
     return true;
   }());
-  final binding =
-      MongolTestWidgetsFlutterBinding.ensureInitialized()
-          as MongolTestWidgetsFlutterBinding;
+  final binding = MongolTestWidgetsFlutterBinding.ensureInitialized()
+      as MongolTestWidgetsFlutterBinding;
   assert(binding is! AutomatedTestWidgetsFlutterBinding);
   final tester = MongolWidgetTester._(binding);
   SemanticsHandle? semanticsHandle;

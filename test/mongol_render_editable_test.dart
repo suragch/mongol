@@ -3325,7 +3325,7 @@ void main() {
           isNull);
 
       // Empty Editable.
-      editable.text = TextSpan(text: '');
+      editable.text = const TextSpan(text: '');
       editable.layout(const BoxConstraints.tightFor(height: 200));
 
       expect(
@@ -3807,7 +3807,8 @@ void main() {
       );
     });
 
-    void verifyDoesNotCrashWithInconsistentTextEditingValue(void Function(SelectionChangedCause) method) {
+    void verifyDoesNotCrashWithInconsistentTextEditingValue(
+        void Function(SelectionChangedCause) method) {
       editable = MongolRenderEditable(
         text: TextSpan(
           text: 'A ' * 50,
@@ -3819,7 +3820,8 @@ void main() {
         selection: const TextSelection(baseOffset: 0, extentOffset: 50),
       );
 
-      layout(editable, constraints: BoxConstraints.loose(const Size(500.0, 500.0)));
+      layout(editable,
+          constraints: BoxConstraints.loose(const Size(500.0, 500.0)));
       dynamic error;
       try {
         method(SelectionChangedCause.tap);
@@ -3843,13 +3845,15 @@ void main() {
       expect(textEditingValue.composing, const TextRange(start: 1, end: 5));
     });
 
-    test('deleteForward is not racy and handles composing region correctly', () {
+    test('deleteForward is not racy and handles composing region correctly',
+        () {
       delegate.textEditingValue = const TextEditingValue(
         text: 'ABCDEF',
         selection: TextSelection.collapsed(offset: 2),
         composing: TextRange(start: 2, end: 6),
       );
-      verifyDoesNotCrashWithInconsistentTextEditingValue(editable.deleteForward);
+      verifyDoesNotCrashWithInconsistentTextEditingValue(
+          editable.deleteForward);
       final textEditingValue = editable.textSelectionDelegate.textEditingValue;
       expect(textEditingValue.text, 'ABDEF');
       expect(textEditingValue.selection.isCollapsed, isTrue);
@@ -3892,8 +3896,7 @@ class _TestRenderEditablePainter extends MongolRenderEditablePainter {
       <_TestRenderEditablePainter>[];
 
   @override
-  void paint(
-      Canvas canvas, Size size, MongolRenderEditable MongolRenderEditable) {
+  void paint(Canvas canvas, Size size, MongolRenderEditable renderEditable) {
     paintCount += 1;
     canvas.drawRect(const Rect.fromLTRB(1, 1, 1, 1),
         Paint()..color = const Color(0x12345678));

@@ -1000,11 +1000,15 @@ class MongolRenderEditable extends RenderBox
     final newSelection = TextSelection.collapsed(offset: selection.start);
     final composing = controllerValue.composing;
     final newComposingRange = !composing.isValid || composing.isCollapsed
-      ? TextRange.empty
-      : TextRange(
-        start: composing.start - (composing.start - selection.start).clamp(0, selection.end - selection.start),
-        end: composing.end - (composing.end - selection.start).clamp(0, selection.end - selection.start),
-      );
+        ? TextRange.empty
+        : TextRange(
+            start: composing.start -
+                (composing.start - selection.start)
+                    .clamp(0, selection.end - selection.start),
+            end: composing.end -
+                (composing.end - selection.start)
+                    .clamp(0, selection.end - selection.start),
+          );
 
     _setTextEditingValue(
       TextEditingValue(
@@ -1119,11 +1123,15 @@ class MongolRenderEditable extends RenderBox
     final composing = controllerValue.composing;
     assert(textBefore.length >= characterBoundary);
     final newComposingRange = !composing.isValid || composing.isCollapsed
-      ? TextRange.empty
-      : TextRange(
-        start: composing.start - (composing.start - characterBoundary).clamp(0, textBefore.length - characterBoundary),
-        end: composing.end - (composing.end - characterBoundary).clamp(0, textBefore.length - characterBoundary),
-      );
+        ? TextRange.empty
+        : TextRange(
+            start: composing.start -
+                (composing.start - characterBoundary)
+                    .clamp(0, textBefore.length - characterBoundary),
+            end: composing.end -
+                (composing.end - characterBoundary)
+                    .clamp(0, textBefore.length - characterBoundary),
+          );
 
     _setTextEditingValue(
       TextEditingValue(
@@ -1151,7 +1159,8 @@ class MongolRenderEditable extends RenderBox
   /// See also:
   ///
   ///   * [deleteForwardByWord], which is same but in the opposite direction.
-  void deleteByWord(SelectionChangedCause cause, [bool includeWhitespace = true]) {
+  void deleteByWord(SelectionChangedCause cause,
+      [bool includeWhitespace = true]) {
     assert(_selection != null);
 
     if (_readOnly || !_selection!.isValid) {
@@ -1173,11 +1182,12 @@ class MongolRenderEditable extends RenderBox
       return;
     }
 
-    final characterBoundary = _getAboveByWord(_textPainter, textBefore.length, includeWhitespace);
+    final characterBoundary =
+        _getAboveByWord(_textPainter, textBefore.length, includeWhitespace);
     textBefore = textBefore.trimRight().substring(0, characterBoundary);
 
     final textAfter = _selection!.textAfter(text);
-    final  newSelection = TextSelection.collapsed(offset: characterBoundary);
+    final newSelection = TextSelection.collapsed(offset: characterBoundary);
     _setTextEditingValue(
       TextEditingValue(text: textBefore + textAfter, selection: newSelection),
       cause,
@@ -1219,7 +1229,8 @@ class MongolRenderEditable extends RenderBox
     }
 
     // When there is a line break, line delete shouldn't do anything
-    final isPreviousCharacterBreakLine = textBefore.codeUnitAt(textBefore.length - 1) == 0x0A;
+    final isPreviousCharacterBreakLine =
+        textBefore.codeUnitAt(textBefore.length - 1) == 0x0A;
     if (isPreviousCharacterBreakLine) {
       return;
     }
@@ -1269,11 +1280,14 @@ class MongolRenderEditable extends RenderBox
     final characterBoundary = nextCharacter(0, textAfter);
     final composing = controllerValue.composing;
     final newComposingRange = !composing.isValid || composing.isCollapsed
-      ? TextRange.empty
-      : TextRange(
-        start: composing.start - (composing.start - textBefore.length).clamp(0, characterBoundary),
-        end: composing.end - (composing.end - textBefore.length).clamp(0, characterBoundary),
-      );
+        ? TextRange.empty
+        : TextRange(
+            start: composing.start -
+                (composing.start - textBefore.length)
+                    .clamp(0, characterBoundary),
+            end: composing.end -
+                (composing.end - textBefore.length).clamp(0, characterBoundary),
+          );
     _setTextEditingValue(
       TextEditingValue(
         text: textBefore + textAfter.substring(characterBoundary),
@@ -1296,7 +1310,8 @@ class MongolRenderEditable extends RenderBox
   /// See also:
   ///
   ///   * [deleteByWord], which is same but in the opposite direction.
-  void deleteForwardByWord(SelectionChangedCause cause, [bool includeWhitespace = true]) {
+  void deleteForwardByWord(SelectionChangedCause cause,
+      [bool includeWhitespace = true]) {
     assert(_selection != null);
 
     if (_readOnly || !_selection!.isValid) {
@@ -1320,7 +1335,8 @@ class MongolRenderEditable extends RenderBox
     }
 
     final textBefore = _selection!.textBefore(text);
-    final characterBoundary = _getBelowByWord(_textPainter, textBefore.length, includeWhitespace);
+    final characterBoundary =
+        _getBelowByWord(_textPainter, textBefore.length, includeWhitespace);
     textAfter = textAfter.substring(characterBoundary - textBefore.length);
 
     _setTextEditingValue(
@@ -1371,7 +1387,8 @@ class MongolRenderEditable extends RenderBox
 
     final textBefore = _selection!.textBefore(text);
     final line = _getLineAtOffset(TextPosition(offset: textBefore.length));
-    textAfter = textAfter.substring(line.end - textBefore.length, textAfter.length);
+    textAfter =
+        textAfter.substring(line.end - textBefore.length, textAfter.length);
 
     _setTextEditingValue(
       TextEditingValue(text: textBefore + textAfter, selection: _selection!),

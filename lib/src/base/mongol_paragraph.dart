@@ -345,13 +345,13 @@ class MongolParagraph {
       if (shouldDrawEllipsis && isLastLine && j == endIndex) {
         if (maxIntrinsicHeight + _ellipsis!.height < height) {
           final run = _runs[j];
-          run.draw(canvas, Offset(0, 0));
+          run.draw(canvas, const Offset(0, 0));
           canvas.translate(run.width, 0);
         }
-        _ellipsis!.draw(canvas, Offset(0, 0));
+        _ellipsis!.draw(canvas, const Offset(0, 0));
       } else {
         final run = _runs[j];
-        run.draw(canvas, Offset(0, 0));
+        run.draw(canvas, const Offset(0, 0));
         canvas.translate(run.width, 0);
       }
       canvas.translate(runSpacing, 0);
@@ -680,7 +680,7 @@ class MongolParagraphBuilder {
   );
 
   static final _defaultTextStyle = ui.TextStyle(
-    color: Color(0xFFFFFFFF),
+    color: const Color(0xFFFFFFFF),
     textBaseline: TextBaseline.alphabetic,
   );
 
@@ -749,7 +749,7 @@ class MongolParagraphBuilder {
       }
 
       final paragraph = builder.build();
-      paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
+      paragraph.layout(const ui.ParagraphConstraints(width: double.infinity));
       final run =
           _TextRun(startIndex, endIndex, segment.isRotatable, paragraph);
       runs.add(run);
@@ -809,7 +809,7 @@ class MongolParagraphBuilder {
     }
     builder.addText(_ellipsis!);
     final paragraph = builder.build();
-    paragraph.layout(ui.ParagraphConstraints(width: double.infinity));
+    paragraph.layout(const ui.ParagraphConstraints(width: double.infinity));
     return _TextRun(-1, -1, false, paragraph);
   }
 }
@@ -899,6 +899,7 @@ class LineBreaker implements Iterator<RotatableString> {
     return (character == ' ' || character == '\n');
   }
 
+  // TODO: rename these in the next major version
   static const MONGOL_QUICKCHECK_START = 0x1800;
   static const MONGOL_QUICKCHECK_END = 0x2060;
   static const KOREAN_JAMO_START = 0x1100;

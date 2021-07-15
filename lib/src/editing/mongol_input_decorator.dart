@@ -1295,7 +1295,7 @@ class _RenderDecoration extends RenderBox {
         _isOutlineAligned ? layout.outlineBaseline : layout.inputBaseline;
 
     if (icon != null) {
-      final y = 0.0;
+      const y = 0.0;
       centerLayout(icon!, y);
     }
 
@@ -2263,7 +2263,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
     // The _Decoration widget and _RenderDecoration assume that contentPadding
     // has been resolved to EdgeInsets.
-    final textDirection = TextDirection.ltr;
+    const textDirection = TextDirection.ltr;
     final decorationContentPadding =
         decoration!.contentPadding?.resolve(textDirection);
 

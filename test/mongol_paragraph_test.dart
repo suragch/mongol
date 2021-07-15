@@ -314,7 +314,7 @@ void main() {
     });
 
     test('handles newlines well', () {
-      final text = '\n';
+      const text = '\n';
       final paragraph = _getParagraph(text, 300);
 
       var boxes = paragraph.getBoxesForRange(0, 1);
@@ -367,17 +367,17 @@ void main() {
     test('empty content does not crash', () {
       const text = '';
       final paragraph = _getParagraph(text, 1000);
-      final position = paragraph.getPositionForOffset(Offset(400, 300));
+      final position = paragraph.getPositionForOffset(const Offset(400, 300));
       expect(position,
-          TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
+          const TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
     });
 
     test('ending with new line does not crash', () {
       const text = 'hello\n';
       final paragraph = _getParagraph(text, 1000);
-      final position = paragraph.getPositionForOffset(Offset(400, 300));
+      final position = paragraph.getPositionForOffset(const Offset(400, 300));
       expect(position,
-          TextPosition(offset: 5, affinity: ui.TextAffinity.downstream));
+          const TextPosition(offset: 5, affinity: ui.TextAffinity.downstream));
     });
   });
 
@@ -402,12 +402,12 @@ void main() {
       expect(range84.textInside(text), equals('Navee!'));
 
       final range85 = paragraph.getWordBoundary(const TextPosition(offset: 85));
-      expect(range85, TextRange(start: 85, end: 85));
+      expect(range85, const TextRange(start: 85, end: 85));
 
       // https://github.com/flutter/flutter/issues/75494
       final range1000 =
           paragraph.getWordBoundary(const TextPosition(offset: 1000));
-      expect(range1000, TextRange(start: 85, end: 1000));
+      expect(range1000, const TextRange(start: 85, end: 1000));
     });
 
     test('getLineBoundary control test', () {
