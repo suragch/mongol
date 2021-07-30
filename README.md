@@ -10,7 +10,7 @@ The primary ones include:
 - `MongolPopupMenuButton`: vertical version of `PopupMenuButton`, for displaying menus
 - `MongolAlertDialog`: vertical version of `AlertDialog`
 
-Browse the sections below to see images of what the widgets look like. Check out the [example project](https://github.com/suragch/mongol/tree/master/example) for a more detailed demonstration.
+Browse the sections below to see images of what the widgets look like. Check out the [live web version](https://suragch.dev/apps/mongol) of the [example project](https://github.com/suragch/mongol/tree/master/example) for a more detailed demonstration.
 
 ## Displaying vertical text
 
