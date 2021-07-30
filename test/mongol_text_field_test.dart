@@ -3581,7 +3581,7 @@ void main() {
 
     await tester.pumpWidget(
       overlay(
-        child: Container(
+        child: SizedBox(
           height: 100.0,
           child: MongolTextField(
             controller: controller,
@@ -3616,11 +3616,9 @@ void main() {
 
     await tester.pumpWidget(
       overlay(
-        child: Container(
-          child: MongolTextField(
-            controller: controller,
-            maxLines: 6,
-          ),
+        child: MongolTextField(
+          controller: controller,
+          maxLines: 6,
         ),
       ),
     );
@@ -4364,7 +4362,6 @@ void main() {
     expect(focusNode1.hasPrimaryFocus, isTrue);
     expect(focusNode2.hasPrimaryFocus, isFalse);
   });
-
 
   // group('Keyboard Tests', () {
   //   late TextEditingController controller;

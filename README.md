@@ -2,6 +2,16 @@
 
 This library is a collection of Flutter widgets for displaying and editing traditional Mongolian vertical text.
 
+The primary ones include:
+
+- `MongolText`: vertical version of `Text`
+- `MongolTextField`: vertical version of `TextField`
+- `MongolListTile`: vertical version of `ListTile`, for use in horizontal listviews and menus
+- `MongolPopupMenuButton`: vertical version of `PopupMenuButton`, for displaying menus
+- `MongolAlertDialog`: vertical version of `AlertDialog`
+
+Browse the sections below to see images of what the widgets look like. Check out the [example project](https://github.com/suragch/mongol/tree/master/example) for a more detailed demonstration.
+
 ## Displaying vertical text
 
 `MongolText` is a vertical text version of Flutter's `Text` widget. Left-to-right line wrapping is supported. 
@@ -125,9 +135,65 @@ There are a few known issues with `MongolTextField`:
 
 - The cursor shows up on the right side of hint text.
 - The gesture detection region for the left text selection handle does not appear directly on the handle.
-- Some of the features are untested.
+- On web and desktop the arrow keys don't move in the expected direction.
   
 If you discover any other problems please open an issue. And if you have time to find the source of the known issues, that would be very helpful.
+
+## Horizontal lists
+
+You can display horizontally scrolling lists with the standard `Listview` widget. All you need to do is set the scroll direction to horizontal.
+
+```dart
+ListView(
+  scrollDirection: Axis.horizontal,
+  children: [
+    MongolText('ᠨᠢᠭᠡ'),
+    MongolText('ᠬᠣᠶᠠᠷ'),
+    MongolText('ᠭᠤᠷᠪᠠ'),
+  ],
+),
+```
+
+For something a little fancier, you can also use the `MongolListTile` widget just like you would use `ListTile`. Here is an example from the example project:
+
+```dart
+Card(
+  child: MongolListTile(
+    leading: FlutterLogo(size: 56.0),
+    title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
+    subtitle: MongolText('ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ'),
+    trailing: Icon(Icons.more_vert),
+  ),
+),
+```
+
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_list_tile.png)
+
+## Menus
+
+To add a popup menu with horizontal items, you can use `MongolPopupMenuButton`. It is customizeable in all the ways that the standard `PopupMenuButton` is.
+
+```dart
+Scaffold(
+  appBar: AppBar(
+    title: const Text('MongolPopupMenuButton'),
+    actions: [
+      MongolPopupMenuButton(
+        itemBuilder: (context) => const [
+          MongolPopupMenuItem(child: MongolText('ᠨᠢᠭᠡ'), value: 1),
+          MongolPopupMenuItem(child: MongolText('ᠬᠤᠶᠠᠷ'), value: 2),
+          MongolPopupMenuItem(child: MongolText('ᠭᠤᠷᠪᠠ'), value: 3),
+        ],
+        tooltip: 'vertical tooltip text',
+        onSelected: (value) => print(value),
+      ),
+    ],
+  ),
+  body: Container(),
+);
+```
+
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_popup_menu_button.gif)
 
 ## Other widgets
 
@@ -145,8 +211,10 @@ This are not part of `mongol` library yet, but you can see an example of how to 
 
 ### TODO
 
-- Improve keyboard
+- Improve keyboard (this may be better as a separate package)
 - Various other text based widgets
 - Support `WidgetSpan`.
 - Add missing tests (currently commented out)
-- For MongolTextAlign.bottom don't count final space in line height
+- For `MongolTextAlign.bottom` don't count final space in line height
+- Fix known issues with `MongolTextField`
+- Add `MongolSelectableText` widget

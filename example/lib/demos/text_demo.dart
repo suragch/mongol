@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class TextDemo extends StatefulWidget {
+  const TextDemo({Key? key}) : super(key: key);
   @override
   _TextDemoState createState() => _TextDemoState();
 }
@@ -18,7 +19,7 @@ class _TextDemoState extends State<TextDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('MongolText')),
       body: Stack(
         children: [
           Column(
@@ -48,7 +49,7 @@ class _TextDemoState extends State<TextDemo> {
                 color: Colors.blue[100],
                 child: MongolText(
                   text,
-                  style: TextStyle(fontSize: 30),
+                  style: const TextStyle(fontSize: 30),
                   textAlign: _alignment,
                 ),
               ),

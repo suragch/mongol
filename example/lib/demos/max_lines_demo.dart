@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class MaxLinesDemo extends StatelessWidget {
+  const MaxLinesDemo({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar:
+          AppBar(title: const Text('MongolText with maxLines and overflow')),
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             color: Colors.blue[100],
-            child: MongolText(
+            child: const MongolText(
               'ellipsis $text',
               style: TextStyle(
                 fontSize: 30,
@@ -22,7 +24,7 @@ class MaxLinesDemo extends StatelessWidget {
           ),
           Container(
             color: Colors.blue[200],
-            child: MongolText(
+            child: const MongolText(
               'fade $text',
               style: TextStyle(
                 fontSize: 30,
@@ -33,7 +35,7 @@ class MaxLinesDemo extends StatelessWidget {
           ),
           Container(
             color: Colors.blue[300],
-            child: MongolText(
+            child: const MongolText(
               'clip $text',
               style: TextStyle(
                 fontSize: 30,
@@ -44,7 +46,7 @@ class MaxLinesDemo extends StatelessWidget {
           ),
           Container(
             color: Colors.blue[400],
-            child: MongolText(
+            child: const MongolText(
               'visible $text',
               style: TextStyle(
                 fontSize: 30,
@@ -55,7 +57,7 @@ class MaxLinesDemo extends StatelessWidget {
           ),
           Container(
             color: Colors.blue[500],
-            child: MongolText(
+            child: const MongolText(
               'null $text',
               style: TextStyle(
                 fontSize: 30,
@@ -66,7 +68,7 @@ class MaxLinesDemo extends StatelessWidget {
           ),
           Container(
             color: Colors.yellow[100],
-            child: MongolText(
+            child: const MongolText(
               text,
               style: TextStyle(
                 fontSize: 30,
@@ -77,7 +79,7 @@ class MaxLinesDemo extends StatelessWidget {
           ),
           Container(
             color: Colors.green[100],
-            child: MongolText(
+            child: const MongolText(
               text,
               style: TextStyle(
                 fontSize: 30,

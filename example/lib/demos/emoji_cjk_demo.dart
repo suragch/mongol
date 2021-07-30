@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class EmojiCjkDemo extends StatelessWidget {
+  const EmojiCjkDemo({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('MongolText with emoji and CJK')),
       body: Center(
         child: Container(
           color: Colors.blue[100],
-          child: MongolText.rich(
+          child: const MongolText.rich(
             text,
             style: TextStyle(fontSize: 30),
           ),

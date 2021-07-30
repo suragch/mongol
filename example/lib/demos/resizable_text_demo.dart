@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class ResizableTextDemo extends StatefulWidget {
+  const ResizableTextDemo({Key? key}) : super(key: key);
   @override
   _ResizableTextDemoState createState() => _ResizableTextDemoState();
 }
@@ -15,7 +16,7 @@ class _ResizableTextDemoState extends State<ResizableTextDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('Resizable MongolText')),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Stack(
@@ -25,7 +26,7 @@ class _ResizableTextDemoState extends State<ResizableTextDemo> {
               color: Colors.blue[100],
               child: MongolText(
                 text,
-                style: TextStyle(fontSize: 30),
+                style: const TextStyle(fontSize: 30),
                 textScaleFactor: scale,
               ),
             ),

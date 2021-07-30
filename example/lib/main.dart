@@ -3,18 +3,21 @@ import 'package:mongol_demo_app/demos/horizontal_listview_demo.dart';
 
 import 'demos/alert_dialog_demo.dart';
 import 'demos/emoji_cjk_demo.dart';
+import 'demos/list_tile_demo.dart';
 import 'demos/max_lines_demo.dart';
 import 'demos/mongol_text_field_demo.dart';
+import 'demos/popup_menu_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/keyboard_demo.dart';
 import 'demos/text_span_demo.dart';
 import 'demos/resizable_text_demo.dart';
 
 void main() {
-  runApp(DemoApp());
+  runApp(const DemoApp());
 }
 
 class DemoApp extends StatelessWidget {
+  const DemoApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,18 +25,19 @@ class DemoApp extends StatelessWidget {
       title: 'mongol',
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'MenksoftQagan'),
       home: Scaffold(
-        appBar: AppBar(title: Text('Mongol package demo')),
-        body: HomeScreen(),
+        appBar: AppBar(title: const Text('Mongol package demo')),
+        body: const HomeScreen(),
       ),
     );
   }
 }
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: <Widget>[
+      children: const <Widget>[
         DemoTile(
           title: 'MongolText',
           destination: TextDemo(),
@@ -69,6 +73,14 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'Resizable text',
           destination: ResizableTextDemo(),
+        ),
+        DemoTile(
+          title: 'Popup Menu',
+          destination: PopupMenuDemo(),
+        ),
+        DemoTile(
+          title: 'MongolListTile',
+          destination: ListTileDemo(),
         ),
       ],
     );

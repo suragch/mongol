@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class AlertDialogDemo extends StatelessWidget {
+  const AlertDialogDemo({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('MongolAlertDialog')),
       body: Center(
         child: ElevatedButton(
-          child: Text('Show Dialog'),
+          child: const Text('Show Dialog'),
           onPressed: () {
             showAlertDialog(context);
           },
@@ -21,7 +22,7 @@ class AlertDialogDemo extends StatelessWidget {
 void showAlertDialog(BuildContext context) {
   // set up the buttons
   Widget actionButton = TextButton(
-    child: MongolText('ᠮᠡᠳᠡᠭᠰᠡᠨ'),
+    child: const MongolText('ᠮᠡᠳᠡᠭᠰᠡᠨ'),
     onPressed: () {
       Navigator.pop(context);
     },
@@ -29,8 +30,8 @@ void showAlertDialog(BuildContext context) {
 
   // set up the AlertDialog
   final alert = MongolAlertDialog(
-    title: MongolText('ᠠᠰᠠᠭᠤᠳᠠᠯ ᠲᠠᠢ'),
-    content: MongolText('ᠬᠣᠯᠪᠣᠭᠳᠠᠬᠤ ᠪᠣᠯᠤᠮᠵᠢ ᠦᠭᠡᠢ ᠪᠠᠶᠢᠨ᠎ᠠ'),
+    title: const MongolText('ᠠᠰᠠᠭᠤᠳᠠᠯ ᠲᠠᠢ'),
+    content: const MongolText('ᠬᠣᠯᠪᠣᠭᠳᠠᠬᠤ ᠪᠣᠯᠤᠮᠵᠢ ᠦᠭᠡᠢ ᠪᠠᠶᠢᠨ᠎ᠠ'),
     actions: [
       actionButton,
     ],

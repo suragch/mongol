@@ -1,3 +1,11 @@
+## [2.1.0] - 2021.7.30
+
+- Added `MongolPopupMenuButton` along with its `MongolPopupMenuEntry`, `MongolPopupMenuDivider`, `MongolPopupMenuItem`, `showMongolMenu`
+- Added `MongolTooltip` (and `MongolIconButton` that needs it) so that `MongolPopupMenuButton` will have a vertical text tooltip.
+- Added `MongolListTile` so that it can be used as a `MongolPopupMenuItem` or in a horizontal ListView.
+- Added supporting (though incomplete) tests for `MongolPopupMenuButton` and `MongolListTile`.
+- Switched to flutter_lints for the demo project.
+
 ## [2.0.2] - 2021.7.15
 
 - Fixed `MongolTextField` tap selection not working on iOS (#12)

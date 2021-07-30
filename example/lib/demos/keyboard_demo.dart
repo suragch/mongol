@@ -3,16 +3,18 @@ import 'package:flutter/rendering.dart';
 import 'package:mongol/mongol.dart';
 
 class KeyboardDemo extends StatelessWidget {
+  const KeyboardDemo({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: BodyWidget(),
+      appBar: AppBar(title: const Text('Keyboard')),
+      body: const BodyWidget(),
     );
   }
 }
 
 class BodyWidget extends StatefulWidget {
+  const BodyWidget({Key? key}) : super(key: key);
   @override
   _BodyWidgetState createState() => _BodyWidgetState();
 }
@@ -43,7 +45,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                 ),
                 // hintText: 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ',
               ),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
               ),
               showCursor: true,
@@ -115,7 +117,7 @@ class _BodyWidgetState extends State<BodyWidget> {
 }
 
 class MongolKeyboard extends StatelessWidget {
-  MongolKeyboard({
+  const MongolKeyboard({
     Key? key,
     this.onTextInput,
     this.onBackspace,
@@ -361,9 +363,7 @@ class MongolKeyboardKey extends StatelessWidget {
             onTap: () {
               onTextInput?.call(text);
             },
-            child: Container(
-              child: Center(child: MongolText(text)),
-            ),
+            child: Center(child: MongolText(text)),
           ),
         ),
       ),
@@ -393,10 +393,8 @@ class BackspaceKey extends StatelessWidget {
             onTap: () {
               onBackspace?.call();
             },
-            child: Container(
-              child: Center(
-                child: Icon(Icons.backspace),
-              ),
+            child: const Center(
+              child: Icon(Icons.backspace),
             ),
           ),
         ),

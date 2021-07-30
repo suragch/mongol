@@ -16,7 +16,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  pedantic: ^1.10.0-nullsafety.3
+  flutter_lints: any
 
 flutter:
   uses-material-design: true

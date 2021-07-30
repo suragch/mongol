@@ -2,16 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class MongolTextFieldDemo extends StatelessWidget {
+  const MongolTextFieldDemo({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: SearchBody(),
+      appBar: AppBar(title: const Text('MongolTextField')),
+      body: const SearchBody(),
     );
   }
 }
 
 class SearchBody extends StatefulWidget {
+  const SearchBody({Key? key}) : super(key: key);
   @override
   _SearchBodyState createState() => _SearchBodyState();
 }
@@ -38,10 +40,10 @@ class _SearchBodyState extends State<SearchBody> {
           width: 200,
           height: 200,
           child: MongolTextField(
-            style: TextStyle(fontSize: 24),
+            style: const TextStyle(fontSize: 24),
             controller: controller,
             maxLines: null,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               border: OutlineInputBorder(),
             ),
           ),

@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class RichTextDemo extends StatelessWidget {
+  const RichTextDemo({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: Center(
+      appBar: AppBar(title: const Text('MongolText.rich')),
+      body: const Center(
         child: ExampleWidget(),
       ),
     );
@@ -14,6 +15,7 @@ class RichTextDemo extends StatelessWidget {
 }
 
 class ExampleWidget extends StatelessWidget {
+  const ExampleWidget({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -22,7 +24,7 @@ class ExampleWidget extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border.all(),
       ),
-      child: MongolText.rich(
+      child: const MongolText.rich(
         text,
         textScaleFactor: 2.5,
       ),

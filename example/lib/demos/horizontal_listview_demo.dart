@@ -2,32 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class HorizontalListviewDemo extends StatelessWidget {
+  const HorizontalListviewDemo({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      body: SearchBody(),
+      appBar: AppBar(title: const Text('ListView with Axis.horizontal')),
+      body: const SearchBody(),
     );
   }
 }
 
 class SearchBody extends StatelessWidget {
+  const SearchBody({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Row(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
+          const Padding(
+            padding: EdgeInsets.symmetric(
               horizontal: 20.0,
               vertical: 20.0,
             ),
-            child: Container(
-              //width: 30,
-              child: MongolTextField(
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
+            child: MongolTextField(
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
               ),
             ),
           ),
