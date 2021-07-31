@@ -27,7 +27,7 @@ import 'package:flutter/material.dart'
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import 'mongol_icon_button.dart';
+import '../button/mongol_icon_button.dart';
 import 'mongol_instrinsic_height.dart';
 import 'mongol_tooltip.dart';
 

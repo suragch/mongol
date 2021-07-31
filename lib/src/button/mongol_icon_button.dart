@@ -18,7 +18,7 @@ import 'package:flutter/material.dart'
         InkResponse;
 import 'package:flutter/widgets.dart';
 
-import 'mongol_tooltip.dart';
+import '../menu/mongol_tooltip.dart';
 
 // Minimum logical pixel size of the IconButton.
 // See: <https://material.io/design/usability/accessibility.html#layout-typography>.
@@ -26,7 +26,7 @@ const double _kMinButtonSize = kMinInteractiveDimension;
 
 /// An IconButton that uses a MongolTooltip
 ///
-/// Everything else about this widget except for the Tooltip should behave
+/// Everything else about this widget except for the tooltip should behave
 /// exactly like IconButton.
 class MongolIconButton extends IconButton {
   const MongolIconButton({
@@ -46,7 +46,7 @@ class MongolIconButton extends IconButton {
     MouseCursor mouseCursor = SystemMouseCursors.click,
     FocusNode? focusNode,
     bool autofocus = false,
-    required this.mongolTooltip,
+    this.mongolTooltip,
     bool enableFeedback = true,
     BoxConstraints? constraints,
     required Widget icon,
@@ -79,7 +79,7 @@ class MongolIconButton extends IconButton {
   ///
   /// This text is displayed when the user long-presses on the button and is
   /// used for accessibility.
-  final String mongolTooltip;
+  final String? mongolTooltip;
 
   @override
   Widget build(BuildContext context) {
@@ -103,29 +103,33 @@ class MongolIconButton extends IconButton {
     final BoxConstraints adjustedConstraints =
         effectiveVisualDensity.effectiveConstraints(unadjustedConstraints);
 
-    Widget result = MongolTooltip(
-      message: mongolTooltip,
-      child: ConstrainedBox(
-        constraints: adjustedConstraints,
-        child: Padding(
-          padding: padding,
-          child: SizedBox(
-            height: iconSize,
-            width: iconSize,
-            child: Align(
-              alignment: alignment,
-              child: IconTheme.merge(
-                data: IconThemeData(
-                  size: iconSize,
-                  color: currentColor,
-                ),
-                child: icon,
+    Widget result = ConstrainedBox(
+      constraints: adjustedConstraints,
+      child: Padding(
+        padding: padding,
+        child: SizedBox(
+          height: iconSize,
+          width: iconSize,
+          child: Align(
+            alignment: alignment,
+            child: IconTheme.merge(
+              data: IconThemeData(
+                size: iconSize,
+                color: currentColor,
               ),
+              child: icon,
             ),
           ),
         ),
       ),
     );
+
+    if (tooltip != null) {
+      result = MongolTooltip(
+        message: tooltip!,
+        child: result,
+      );
+    }
 
     return Semantics(
       button: true,

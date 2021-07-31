@@ -36,7 +36,10 @@ class PopupMenuDemo extends StatelessWidget {
   }
 
   _showStackBar(BuildContext context, Object? value) {
-    final snackBar = SnackBar(content: Text('$value'));
+    final snackBar = SnackBar(
+      content: Text('$value'),
+      duration: const Duration(milliseconds: 500),
+    );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

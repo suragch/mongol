@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mongol_demo_app/demos/horizontal_listview_demo.dart';
 
+import 'demos/horizontal_listview_demo.dart';
 import 'demos/alert_dialog_demo.dart';
+import 'demos/button_demo.dart';
 import 'demos/emoji_cjk_demo.dart';
 import 'demos/list_tile_demo.dart';
 import 'demos/max_lines_demo.dart';
@@ -81,6 +82,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'MongolListTile',
           destination: ListTileDemo(),
+        ),
+        DemoTile(
+          title: 'Buttons',
+          destination: ButtonDemo(),
         ),
       ],
     );
