@@ -21,7 +21,7 @@ class AlertDialogDemo extends StatelessWidget {
 
 void showAlertDialog(BuildContext context) {
   // set up the buttons
-  Widget actionButton = TextButton(
+  Widget actionButton = MongolTextButton(
     child: const MongolText('ᠮᠡᠳᠡᠭᠰᠡᠨ'),
     onPressed: () {
       Navigator.pop(context);

@@ -31,13 +31,13 @@
             <td class="headerValue">lcov.info</td>
             <td></td>
             <td class="headerItem">Lines:</td>
-            <td class="headerCovTableEntry">122</td>
+            <td class="headerCovTableEntry">123</td>
             <td class="headerCovTableEntry">152</td>
-            <td class="headerCovTableEntryMed">80.3 %</td>
+            <td class="headerCovTableEntryMed">80.9 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-07-30 09:13:58</td>
+            <td class="headerValue">2021-08-02 17:55:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -88,7 +88,7 @@
 <a name="26"><span class="lineNum">      26 </span>            :   ///</a>
 <a name="27"><span class="lineNum">      27 </span>            :   /// The [maxLines] property may be null (and indeed defaults to null), but if</a>
 <a name="28"><span class="lineNum">      28 </span>            :   /// it is not null, it must be greater than zero.</a>
-<a name="29"><span class="lineNum">      29 </span><span class="lineCov">          7 :   MongolRenderParagraph(</span></a>
+<a name="29"><span class="lineNum">      29 </span><span class="lineCov">          8 :   MongolRenderParagraph(</span></a>
 <a name="30"><span class="lineNum">      30 </span>            :     TextSpan text, {</a>
 <a name="31"><span class="lineNum">      31 </span>            :     MongolTextAlign textAlign = MongolTextAlign.top,</a>
 <a name="32"><span class="lineNum">      32 </span>            :     bool softWrap = true,</a>
@@ -98,12 +98,12 @@
 <a name="36"><span class="lineNum">      36 </span><span class="lineCov">          1 :   })  : assert(maxLines == null || maxLines &gt; 0),</span></a>
 <a name="37"><span class="lineNum">      37 </span>            :         _softWrap = softWrap,</a>
 <a name="38"><span class="lineNum">      38 </span>            :         _overflow = overflow,</a>
-<a name="39"><span class="lineNum">      39 </span><span class="lineCov">          7 :         _textPainter = MongolTextPainter(</span></a>
+<a name="39"><span class="lineNum">      39 </span><span class="lineCov">          8 :         _textPainter = MongolTextPainter(</span></a>
 <a name="40"><span class="lineNum">      40 </span>            :           text: text,</a>
 <a name="41"><span class="lineNum">      41 </span>            :           textAlign: textAlign,</a>
 <a name="42"><span class="lineNum">      42 </span>            :           textScaleFactor: textScaleFactor,</a>
 <a name="43"><span class="lineNum">      43 </span>            :           maxLines: maxLines,</a>
-<a name="44"><span class="lineNum">      44 </span><span class="lineCov">          7 :           ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,</span></a>
+<a name="44"><span class="lineNum">      44 </span><span class="lineCov">          8 :           ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,</span></a>
 <a name="45"><span class="lineNum">      45 </span>            :         );</a>
 <a name="46"><span class="lineNum">      46 </span>            : </a>
 <a name="47"><span class="lineNum">      47 </span><span class="lineNoCov">          0 :   @override</span></a>
@@ -116,15 +116,15 @@
 <a name="54"><span class="lineNum">      54 </span>            :   final MongolTextPainter _textPainter;</a>
 <a name="55"><span class="lineNum">      55 </span>            : </a>
 <a name="56"><span class="lineNum">      56 </span>            :   /// The text to display</a>
-<a name="57"><span class="lineNum">      57 </span><span class="lineNoCov">          0 :   TextSpan get text =&gt; _textPainter.text!;</span></a>
-<a name="58"><span class="lineNum">      58 </span><span class="lineCov">          5 :   set text(TextSpan value) {</span></a>
-<a name="59"><span class="lineNum">      59 </span><span class="lineCov">         15 :     switch (_textPainter.text!.compareTo(value)) {</span></a>
-<a name="60"><span class="lineNum">      60 </span><span class="lineCov">          5 :       case RenderComparison.identical:</span></a>
-<a name="61"><span class="lineNum">      61 </span><span class="lineCov">          4 :       case RenderComparison.metadata:</span></a>
+<a name="57"><span class="lineNum">      57 </span><span class="lineCov">          3 :   TextSpan get text =&gt; _textPainter.text!;</span></a>
+<a name="58"><span class="lineNum">      58 </span><span class="lineCov">          6 :   set text(TextSpan value) {</span></a>
+<a name="59"><span class="lineNum">      59 </span><span class="lineCov">         18 :     switch (_textPainter.text!.compareTo(value)) {</span></a>
+<a name="60"><span class="lineNum">      60 </span><span class="lineCov">          6 :       case RenderComparison.identical:</span></a>
+<a name="61"><span class="lineNum">      61 </span><span class="lineCov">          5 :       case RenderComparison.metadata:</span></a>
 <a name="62"><span class="lineNum">      62 </span>            :         return;</a>
-<a name="63"><span class="lineNum">      63 </span><span class="lineCov">          4 :       case RenderComparison.paint:</span></a>
-<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          4 :         _textPainter.text = value;</span></a>
-<a name="65"><span class="lineNum">      65 </span><span class="lineCov">          2 :         markNeedsPaint();</span></a>
+<a name="63"><span class="lineNum">      63 </span><span class="lineCov">          5 :       case RenderComparison.paint:</span></a>
+<a name="64"><span class="lineNum">      64 </span><span class="lineCov">          6 :         _textPainter.text = value;</span></a>
+<a name="65"><span class="lineNum">      65 </span><span class="lineCov">          3 :         markNeedsPaint();</span></a>
 <a name="66"><span class="lineNum">      66 </span>            :         break;</a>
 <a name="67"><span class="lineNum">      67 </span><span class="lineCov">          3 :       case RenderComparison.layout:</span></a>
 <a name="68"><span class="lineNum">      68 </span><span class="lineCov">          6 :         _textPainter.text = value;</span></a>
@@ -135,8 +135,8 @@
 <a name="73"><span class="lineNum">      73 </span>            : </a>
 <a name="74"><span class="lineNum">      74 </span>            :   /// How the text should be aligned vertically.</a>
 <a name="75"><span class="lineNum">      75 </span><span class="lineNoCov">          0 :   MongolTextAlign get textAlign =&gt; _textPainter.textAlign;</span></a>
-<a name="76"><span class="lineNum">      76 </span><span class="lineCov">          5 :   set textAlign(MongolTextAlign value) {</span></a>
-<a name="77"><span class="lineNum">      77 </span><span class="lineCov">         15 :     if (_textPainter.textAlign == value) {</span></a>
+<a name="76"><span class="lineNum">      76 </span><span class="lineCov">          6 :   set textAlign(MongolTextAlign value) {</span></a>
+<a name="77"><span class="lineNum">      77 </span><span class="lineCov">         18 :     if (_textPainter.textAlign == value) {</span></a>
 <a name="78"><span class="lineNum">      78 </span>            :       return;</a>
 <a name="79"><span class="lineNum">      79 </span>            :     }</a>
 <a name="80"><span class="lineNum">      80 </span><span class="lineCov">          2 :     _textPainter.textAlign = value;</span></a>
@@ -150,10 +150,10 @@
 <a name="88"><span class="lineNum">      88 </span>            :   ///</a>
 <a name="89"><span class="lineNum">      89 </span>            :   /// If [softWrap] is false, [overflow] and [textAlign] may have unexpected</a>
 <a name="90"><span class="lineNum">      90 </span>            :   /// effects.</a>
-<a name="91"><span class="lineNum">      91 </span><span class="lineCov">         14 :   bool get softWrap =&gt; _softWrap;</span></a>
+<a name="91"><span class="lineNum">      91 </span><span class="lineCov">         16 :   bool get softWrap =&gt; _softWrap;</span></a>
 <a name="92"><span class="lineNum">      92 </span>            :   bool _softWrap;</a>
-<a name="93"><span class="lineNum">      93 </span><span class="lineCov">          5 :   set softWrap(bool value) {</span></a>
-<a name="94"><span class="lineNum">      94 </span><span class="lineCov">         10 :     if (_softWrap == value) {</span></a>
+<a name="93"><span class="lineNum">      93 </span><span class="lineCov">          6 :   set softWrap(bool value) {</span></a>
+<a name="94"><span class="lineNum">      94 </span><span class="lineCov">         12 :     if (_softWrap == value) {</span></a>
 <a name="95"><span class="lineNum">      95 </span>            :       return;</a>
 <a name="96"><span class="lineNum">      96 </span>            :     }</a>
 <a name="97"><span class="lineNum">      97 </span><span class="lineCov">          1 :     _softWrap = value;</span></a>
@@ -163,8 +163,8 @@
 <a name="101"><span class="lineNum">     101 </span>            :   /// How visual overflow should be handled.</a>
 <a name="102"><span class="lineNum">     102 </span><span class="lineCov">          4 :   TextOverflow get overflow =&gt; _overflow;</span></a>
 <a name="103"><span class="lineNum">     103 </span>            :   TextOverflow _overflow;</a>
-<a name="104"><span class="lineNum">     104 </span><span class="lineCov">          5 :   set overflow(TextOverflow value) {</span></a>
-<a name="105"><span class="lineNum">     105 </span><span class="lineCov">         10 :     if (_overflow == value) {</span></a>
+<a name="104"><span class="lineNum">     104 </span><span class="lineCov">          6 :   set overflow(TextOverflow value) {</span></a>
+<a name="105"><span class="lineNum">     105 </span><span class="lineCov">         12 :     if (_overflow == value) {</span></a>
 <a name="106"><span class="lineNum">     106 </span>            :       return;</a>
 <a name="107"><span class="lineNum">     107 </span>            :     }</a>
 <a name="108"><span class="lineNum">     108 </span><span class="lineCov">          1 :     _overflow = value;</span></a>
@@ -177,10 +177,10 @@
 <a name="115"><span class="lineNum">     115 </span>            :   /// For example, if the text scale factor is 1.5, text will be 50% larger than</a>
 <a name="116"><span class="lineNum">     116 </span>            :   /// the specified font size.</a>
 <a name="117"><span class="lineNum">     117 </span><span class="lineCov">          3 :   double get textScaleFactor =&gt; _textPainter.textScaleFactor;</span></a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          5 :   set textScaleFactor(double value) {</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineCov">         15 :     if (_textPainter.textScaleFactor == value) return;</span></a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineCov">          2 :     _textPainter.textScaleFactor = value;</span></a>
-<a name="121"><span class="lineNum">     121 </span><span class="lineCov">          1 :     markNeedsLayout();</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          6 :   set textScaleFactor(double value) {</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">         18 :     if (_textPainter.textScaleFactor == value) return;</span></a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineCov">          4 :     _textPainter.textScaleFactor = value;</span></a>
+<a name="121"><span class="lineNum">     121 </span><span class="lineCov">          2 :     markNeedsLayout();</span></a>
 <a name="122"><span class="lineNum">     122 </span>            :   }</a>
 <a name="123"><span class="lineNum">     123 </span>            : </a>
 <a name="124"><span class="lineNum">     124 </span>            :   /// An optional maximum number of lines for the text to span, wrapping if</a>
@@ -190,9 +190,9 @@
 <a name="128"><span class="lineNum">     128 </span>            : </a>
 <a name="129"><span class="lineNum">     129 </span>            :   /// The value may be null. If it is not null, then it must be greater than</a>
 <a name="130"><span class="lineNum">     130 </span>            :   /// zero.</a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          5 :   set maxLines(int? value) {</span></a>
+<a name="131"><span class="lineNum">     131 </span><span class="lineCov">          6 :   set maxLines(int? value) {</span></a>
 <a name="132"><span class="lineNum">     132 </span><span class="lineCov">          2 :     assert(value == null || value &gt; 0);</span></a>
-<a name="133"><span class="lineNum">     133 </span><span class="lineCov">         15 :     if (_textPainter.maxLines == value) {</span></a>
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">         18 :     if (_textPainter.maxLines == value) {</span></a>
 <a name="134"><span class="lineNum">     134 </span>            :       return;</a>
 <a name="135"><span class="lineNum">     135 </span>            :     }</a>
 <a name="136"><span class="lineNum">     136 </span><span class="lineCov">          2 :     _textPainter.maxLines = value;</span></a>
@@ -210,49 +210,49 @@
 <a name="148"><span class="lineNum">     148 </span><span class="lineNoCov">          0 :   @visibleForTesting</span></a>
 <a name="149"><span class="lineNum">     149 </span><span class="lineNoCov">          0 :   bool get debugHasOverflowShader =&gt; _overflowShader != null;</span></a>
 <a name="150"><span class="lineNum">     150 </span>            : </a>
-<a name="151"><span class="lineNum">     151 </span><span class="lineCov">          7 :   void _layoutText({</span></a>
+<a name="151"><span class="lineNum">     151 </span><span class="lineCov">          8 :   void _layoutText({</span></a>
 <a name="152"><span class="lineNum">     152 </span>            :     double minHeight = 0.0,</a>
 <a name="153"><span class="lineNum">     153 </span>            :     double maxHeight = double.infinity,</a>
 <a name="154"><span class="lineNum">     154 </span>            :   }) {</a>
-<a name="155"><span class="lineNum">     155 </span><span class="lineCov">         11 :     final heightMatters = softWrap || overflow == TextOverflow.ellipsis;</span></a>
-<a name="156"><span class="lineNum">     156 </span><span class="lineCov">         14 :     _textPainter.layout(</span></a>
+<a name="155"><span class="lineNum">     155 </span><span class="lineCov">         12 :     final heightMatters = softWrap || overflow == TextOverflow.ellipsis;</span></a>
+<a name="156"><span class="lineNum">     156 </span><span class="lineCov">         16 :     _textPainter.layout(</span></a>
 <a name="157"><span class="lineNum">     157 </span>            :       minHeight: minHeight,</a>
 <a name="158"><span class="lineNum">     158 </span>            :       maxHeight: heightMatters ? maxHeight : double.infinity,</a>
 <a name="159"><span class="lineNum">     159 </span>            :     );</a>
 <a name="160"><span class="lineNum">     160 </span>            :   }</a>
 <a name="161"><span class="lineNum">     161 </span>            : </a>
-<a name="162"><span class="lineNum">     162 </span><span class="lineCov">          7 :   void _layoutTextWithConstraints(BoxConstraints constraints) {</span></a>
-<a name="163"><span class="lineNum">     163 </span><span class="lineCov">          7 :     _layoutText(</span></a>
-<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          7 :       minHeight: constraints.minHeight,</span></a>
-<a name="165"><span class="lineNum">     165 </span><span class="lineCov">          7 :       maxHeight: constraints.maxHeight,</span></a>
+<a name="162"><span class="lineNum">     162 </span><span class="lineCov">          8 :   void _layoutTextWithConstraints(BoxConstraints constraints) {</span></a>
+<a name="163"><span class="lineNum">     163 </span><span class="lineCov">          8 :     _layoutText(</span></a>
+<a name="164"><span class="lineNum">     164 </span><span class="lineCov">          8 :       minHeight: constraints.minHeight,</span></a>
+<a name="165"><span class="lineNum">     165 </span><span class="lineCov">          8 :       maxHeight: constraints.maxHeight,</span></a>
 <a name="166"><span class="lineNum">     166 </span>            :     );</a>
 <a name="167"><span class="lineNum">     167 </span>            :   }</a>
 <a name="168"><span class="lineNum">     168 </span>            : </a>
-<a name="169"><span class="lineNum">     169 </span><span class="lineCov">          4 :   @override</span></a>
+<a name="169"><span class="lineNum">     169 </span><span class="lineCov">          5 :   @override</span></a>
 <a name="170"><span class="lineNum">     170 </span>            :   double computeMinIntrinsicHeight(double width) {</a>
-<a name="171"><span class="lineNum">     171 </span><span class="lineCov">          4 :     _layoutText();</span></a>
-<a name="172"><span class="lineNum">     172 </span><span class="lineCov">          8 :     return _textPainter.minIntrinsicHeight;</span></a>
+<a name="171"><span class="lineNum">     171 </span><span class="lineCov">          5 :     _layoutText();</span></a>
+<a name="172"><span class="lineNum">     172 </span><span class="lineCov">         10 :     return _textPainter.minIntrinsicHeight;</span></a>
 <a name="173"><span class="lineNum">     173 </span>            :   }</a>
 <a name="174"><span class="lineNum">     174 </span>            : </a>
-<a name="175"><span class="lineNum">     175 </span><span class="lineCov">          4 :   @override</span></a>
+<a name="175"><span class="lineNum">     175 </span><span class="lineCov">          5 :   @override</span></a>
 <a name="176"><span class="lineNum">     176 </span>            :   double computeMaxIntrinsicHeight(double width) {</a>
-<a name="177"><span class="lineNum">     177 </span><span class="lineCov">          4 :     _layoutText();</span></a>
-<a name="178"><span class="lineNum">     178 </span><span class="lineCov">          8 :     return _textPainter.maxIntrinsicHeight;</span></a>
+<a name="177"><span class="lineNum">     177 </span><span class="lineCov">          5 :     _layoutText();</span></a>
+<a name="178"><span class="lineNum">     178 </span><span class="lineCov">         10 :     return _textPainter.maxIntrinsicHeight;</span></a>
 <a name="179"><span class="lineNum">     179 </span>            :   }</a>
 <a name="180"><span class="lineNum">     180 </span>            : </a>
-<a name="181"><span class="lineNum">     181 </span><span class="lineCov">          4 :   double _computeIntrinsicWidth(double height) {</span></a>
-<a name="182"><span class="lineNum">     182 </span><span class="lineCov">          4 :     _layoutText(minHeight: height, maxHeight: height);</span></a>
-<a name="183"><span class="lineNum">     183 </span><span class="lineCov">          8 :     return _textPainter.width;</span></a>
+<a name="181"><span class="lineNum">     181 </span><span class="lineCov">          5 :   double _computeIntrinsicWidth(double height) {</span></a>
+<a name="182"><span class="lineNum">     182 </span><span class="lineCov">          5 :     _layoutText(minHeight: height, maxHeight: height);</span></a>
+<a name="183"><span class="lineNum">     183 </span><span class="lineCov">         10 :     return _textPainter.width;</span></a>
 <a name="184"><span class="lineNum">     184 </span>            :   }</a>
 <a name="185"><span class="lineNum">     185 </span>            : </a>
-<a name="186"><span class="lineNum">     186 </span><span class="lineCov">          4 :   @override</span></a>
+<a name="186"><span class="lineNum">     186 </span><span class="lineCov">          5 :   @override</span></a>
 <a name="187"><span class="lineNum">     187 </span>            :   double computeMinIntrinsicWidth(double height) {</a>
-<a name="188"><span class="lineNum">     188 </span><span class="lineCov">          4 :     return _computeIntrinsicWidth(height);</span></a>
+<a name="188"><span class="lineNum">     188 </span><span class="lineCov">          5 :     return _computeIntrinsicWidth(height);</span></a>
 <a name="189"><span class="lineNum">     189 </span>            :   }</a>
 <a name="190"><span class="lineNum">     190 </span>            : </a>
-<a name="191"><span class="lineNum">     191 </span><span class="lineCov">          4 :   @override</span></a>
+<a name="191"><span class="lineNum">     191 </span><span class="lineCov">          5 :   @override</span></a>
 <a name="192"><span class="lineNum">     192 </span>            :   double computeMaxIntrinsicWidth(double height) {</a>
-<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          4 :     return _computeIntrinsicWidth(height);</span></a>
+<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          5 :     return _computeIntrinsicWidth(height);</span></a>
 <a name="194"><span class="lineNum">     194 </span>            :   }</a>
 <a name="195"><span class="lineNum">     195 </span>            : </a>
 <a name="196"><span class="lineNum">     196 </span><span class="lineCov">          2 :   @override</span></a>
@@ -263,29 +263,29 @@
 <a name="201"><span class="lineNum">     201 </span><span class="lineCov">          4 :     return _textPainter.computeDistanceToActualBaseline(baseline);</span></a>
 <a name="202"><span class="lineNum">     202 </span>            :   }</a>
 <a name="203"><span class="lineNum">     203 </span>            : </a>
-<a name="204"><span class="lineNum">     204 </span><span class="lineCov">          3 :   @override</span></a>
+<a name="204"><span class="lineNum">     204 </span><span class="lineCov">          4 :   @override</span></a>
 <a name="205"><span class="lineNum">     205 </span>            :   bool hitTestSelf(Offset position) =&gt; true;</a>
 <a name="206"><span class="lineNum">     206 </span>            : </a>
-<a name="207"><span class="lineNum">     207 </span><span class="lineCov">          3 :   @override</span></a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineCov">          4 :   @override</span></a>
 <a name="208"><span class="lineNum">     208 </span>            :   void handleEvent(PointerEvent event, BoxHitTestEntry entry) {</a>
-<a name="209"><span class="lineNum">     209 </span><span class="lineCov">          3 :     assert(debugHandleEvent(event, entry));</span></a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineCov">          3 :     if (event is! PointerDownEvent) return;</span></a>
-<a name="211"><span class="lineNum">     211 </span><span class="lineCov">          6 :     _layoutTextWithConstraints(constraints);</span></a>
-<a name="212"><span class="lineNum">     212 </span><span class="lineCov">          3 :     final offset = entry.localPosition;</span></a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineCov">          6 :     final position = _textPainter.getPositionForOffset(offset);</span></a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineCov">          9 :     final span = _textPainter.text!.getSpanForPosition(position);</span></a>
+<a name="209"><span class="lineNum">     209 </span><span class="lineCov">          4 :     assert(debugHandleEvent(event, entry));</span></a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineCov">          4 :     if (event is! PointerDownEvent) return;</span></a>
+<a name="211"><span class="lineNum">     211 </span><span class="lineCov">          8 :     _layoutTextWithConstraints(constraints);</span></a>
+<a name="212"><span class="lineNum">     212 </span><span class="lineCov">          4 :     final offset = entry.localPosition;</span></a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineCov">          8 :     final position = _textPainter.getPositionForOffset(offset);</span></a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineCov">         12 :     final span = _textPainter.text!.getSpanForPosition(position);</span></a>
 <a name="215"><span class="lineNum">     215 </span>            :     if (span == null) {</a>
 <a name="216"><span class="lineNum">     216 </span>            :       return;</a>
 <a name="217"><span class="lineNum">     217 </span>            :     }</a>
-<a name="218"><span class="lineNum">     218 </span><span class="lineCov">          3 :     if (span is TextSpan) {</span></a>
-<a name="219"><span class="lineNum">     219 </span><span class="lineCov">          3 :       span.recognizer?.addPointer(event);</span></a>
+<a name="218"><span class="lineNum">     218 </span><span class="lineCov">          4 :     if (span is TextSpan) {</span></a>
+<a name="219"><span class="lineNum">     219 </span><span class="lineCov">          4 :       span.recognizer?.addPointer(event);</span></a>
 <a name="220"><span class="lineNum">     220 </span>            :     }</a>
 <a name="221"><span class="lineNum">     221 </span>            :   }</a>
 <a name="222"><span class="lineNum">     222 </span>            : </a>
-<a name="223"><span class="lineNum">     223 </span><span class="lineCov">          7 :   @override</span></a>
+<a name="223"><span class="lineNum">     223 </span><span class="lineCov">          8 :   @override</span></a>
 <a name="224"><span class="lineNum">     224 </span>            :   void performLayout() {</a>
-<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          7 :     final constraints = this.constraints;</span></a>
-<a name="226"><span class="lineNum">     226 </span><span class="lineCov">          7 :     _layoutTextWithConstraints(constraints);</span></a>
+<a name="225"><span class="lineNum">     225 </span><span class="lineCov">          8 :     final constraints = this.constraints;</span></a>
+<a name="226"><span class="lineNum">     226 </span><span class="lineCov">          8 :     _layoutTextWithConstraints(constraints);</span></a>
 <a name="227"><span class="lineNum">     227 </span>            :     // final textSize = _textPainter.size;</a>
 <a name="228"><span class="lineNum">     228 </span>            :     // size = constraints.constrain(textSize);</a>
 <a name="229"><span class="lineNum">     229 </span>            : </a>
@@ -294,13 +294,13 @@
 <a name="232"><span class="lineNum">     232 </span>            :     // which will change _textPainter's layout because the intrinsic size</a>
 <a name="233"><span class="lineNum">     233 </span>            :     // calculations are destructive. Other _textPainter state will also be</a>
 <a name="234"><span class="lineNum">     234 </span>            :     // affected. See also MongolRenderEditable which has a similar issue.</a>
-<a name="235"><span class="lineNum">     235 </span><span class="lineCov">         14 :     final textSize = _textPainter.size;</span></a>
-<a name="236"><span class="lineNum">     236 </span><span class="lineCov">         14 :     final textDidExceedMaxLines = _textPainter.didExceedMaxLines;</span></a>
-<a name="237"><span class="lineNum">     237 </span><span class="lineCov">         14 :     size = constraints.constrain(textSize);</span></a>
+<a name="235"><span class="lineNum">     235 </span><span class="lineCov">         16 :     final textSize = _textPainter.size;</span></a>
+<a name="236"><span class="lineNum">     236 </span><span class="lineCov">         16 :     final textDidExceedMaxLines = _textPainter.didExceedMaxLines;</span></a>
+<a name="237"><span class="lineNum">     237 </span><span class="lineCov">         16 :     size = constraints.constrain(textSize);</span></a>
 <a name="238"><span class="lineNum">     238 </span>            : </a>
 <a name="239"><span class="lineNum">     239 </span>            :     final didOverflowWidth =</a>
-<a name="240"><span class="lineNum">     240 </span><span class="lineCov">         28 :         size.width &lt; textSize.width || textDidExceedMaxLines;</span></a>
-<a name="241"><span class="lineNum">     241 </span><span class="lineCov">         28 :     final didOverflowHeight = size.height &lt; textSize.height;</span></a>
+<a name="240"><span class="lineNum">     240 </span><span class="lineCov">         32 :         size.width &lt; textSize.width || textDidExceedMaxLines;</span></a>
+<a name="241"><span class="lineNum">     241 </span><span class="lineCov">         32 :     final didOverflowHeight = size.height &lt; textSize.height;</span></a>
 <a name="242"><span class="lineNum">     242 </span>            :     final hasVisualOverflow = didOverflowHeight || didOverflowWidth;</a>
 <a name="243"><span class="lineNum">     243 </span>            :     if (hasVisualOverflow) {</a>
 <a name="244"><span class="lineNum">     244 </span><span class="lineCov">          1 :       switch (_overflow) {</span></a>
@@ -340,23 +340,23 @@
 <a name="278"><span class="lineNum">     278 </span>            :           break;</a>
 <a name="279"><span class="lineNum">     279 </span>            :       }</a>
 <a name="280"><span class="lineNum">     280 </span>            :     } else {</a>
-<a name="281"><span class="lineNum">     281 </span><span class="lineCov">          7 :       _needsClipping = false;</span></a>
-<a name="282"><span class="lineNum">     282 </span><span class="lineCov">          7 :       _overflowShader = null;</span></a>
+<a name="281"><span class="lineNum">     281 </span><span class="lineCov">          8 :       _needsClipping = false;</span></a>
+<a name="282"><span class="lineNum">     282 </span><span class="lineCov">          8 :       _overflowShader = null;</span></a>
 <a name="283"><span class="lineNum">     283 </span>            :     }</a>
 <a name="284"><span class="lineNum">     284 </span>            :   }</a>
 <a name="285"><span class="lineNum">     285 </span>            : </a>
-<a name="286"><span class="lineNum">     286 </span><span class="lineCov">          7 :   @override</span></a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineCov">          8 :   @override</span></a>
 <a name="287"><span class="lineNum">     287 </span>            :   void paint(PaintingContext context, Offset offset) {</a>
-<a name="288"><span class="lineNum">     288 </span><span class="lineCov">         14 :     _layoutTextWithConstraints(constraints);</span></a>
-<a name="289"><span class="lineNum">     289 </span><span class="lineCov">          7 :     assert(() {</span></a>
+<a name="288"><span class="lineNum">     288 </span><span class="lineCov">         16 :     _layoutTextWithConstraints(constraints);</span></a>
+<a name="289"><span class="lineNum">     289 </span><span class="lineCov">          8 :     assert(() {</span></a>
 <a name="290"><span class="lineNum">     290 </span>            :       if (debugRepaintTextRainbowEnabled) {</a>
 <a name="291"><span class="lineNum">     291 </span><span class="lineNoCov">          0 :         final paint = Paint()..color = debugCurrentRepaintColor.toColor();</span></a>
 <a name="292"><span class="lineNum">     292 </span><span class="lineNoCov">          0 :         context.canvas.drawRect(offset &amp; size, paint);</span></a>
 <a name="293"><span class="lineNum">     293 </span>            :       }</a>
 <a name="294"><span class="lineNum">     294 </span>            :       return true;</a>
-<a name="295"><span class="lineNum">     295 </span><span class="lineCov">          7 :     }());</span></a>
+<a name="295"><span class="lineNum">     295 </span><span class="lineCov">          8 :     }());</span></a>
 <a name="296"><span class="lineNum">     296 </span>            : </a>
-<a name="297"><span class="lineNum">     297 </span><span class="lineCov">          7 :     if (_needsClipping) {</span></a>
+<a name="297"><span class="lineNum">     297 </span><span class="lineCov">          8 :     if (_needsClipping) {</span></a>
 <a name="298"><span class="lineNum">     298 </span><span class="lineCov">          2 :       final bounds = offset &amp; size;</span></a>
 <a name="299"><span class="lineNum">     299 </span><span class="lineCov">          1 :       if (_overflowShader != null) {</span></a>
 <a name="300"><span class="lineNum">     300 </span>            :         // This layer limits what the shader below blends with to be just the</a>
@@ -368,9 +368,9 @@
 <a name="306"><span class="lineNum">     306 </span><span class="lineCov">          2 :       context.canvas.clipRect(bounds);</span></a>
 <a name="307"><span class="lineNum">     307 </span>            :     }</a>
 <a name="308"><span class="lineNum">     308 </span>            : </a>
-<a name="309"><span class="lineNum">     309 </span><span class="lineCov">         21 :     _textPainter.paint(context.canvas, offset);</span></a>
+<a name="309"><span class="lineNum">     309 </span><span class="lineCov">         24 :     _textPainter.paint(context.canvas, offset);</span></a>
 <a name="310"><span class="lineNum">     310 </span>            : </a>
-<a name="311"><span class="lineNum">     311 </span><span class="lineCov">          7 :     if (_needsClipping) {</span></a>
+<a name="311"><span class="lineNum">     311 </span><span class="lineCov">          8 :     if (_needsClipping) {</span></a>
 <a name="312"><span class="lineNum">     312 </span><span class="lineCov">          1 :       if (_overflowShader != null) {</span></a>
 <a name="313"><span class="lineNum">     313 </span><span class="lineCov">          4 :         context.canvas.translate(offset.dx, offset.dy);</span></a>
 <a name="314"><span class="lineNum">     314 </span><span class="lineCov">          1 :         final paint = Paint()</span></a>

@@ -1,3 +1,7 @@
+## [2.2.0] - 2021.8.2
+
+- Added buttons: `MongolTextButton`, `MongolOutlineButton`, and `MongolElevatedButton`
+
 ## [2.1.0] - 2021.7.30
 
 - Added `MongolPopupMenuButton` along with its `MongolPopupMenuEntry`, `MongolPopupMenuDivider`, `MongolPopupMenuItem`, `showMongolMenu`

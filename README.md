@@ -195,6 +195,22 @@ Scaffold(
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_popup_menu_button.gif)
 
+## Buttons
+
+There are Mongol equivalents to all of the Flutter buttons:
+
+- `MongolTextButton`
+- `MongolOutlinedButton`
+- `MongolElevatedButton`
+- `MongolTextButton.icon`
+- `MongolOutlinedButton.icon`
+- `MongolElevatedButton.icon`
+- `MongolIconButton`
+
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/buttons.gif)
+
+The reason for the Mongol icon button is to provide a vertical tooltip that will appear for a longpress on mobile and for a mouse hover on desktop and web.
+
 ## Other widgets
 
 ### MongolAlertDialog

@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-07-30 09:13:58</td>
+            <td class="headerValue">2021-08-02 17:55:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -130,7 +130,7 @@
 <a name="68"><span class="lineNum">      68 </span>            :   /// it is not null, it must be greater than zero.</a>
 <a name="69"><span class="lineNum">      69 </span>            :   ///</a>
 <a name="70"><span class="lineNum">      70 </span>            :   /// The [text] argument must not be null.</a>
-<a name="71"><span class="lineNum">      71 </span><span class="lineCov">          8 :   const MongolRichText({</span></a>
+<a name="71"><span class="lineNum">      71 </span><span class="lineCov">          9 :   const MongolRichText({</span></a>
 <a name="72"><span class="lineNum">      72 </span>            :     Key? key,</a>
 <a name="73"><span class="lineNum">      73 </span>            :     required this.text,</a>
 <a name="74"><span class="lineNum">      74 </span>            :     this.textAlign = MongolTextAlign.top,</a>
@@ -139,7 +139,7 @@
 <a name="77"><span class="lineNum">      77 </span>            :     this.textScaleFactor = 1.0,</a>
 <a name="78"><span class="lineNum">      78 </span>            :     this.maxLines,</a>
 <a name="79"><span class="lineNum">      79 </span><span class="lineCov">          2 :   })  : assert(maxLines == null || maxLines &gt; 0),</span></a>
-<a name="80"><span class="lineNum">      80 </span><span class="lineCov">          7 :         super(key: key);</span></a>
+<a name="80"><span class="lineNum">      80 </span><span class="lineCov">          8 :         super(key: key);</span></a>
 <a name="81"><span class="lineNum">      81 </span>            : </a>
 <a name="82"><span class="lineNum">      82 </span>            :   /// The text to display in this widget.</a>
 <a name="83"><span class="lineNum">      83 </span>            :   final TextSpan text;</a>
@@ -170,28 +170,28 @@
 <a name="108"><span class="lineNum">     108 </span>            :   /// edge of the box.</a>
 <a name="109"><span class="lineNum">     109 </span>            :   final int? maxLines;</a>
 <a name="110"><span class="lineNum">     110 </span>            : </a>
-<a name="111"><span class="lineNum">     111 </span><span class="lineCov">          7 :   @override</span></a>
+<a name="111"><span class="lineNum">     111 </span><span class="lineCov">          8 :   @override</span></a>
 <a name="112"><span class="lineNum">     112 </span>            :   MongolRenderParagraph createRenderObject(BuildContext context) {</a>
-<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          7 :     return MongolRenderParagraph(</span></a>
-<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          7 :       text,</span></a>
-<a name="115"><span class="lineNum">     115 </span><span class="lineCov">          7 :       textAlign: textAlign,</span></a>
-<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          7 :       softWrap: softWrap,</span></a>
-<a name="117"><span class="lineNum">     117 </span><span class="lineCov">          7 :       overflow: overflow,</span></a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          7 :       textScaleFactor: textScaleFactor,</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          7 :       maxLines: maxLines,</span></a>
+<a name="113"><span class="lineNum">     113 </span><span class="lineCov">          8 :     return MongolRenderParagraph(</span></a>
+<a name="114"><span class="lineNum">     114 </span><span class="lineCov">          8 :       text,</span></a>
+<a name="115"><span class="lineNum">     115 </span><span class="lineCov">          8 :       textAlign: textAlign,</span></a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">          8 :       softWrap: softWrap,</span></a>
+<a name="117"><span class="lineNum">     117 </span><span class="lineCov">          8 :       overflow: overflow,</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          8 :       textScaleFactor: textScaleFactor,</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          8 :       maxLines: maxLines,</span></a>
 <a name="120"><span class="lineNum">     120 </span>            :     );</a>
 <a name="121"><span class="lineNum">     121 </span>            :   }</a>
 <a name="122"><span class="lineNum">     122 </span>            : </a>
-<a name="123"><span class="lineNum">     123 </span><span class="lineCov">          5 :   @override</span></a>
+<a name="123"><span class="lineNum">     123 </span><span class="lineCov">          6 :   @override</span></a>
 <a name="124"><span class="lineNum">     124 </span>            :   void updateRenderObject(</a>
 <a name="125"><span class="lineNum">     125 </span>            :       BuildContext context, MongolRenderParagraph renderObject) {</a>
 <a name="126"><span class="lineNum">     126 </span>            :     renderObject</a>
-<a name="127"><span class="lineNum">     127 </span><span class="lineCov">         10 :       ..text = text</span></a>
-<a name="128"><span class="lineNum">     128 </span><span class="lineCov">         10 :       ..textAlign = textAlign</span></a>
-<a name="129"><span class="lineNum">     129 </span><span class="lineCov">         10 :       ..softWrap = softWrap</span></a>
-<a name="130"><span class="lineNum">     130 </span><span class="lineCov">         10 :       ..overflow = overflow</span></a>
-<a name="131"><span class="lineNum">     131 </span><span class="lineCov">         10 :       ..textScaleFactor = textScaleFactor</span></a>
-<a name="132"><span class="lineNum">     132 </span><span class="lineCov">         10 :       ..maxLines = maxLines;</span></a>
+<a name="127"><span class="lineNum">     127 </span><span class="lineCov">         12 :       ..text = text</span></a>
+<a name="128"><span class="lineNum">     128 </span><span class="lineCov">         12 :       ..textAlign = textAlign</span></a>
+<a name="129"><span class="lineNum">     129 </span><span class="lineCov">         12 :       ..softWrap = softWrap</span></a>
+<a name="130"><span class="lineNum">     130 </span><span class="lineCov">         12 :       ..overflow = overflow</span></a>
+<a name="131"><span class="lineNum">     131 </span><span class="lineCov">         12 :       ..textScaleFactor = textScaleFactor</span></a>
+<a name="132"><span class="lineNum">     132 </span><span class="lineCov">         12 :       ..maxLines = maxLines;</span></a>
 <a name="133"><span class="lineNum">     133 </span>            :   }</a>
 <a name="134"><span class="lineNum">     134 </span>            : </a>
 <a name="135"><span class="lineNum">     135 </span><span class="lineNoCov">          0 :   @override</span></a>

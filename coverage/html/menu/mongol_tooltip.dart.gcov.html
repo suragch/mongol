@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-07-30 09:13:58</td>
+            <td class="headerValue">2021-08-02 17:55:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -171,7 +171,7 @@
 <a name="109"><span class="lineNum">     109 </span>            :   ///</a>
 <a name="110"><span class="lineNum">     110 </span>            :   /// All parameters that are defined in the constructor will</a>
 <a name="111"><span class="lineNum">     111 </span>            :   /// override the default values _and_ the values in [TooltipTheme.of].</a>
-<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          1 :   const MongolTooltip({</span></a>
+<a name="112"><span class="lineNum">     112 </span><span class="lineCov">          2 :   const MongolTooltip({</span></a>
 <a name="113"><span class="lineNum">     113 </span>            :     Key? key,</a>
 <a name="114"><span class="lineNum">     114 </span>            :     required this.message,</a>
 <a name="115"><span class="lineNum">     115 </span>            :     this.width,</a>
@@ -185,7 +185,7 @@
 <a name="123"><span class="lineNum">     123 </span>            :     this.waitDuration,</a>
 <a name="124"><span class="lineNum">     124 </span>            :     this.showDuration,</a>
 <a name="125"><span class="lineNum">     125 </span>            :     this.child,</a>
-<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          1 :   }) : super(key: key);</span></a>
+<a name="126"><span class="lineNum">     126 </span><span class="lineCov">          2 :   }) : super(key: key);</span></a>
 <a name="127"><span class="lineNum">     127 </span>            : </a>
 <a name="128"><span class="lineNum">     128 </span>            :   /// The text to display in the tooltip.</a>
 <a name="129"><span class="lineNum">     129 </span>            :   final String message;</a>
@@ -275,8 +275,8 @@
 <a name="213"><span class="lineNum">     213 </span>            :   /// Defaults to 1.5 seconds.</a>
 <a name="214"><span class="lineNum">     214 </span>            :   final Duration? showDuration;</a>
 <a name="215"><span class="lineNum">     215 </span>            : </a>
-<a name="216"><span class="lineNum">     216 </span><span class="lineCov">          1 :   @override</span></a>
-<a name="217"><span class="lineNum">     217 </span><span class="lineCov">          1 :   _MongolTooltipState createState() =&gt; _MongolTooltipState();</span></a>
+<a name="216"><span class="lineNum">     216 </span><span class="lineCov">          2 :   @override</span></a>
+<a name="217"><span class="lineNum">     217 </span><span class="lineCov">          2 :   _MongolTooltipState createState() =&gt; _MongolTooltipState();</span></a>
 <a name="218"><span class="lineNum">     218 </span>            : </a>
 <a name="219"><span class="lineNum">     219 </span><span class="lineNoCov">          0 :   @override</span></a>
 <a name="220"><span class="lineNum">     220 </span>            :   void debugFillProperties(DiagnosticPropertiesBuilder properties) {</a>
@@ -335,54 +335,54 @@
 <a name="273"><span class="lineNum">     273 </span>            :   late bool _mouseIsConnected;</a>
 <a name="274"><span class="lineNum">     274 </span>            :   bool _longPressActivated = false;</a>
 <a name="275"><span class="lineNum">     275 </span>            : </a>
-<a name="276"><span class="lineNum">     276 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="276"><span class="lineNum">     276 </span><span class="lineCov">          2 :   @override</span></a>
 <a name="277"><span class="lineNum">     277 </span>            :   void initState() {</a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineCov">          1 :     super.initState();</span></a>
-<a name="279"><span class="lineNum">     279 </span><span class="lineCov">          4 :     _mouseIsConnected = RendererBinding.instance!.mouseTracker.mouseIsConnected;</span></a>
-<a name="280"><span class="lineNum">     280 </span><span class="lineCov">          2 :     _controller = AnimationController(</span></a>
+<a name="278"><span class="lineNum">     278 </span><span class="lineCov">          2 :     super.initState();</span></a>
+<a name="279"><span class="lineNum">     279 </span><span class="lineCov">          8 :     _mouseIsConnected = RendererBinding.instance!.mouseTracker.mouseIsConnected;</span></a>
+<a name="280"><span class="lineNum">     280 </span><span class="lineCov">          4 :     _controller = AnimationController(</span></a>
 <a name="281"><span class="lineNum">     281 </span>            :       duration: _fadeInDuration,</a>
 <a name="282"><span class="lineNum">     282 </span>            :       reverseDuration: _fadeOutDuration,</a>
 <a name="283"><span class="lineNum">     283 </span>            :       vsync: this,</a>
-<a name="284"><span class="lineNum">     284 </span><span class="lineCov">          2 :     )..addStatusListener(_handleStatusChanged);</span></a>
+<a name="284"><span class="lineNum">     284 </span><span class="lineCov">          4 :     )..addStatusListener(_handleStatusChanged);</span></a>
 <a name="285"><span class="lineNum">     285 </span>            :     // Listen to see when a mouse is added.</a>
-<a name="286"><span class="lineNum">     286 </span><span class="lineCov">          2 :     RendererBinding.instance!.mouseTracker</span></a>
-<a name="287"><span class="lineNum">     287 </span><span class="lineCov">          2 :         .addListener(_handleMouseTrackerChange);</span></a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineCov">          4 :     RendererBinding.instance!.mouseTracker</span></a>
+<a name="287"><span class="lineNum">     287 </span><span class="lineCov">          4 :         .addListener(_handleMouseTrackerChange);</span></a>
 <a name="288"><span class="lineNum">     288 </span>            :     // Listen to global pointer events so that we can hide a tooltip immediately</a>
 <a name="289"><span class="lineNum">     289 </span>            :     // if some other control is clicked on.</a>
-<a name="290"><span class="lineNum">     290 </span><span class="lineCov">          4 :     GestureBinding.instance!.pointerRouter.addGlobalRoute(_handlePointerEvent);</span></a>
+<a name="290"><span class="lineNum">     290 </span><span class="lineCov">          8 :     GestureBinding.instance!.pointerRouter.addGlobalRoute(_handlePointerEvent);</span></a>
 <a name="291"><span class="lineNum">     291 </span>            :   }</a>
 <a name="292"><span class="lineNum">     292 </span>            : </a>
 <a name="293"><span class="lineNum">     293 </span>            :   // https://material.io/components/tooltips#specs</a>
-<a name="294"><span class="lineNum">     294 </span><span class="lineCov">          1 :   double _getDefaultTooltipWidth() {</span></a>
-<a name="295"><span class="lineNum">     295 </span><span class="lineCov">          2 :     final ThemeData theme = Theme.of(context);</span></a>
-<a name="296"><span class="lineNum">     296 </span><span class="lineCov">          1 :     switch (theme.platform) {</span></a>
-<a name="297"><span class="lineNum">     297 </span><span class="lineCov">          1 :       case TargetPlatform.macOS:</span></a>
-<a name="298"><span class="lineNum">     298 </span><span class="lineCov">          1 :       case TargetPlatform.linux:</span></a>
-<a name="299"><span class="lineNum">     299 </span><span class="lineCov">          1 :       case TargetPlatform.windows:</span></a>
+<a name="294"><span class="lineNum">     294 </span><span class="lineCov">          2 :   double _getDefaultTooltipWidth() {</span></a>
+<a name="295"><span class="lineNum">     295 </span><span class="lineCov">          4 :     final ThemeData theme = Theme.of(context);</span></a>
+<a name="296"><span class="lineNum">     296 </span><span class="lineCov">          2 :     switch (theme.platform) {</span></a>
+<a name="297"><span class="lineNum">     297 </span><span class="lineCov">          2 :       case TargetPlatform.macOS:</span></a>
+<a name="298"><span class="lineNum">     298 </span><span class="lineCov">          2 :       case TargetPlatform.linux:</span></a>
+<a name="299"><span class="lineNum">     299 </span><span class="lineCov">          2 :       case TargetPlatform.windows:</span></a>
 <a name="300"><span class="lineNum">     300 </span>            :         return 24.0;</a>
 <a name="301"><span class="lineNum">     301 </span>            :       default:</a>
 <a name="302"><span class="lineNum">     302 </span>            :         return 32.0;</a>
 <a name="303"><span class="lineNum">     303 </span>            :     }</a>
 <a name="304"><span class="lineNum">     304 </span>            :   }</a>
 <a name="305"><span class="lineNum">     305 </span>            : </a>
-<a name="306"><span class="lineNum">     306 </span><span class="lineCov">          1 :   EdgeInsets _getDefaultPadding() {</span></a>
-<a name="307"><span class="lineNum">     307 </span><span class="lineCov">          2 :     final ThemeData theme = Theme.of(context);</span></a>
-<a name="308"><span class="lineNum">     308 </span><span class="lineCov">          1 :     switch (theme.platform) {</span></a>
-<a name="309"><span class="lineNum">     309 </span><span class="lineCov">          1 :       case TargetPlatform.macOS:</span></a>
-<a name="310"><span class="lineNum">     310 </span><span class="lineCov">          1 :       case TargetPlatform.linux:</span></a>
-<a name="311"><span class="lineNum">     311 </span><span class="lineCov">          1 :       case TargetPlatform.windows:</span></a>
+<a name="306"><span class="lineNum">     306 </span><span class="lineCov">          2 :   EdgeInsets _getDefaultPadding() {</span></a>
+<a name="307"><span class="lineNum">     307 </span><span class="lineCov">          4 :     final ThemeData theme = Theme.of(context);</span></a>
+<a name="308"><span class="lineNum">     308 </span><span class="lineCov">          2 :     switch (theme.platform) {</span></a>
+<a name="309"><span class="lineNum">     309 </span><span class="lineCov">          2 :       case TargetPlatform.macOS:</span></a>
+<a name="310"><span class="lineNum">     310 </span><span class="lineCov">          2 :       case TargetPlatform.linux:</span></a>
+<a name="311"><span class="lineNum">     311 </span><span class="lineCov">          2 :       case TargetPlatform.windows:</span></a>
 <a name="312"><span class="lineNum">     312 </span>            :         return const EdgeInsets.symmetric(vertical: 8.0);</a>
 <a name="313"><span class="lineNum">     313 </span>            :       default:</a>
 <a name="314"><span class="lineNum">     314 </span>            :         return const EdgeInsets.symmetric(vertical: 16.0);</a>
 <a name="315"><span class="lineNum">     315 </span>            :     }</a>
 <a name="316"><span class="lineNum">     316 </span>            :   }</a>
 <a name="317"><span class="lineNum">     317 </span>            : </a>
-<a name="318"><span class="lineNum">     318 </span><span class="lineCov">          1 :   double _getDefaultFontSize() {</span></a>
-<a name="319"><span class="lineNum">     319 </span><span class="lineCov">          2 :     final ThemeData theme = Theme.of(context);</span></a>
-<a name="320"><span class="lineNum">     320 </span><span class="lineCov">          1 :     switch (theme.platform) {</span></a>
-<a name="321"><span class="lineNum">     321 </span><span class="lineCov">          1 :       case TargetPlatform.macOS:</span></a>
-<a name="322"><span class="lineNum">     322 </span><span class="lineCov">          1 :       case TargetPlatform.linux:</span></a>
-<a name="323"><span class="lineNum">     323 </span><span class="lineCov">          1 :       case TargetPlatform.windows:</span></a>
+<a name="318"><span class="lineNum">     318 </span><span class="lineCov">          2 :   double _getDefaultFontSize() {</span></a>
+<a name="319"><span class="lineNum">     319 </span><span class="lineCov">          4 :     final ThemeData theme = Theme.of(context);</span></a>
+<a name="320"><span class="lineNum">     320 </span><span class="lineCov">          2 :     switch (theme.platform) {</span></a>
+<a name="321"><span class="lineNum">     321 </span><span class="lineCov">          2 :       case TargetPlatform.macOS:</span></a>
+<a name="322"><span class="lineNum">     322 </span><span class="lineCov">          2 :       case TargetPlatform.linux:</span></a>
+<a name="323"><span class="lineNum">     323 </span><span class="lineCov">          2 :       case TargetPlatform.windows:</span></a>
 <a name="324"><span class="lineNum">     324 </span>            :         return 10.0;</a>
 <a name="325"><span class="lineNum">     325 </span>            :       default:</a>
 <a name="326"><span class="lineNum">     326 </span>            :         return 14.0;</a>
@@ -503,8 +503,8 @@
 <a name="441"><span class="lineNum">     441 </span><span class="lineNoCov">          0 :     _entry = null;</span></a>
 <a name="442"><span class="lineNum">     442 </span>            :   }</a>
 <a name="443"><span class="lineNum">     443 </span>            : </a>
-<a name="444"><span class="lineNum">     444 </span><span class="lineCov">          1 :   void _handlePointerEvent(PointerEvent event) {</span></a>
-<a name="445"><span class="lineNum">     445 </span><span class="lineCov">          1 :     if (_entry == null) {</span></a>
+<a name="444"><span class="lineNum">     444 </span><span class="lineCov">          2 :   void _handlePointerEvent(PointerEvent event) {</span></a>
+<a name="445"><span class="lineNum">     445 </span><span class="lineCov">          2 :     if (_entry == null) {</span></a>
 <a name="446"><span class="lineNum">     446 </span>            :       return;</a>
 <a name="447"><span class="lineNum">     447 </span>            :     }</a>
 <a name="448"><span class="lineNum">     448 </span><span class="lineNoCov">          0 :     if (event is PointerUpEvent || event is PointerCancelEvent) {</span></a>
@@ -514,26 +514,26 @@
 <a name="452"><span class="lineNum">     452 </span>            :     }</a>
 <a name="453"><span class="lineNum">     453 </span>            :   }</a>
 <a name="454"><span class="lineNum">     454 </span>            : </a>
-<a name="455"><span class="lineNum">     455 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="455"><span class="lineNum">     455 </span><span class="lineCov">          2 :   @override</span></a>
 <a name="456"><span class="lineNum">     456 </span>            :   void deactivate() {</a>
-<a name="457"><span class="lineNum">     457 </span><span class="lineCov">          1 :     if (_entry != null) {</span></a>
+<a name="457"><span class="lineNum">     457 </span><span class="lineCov">          2 :     if (_entry != null) {</span></a>
 <a name="458"><span class="lineNum">     458 </span><span class="lineNoCov">          0 :       _hideTooltip(immediately: true);</span></a>
 <a name="459"><span class="lineNum">     459 </span>            :     }</a>
-<a name="460"><span class="lineNum">     460 </span><span class="lineCov">          1 :     _showTimer?.cancel();</span></a>
-<a name="461"><span class="lineNum">     461 </span><span class="lineCov">          1 :     super.deactivate();</span></a>
+<a name="460"><span class="lineNum">     460 </span><span class="lineCov">          2 :     _showTimer?.cancel();</span></a>
+<a name="461"><span class="lineNum">     461 </span><span class="lineCov">          2 :     super.deactivate();</span></a>
 <a name="462"><span class="lineNum">     462 </span>            :   }</a>
 <a name="463"><span class="lineNum">     463 </span>            : </a>
-<a name="464"><span class="lineNum">     464 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="464"><span class="lineNum">     464 </span><span class="lineCov">          2 :   @override</span></a>
 <a name="465"><span class="lineNum">     465 </span>            :   void dispose() {</a>
-<a name="466"><span class="lineNum">     466 </span><span class="lineCov">          2 :     GestureBinding.instance!.pointerRouter</span></a>
-<a name="467"><span class="lineNum">     467 </span><span class="lineCov">          2 :         .removeGlobalRoute(_handlePointerEvent);</span></a>
-<a name="468"><span class="lineNum">     468 </span><span class="lineCov">          2 :     RendererBinding.instance!.mouseTracker</span></a>
-<a name="469"><span class="lineNum">     469 </span><span class="lineCov">          2 :         .removeListener(_handleMouseTrackerChange);</span></a>
-<a name="470"><span class="lineNum">     470 </span><span class="lineCov">          1 :     if (_entry != null) {</span></a>
+<a name="466"><span class="lineNum">     466 </span><span class="lineCov">          4 :     GestureBinding.instance!.pointerRouter</span></a>
+<a name="467"><span class="lineNum">     467 </span><span class="lineCov">          4 :         .removeGlobalRoute(_handlePointerEvent);</span></a>
+<a name="468"><span class="lineNum">     468 </span><span class="lineCov">          4 :     RendererBinding.instance!.mouseTracker</span></a>
+<a name="469"><span class="lineNum">     469 </span><span class="lineCov">          4 :         .removeListener(_handleMouseTrackerChange);</span></a>
+<a name="470"><span class="lineNum">     470 </span><span class="lineCov">          2 :     if (_entry != null) {</span></a>
 <a name="471"><span class="lineNum">     471 </span><span class="lineNoCov">          0 :       _removeEntry();</span></a>
 <a name="472"><span class="lineNum">     472 </span>            :     }</a>
-<a name="473"><span class="lineNum">     473 </span><span class="lineCov">          2 :     _controller.dispose();</span></a>
-<a name="474"><span class="lineNum">     474 </span><span class="lineCov">          1 :     super.dispose();</span></a>
+<a name="473"><span class="lineNum">     473 </span><span class="lineCov">          4 :     _controller.dispose();</span></a>
+<a name="474"><span class="lineNum">     474 </span><span class="lineCov">          2 :     super.dispose();</span></a>
 <a name="475"><span class="lineNum">     475 </span>            :   }</a>
 <a name="476"><span class="lineNum">     476 </span>            : </a>
 <a name="477"><span class="lineNum">     477 </span><span class="lineNoCov">          0 :   void _handleLongPress() {</span></a>
@@ -544,14 +544,14 @@
 <a name="482"><span class="lineNum">     482 </span>            :     }</a>
 <a name="483"><span class="lineNum">     483 </span>            :   }</a>
 <a name="484"><span class="lineNum">     484 </span>            : </a>
-<a name="485"><span class="lineNum">     485 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="485"><span class="lineNum">     485 </span><span class="lineCov">          2 :   @override</span></a>
 <a name="486"><span class="lineNum">     486 </span>            :   Widget build(BuildContext context) {</a>
-<a name="487"><span class="lineNum">     487 </span><span class="lineCov">          2 :     assert(Overlay.of(context, debugRequiredFor: widget) != null);</span></a>
-<a name="488"><span class="lineNum">     488 </span><span class="lineCov">          1 :     final ThemeData theme = Theme.of(context);</span></a>
-<a name="489"><span class="lineNum">     489 </span><span class="lineCov">          1 :     final TooltipThemeData tooltipTheme = TooltipTheme.of(context);</span></a>
+<a name="487"><span class="lineNum">     487 </span><span class="lineCov">          4 :     assert(Overlay.of(context, debugRequiredFor: widget) != null);</span></a>
+<a name="488"><span class="lineNum">     488 </span><span class="lineCov">          2 :     final ThemeData theme = Theme.of(context);</span></a>
+<a name="489"><span class="lineNum">     489 </span><span class="lineCov">          2 :     final TooltipThemeData tooltipTheme = TooltipTheme.of(context);</span></a>
 <a name="490"><span class="lineNum">     490 </span>            :     final TextStyle defaultTextStyle;</a>
 <a name="491"><span class="lineNum">     491 </span>            :     final BoxDecoration defaultDecoration;</a>
-<a name="492"><span class="lineNum">     492 </span><span class="lineCov">          2 :     if (theme.brightness == Brightness.dark) {</span></a>
+<a name="492"><span class="lineNum">     492 </span><span class="lineCov">          4 :     if (theme.brightness == Brightness.dark) {</span></a>
 <a name="493"><span class="lineNum">     493 </span><span class="lineNoCov">          0 :       defaultTextStyle = theme.textTheme.bodyText2!.copyWith(</span></a>
 <a name="494"><span class="lineNum">     494 </span>            :         color: Colors.black,</a>
 <a name="495"><span class="lineNum">     495 </span><span class="lineNoCov">          0 :         fontSize: _getDefaultFontSize(),</span></a>
@@ -561,49 +561,49 @@
 <a name="499"><span class="lineNum">     499 </span>            :         borderRadius: const BorderRadius.all(Radius.circular(4)),</a>
 <a name="500"><span class="lineNum">     500 </span>            :       );</a>
 <a name="501"><span class="lineNum">     501 </span>            :     } else {</a>
-<a name="502"><span class="lineNum">     502 </span><span class="lineCov">          3 :       defaultTextStyle = theme.textTheme.bodyText2!.copyWith(</span></a>
+<a name="502"><span class="lineNum">     502 </span><span class="lineCov">          6 :       defaultTextStyle = theme.textTheme.bodyText2!.copyWith(</span></a>
 <a name="503"><span class="lineNum">     503 </span>            :         color: Colors.white,</a>
-<a name="504"><span class="lineNum">     504 </span><span class="lineCov">          1 :         fontSize: _getDefaultFontSize(),</span></a>
+<a name="504"><span class="lineNum">     504 </span><span class="lineCov">          2 :         fontSize: _getDefaultFontSize(),</span></a>
 <a name="505"><span class="lineNum">     505 </span>            :       );</a>
-<a name="506"><span class="lineNum">     506 </span><span class="lineCov">          1 :       defaultDecoration = BoxDecoration(</span></a>
-<a name="507"><span class="lineNum">     507 </span><span class="lineCov">          2 :         color: Colors.grey[700]!.withOpacity(0.9),</span></a>
+<a name="506"><span class="lineNum">     506 </span><span class="lineCov">          2 :       defaultDecoration = BoxDecoration(</span></a>
+<a name="507"><span class="lineNum">     507 </span><span class="lineCov">          4 :         color: Colors.grey[700]!.withOpacity(0.9),</span></a>
 <a name="508"><span class="lineNum">     508 </span>            :         borderRadius: const BorderRadius.all(Radius.circular(4)),</a>
 <a name="509"><span class="lineNum">     509 </span>            :       );</a>
 <a name="510"><span class="lineNum">     510 </span>            :     }</a>
 <a name="511"><span class="lineNum">     511 </span>            : </a>
-<a name="512"><span class="lineNum">     512 </span><span class="lineCov">          5 :     width = widget.width ?? tooltipTheme.height ?? _getDefaultTooltipWidth();</span></a>
-<a name="513"><span class="lineNum">     513 </span><span class="lineCov">          5 :     padding = widget.padding ?? tooltipTheme.padding ?? _getDefaultPadding();</span></a>
-<a name="514"><span class="lineNum">     514 </span><span class="lineCov">          4 :     margin = widget.margin ?? tooltipTheme.margin ?? _defaultMargin;</span></a>
-<a name="515"><span class="lineNum">     515 </span><span class="lineCov">          3 :     horizontalOffset = widget.horizontalOffset ??</span></a>
-<a name="516"><span class="lineNum">     516 </span><span class="lineCov">          1 :         tooltipTheme.verticalOffset ??</span></a>
+<a name="512"><span class="lineNum">     512 </span><span class="lineCov">         10 :     width = widget.width ?? tooltipTheme.height ?? _getDefaultTooltipWidth();</span></a>
+<a name="513"><span class="lineNum">     513 </span><span class="lineCov">         10 :     padding = widget.padding ?? tooltipTheme.padding ?? _getDefaultPadding();</span></a>
+<a name="514"><span class="lineNum">     514 </span><span class="lineCov">          8 :     margin = widget.margin ?? tooltipTheme.margin ?? _defaultMargin;</span></a>
+<a name="515"><span class="lineNum">     515 </span><span class="lineCov">          6 :     horizontalOffset = widget.horizontalOffset ??</span></a>
+<a name="516"><span class="lineNum">     516 </span><span class="lineCov">          2 :         tooltipTheme.verticalOffset ??</span></a>
 <a name="517"><span class="lineNum">     517 </span>            :         _defaultHorizontalOffset;</a>
-<a name="518"><span class="lineNum">     518 </span><span class="lineCov">          1 :     preferRight =</span></a>
-<a name="519"><span class="lineNum">     519 </span><span class="lineCov">          3 :         widget.preferRight ?? tooltipTheme.preferBelow ?? _defaultPreferRight;</span></a>
-<a name="520"><span class="lineNum">     520 </span><span class="lineCov">          3 :     excludeFromSemantics = widget.excludeFromSemantics ??</span></a>
-<a name="521"><span class="lineNum">     521 </span><span class="lineCov">          1 :         tooltipTheme.excludeFromSemantics ??</span></a>
+<a name="518"><span class="lineNum">     518 </span><span class="lineCov">          2 :     preferRight =</span></a>
+<a name="519"><span class="lineNum">     519 </span><span class="lineCov">          6 :         widget.preferRight ?? tooltipTheme.preferBelow ?? _defaultPreferRight;</span></a>
+<a name="520"><span class="lineNum">     520 </span><span class="lineCov">          6 :     excludeFromSemantics = widget.excludeFromSemantics ??</span></a>
+<a name="521"><span class="lineNum">     521 </span><span class="lineCov">          2 :         tooltipTheme.excludeFromSemantics ??</span></a>
 <a name="522"><span class="lineNum">     522 </span>            :         _defaultExcludeFromSemantics;</a>
-<a name="523"><span class="lineNum">     523 </span><span class="lineCov">          1 :     decoration =</span></a>
-<a name="524"><span class="lineNum">     524 </span><span class="lineCov">          3 :         widget.decoration ?? tooltipTheme.decoration ?? defaultDecoration;</span></a>
-<a name="525"><span class="lineNum">     525 </span><span class="lineCov">          4 :     textStyle = widget.textStyle ?? tooltipTheme.textStyle ?? defaultTextStyle;</span></a>
-<a name="526"><span class="lineNum">     526 </span><span class="lineCov">          3 :     waitDuration = widget.waitDuration ??</span></a>
-<a name="527"><span class="lineNum">     527 </span><span class="lineCov">          1 :         tooltipTheme.waitDuration ??</span></a>
+<a name="523"><span class="lineNum">     523 </span><span class="lineCov">          2 :     decoration =</span></a>
+<a name="524"><span class="lineNum">     524 </span><span class="lineCov">          6 :         widget.decoration ?? tooltipTheme.decoration ?? defaultDecoration;</span></a>
+<a name="525"><span class="lineNum">     525 </span><span class="lineCov">          8 :     textStyle = widget.textStyle ?? tooltipTheme.textStyle ?? defaultTextStyle;</span></a>
+<a name="526"><span class="lineNum">     526 </span><span class="lineCov">          6 :     waitDuration = widget.waitDuration ??</span></a>
+<a name="527"><span class="lineNum">     527 </span><span class="lineCov">          2 :         tooltipTheme.waitDuration ??</span></a>
 <a name="528"><span class="lineNum">     528 </span>            :         _defaultWaitDuration;</a>
-<a name="529"><span class="lineNum">     529 </span><span class="lineCov">          3 :     showDuration = widget.showDuration ??</span></a>
-<a name="530"><span class="lineNum">     530 </span><span class="lineCov">          1 :         tooltipTheme.showDuration ??</span></a>
+<a name="529"><span class="lineNum">     529 </span><span class="lineCov">          6 :     showDuration = widget.showDuration ??</span></a>
+<a name="530"><span class="lineNum">     530 </span><span class="lineCov">          2 :         tooltipTheme.showDuration ??</span></a>
 <a name="531"><span class="lineNum">     531 </span>            :         _defaultShowDuration;</a>
 <a name="532"><span class="lineNum">     532 </span>            : </a>
-<a name="533"><span class="lineNum">     533 </span><span class="lineCov">          1 :     Widget result = GestureDetector(</span></a>
+<a name="533"><span class="lineNum">     533 </span><span class="lineCov">          2 :     Widget result = GestureDetector(</span></a>
 <a name="534"><span class="lineNum">     534 </span>            :       behavior: HitTestBehavior.opaque,</a>
-<a name="535"><span class="lineNum">     535 </span><span class="lineCov">          1 :       onLongPress: _handleLongPress,</span></a>
+<a name="535"><span class="lineNum">     535 </span><span class="lineCov">          2 :       onLongPress: _handleLongPress,</span></a>
 <a name="536"><span class="lineNum">     536 </span>            :       excludeFromSemantics: true,</a>
-<a name="537"><span class="lineNum">     537 </span><span class="lineCov">          1 :       child: Semantics(</span></a>
-<a name="538"><span class="lineNum">     538 </span><span class="lineCov">          3 :         label: excludeFromSemantics ? null : widget.message,</span></a>
-<a name="539"><span class="lineNum">     539 </span><span class="lineCov">          2 :         child: widget.child,</span></a>
+<a name="537"><span class="lineNum">     537 </span><span class="lineCov">          2 :       child: Semantics(</span></a>
+<a name="538"><span class="lineNum">     538 </span><span class="lineCov">          6 :         label: excludeFromSemantics ? null : widget.message,</span></a>
+<a name="539"><span class="lineNum">     539 </span><span class="lineCov">          4 :         child: widget.child,</span></a>
 <a name="540"><span class="lineNum">     540 </span>            :       ),</a>
 <a name="541"><span class="lineNum">     541 </span>            :     );</a>
 <a name="542"><span class="lineNum">     542 </span>            : </a>
 <a name="543"><span class="lineNum">     543 </span>            :     // Only check for hovering if there is a mouse connected.</a>
-<a name="544"><span class="lineNum">     544 </span><span class="lineCov">          1 :     if (_mouseIsConnected) {</span></a>
+<a name="544"><span class="lineNum">     544 </span><span class="lineCov">          2 :     if (_mouseIsConnected) {</span></a>
 <a name="545"><span class="lineNum">     545 </span><span class="lineNoCov">          0 :       result = MouseRegion(</span></a>
 <a name="546"><span class="lineNum">     546 </span><span class="lineNoCov">          0 :         onEnter: (PointerEnterEvent event) =&gt; _showTooltip(),</span></a>
 <a name="547"><span class="lineNum">     547 </span><span class="lineNoCov">          0 :         onExit: (PointerExitEvent event) =&gt; _hideTooltip(),</span></a>

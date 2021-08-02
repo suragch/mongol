@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-07-30 09:13:58</td>
+            <td class="headerValue">2021-08-02 17:55:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -138,7 +138,7 @@
 <a name="76"><span class="lineNum">      76 </span>            :   /// If the [softWrap] is true or null, the glyph causing overflow, and those </a>
 <a name="77"><span class="lineNum">      77 </span>            :   /// that follow, will not be rendered. Otherwise, it will be shown with the </a>
 <a name="78"><span class="lineNum">      78 </span>            :   /// given overflow option.</a>
-<a name="79"><span class="lineNum">      79 </span><span class="lineCov">          9 :   const MongolText(</span></a>
+<a name="79"><span class="lineNum">      79 </span><span class="lineCov">         10 :   const MongolText(</span></a>
 <a name="80"><span class="lineNum">      80 </span>            :     this.data, {</a>
 <a name="81"><span class="lineNum">      81 </span>            :     Key? key,</a>
 <a name="82"><span class="lineNum">      82 </span>            :     this.style,</a>
@@ -234,31 +234,31 @@
 <a name="172"><span class="lineNum">     172 </span>            :   /// ```</a>
 <a name="173"><span class="lineNum">     173 </span>            :   final String? semanticsLabel;</a>
 <a name="174"><span class="lineNum">     174 </span>            : </a>
-<a name="175"><span class="lineNum">     175 </span><span class="lineCov">          7 :   @override</span></a>
+<a name="175"><span class="lineNum">     175 </span><span class="lineCov">          8 :   @override</span></a>
 <a name="176"><span class="lineNum">     176 </span>            :   Widget build(BuildContext context) {</a>
-<a name="177"><span class="lineNum">     177 </span><span class="lineCov">          7 :     final defaultTextStyle = DefaultTextStyle.of(context);</span></a>
-<a name="178"><span class="lineNum">     178 </span><span class="lineCov">          7 :     var effectiveTextStyle = style;</span></a>
-<a name="179"><span class="lineNum">     179 </span><span class="lineCov">         13 :     if (style == null || style!.inherit) {</span></a>
-<a name="180"><span class="lineNum">     180 </span><span class="lineCov">         14 :       effectiveTextStyle = defaultTextStyle.style.merge(effectiveTextStyle);</span></a>
+<a name="177"><span class="lineNum">     177 </span><span class="lineCov">          8 :     final defaultTextStyle = DefaultTextStyle.of(context);</span></a>
+<a name="178"><span class="lineNum">     178 </span><span class="lineCov">          8 :     var effectiveTextStyle = style;</span></a>
+<a name="179"><span class="lineNum">     179 </span><span class="lineCov">         14 :     if (style == null || style!.inherit) {</span></a>
+<a name="180"><span class="lineNum">     180 </span><span class="lineCov">         16 :       effectiveTextStyle = defaultTextStyle.style.merge(effectiveTextStyle);</span></a>
 <a name="181"><span class="lineNum">     181 </span>            :     }</a>
-<a name="182"><span class="lineNum">     182 </span><span class="lineCov">          7 :     if (MediaQuery.boldTextOverride(context)) {</span></a>
+<a name="182"><span class="lineNum">     182 </span><span class="lineCov">          8 :     if (MediaQuery.boldTextOverride(context)) {</span></a>
 <a name="183"><span class="lineNum">     183 </span>            :       effectiveTextStyle = effectiveTextStyle!</a>
 <a name="184"><span class="lineNum">     184 </span><span class="lineNoCov">          0 :           .merge(const TextStyle(fontWeight: FontWeight.bold));</span></a>
 <a name="185"><span class="lineNum">     185 </span>            :     }</a>
-<a name="186"><span class="lineNum">     186 </span><span class="lineCov">         14 :     final defaultTextAlign = mapHorizontalToMongolTextAlign(defaultTextStyle.textAlign);</span></a>
-<a name="187"><span class="lineNum">     187 </span><span class="lineCov">          7 :     Widget result = MongolRichText(</span></a>
-<a name="188"><span class="lineNum">     188 </span><span class="lineCov">          7 :       textAlign: textAlign ?? defaultTextAlign ?? MongolTextAlign.top,</span></a>
-<a name="189"><span class="lineNum">     189 </span><span class="lineCov">         14 :       softWrap: softWrap ?? defaultTextStyle.softWrap,</span></a>
-<a name="190"><span class="lineNum">     190 </span><span class="lineCov">         14 :       overflow: overflow ?? defaultTextStyle.overflow,</span></a>
-<a name="191"><span class="lineNum">     191 </span><span class="lineCov">         14 :       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),</span></a>
-<a name="192"><span class="lineNum">     192 </span><span class="lineCov">         14 :       maxLines: maxLines ?? defaultTextStyle.maxLines,</span></a>
-<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          7 :       text: TextSpan(</span></a>
+<a name="186"><span class="lineNum">     186 </span><span class="lineCov">         16 :     final defaultTextAlign = mapHorizontalToMongolTextAlign(defaultTextStyle.textAlign);</span></a>
+<a name="187"><span class="lineNum">     187 </span><span class="lineCov">          8 :     Widget result = MongolRichText(</span></a>
+<a name="188"><span class="lineNum">     188 </span><span class="lineCov">          8 :       textAlign: textAlign ?? defaultTextAlign ?? MongolTextAlign.top,</span></a>
+<a name="189"><span class="lineNum">     189 </span><span class="lineCov">         16 :       softWrap: softWrap ?? defaultTextStyle.softWrap,</span></a>
+<a name="190"><span class="lineNum">     190 </span><span class="lineCov">         16 :       overflow: overflow ?? defaultTextStyle.overflow,</span></a>
+<a name="191"><span class="lineNum">     191 </span><span class="lineCov">         16 :       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),</span></a>
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">         16 :       maxLines: maxLines ?? defaultTextStyle.maxLines,</span></a>
+<a name="193"><span class="lineNum">     193 </span><span class="lineCov">          8 :       text: TextSpan(</span></a>
 <a name="194"><span class="lineNum">     194 </span>            :         style: effectiveTextStyle,</a>
-<a name="195"><span class="lineNum">     195 </span><span class="lineCov">          7 :         text: data,</span></a>
-<a name="196"><span class="lineNum">     196 </span><span class="lineCov">          9 :         children: textSpan != null ? &lt;TextSpan&gt;[textSpan!] : null,</span></a>
+<a name="195"><span class="lineNum">     195 </span><span class="lineCov">          8 :         text: data,</span></a>
+<a name="196"><span class="lineNum">     196 </span><span class="lineCov">         10 :         children: textSpan != null ? &lt;TextSpan&gt;[textSpan!] : null,</span></a>
 <a name="197"><span class="lineNum">     197 </span>            :       ),</a>
 <a name="198"><span class="lineNum">     198 </span>            :     );</a>
-<a name="199"><span class="lineNum">     199 </span><span class="lineCov">          7 :     if (semanticsLabel != null) {</span></a>
+<a name="199"><span class="lineNum">     199 </span><span class="lineCov">          8 :     if (semanticsLabel != null) {</span></a>
 <a name="200"><span class="lineNum">     200 </span><span class="lineNoCov">          0 :       result = Semantics(</span></a>
 <a name="201"><span class="lineNum">     201 </span>            :         textDirection: TextDirection.ltr,</a>
 <a name="202"><span class="lineNum">     202 </span><span class="lineNoCov">          0 :         label: semanticsLabel,</span></a>

@@ -32,12 +32,12 @@
             <td></td>
             <td class="headerItem">Lines:</td>
             <td class="headerCovTableEntry">208</td>
-            <td class="headerCovTableEntry">219</td>
-            <td class="headerCovTableEntryHi">95.0 %</td>
+            <td class="headerCovTableEntry">218</td>
+            <td class="headerCovTableEntryHi">95.4 %</td>
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-07-30 09:13:58</td>
+            <td class="headerValue">2021-08-02 17:55:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -89,7 +89,7 @@
 <a name="27"><span class="lineNum">      27 </span>            : import 'package:flutter/rendering.dart';</a>
 <a name="28"><span class="lineNum">      28 </span>            : import 'package:flutter/widgets.dart';</a>
 <a name="29"><span class="lineNum">      29 </span>            : </a>
-<a name="30"><span class="lineNum">      30 </span>            : import 'mongol_icon_button.dart';</a>
+<a name="30"><span class="lineNum">      30 </span>            : import '../button/mongol_icon_button.dart';</a>
 <a name="31"><span class="lineNum">      31 </span>            : import 'mongol_instrinsic_height.dart';</a>
 <a name="32"><span class="lineNum">      32 </span>            : import 'mongol_tooltip.dart';</a>
 <a name="33"><span class="lineNum">      33 </span>            : </a>
@@ -113,7 +113,7 @@
 <a name="51"><span class="lineNum">      51 </span>            : /// A base class for entries in a material design popup menu.</a>
 <a name="52"><span class="lineNum">      52 </span>            : ///</a>
 <a name="53"><span class="lineNum">      53 </span>            : /// The popup menu widget uses this interface to interact with the menu items.</a>
-<a name="54"><span class="lineNum">      54 </span>            : /// To show a popup menu, use the [showMenu] function. To create a button that</a>
+<a name="54"><span class="lineNum">      54 </span>            : /// To show a popup menu, use the [showMongolMenu] function. To create a button that</a>
 <a name="55"><span class="lineNum">      55 </span>            : /// shows a popup menu, consider using [MongolPopupMenuButton].</a>
 <a name="56"><span class="lineNum">      56 </span>            : ///</a>
 <a name="57"><span class="lineNum">      57 </span>            : /// The type `T` is the type of the value(s) the entry represents. All the</a>
@@ -128,17 +128,17 @@
 <a name="66"><span class="lineNum">      66 </span>            : ///</a>
 <a name="67"><span class="lineNum">      67 </span>            : ///  * [MongolPopupMenuItem], a popup menu entry for a single value.</a>
 <a name="68"><span class="lineNum">      68 </span>            : ///  * [MongolPopupMenuDivider], a popup menu entry that is just a vertical line.</a>
-<a name="69"><span class="lineNum">      69 </span>            : ///  * [showMenu], a method to dynamically show a popup menu at a given location.</a>
+<a name="69"><span class="lineNum">      69 </span>            : ///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.</a>
 <a name="70"><span class="lineNum">      70 </span>            : ///  * [MongolPopupMenuButton], an [IconButton] that automatically shows a menu</a>
 <a name="71"><span class="lineNum">      71 </span>            : ///    when it is tapped.</a>
 <a name="72"><span class="lineNum">      72 </span>            : abstract class MongolPopupMenuEntry&lt;T&gt; extends StatefulWidget {</a>
 <a name="73"><span class="lineNum">      73 </span>            :   /// Abstract const constructor. This constructor enables subclasses to provide</a>
 <a name="74"><span class="lineNum">      74 </span>            :   /// const constructors so that they can be used in const expressions.</a>
-<a name="75"><span class="lineNum">      75 </span><span class="lineCov">         10 :   const MongolPopupMenuEntry({Key? key}) : super(key: key);</span></a>
+<a name="75"><span class="lineNum">      75 </span><span class="lineCov">          2 :   const MongolPopupMenuEntry({Key? key}) : super(key: key);</span></a>
 <a name="76"><span class="lineNum">      76 </span>            : </a>
 <a name="77"><span class="lineNum">      77 </span>            :   /// The amount of horizontal space occupied by this entry.</a>
 <a name="78"><span class="lineNum">      78 </span>            :   ///</a>
-<a name="79"><span class="lineNum">      79 </span>            :   /// This value is used at the time the [showMenu] method is called, if the</a>
+<a name="79"><span class="lineNum">      79 </span>            :   /// This value is used at the time the [showMongolMenu] method is called, if the</a>
 <a name="80"><span class="lineNum">      80 </span>            :   /// `initialValue` argument is provided, to determine the position of this</a>
 <a name="81"><span class="lineNum">      81 </span>            :   /// entry when aligning the selected entry over the given `position`. It is</a>
 <a name="82"><span class="lineNum">      82 </span>            :   /// otherwise ignored.</a>
@@ -146,7 +146,7 @@
 <a name="84"><span class="lineNum">      84 </span>            : </a>
 <a name="85"><span class="lineNum">      85 </span>            :   /// Whether this entry represents a particular value.</a>
 <a name="86"><span class="lineNum">      86 </span>            :   ///</a>
-<a name="87"><span class="lineNum">      87 </span>            :   /// This method is used by [showMenu], when it is called, to align the entry</a>
+<a name="87"><span class="lineNum">      87 </span>            :   /// This method is used by [showMongolMenu], when it is called, to align the entry</a>
 <a name="88"><span class="lineNum">      88 </span>            :   /// representing the `initialValue`, if any, to the given `position`, and then</a>
 <a name="89"><span class="lineNum">      89 </span>            :   /// later is called on each entry to determine if it should be highlighted (if</a>
 <a name="90"><span class="lineNum">      90 </span>            :   /// the method returns true, the entry will have its background color set to</a>
@@ -166,7 +166,7 @@
 <a name="104"><span class="lineNum">     104 </span>            : /// See also:</a>
 <a name="105"><span class="lineNum">     105 </span>            : ///</a>
 <a name="106"><span class="lineNum">     106 </span>            : ///  * [MongolPopupMenuItem], for the kinds of items that this widget divides.</a>
-<a name="107"><span class="lineNum">     107 </span>            : ///  * [showMenu], a method to dynamically show a popup menu at a given location.</a>
+<a name="107"><span class="lineNum">     107 </span>            : ///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.</a>
 <a name="108"><span class="lineNum">     108 </span>            : ///  * [MongolPopupMenuButton], an [IconButton] that automatically shows a menu</a>
 <a name="109"><span class="lineNum">     109 </span>            : ///    when it is tapped.</a>
 <a name="110"><span class="lineNum">     110 </span>            : class MongolPopupMenuDivider extends MongolPopupMenuEntry&lt;Never&gt; {</a>
@@ -248,7 +248,7 @@
 <a name="186"><span class="lineNum">     186 </span>            : </a>
 <a name="187"><span class="lineNum">     187 </span>            : /// An item in a Mongol material design popup menu.</a>
 <a name="188"><span class="lineNum">     188 </span>            : ///</a>
-<a name="189"><span class="lineNum">     189 </span>            : /// To show a popup menu, use the [showMenu] function. To create a button that</a>
+<a name="189"><span class="lineNum">     189 </span>            : /// To show a popup menu, use the [showMongolMenu] function. To create a button that</a>
 <a name="190"><span class="lineNum">     190 </span>            : /// shows a popup menu, consider using [MongolPopupMenuButton].</a>
 <a name="191"><span class="lineNum">     191 </span>            : ///</a>
 <a name="192"><span class="lineNum">     192 </span>            : /// Typically the [child] of a [MongolPopupMenuItem] is a [MongolText] widget.</a>
@@ -276,7 +276,7 @@
 <a name="214"><span class="lineNum">     214 </span>            : /// See also:</a>
 <a name="215"><span class="lineNum">     215 </span>            : ///</a>
 <a name="216"><span class="lineNum">     216 </span>            : ///  * [MongolPopupMenuDivider], which can be used to divide items from each other.</a>
-<a name="217"><span class="lineNum">     217 </span>            : ///  * [showMenu], a method to dynamically show a popup menu at a given location.</a>
+<a name="217"><span class="lineNum">     217 </span>            : ///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.</a>
 <a name="218"><span class="lineNum">     218 </span>            : ///  * [MongolPopupMenuButton], an [IconButton] that automatically shows a menu when</a>
 <a name="219"><span class="lineNum">     219 </span>            : ///    it is tapped.</a>
 <a name="220"><span class="lineNum">     220 </span>            : class MongolPopupMenuItem&lt;T&gt; extends MongolPopupMenuEntry&lt;T&gt; {</a>
@@ -297,7 +297,7 @@
 <a name="235"><span class="lineNum">     235 </span>            :     required this.child,</a>
 <a name="236"><span class="lineNum">     236 </span><span class="lineCov">          1 :   }) : super(key: key);</span></a>
 <a name="237"><span class="lineNum">     237 </span>            : </a>
-<a name="238"><span class="lineNum">     238 </span>            :   /// The value that will be returned by [showMenu] if this entry is selected.</a>
+<a name="238"><span class="lineNum">     238 </span>            :   /// The value that will be returned by [showMongolMenu] if this entry is selected.</a>
 <a name="239"><span class="lineNum">     239 </span>            :   final T? value;</a>
 <a name="240"><span class="lineNum">     240 </span>            : </a>
 <a name="241"><span class="lineNum">     241 </span>            :   /// Called when the menu item is tapped.</a>
@@ -474,7 +474,7 @@
 <a name="412"><span class="lineNum">     412 </span><span class="lineCov">          2 :         parent: route.animation!,</span></a>
 <a name="413"><span class="lineNum">     413 </span><span class="lineCov">          1 :         curve: Interval(start, end),</span></a>
 <a name="414"><span class="lineNum">     414 </span>            :       );</a>
-<a name="415"><span class="lineNum">     415 </span><span class="lineCov">          3 :       Widget item = route.items[i] as Widget;</span></a>
+<a name="415"><span class="lineNum">     415 </span><span class="lineCov">          3 :       Widget item = route.items[i];</span></a>
 <a name="416"><span class="lineNum">     416 </span><span class="lineCov">          2 :       if (route.initialValue != null &amp;&amp;</span></a>
 <a name="417"><span class="lineNum">     417 </span><span class="lineCov">          3 :           (route.items[i] as MongolPopupMenuItem)</span></a>
 <a name="418"><span class="lineNum">     418 </span><span class="lineCov">          3 :               .represents(route.initialValue)) {</span></a>
@@ -597,7 +597,7 @@
 <a name="535"><span class="lineNum">     535 </span><span class="lineCov">          7 :     final double buttonWidth = size.width - position.left - position.right;</span></a>
 <a name="536"><span class="lineNum">     536 </span>            :     // Find the ideal horizontal position.</a>
 <a name="537"><span class="lineNum">     537 </span><span class="lineCov">          2 :     double x = position.left;</span></a>
-<a name="538"><span class="lineNum">     538 </span><span class="lineCov">          2 :     if (selectedItemIndex != null &amp;&amp; itemSizes != null) {</span></a>
+<a name="538"><span class="lineNum">     538 </span><span class="lineCov">          1 :     if (selectedItemIndex != null) {</span></a>
 <a name="539"><span class="lineNum">     539 </span>            :       double selectedItemOffset = _kMenuHorizontalPadding;</a>
 <a name="540"><span class="lineNum">     540 </span><span class="lineCov">          3 :       for (int index = 0; index &lt; selectedItemIndex!; index += 1) {</span></a>
 <a name="541"><span class="lineNum">     541 </span><span class="lineCov">          4 :         selectedItemOffset += itemSizes[index]!.width;</span></a>
@@ -783,7 +783,7 @@
 <a name="721"><span class="lineNum">     721 </span>            : ///    calling this method automatically.</a>
 <a name="722"><span class="lineNum">     722 </span>            : ///  * [SemanticsConfiguration.namesRoute], for a description of edge triggered</a>
 <a name="723"><span class="lineNum">     723 </span>            : ///    semantics.</a>
-<a name="724"><span class="lineNum">     724 </span><span class="lineCov">          1 : Future&lt;T?&gt; showMenu&lt;T&gt;({</span></a>
+<a name="724"><span class="lineNum">     724 </span><span class="lineCov">          1 : Future&lt;T?&gt; showMongolMenu&lt;T&gt;({</span></a>
 <a name="725"><span class="lineNum">     725 </span>            :   required BuildContext context,</a>
 <a name="726"><span class="lineNum">     726 </span>            :   required RelativeRect position,</a>
 <a name="727"><span class="lineNum">     727 </span>            :   required List&lt;MongolPopupMenuEntry&lt;T&gt;&gt; items,</a>
@@ -883,7 +883,7 @@
 <a name="821"><span class="lineNum">     821 </span>            : ///</a>
 <a name="822"><span class="lineNum">     822 </span>            : ///  * [MongolPopupMenuItem], a popup menu entry for a single value.</a>
 <a name="823"><span class="lineNum">     823 </span>            : ///  * [MongolPopupMenuDivider], a popup menu entry that is just a vertical line.</a>
-<a name="824"><span class="lineNum">     824 </span>            : ///  * [showMenu], a method to dynamically show a popup menu at a given location.</a>
+<a name="824"><span class="lineNum">     824 </span>            : ///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.</a>
 <a name="825"><span class="lineNum">     825 </span>            : class MongolPopupMenuButton&lt;T&gt; extends StatefulWidget {</a>
 <a name="826"><span class="lineNum">     826 </span>            :   /// Creates a button that shows a popup menu.</a>
 <a name="827"><span class="lineNum">     827 </span>            :   ///</a>
@@ -905,200 +905,199 @@
 <a name="843"><span class="lineNum">     843 </span>            :     this.shape,</a>
 <a name="844"><span class="lineNum">     844 </span>            :     this.color,</a>
 <a name="845"><span class="lineNum">     845 </span>            :     this.enableFeedback,</a>
-<a name="846"><span class="lineNum">     846 </span><span class="lineNoCov">          0 :   })  : assert(itemBuilder != null),</span></a>
-<a name="847"><span class="lineNum">     847 </span>            :         assert(</a>
-<a name="848"><span class="lineNum">     848 </span><span class="lineCov">          1 :           !(child != null &amp;&amp; icon != null),</span></a>
-<a name="849"><span class="lineNum">     849 </span>            :           'You can only pass [child] or [icon], not both.',</a>
-<a name="850"><span class="lineNum">     850 </span>            :         ),</a>
-<a name="851"><span class="lineNum">     851 </span><span class="lineCov">          1 :         super(key: key);</span></a>
-<a name="852"><span class="lineNum">     852 </span>            : </a>
-<a name="853"><span class="lineNum">     853 </span>            :   /// Called when the button is pressed to create the items to show in the menu.</a>
-<a name="854"><span class="lineNum">     854 </span>            :   final MongolPopupMenuItemBuilder&lt;T&gt; itemBuilder;</a>
-<a name="855"><span class="lineNum">     855 </span>            : </a>
-<a name="856"><span class="lineNum">     856 </span>            :   /// The value of the menu item, if any, that should be highlighted when the menu opens.</a>
-<a name="857"><span class="lineNum">     857 </span>            :   final T? initialValue;</a>
-<a name="858"><span class="lineNum">     858 </span>            : </a>
-<a name="859"><span class="lineNum">     859 </span>            :   /// Called when the user selects a value from the popup menu created by this button.</a>
-<a name="860"><span class="lineNum">     860 </span>            :   ///</a>
-<a name="861"><span class="lineNum">     861 </span>            :   /// If the popup menu is dismissed without selecting a value, [onCanceled] is</a>
-<a name="862"><span class="lineNum">     862 </span>            :   /// called instead.</a>
-<a name="863"><span class="lineNum">     863 </span>            :   final MongolPopupMenuItemSelected&lt;T&gt;? onSelected;</a>
-<a name="864"><span class="lineNum">     864 </span>            : </a>
-<a name="865"><span class="lineNum">     865 </span>            :   /// Called when the user dismisses the popup menu without selecting an item.</a>
-<a name="866"><span class="lineNum">     866 </span>            :   ///</a>
-<a name="867"><span class="lineNum">     867 </span>            :   /// If the user selects a value, [onSelected] is called instead.</a>
-<a name="868"><span class="lineNum">     868 </span>            :   final MongolPopupMenuCanceled? onCanceled;</a>
-<a name="869"><span class="lineNum">     869 </span>            : </a>
-<a name="870"><span class="lineNum">     870 </span>            :   /// Text that describes the action that will occur when the button is pressed.</a>
-<a name="871"><span class="lineNum">     871 </span>            :   ///</a>
-<a name="872"><span class="lineNum">     872 </span>            :   /// This text is displayed when the user long-presses on the button and is</a>
-<a name="873"><span class="lineNum">     873 </span>            :   /// used for accessibility.</a>
-<a name="874"><span class="lineNum">     874 </span>            :   final String? tooltip;</a>
-<a name="875"><span class="lineNum">     875 </span>            : </a>
-<a name="876"><span class="lineNum">     876 </span>            :   /// The z-coordinate at which to place the menu when open. This controls the</a>
-<a name="877"><span class="lineNum">     877 </span>            :   /// size of the shadow below the menu.</a>
-<a name="878"><span class="lineNum">     878 </span>            :   ///</a>
-<a name="879"><span class="lineNum">     879 </span>            :   /// Defaults to 8, the appropriate elevation for popup menus.</a>
-<a name="880"><span class="lineNum">     880 </span>            :   final double? elevation;</a>
-<a name="881"><span class="lineNum">     881 </span>            : </a>
-<a name="882"><span class="lineNum">     882 </span>            :   /// Matches IconButton's 8 dps padding by default. In some cases, notably where</a>
-<a name="883"><span class="lineNum">     883 </span>            :   /// this button appears as the trailing element of a list item, it's useful to be able</a>
-<a name="884"><span class="lineNum">     884 </span>            :   /// to set the padding to zero.</a>
-<a name="885"><span class="lineNum">     885 </span>            :   final EdgeInsetsGeometry padding;</a>
-<a name="886"><span class="lineNum">     886 </span>            : </a>
-<a name="887"><span class="lineNum">     887 </span>            :   /// If provided, [child] is the widget used for this button</a>
-<a name="888"><span class="lineNum">     888 </span>            :   /// and the button will utilize an [InkWell] for taps.</a>
-<a name="889"><span class="lineNum">     889 </span>            :   final Widget? child;</a>
-<a name="890"><span class="lineNum">     890 </span>            : </a>
-<a name="891"><span class="lineNum">     891 </span>            :   /// If provided, the [icon] is used for this button</a>
-<a name="892"><span class="lineNum">     892 </span>            :   /// and the button will behave like an [IconButton].</a>
-<a name="893"><span class="lineNum">     893 </span>            :   final Widget? icon;</a>
-<a name="894"><span class="lineNum">     894 </span>            : </a>
-<a name="895"><span class="lineNum">     895 </span>            :   /// The offset applied to the Popup Menu Button.</a>
-<a name="896"><span class="lineNum">     896 </span>            :   ///</a>
-<a name="897"><span class="lineNum">     897 </span>            :   /// When not set, the Popup Menu Button will be positioned directly next to</a>
-<a name="898"><span class="lineNum">     898 </span>            :   /// the button that was used to create it.</a>
-<a name="899"><span class="lineNum">     899 </span>            :   final Offset offset;</a>
-<a name="900"><span class="lineNum">     900 </span>            : </a>
-<a name="901"><span class="lineNum">     901 </span>            :   /// Whether this popup menu button is interactive.</a>
-<a name="902"><span class="lineNum">     902 </span>            :   ///</a>
-<a name="903"><span class="lineNum">     903 </span>            :   /// Must be non-null, defaults to `true`</a>
-<a name="904"><span class="lineNum">     904 </span>            :   ///</a>
-<a name="905"><span class="lineNum">     905 </span>            :   /// If `true` the button will respond to presses by displaying the menu.</a>
-<a name="906"><span class="lineNum">     906 </span>            :   ///</a>
-<a name="907"><span class="lineNum">     907 </span>            :   /// If `false`, the button is styled with the disabled color from the</a>
-<a name="908"><span class="lineNum">     908 </span>            :   /// current [Theme] and will not respond to presses or show the popup</a>
-<a name="909"><span class="lineNum">     909 </span>            :   /// menu and [onSelected], [onCanceled] and [itemBuilder] will not be called.</a>
-<a name="910"><span class="lineNum">     910 </span>            :   ///</a>
-<a name="911"><span class="lineNum">     911 </span>            :   /// This can be useful in situations where the app needs to show the button,</a>
-<a name="912"><span class="lineNum">     912 </span>            :   /// but doesn't currently have anything to show in the menu.</a>
-<a name="913"><span class="lineNum">     913 </span>            :   final bool enabled;</a>
-<a name="914"><span class="lineNum">     914 </span>            : </a>
-<a name="915"><span class="lineNum">     915 </span>            :   /// If provided, the shape used for the menu.</a>
-<a name="916"><span class="lineNum">     916 </span>            :   ///</a>
-<a name="917"><span class="lineNum">     917 </span>            :   /// If this property is null, then [PopupMenuThemeData.shape] is used.</a>
-<a name="918"><span class="lineNum">     918 </span>            :   /// If [PopupMenuThemeData.shape] is also null, then the default shape for</a>
-<a name="919"><span class="lineNum">     919 </span>            :   /// [MaterialType.card] is used. This default shape is a rectangle with</a>
-<a name="920"><span class="lineNum">     920 </span>            :   /// rounded edges of BorderRadius.circular(2.0).</a>
-<a name="921"><span class="lineNum">     921 </span>            :   final ShapeBorder? shape;</a>
-<a name="922"><span class="lineNum">     922 </span>            : </a>
-<a name="923"><span class="lineNum">     923 </span>            :   /// If provided, the background color used for the menu.</a>
-<a name="924"><span class="lineNum">     924 </span>            :   ///</a>
-<a name="925"><span class="lineNum">     925 </span>            :   /// If this property is null, then [PopupMenuThemeData.color] is used.</a>
-<a name="926"><span class="lineNum">     926 </span>            :   /// If [PopupMenuThemeData.color] is also null, then</a>
-<a name="927"><span class="lineNum">     927 </span>            :   /// Theme.of(context).cardColor is used.</a>
-<a name="928"><span class="lineNum">     928 </span>            :   final Color? color;</a>
-<a name="929"><span class="lineNum">     929 </span>            : </a>
-<a name="930"><span class="lineNum">     930 </span>            :   /// Whether detected gestures should provide acoustic and/or haptic feedback.</a>
-<a name="931"><span class="lineNum">     931 </span>            :   ///</a>
-<a name="932"><span class="lineNum">     932 </span>            :   /// For example, on Android a tap will produce a clicking sound and a</a>
-<a name="933"><span class="lineNum">     933 </span>            :   /// long-press will produce a short vibration, when feedback is enabled.</a>
-<a name="934"><span class="lineNum">     934 </span>            :   ///</a>
-<a name="935"><span class="lineNum">     935 </span>            :   /// See also:</a>
-<a name="936"><span class="lineNum">     936 </span>            :   ///</a>
-<a name="937"><span class="lineNum">     937 </span>            :   ///  * [Feedback] for providing platform-specific feedback to certain actions.</a>
-<a name="938"><span class="lineNum">     938 </span>            :   final bool? enableFeedback;</a>
-<a name="939"><span class="lineNum">     939 </span>            : </a>
-<a name="940"><span class="lineNum">     940 </span>            :   /// If provided, the size of the [Icon].</a>
-<a name="941"><span class="lineNum">     941 </span>            :   ///</a>
-<a name="942"><span class="lineNum">     942 </span>            :   /// If this property is null, the default size is 24.0 pixels.</a>
-<a name="943"><span class="lineNum">     943 </span>            :   final double? iconSize;</a>
-<a name="944"><span class="lineNum">     944 </span>            : </a>
-<a name="945"><span class="lineNum">     945 </span><span class="lineCov">          1 :   @override</span></a>
-<a name="946"><span class="lineNum">     946 </span>            :   MongolPopupMenuButtonState&lt;T&gt; createState() =&gt;</a>
-<a name="947"><span class="lineNum">     947 </span><span class="lineCov">          1 :       MongolPopupMenuButtonState&lt;T&gt;();</span></a>
-<a name="948"><span class="lineNum">     948 </span>            : }</a>
-<a name="949"><span class="lineNum">     949 </span>            : </a>
-<a name="950"><span class="lineNum">     950 </span>            : /// The [State] for a [MongolPopupMenuButton].</a>
-<a name="951"><span class="lineNum">     951 </span>            : ///</a>
-<a name="952"><span class="lineNum">     952 </span>            : /// See [showButtonMenu] for a way to programmatically open the popup menu</a>
-<a name="953"><span class="lineNum">     953 </span>            : /// of your button state.</a>
-<a name="954"><span class="lineNum">     954 </span>            : class MongolPopupMenuButtonState&lt;T&gt; extends State&lt;MongolPopupMenuButton&lt;T&gt;&gt; {</a>
-<a name="955"><span class="lineNum">     955 </span>            :   /// A method to show a popup menu with the items supplied to</a>
-<a name="956"><span class="lineNum">     956 </span>            :   /// [MongolPopupMenuButton.itemBuilder] at the position of your [MongolPopupMenuButton].</a>
-<a name="957"><span class="lineNum">     957 </span>            :   ///</a>
-<a name="958"><span class="lineNum">     958 </span>            :   /// By default, it is called when the user taps the button and [MongolPopupMenuButton.enabled]</a>
-<a name="959"><span class="lineNum">     959 </span>            :   /// is set to `true`. Moreover, you can open the button by calling the method manually.</a>
-<a name="960"><span class="lineNum">     960 </span>            :   ///</a>
-<a name="961"><span class="lineNum">     961 </span>            :   /// You would access your [MongolPopupMenuButtonState] using a [GlobalKey] and</a>
-<a name="962"><span class="lineNum">     962 </span>            :   /// show the menu of the button with `globalKey.currentState.showButtonMenu`.</a>
-<a name="963"><span class="lineNum">     963 </span><span class="lineCov">          1 :   void showButtonMenu() {</span></a>
-<a name="964"><span class="lineNum">     964 </span><span class="lineCov">          2 :     final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);</span></a>
-<a name="965"><span class="lineNum">     965 </span><span class="lineCov">          2 :     final RenderBox button = context.findRenderObject()! as RenderBox;</span></a>
-<a name="966"><span class="lineNum">     966 </span>            :     final RenderBox overlay =</a>
-<a name="967"><span class="lineNum">     967 </span><span class="lineCov">          5 :         Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;</span></a>
-<a name="968"><span class="lineNum">     968 </span><span class="lineCov">          1 :     final RelativeRect position = RelativeRect.fromRect(</span></a>
-<a name="969"><span class="lineNum">     969 </span><span class="lineCov">          1 :       Rect.fromPoints(</span></a>
-<a name="970"><span class="lineNum">     970 </span><span class="lineCov">          3 :         button.localToGlobal(widget.offset, ancestor: overlay),</span></a>
-<a name="971"><span class="lineNum">     971 </span><span class="lineCov">          1 :         button.localToGlobal(</span></a>
-<a name="972"><span class="lineNum">     972 </span><span class="lineCov">          5 :             button.size.bottomRight(Offset.zero) + widget.offset,</span></a>
-<a name="973"><span class="lineNum">     973 </span>            :             ancestor: overlay),</a>
-<a name="974"><span class="lineNum">     974 </span>            :       ),</a>
-<a name="975"><span class="lineNum">     975 </span><span class="lineCov">          2 :       Offset.zero &amp; overlay.size,</span></a>
-<a name="976"><span class="lineNum">     976 </span>            :     );</a>
-<a name="977"><span class="lineNum">     977 </span><span class="lineCov">          4 :     final List&lt;MongolPopupMenuEntry&lt;T&gt;&gt; items = widget.itemBuilder(context);</span></a>
-<a name="978"><span class="lineNum">     978 </span>            :     // Only show the menu if there is something to show</a>
-<a name="979"><span class="lineNum">     979 </span><span class="lineCov">          1 :     if (items.isNotEmpty) {</span></a>
-<a name="980"><span class="lineNum">     980 </span><span class="lineCov">          1 :       showMenu&lt;T?&gt;(</span></a>
-<a name="981"><span class="lineNum">     981 </span><span class="lineCov">          1 :         context: context,</span></a>
-<a name="982"><span class="lineNum">     982 </span><span class="lineCov">          3 :         elevation: widget.elevation ?? popupMenuTheme.elevation,</span></a>
-<a name="983"><span class="lineNum">     983 </span>            :         items: items,</a>
-<a name="984"><span class="lineNum">     984 </span><span class="lineCov">          2 :         initialValue: widget.initialValue,</span></a>
-<a name="985"><span class="lineNum">     985 </span>            :         position: position,</a>
-<a name="986"><span class="lineNum">     986 </span><span class="lineCov">          3 :         shape: widget.shape ?? popupMenuTheme.shape,</span></a>
-<a name="987"><span class="lineNum">     987 </span><span class="lineCov">          3 :         color: widget.color ?? popupMenuTheme.color,</span></a>
-<a name="988"><span class="lineNum">     988 </span><span class="lineCov">          2 :       ).then&lt;void&gt;((T? newValue) {</span></a>
-<a name="989"><span class="lineNum">     989 </span><span class="lineCov">          1 :         if (!mounted) return null;</span></a>
-<a name="990"><span class="lineNum">     990 </span>            :         if (newValue == null) {</a>
-<a name="991"><span class="lineNum">     991 </span><span class="lineCov">          3 :           widget.onCanceled?.call();</span></a>
-<a name="992"><span class="lineNum">     992 </span>            :           return null;</a>
-<a name="993"><span class="lineNum">     993 </span>            :         }</a>
-<a name="994"><span class="lineNum">     994 </span><span class="lineCov">          3 :         widget.onSelected?.call(newValue);</span></a>
-<a name="995"><span class="lineNum">     995 </span>            :       });</a>
-<a name="996"><span class="lineNum">     996 </span>            :     }</a>
-<a name="997"><span class="lineNum">     997 </span>            :   }</a>
-<a name="998"><span class="lineNum">     998 </span>            : </a>
-<a name="999"><span class="lineNum">     999 </span><span class="lineCov">          1 :   bool get _canRequestFocus {</span></a>
-<a name="1000"><span class="lineNum">    1000 </span><span class="lineCov">          3 :     final NavigationMode mode = MediaQuery.maybeOf(context)?.navigationMode ??</span></a>
-<a name="1001"><span class="lineNum">    1001 </span>            :         NavigationMode.traditional;</a>
-<a name="1002"><span class="lineNum">    1002 </span>            :     switch (mode) {</a>
-<a name="1003"><span class="lineNum">    1003 </span><span class="lineCov">          1 :       case NavigationMode.traditional:</span></a>
-<a name="1004"><span class="lineNum">    1004 </span><span class="lineCov">          2 :         return widget.enabled;</span></a>
-<a name="1005"><span class="lineNum">    1005 </span><span class="lineCov">          1 :       case NavigationMode.directional:</span></a>
-<a name="1006"><span class="lineNum">    1006 </span>            :         return true;</a>
-<a name="1007"><span class="lineNum">    1007 </span>            :     }</a>
-<a name="1008"><span class="lineNum">    1008 </span>            :   }</a>
-<a name="1009"><span class="lineNum">    1009 </span>            : </a>
-<a name="1010"><span class="lineNum">    1010 </span><span class="lineCov">          1 :   @override</span></a>
-<a name="1011"><span class="lineNum">    1011 </span>            :   Widget build(BuildContext context) {</a>
-<a name="1012"><span class="lineNum">    1012 </span><span class="lineCov">          2 :     final bool enableFeedback = widget.enableFeedback ??</span></a>
-<a name="1013"><span class="lineNum">    1013 </span><span class="lineCov">          2 :         PopupMenuTheme.of(context).enableFeedback ??</span></a>
-<a name="1014"><span class="lineNum">    1014 </span>            :         true;</a>
-<a name="1015"><span class="lineNum">    1015 </span>            : </a>
-<a name="1016"><span class="lineNum">    1016 </span><span class="lineCov">          2 :     if (widget.child != null) {</span></a>
-<a name="1017"><span class="lineNum">    1017 </span><span class="lineCov">          1 :       return MongolTooltip(</span></a>
-<a name="1018"><span class="lineNum">    1018 </span>            :         message:</a>
-<a name="1019"><span class="lineNum">    1019 </span><span class="lineCov">          4 :             widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,</span></a>
-<a name="1020"><span class="lineNum">    1020 </span><span class="lineCov">          1 :         child: InkWell(</span></a>
-<a name="1021"><span class="lineNum">    1021 </span><span class="lineCov">          3 :           onTap: widget.enabled ? showButtonMenu : null,</span></a>
-<a name="1022"><span class="lineNum">    1022 </span><span class="lineCov">          1 :           canRequestFocus: _canRequestFocus,</span></a>
-<a name="1023"><span class="lineNum">    1023 </span><span class="lineCov">          2 :           child: widget.child,</span></a>
-<a name="1024"><span class="lineNum">    1024 </span>            :           enableFeedback: enableFeedback,</a>
-<a name="1025"><span class="lineNum">    1025 </span>            :         ),</a>
-<a name="1026"><span class="lineNum">    1026 </span>            :       );</a>
-<a name="1027"><span class="lineNum">    1027 </span>            :     }</a>
-<a name="1028"><span class="lineNum">    1028 </span>            : </a>
-<a name="1029"><span class="lineNum">    1029 </span><span class="lineCov">          1 :     return MongolIconButton(</span></a>
-<a name="1030"><span class="lineNum">    1030 </span><span class="lineCov">          5 :       icon: widget.icon ?? Icon(Icons.adaptive.more),</span></a>
-<a name="1031"><span class="lineNum">    1031 </span><span class="lineCov">          2 :       padding: widget.padding,</span></a>
-<a name="1032"><span class="lineNum">    1032 </span><span class="lineCov">          2 :       iconSize: widget.iconSize ?? 24.0,</span></a>
-<a name="1033"><span class="lineNum">    1033 </span>            :       mongolTooltip:</a>
-<a name="1034"><span class="lineNum">    1034 </span><span class="lineCov">          4 :           widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,</span></a>
-<a name="1035"><span class="lineNum">    1035 </span><span class="lineCov">          3 :       onPressed: widget.enabled ? showButtonMenu : null,</span></a>
-<a name="1036"><span class="lineNum">    1036 </span>            :       enableFeedback: enableFeedback,</a>
-<a name="1037"><span class="lineNum">    1037 </span>            :     );</a>
-<a name="1038"><span class="lineNum">    1038 </span>            :   }</a>
-<a name="1039"><span class="lineNum">    1039 </span>            : }</a>
+<a name="846"><span class="lineNum">     846 </span>            :   })  : assert(</a>
+<a name="847"><span class="lineNum">     847 </span><span class="lineCov">          1 :           !(child != null &amp;&amp; icon != null),</span></a>
+<a name="848"><span class="lineNum">     848 </span>            :           'You can only pass [child] or [icon], not both.',</a>
+<a name="849"><span class="lineNum">     849 </span>            :         ),</a>
+<a name="850"><span class="lineNum">     850 </span><span class="lineCov">          1 :         super(key: key);</span></a>
+<a name="851"><span class="lineNum">     851 </span>            : </a>
+<a name="852"><span class="lineNum">     852 </span>            :   /// Called when the button is pressed to create the items to show in the menu.</a>
+<a name="853"><span class="lineNum">     853 </span>            :   final MongolPopupMenuItemBuilder&lt;T&gt; itemBuilder;</a>
+<a name="854"><span class="lineNum">     854 </span>            : </a>
+<a name="855"><span class="lineNum">     855 </span>            :   /// The value of the menu item, if any, that should be highlighted when the menu opens.</a>
+<a name="856"><span class="lineNum">     856 </span>            :   final T? initialValue;</a>
+<a name="857"><span class="lineNum">     857 </span>            : </a>
+<a name="858"><span class="lineNum">     858 </span>            :   /// Called when the user selects a value from the popup menu created by this button.</a>
+<a name="859"><span class="lineNum">     859 </span>            :   ///</a>
+<a name="860"><span class="lineNum">     860 </span>            :   /// If the popup menu is dismissed without selecting a value, [onCanceled] is</a>
+<a name="861"><span class="lineNum">     861 </span>            :   /// called instead.</a>
+<a name="862"><span class="lineNum">     862 </span>            :   final MongolPopupMenuItemSelected&lt;T&gt;? onSelected;</a>
+<a name="863"><span class="lineNum">     863 </span>            : </a>
+<a name="864"><span class="lineNum">     864 </span>            :   /// Called when the user dismisses the popup menu without selecting an item.</a>
+<a name="865"><span class="lineNum">     865 </span>            :   ///</a>
+<a name="866"><span class="lineNum">     866 </span>            :   /// If the user selects a value, [onSelected] is called instead.</a>
+<a name="867"><span class="lineNum">     867 </span>            :   final MongolPopupMenuCanceled? onCanceled;</a>
+<a name="868"><span class="lineNum">     868 </span>            : </a>
+<a name="869"><span class="lineNum">     869 </span>            :   /// Text that describes the action that will occur when the button is pressed.</a>
+<a name="870"><span class="lineNum">     870 </span>            :   ///</a>
+<a name="871"><span class="lineNum">     871 </span>            :   /// This text is displayed when the user long-presses on the button and is</a>
+<a name="872"><span class="lineNum">     872 </span>            :   /// used for accessibility.</a>
+<a name="873"><span class="lineNum">     873 </span>            :   final String? tooltip;</a>
+<a name="874"><span class="lineNum">     874 </span>            : </a>
+<a name="875"><span class="lineNum">     875 </span>            :   /// The z-coordinate at which to place the menu when open. This controls the</a>
+<a name="876"><span class="lineNum">     876 </span>            :   /// size of the shadow below the menu.</a>
+<a name="877"><span class="lineNum">     877 </span>            :   ///</a>
+<a name="878"><span class="lineNum">     878 </span>            :   /// Defaults to 8, the appropriate elevation for popup menus.</a>
+<a name="879"><span class="lineNum">     879 </span>            :   final double? elevation;</a>
+<a name="880"><span class="lineNum">     880 </span>            : </a>
+<a name="881"><span class="lineNum">     881 </span>            :   /// Matches IconButton's 8 dps padding by default. In some cases, notably where</a>
+<a name="882"><span class="lineNum">     882 </span>            :   /// this button appears as the trailing element of a list item, it's useful to be able</a>
+<a name="883"><span class="lineNum">     883 </span>            :   /// to set the padding to zero.</a>
+<a name="884"><span class="lineNum">     884 </span>            :   final EdgeInsetsGeometry padding;</a>
+<a name="885"><span class="lineNum">     885 </span>            : </a>
+<a name="886"><span class="lineNum">     886 </span>            :   /// If provided, [child] is the widget used for this button</a>
+<a name="887"><span class="lineNum">     887 </span>            :   /// and the button will utilize an [InkWell] for taps.</a>
+<a name="888"><span class="lineNum">     888 </span>            :   final Widget? child;</a>
+<a name="889"><span class="lineNum">     889 </span>            : </a>
+<a name="890"><span class="lineNum">     890 </span>            :   /// If provided, the [icon] is used for this button</a>
+<a name="891"><span class="lineNum">     891 </span>            :   /// and the button will behave like an [IconButton].</a>
+<a name="892"><span class="lineNum">     892 </span>            :   final Widget? icon;</a>
+<a name="893"><span class="lineNum">     893 </span>            : </a>
+<a name="894"><span class="lineNum">     894 </span>            :   /// The offset applied to the Popup Menu Button.</a>
+<a name="895"><span class="lineNum">     895 </span>            :   ///</a>
+<a name="896"><span class="lineNum">     896 </span>            :   /// When not set, the Popup Menu Button will be positioned directly next to</a>
+<a name="897"><span class="lineNum">     897 </span>            :   /// the button that was used to create it.</a>
+<a name="898"><span class="lineNum">     898 </span>            :   final Offset offset;</a>
+<a name="899"><span class="lineNum">     899 </span>            : </a>
+<a name="900"><span class="lineNum">     900 </span>            :   /// Whether this popup menu button is interactive.</a>
+<a name="901"><span class="lineNum">     901 </span>            :   ///</a>
+<a name="902"><span class="lineNum">     902 </span>            :   /// Must be non-null, defaults to `true`</a>
+<a name="903"><span class="lineNum">     903 </span>            :   ///</a>
+<a name="904"><span class="lineNum">     904 </span>            :   /// If `true` the button will respond to presses by displaying the menu.</a>
+<a name="905"><span class="lineNum">     905 </span>            :   ///</a>
+<a name="906"><span class="lineNum">     906 </span>            :   /// If `false`, the button is styled with the disabled color from the</a>
+<a name="907"><span class="lineNum">     907 </span>            :   /// current [Theme] and will not respond to presses or show the popup</a>
+<a name="908"><span class="lineNum">     908 </span>            :   /// menu and [onSelected], [onCanceled] and [itemBuilder] will not be called.</a>
+<a name="909"><span class="lineNum">     909 </span>            :   ///</a>
+<a name="910"><span class="lineNum">     910 </span>            :   /// This can be useful in situations where the app needs to show the button,</a>
+<a name="911"><span class="lineNum">     911 </span>            :   /// but doesn't currently have anything to show in the menu.</a>
+<a name="912"><span class="lineNum">     912 </span>            :   final bool enabled;</a>
+<a name="913"><span class="lineNum">     913 </span>            : </a>
+<a name="914"><span class="lineNum">     914 </span>            :   /// If provided, the shape used for the menu.</a>
+<a name="915"><span class="lineNum">     915 </span>            :   ///</a>
+<a name="916"><span class="lineNum">     916 </span>            :   /// If this property is null, then [PopupMenuThemeData.shape] is used.</a>
+<a name="917"><span class="lineNum">     917 </span>            :   /// If [PopupMenuThemeData.shape] is also null, then the default shape for</a>
+<a name="918"><span class="lineNum">     918 </span>            :   /// [MaterialType.card] is used. This default shape is a rectangle with</a>
+<a name="919"><span class="lineNum">     919 </span>            :   /// rounded edges of BorderRadius.circular(2.0).</a>
+<a name="920"><span class="lineNum">     920 </span>            :   final ShapeBorder? shape;</a>
+<a name="921"><span class="lineNum">     921 </span>            : </a>
+<a name="922"><span class="lineNum">     922 </span>            :   /// If provided, the background color used for the menu.</a>
+<a name="923"><span class="lineNum">     923 </span>            :   ///</a>
+<a name="924"><span class="lineNum">     924 </span>            :   /// If this property is null, then [PopupMenuThemeData.color] is used.</a>
+<a name="925"><span class="lineNum">     925 </span>            :   /// If [PopupMenuThemeData.color] is also null, then</a>
+<a name="926"><span class="lineNum">     926 </span>            :   /// Theme.of(context).cardColor is used.</a>
+<a name="927"><span class="lineNum">     927 </span>            :   final Color? color;</a>
+<a name="928"><span class="lineNum">     928 </span>            : </a>
+<a name="929"><span class="lineNum">     929 </span>            :   /// Whether detected gestures should provide acoustic and/or haptic feedback.</a>
+<a name="930"><span class="lineNum">     930 </span>            :   ///</a>
+<a name="931"><span class="lineNum">     931 </span>            :   /// For example, on Android a tap will produce a clicking sound and a</a>
+<a name="932"><span class="lineNum">     932 </span>            :   /// long-press will produce a short vibration, when feedback is enabled.</a>
+<a name="933"><span class="lineNum">     933 </span>            :   ///</a>
+<a name="934"><span class="lineNum">     934 </span>            :   /// See also:</a>
+<a name="935"><span class="lineNum">     935 </span>            :   ///</a>
+<a name="936"><span class="lineNum">     936 </span>            :   ///  * [Feedback] for providing platform-specific feedback to certain actions.</a>
+<a name="937"><span class="lineNum">     937 </span>            :   final bool? enableFeedback;</a>
+<a name="938"><span class="lineNum">     938 </span>            : </a>
+<a name="939"><span class="lineNum">     939 </span>            :   /// If provided, the size of the [Icon].</a>
+<a name="940"><span class="lineNum">     940 </span>            :   ///</a>
+<a name="941"><span class="lineNum">     941 </span>            :   /// If this property is null, the default size is 24.0 pixels.</a>
+<a name="942"><span class="lineNum">     942 </span>            :   final double? iconSize;</a>
+<a name="943"><span class="lineNum">     943 </span>            : </a>
+<a name="944"><span class="lineNum">     944 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="945"><span class="lineNum">     945 </span>            :   MongolPopupMenuButtonState&lt;T&gt; createState() =&gt;</a>
+<a name="946"><span class="lineNum">     946 </span><span class="lineCov">          1 :       MongolPopupMenuButtonState&lt;T&gt;();</span></a>
+<a name="947"><span class="lineNum">     947 </span>            : }</a>
+<a name="948"><span class="lineNum">     948 </span>            : </a>
+<a name="949"><span class="lineNum">     949 </span>            : /// The [State] for a [MongolPopupMenuButton].</a>
+<a name="950"><span class="lineNum">     950 </span>            : ///</a>
+<a name="951"><span class="lineNum">     951 </span>            : /// See [showButtonMenu] for a way to programmatically open the popup menu</a>
+<a name="952"><span class="lineNum">     952 </span>            : /// of your button state.</a>
+<a name="953"><span class="lineNum">     953 </span>            : class MongolPopupMenuButtonState&lt;T&gt; extends State&lt;MongolPopupMenuButton&lt;T&gt;&gt; {</a>
+<a name="954"><span class="lineNum">     954 </span>            :   /// A method to show a popup menu with the items supplied to</a>
+<a name="955"><span class="lineNum">     955 </span>            :   /// [MongolPopupMenuButton.itemBuilder] at the position of your [MongolPopupMenuButton].</a>
+<a name="956"><span class="lineNum">     956 </span>            :   ///</a>
+<a name="957"><span class="lineNum">     957 </span>            :   /// By default, it is called when the user taps the button and [MongolPopupMenuButton.enabled]</a>
+<a name="958"><span class="lineNum">     958 </span>            :   /// is set to `true`. Moreover, you can open the button by calling the method manually.</a>
+<a name="959"><span class="lineNum">     959 </span>            :   ///</a>
+<a name="960"><span class="lineNum">     960 </span>            :   /// You would access your [MongolPopupMenuButtonState] using a [GlobalKey] and</a>
+<a name="961"><span class="lineNum">     961 </span>            :   /// show the menu of the button with `globalKey.currentState.showButtonMenu`.</a>
+<a name="962"><span class="lineNum">     962 </span><span class="lineCov">          1 :   void showButtonMenu() {</span></a>
+<a name="963"><span class="lineNum">     963 </span><span class="lineCov">          2 :     final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);</span></a>
+<a name="964"><span class="lineNum">     964 </span><span class="lineCov">          2 :     final RenderBox button = context.findRenderObject()! as RenderBox;</span></a>
+<a name="965"><span class="lineNum">     965 </span>            :     final RenderBox overlay =</a>
+<a name="966"><span class="lineNum">     966 </span><span class="lineCov">          5 :         Navigator.of(context).overlay!.context.findRenderObject()! as RenderBox;</span></a>
+<a name="967"><span class="lineNum">     967 </span><span class="lineCov">          1 :     final RelativeRect position = RelativeRect.fromRect(</span></a>
+<a name="968"><span class="lineNum">     968 </span><span class="lineCov">          1 :       Rect.fromPoints(</span></a>
+<a name="969"><span class="lineNum">     969 </span><span class="lineCov">          3 :         button.localToGlobal(widget.offset, ancestor: overlay),</span></a>
+<a name="970"><span class="lineNum">     970 </span><span class="lineCov">          1 :         button.localToGlobal(</span></a>
+<a name="971"><span class="lineNum">     971 </span><span class="lineCov">          5 :             button.size.bottomRight(Offset.zero) + widget.offset,</span></a>
+<a name="972"><span class="lineNum">     972 </span>            :             ancestor: overlay),</a>
+<a name="973"><span class="lineNum">     973 </span>            :       ),</a>
+<a name="974"><span class="lineNum">     974 </span><span class="lineCov">          2 :       Offset.zero &amp; overlay.size,</span></a>
+<a name="975"><span class="lineNum">     975 </span>            :     );</a>
+<a name="976"><span class="lineNum">     976 </span><span class="lineCov">          4 :     final List&lt;MongolPopupMenuEntry&lt;T&gt;&gt; items = widget.itemBuilder(context);</span></a>
+<a name="977"><span class="lineNum">     977 </span>            :     // Only show the menu if there is something to show</a>
+<a name="978"><span class="lineNum">     978 </span><span class="lineCov">          1 :     if (items.isNotEmpty) {</span></a>
+<a name="979"><span class="lineNum">     979 </span><span class="lineCov">          1 :       showMongolMenu&lt;T?&gt;(</span></a>
+<a name="980"><span class="lineNum">     980 </span><span class="lineCov">          1 :         context: context,</span></a>
+<a name="981"><span class="lineNum">     981 </span><span class="lineCov">          3 :         elevation: widget.elevation ?? popupMenuTheme.elevation,</span></a>
+<a name="982"><span class="lineNum">     982 </span>            :         items: items,</a>
+<a name="983"><span class="lineNum">     983 </span><span class="lineCov">          2 :         initialValue: widget.initialValue,</span></a>
+<a name="984"><span class="lineNum">     984 </span>            :         position: position,</a>
+<a name="985"><span class="lineNum">     985 </span><span class="lineCov">          3 :         shape: widget.shape ?? popupMenuTheme.shape,</span></a>
+<a name="986"><span class="lineNum">     986 </span><span class="lineCov">          3 :         color: widget.color ?? popupMenuTheme.color,</span></a>
+<a name="987"><span class="lineNum">     987 </span><span class="lineCov">          2 :       ).then&lt;void&gt;((T? newValue) {</span></a>
+<a name="988"><span class="lineNum">     988 </span><span class="lineCov">          1 :         if (!mounted) return null;</span></a>
+<a name="989"><span class="lineNum">     989 </span>            :         if (newValue == null) {</a>
+<a name="990"><span class="lineNum">     990 </span><span class="lineCov">          3 :           widget.onCanceled?.call();</span></a>
+<a name="991"><span class="lineNum">     991 </span>            :           return null;</a>
+<a name="992"><span class="lineNum">     992 </span>            :         }</a>
+<a name="993"><span class="lineNum">     993 </span><span class="lineCov">          3 :         widget.onSelected?.call(newValue);</span></a>
+<a name="994"><span class="lineNum">     994 </span>            :       });</a>
+<a name="995"><span class="lineNum">     995 </span>            :     }</a>
+<a name="996"><span class="lineNum">     996 </span>            :   }</a>
+<a name="997"><span class="lineNum">     997 </span>            : </a>
+<a name="998"><span class="lineNum">     998 </span><span class="lineCov">          1 :   bool get _canRequestFocus {</span></a>
+<a name="999"><span class="lineNum">     999 </span><span class="lineCov">          3 :     final NavigationMode mode = MediaQuery.maybeOf(context)?.navigationMode ??</span></a>
+<a name="1000"><span class="lineNum">    1000 </span>            :         NavigationMode.traditional;</a>
+<a name="1001"><span class="lineNum">    1001 </span>            :     switch (mode) {</a>
+<a name="1002"><span class="lineNum">    1002 </span><span class="lineCov">          1 :       case NavigationMode.traditional:</span></a>
+<a name="1003"><span class="lineNum">    1003 </span><span class="lineCov">          2 :         return widget.enabled;</span></a>
+<a name="1004"><span class="lineNum">    1004 </span><span class="lineCov">          1 :       case NavigationMode.directional:</span></a>
+<a name="1005"><span class="lineNum">    1005 </span>            :         return true;</a>
+<a name="1006"><span class="lineNum">    1006 </span>            :     }</a>
+<a name="1007"><span class="lineNum">    1007 </span>            :   }</a>
+<a name="1008"><span class="lineNum">    1008 </span>            : </a>
+<a name="1009"><span class="lineNum">    1009 </span><span class="lineCov">          1 :   @override</span></a>
+<a name="1010"><span class="lineNum">    1010 </span>            :   Widget build(BuildContext context) {</a>
+<a name="1011"><span class="lineNum">    1011 </span><span class="lineCov">          2 :     final bool enableFeedback = widget.enableFeedback ??</span></a>
+<a name="1012"><span class="lineNum">    1012 </span><span class="lineCov">          2 :         PopupMenuTheme.of(context).enableFeedback ??</span></a>
+<a name="1013"><span class="lineNum">    1013 </span>            :         true;</a>
+<a name="1014"><span class="lineNum">    1014 </span>            : </a>
+<a name="1015"><span class="lineNum">    1015 </span><span class="lineCov">          2 :     if (widget.child != null) {</span></a>
+<a name="1016"><span class="lineNum">    1016 </span><span class="lineCov">          1 :       return MongolTooltip(</span></a>
+<a name="1017"><span class="lineNum">    1017 </span>            :         message:</a>
+<a name="1018"><span class="lineNum">    1018 </span><span class="lineCov">          4 :             widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,</span></a>
+<a name="1019"><span class="lineNum">    1019 </span><span class="lineCov">          1 :         child: InkWell(</span></a>
+<a name="1020"><span class="lineNum">    1020 </span><span class="lineCov">          3 :           onTap: widget.enabled ? showButtonMenu : null,</span></a>
+<a name="1021"><span class="lineNum">    1021 </span><span class="lineCov">          1 :           canRequestFocus: _canRequestFocus,</span></a>
+<a name="1022"><span class="lineNum">    1022 </span><span class="lineCov">          2 :           child: widget.child,</span></a>
+<a name="1023"><span class="lineNum">    1023 </span>            :           enableFeedback: enableFeedback,</a>
+<a name="1024"><span class="lineNum">    1024 </span>            :         ),</a>
+<a name="1025"><span class="lineNum">    1025 </span>            :       );</a>
+<a name="1026"><span class="lineNum">    1026 </span>            :     }</a>
+<a name="1027"><span class="lineNum">    1027 </span>            : </a>
+<a name="1028"><span class="lineNum">    1028 </span><span class="lineCov">          1 :     return MongolIconButton(</span></a>
+<a name="1029"><span class="lineNum">    1029 </span><span class="lineCov">          5 :       icon: widget.icon ?? Icon(Icons.adaptive.more),</span></a>
+<a name="1030"><span class="lineNum">    1030 </span><span class="lineCov">          2 :       padding: widget.padding,</span></a>
+<a name="1031"><span class="lineNum">    1031 </span><span class="lineCov">          2 :       iconSize: widget.iconSize ?? 24.0,</span></a>
+<a name="1032"><span class="lineNum">    1032 </span>            :       mongolTooltip:</a>
+<a name="1033"><span class="lineNum">    1033 </span><span class="lineCov">          4 :           widget.tooltip ?? MaterialLocalizations.of(context).showMenuTooltip,</span></a>
+<a name="1034"><span class="lineNum">    1034 </span><span class="lineCov">          3 :       onPressed: widget.enabled ? showButtonMenu : null,</span></a>
+<a name="1035"><span class="lineNum">    1035 </span>            :       enableFeedback: enableFeedback,</a>
+<a name="1036"><span class="lineNum">    1036 </span>            :     );</a>
+<a name="1037"><span class="lineNum">    1037 </span>            :   }</a>
+<a name="1038"><span class="lineNum">    1038 </span>            : }</a>
 </pre>
       </td>
     </tr>

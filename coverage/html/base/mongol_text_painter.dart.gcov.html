@@ -37,7 +37,7 @@
           </tr>
           <tr>
             <td class="headerItem">Date:</td>
-            <td class="headerValue">2021-07-30 09:13:58</td>
+            <td class="headerValue">2021-08-02 17:55:49</td>
             <td></td>
             <td class="headerItem">Functions:</td>
             <td class="headerCovTableEntry">0</td>
@@ -96,7 +96,7 @@
 <a name="34"><span class="lineNum">      34 </span>            : }</a>
 <a name="35"><span class="lineNum">      35 </span>            : </a>
 <a name="36"><span class="lineNum">      36 </span>            : /// A convenience method for converting MongolTextAlign to TextAlign</a>
-<a name="37"><span class="lineNum">      37 </span><span class="lineCov">          7 : MongolTextAlign? mapHorizontalToMongolTextAlign(TextAlign? textAlign) {</span></a>
+<a name="37"><span class="lineNum">      37 </span><span class="lineCov">          8 : MongolTextAlign? mapHorizontalToMongolTextAlign(TextAlign? textAlign) {</span></a>
 <a name="38"><span class="lineNum">      38 </span>            :   if (textAlign == null) return null;</a>
 <a name="39"><span class="lineNum">      39 </span>            :   switch (textAlign) {</a>
 <a name="40"><span class="lineNum">      40 </span><span class="lineCov">          1 :     case TextAlign.left:</span></a>
@@ -134,13 +134,13 @@
 <a name="72"><span class="lineNum">      72 </span>            :   ///</a>
 <a name="73"><span class="lineNum">      73 </span>            :   /// The `text` argument is optional but [text] must be non-null before</a>
 <a name="74"><span class="lineNum">      74 </span>            :   /// calling [layout].</a>
-<a name="75"><span class="lineNum">      75 </span><span class="lineCov">         10 :   MongolTextPainter({</span></a>
+<a name="75"><span class="lineNum">      75 </span><span class="lineCov">         11 :   MongolTextPainter({</span></a>
 <a name="76"><span class="lineNum">      76 </span>            :     TextSpan? text,</a>
 <a name="77"><span class="lineNum">      77 </span>            :     MongolTextAlign textAlign = MongolTextAlign.top,</a>
 <a name="78"><span class="lineNum">      78 </span>            :     double textScaleFactor = 1.0,</a>
 <a name="79"><span class="lineNum">      79 </span>            :     int? maxLines,</a>
 <a name="80"><span class="lineNum">      80 </span>            :     String? ellipsis,</a>
-<a name="81"><span class="lineNum">      81 </span><span class="lineCov">         10 :   })  : assert(text == null || text.debugAssertIsValid()),</span></a>
+<a name="81"><span class="lineNum">      81 </span><span class="lineCov">         11 :   })  : assert(text == null || text.debugAssertIsValid()),</span></a>
 <a name="82"><span class="lineNum">      82 </span><span class="lineCov">          1 :         assert(maxLines == null || maxLines &gt; 0),</span></a>
 <a name="83"><span class="lineNum">      83 </span>            :         _text = text,</a>
 <a name="84"><span class="lineNum">      84 </span>            :         _textAlign = textAlign,</a>
@@ -157,11 +157,11 @@
 <a name="95"><span class="lineNum">      95 </span>            :   /// Uses this method to notify text painter to relayout in the case of</a>
 <a name="96"><span class="lineNum">      96 </span>            :   /// layout changes in engine. In most cases, updating text painter properties</a>
 <a name="97"><span class="lineNum">      97 </span>            :   /// in framework will automatically invoke this method.</a>
-<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          8 :   void markNeedsLayout() {</span></a>
-<a name="99"><span class="lineNum">      99 </span><span class="lineCov">          8 :     _paragraph = null;</span></a>
-<a name="100"><span class="lineNum">     100 </span><span class="lineCov">          8 :     _needsLayout = true;</span></a>
-<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          8 :     _previousCaretPosition = null;</span></a>
-<a name="102"><span class="lineNum">     102 </span><span class="lineCov">          8 :     _previousCaretPrototype = null;</span></a>
+<a name="98"><span class="lineNum">      98 </span><span class="lineCov">          9 :   void markNeedsLayout() {</span></a>
+<a name="99"><span class="lineNum">      99 </span><span class="lineCov">          9 :     _paragraph = null;</span></a>
+<a name="100"><span class="lineNum">     100 </span><span class="lineCov">          9 :     _needsLayout = true;</span></a>
+<a name="101"><span class="lineNum">     101 </span><span class="lineCov">          9 :     _previousCaretPosition = null;</span></a>
+<a name="102"><span class="lineNum">     102 </span><span class="lineCov">          9 :     _previousCaretPrototype = null;</span></a>
 <a name="103"><span class="lineNum">     103 </span>            :   }</a>
 <a name="104"><span class="lineNum">     104 </span>            : </a>
 <a name="105"><span class="lineNum">     105 </span>            :   /// The (potentially styled) text to paint.</a>
@@ -175,16 +175,16 @@
 <a name="113"><span class="lineNum">     113 </span>            :   /// [TextSpan.toPlainText] to get the full contents of all nodes in the tree.</a>
 <a name="114"><span class="lineNum">     114 </span>            :   /// [TextSpan.text] will only provide the contents of the first node in the</a>
 <a name="115"><span class="lineNum">     115 </span>            :   /// tree.</a>
-<a name="116"><span class="lineNum">     116 </span><span class="lineCov">         20 :   TextSpan? get text =&gt; _text;</span></a>
+<a name="116"><span class="lineNum">     116 </span><span class="lineCov">         22 :   TextSpan? get text =&gt; _text;</span></a>
 <a name="117"><span class="lineNum">     117 </span>            :   TextSpan? _text;</a>
-<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          7 :   set text(TextSpan? value) {</span></a>
-<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          7 :     assert(value == null || value.debugAssertIsValid());</span></a>
-<a name="120"><span class="lineNum">     120 </span><span class="lineCov">         14 :     if (_text == value) return;</span></a>
-<a name="121"><span class="lineNum">     121 </span><span class="lineCov">         28 :     if (_text?.style != value?.style) {</span></a>
-<a name="122"><span class="lineNum">     122 </span><span class="lineCov">          6 :       _layoutTemplate = null;</span></a>
+<a name="118"><span class="lineNum">     118 </span><span class="lineCov">          8 :   set text(TextSpan? value) {</span></a>
+<a name="119"><span class="lineNum">     119 </span><span class="lineCov">          8 :     assert(value == null || value.debugAssertIsValid());</span></a>
+<a name="120"><span class="lineNum">     120 </span><span class="lineCov">         16 :     if (_text == value) return;</span></a>
+<a name="121"><span class="lineNum">     121 </span><span class="lineCov">         32 :     if (_text?.style != value?.style) {</span></a>
+<a name="122"><span class="lineNum">     122 </span><span class="lineCov">          7 :       _layoutTemplate = null;</span></a>
 <a name="123"><span class="lineNum">     123 </span>            :     }</a>
-<a name="124"><span class="lineNum">     124 </span><span class="lineCov">          7 :     _text = value;</span></a>
-<a name="125"><span class="lineNum">     125 </span><span class="lineCov">          7 :     markNeedsLayout();</span></a>
+<a name="124"><span class="lineNum">     124 </span><span class="lineCov">          8 :     _text = value;</span></a>
+<a name="125"><span class="lineNum">     125 </span><span class="lineCov">          8 :     markNeedsLayout();</span></a>
 <a name="126"><span class="lineNum">     126 </span>            :   }</a>
 <a name="127"><span class="lineNum">     127 </span>            : </a>
 <a name="128"><span class="lineNum">     128 </span>            :   /// How the text should be aligned vertically.</a>
@@ -192,7 +192,7 @@
 <a name="130"><span class="lineNum">     130 </span>            :   /// After this is set, you must call [layout] before the next call to [paint].</a>
 <a name="131"><span class="lineNum">     131 </span>            :   ///</a>
 <a name="132"><span class="lineNum">     132 </span>            :   /// The [textAlign] property defaults to [MongolTextAlign.top].</a>
-<a name="133"><span class="lineNum">     133 </span><span class="lineCov">         16 :   MongolTextAlign get textAlign =&gt; _textAlign;</span></a>
+<a name="133"><span class="lineNum">     133 </span><span class="lineCov">         18 :   MongolTextAlign get textAlign =&gt; _textAlign;</span></a>
 <a name="134"><span class="lineNum">     134 </span>            :   MongolTextAlign _textAlign;</a>
 <a name="135"><span class="lineNum">     135 </span><span class="lineCov">          4 :   set textAlign(MongolTextAlign value) {</span></a>
 <a name="136"><span class="lineNum">     136 </span><span class="lineCov">          8 :     if (_textAlign == value) {</span></a>
@@ -208,13 +208,13 @@
 <a name="146"><span class="lineNum">     146 </span>            :   /// the specified font size.</a>
 <a name="147"><span class="lineNum">     147 </span>            :   ///</a>
 <a name="148"><span class="lineNum">     148 </span>            :   /// After this is set, you must call [layout] before the next call to [paint].</a>
-<a name="149"><span class="lineNum">     149 </span><span class="lineCov">         20 :   double get textScaleFactor =&gt; _textScaleFactor;</span></a>
+<a name="149"><span class="lineNum">     149 </span><span class="lineCov">         22 :   double get textScaleFactor =&gt; _textScaleFactor;</span></a>
 <a name="150"><span class="lineNum">     150 </span>            :   double _textScaleFactor;</a>
-<a name="151"><span class="lineNum">     151 </span><span class="lineCov">          2 :   set textScaleFactor(double value) {</span></a>
-<a name="152"><span class="lineNum">     152 </span><span class="lineCov">          4 :     if (_textScaleFactor == value) return;</span></a>
-<a name="153"><span class="lineNum">     153 </span><span class="lineCov">          2 :     _textScaleFactor = value;</span></a>
-<a name="154"><span class="lineNum">     154 </span><span class="lineCov">          2 :     markNeedsLayout();</span></a>
-<a name="155"><span class="lineNum">     155 </span><span class="lineCov">          2 :     _layoutTemplate = null;</span></a>
+<a name="151"><span class="lineNum">     151 </span><span class="lineCov">          3 :   set textScaleFactor(double value) {</span></a>
+<a name="152"><span class="lineNum">     152 </span><span class="lineCov">          6 :     if (_textScaleFactor == value) return;</span></a>
+<a name="153"><span class="lineNum">     153 </span><span class="lineCov">          3 :     _textScaleFactor = value;</span></a>
+<a name="154"><span class="lineNum">     154 </span><span class="lineCov">          3 :     markNeedsLayout();</span></a>
+<a name="155"><span class="lineNum">     155 </span><span class="lineCov">          3 :     _layoutTemplate = null;</span></a>
 <a name="156"><span class="lineNum">     156 </span>            :   }</a>
 <a name="157"><span class="lineNum">     157 </span>            : </a>
 <a name="158"><span class="lineNum">     158 </span>            :   /// The string used to ellipsize overflowing text. Setting this to a non-empty</a>
@@ -233,7 +233,7 @@
 <a name="171"><span class="lineNum">     171 </span>            :   /// overflow effects using the [TextOverflow] enum. The</a>
 <a name="172"><span class="lineNum">     172 </span>            :   /// [TextOverflow.ellipsis] value corresponds to setting this property to</a>
 <a name="173"><span class="lineNum">     173 </span>            :   /// U+2026 HORIZONTAL ELLIPSIS (…).</a>
-<a name="174"><span class="lineNum">     174 </span><span class="lineCov">         20 :   String? get ellipsis =&gt; _ellipsis;</span></a>
+<a name="174"><span class="lineNum">     174 </span><span class="lineCov">         22 :   String? get ellipsis =&gt; _ellipsis;</span></a>
 <a name="175"><span class="lineNum">     175 </span>            :   String? _ellipsis;</a>
 <a name="176"><span class="lineNum">     176 </span><span class="lineCov">          1 :   set ellipsis(String? value) {</span></a>
 <a name="177"><span class="lineNum">     177 </span><span class="lineNoCov">          0 :     assert(value == null || value.isNotEmpty);</span></a>
@@ -251,7 +251,7 @@
 <a name="189"><span class="lineNum">     189 </span>            :   /// subsequent lines are dropped.</a>
 <a name="190"><span class="lineNum">     190 </span>            :   ///</a>
 <a name="191"><span class="lineNum">     191 </span>            :   /// After this is set, you must call [layout] before the next call to [paint].</a>
-<a name="192"><span class="lineNum">     192 </span><span class="lineCov">         20 :   int? get maxLines =&gt; _maxLines;</span></a>
+<a name="192"><span class="lineNum">     192 </span><span class="lineCov">         22 :   int? get maxLines =&gt; _maxLines;</span></a>
 <a name="193"><span class="lineNum">     193 </span>            :   int? _maxLines;</a>
 <a name="194"><span class="lineNum">     194 </span>            : </a>
 <a name="195"><span class="lineNum">     195 </span>            :   /// The value may be null. If it is not null, then it must be greater than zero.</a>
@@ -266,15 +266,15 @@
 <a name="204"><span class="lineNum">     204 </span>            : </a>
 <a name="205"><span class="lineNum">     205 </span>            :   MongolParagraph? _layoutTemplate;</a>
 <a name="206"><span class="lineNum">     206 </span>            : </a>
-<a name="207"><span class="lineNum">     207 </span><span class="lineCov">         10 :   ui.ParagraphStyle _createParagraphStyle() {</span></a>
+<a name="207"><span class="lineNum">     207 </span><span class="lineCov">         11 :   ui.ParagraphStyle _createParagraphStyle() {</span></a>
 <a name="208"><span class="lineNum">     208 </span>            :     // textAlign should always be `left` because this is the style for</a>
 <a name="209"><span class="lineNum">     209 </span>            :     // a single text run. MongolTextAlign is handled elsewhere.</a>
-<a name="210"><span class="lineNum">     210 </span><span class="lineCov">         30 :     return _text!.style?.getParagraphStyle(</span></a>
+<a name="210"><span class="lineNum">     210 </span><span class="lineCov">         33 :     return _text!.style?.getParagraphStyle(</span></a>
 <a name="211"><span class="lineNum">     211 </span>            :           textAlign: TextAlign.left,</a>
 <a name="212"><span class="lineNum">     212 </span>            :           textDirection: TextDirection.ltr,</a>
-<a name="213"><span class="lineNum">     213 </span><span class="lineCov">         10 :           textScaleFactor: textScaleFactor,</span></a>
-<a name="214"><span class="lineNum">     214 </span><span class="lineCov">         10 :           maxLines: maxLines,</span></a>
-<a name="215"><span class="lineNum">     215 </span><span class="lineCov">         10 :           ellipsis: ellipsis,</span></a>
+<a name="213"><span class="lineNum">     213 </span><span class="lineCov">         11 :           textScaleFactor: textScaleFactor,</span></a>
+<a name="214"><span class="lineNum">     214 </span><span class="lineCov">         11 :           maxLines: maxLines,</span></a>
+<a name="215"><span class="lineNum">     215 </span><span class="lineCov">         11 :           ellipsis: ellipsis,</span></a>
 <a name="216"><span class="lineNum">     216 </span>            :           locale: null,</a>
 <a name="217"><span class="lineNum">     217 </span>            :           strutStyle: null,</a>
 <a name="218"><span class="lineNum">     218 </span>            :         ) ??</a>
@@ -319,50 +319,50 @@
 <a name="257"><span class="lineNum">     257 </span><span class="lineCov">          8 :     return _layoutTemplate!.width;</span></a>
 <a name="258"><span class="lineNum">     258 </span>            :   }</a>
 <a name="259"><span class="lineNum">     259 </span>            : </a>
-<a name="260"><span class="lineNum">     260 </span><span class="lineCov">         10 :   double _applyFloatingPointHack(double layoutValue) {</span></a>
-<a name="261"><span class="lineNum">     261 </span><span class="lineCov">         10 :     return layoutValue.ceilToDouble();</span></a>
+<a name="260"><span class="lineNum">     260 </span><span class="lineCov">         11 :   double _applyFloatingPointHack(double layoutValue) {</span></a>
+<a name="261"><span class="lineNum">     261 </span><span class="lineCov">         11 :     return layoutValue.ceilToDouble();</span></a>
 <a name="262"><span class="lineNum">     262 </span>            :   }</a>
 <a name="263"><span class="lineNum">     263 </span>            : </a>
 <a name="264"><span class="lineNum">     264 </span>            :   /// The height at which decreasing the height of the text would prevent it from</a>
 <a name="265"><span class="lineNum">     265 </span>            :   /// painting itself completely within its bounds.</a>
 <a name="266"><span class="lineNum">     266 </span>            :   ///</a>
 <a name="267"><span class="lineNum">     267 </span>            :   /// Valid only after [layout] has been called.</a>
-<a name="268"><span class="lineNum">     268 </span><span class="lineCov">          6 :   double get minIntrinsicHeight {</span></a>
-<a name="269"><span class="lineNum">     269 </span><span class="lineCov">          6 :     assert(!_needsLayout);</span></a>
-<a name="270"><span class="lineNum">     270 </span><span class="lineCov">         18 :     return _applyFloatingPointHack(_paragraph!.minIntrinsicHeight);</span></a>
+<a name="268"><span class="lineNum">     268 </span><span class="lineCov">          7 :   double get minIntrinsicHeight {</span></a>
+<a name="269"><span class="lineNum">     269 </span><span class="lineCov">          7 :     assert(!_needsLayout);</span></a>
+<a name="270"><span class="lineNum">     270 </span><span class="lineCov">         21 :     return _applyFloatingPointHack(_paragraph!.minIntrinsicHeight);</span></a>
 <a name="271"><span class="lineNum">     271 </span>            :   }</a>
 <a name="272"><span class="lineNum">     272 </span>            : </a>
 <a name="273"><span class="lineNum">     273 </span>            :   /// The height at which increasing the height of the text no longer decreases</a>
 <a name="274"><span class="lineNum">     274 </span>            :   /// the width.</a>
 <a name="275"><span class="lineNum">     275 </span>            :   ///</a>
 <a name="276"><span class="lineNum">     276 </span>            :   /// Valid only after [layout] has been called.</a>
-<a name="277"><span class="lineNum">     277 </span><span class="lineCov">          9 :   double get maxIntrinsicHeight {</span></a>
-<a name="278"><span class="lineNum">     278 </span><span class="lineCov">          9 :     assert(!_needsLayout);</span></a>
-<a name="279"><span class="lineNum">     279 </span><span class="lineCov">         27 :     return _applyFloatingPointHack(_paragraph!.maxIntrinsicHeight);</span></a>
+<a name="277"><span class="lineNum">     277 </span><span class="lineCov">         10 :   double get maxIntrinsicHeight {</span></a>
+<a name="278"><span class="lineNum">     278 </span><span class="lineCov">         10 :     assert(!_needsLayout);</span></a>
+<a name="279"><span class="lineNum">     279 </span><span class="lineCov">         30 :     return _applyFloatingPointHack(_paragraph!.maxIntrinsicHeight);</span></a>
 <a name="280"><span class="lineNum">     280 </span>            :   }</a>
 <a name="281"><span class="lineNum">     281 </span>            : </a>
 <a name="282"><span class="lineNum">     282 </span>            :   /// The horizontal space required to paint this text.</a>
 <a name="283"><span class="lineNum">     283 </span>            :   ///</a>
 <a name="284"><span class="lineNum">     284 </span>            :   /// Valid only after [layout] has been called.</a>
-<a name="285"><span class="lineNum">     285 </span><span class="lineCov">         10 :   double get width {</span></a>
-<a name="286"><span class="lineNum">     286 </span><span class="lineCov">         10 :     assert(!_needsLayout);</span></a>
-<a name="287"><span class="lineNum">     287 </span><span class="lineCov">         30 :     return _applyFloatingPointHack(_paragraph!.width);</span></a>
+<a name="285"><span class="lineNum">     285 </span><span class="lineCov">         11 :   double get width {</span></a>
+<a name="286"><span class="lineNum">     286 </span><span class="lineCov">         11 :     assert(!_needsLayout);</span></a>
+<a name="287"><span class="lineNum">     287 </span><span class="lineCov">         33 :     return _applyFloatingPointHack(_paragraph!.width);</span></a>
 <a name="288"><span class="lineNum">     288 </span>            :   }</a>
 <a name="289"><span class="lineNum">     289 </span>            : </a>
 <a name="290"><span class="lineNum">     290 </span>            :   /// The vertical space required to paint this text.</a>
 <a name="291"><span class="lineNum">     291 </span>            :   ///</a>
 <a name="292"><span class="lineNum">     292 </span>            :   /// Valid only after [layout] has been called.</a>
-<a name="293"><span class="lineNum">     293 </span><span class="lineCov">         10 :   double get height {</span></a>
-<a name="294"><span class="lineNum">     294 </span><span class="lineCov">         10 :     assert(!_needsLayout);</span></a>
-<a name="295"><span class="lineNum">     295 </span><span class="lineCov">         30 :     return _applyFloatingPointHack(_paragraph!.height);</span></a>
+<a name="293"><span class="lineNum">     293 </span><span class="lineCov">         11 :   double get height {</span></a>
+<a name="294"><span class="lineNum">     294 </span><span class="lineCov">         11 :     assert(!_needsLayout);</span></a>
+<a name="295"><span class="lineNum">     295 </span><span class="lineCov">         33 :     return _applyFloatingPointHack(_paragraph!.height);</span></a>
 <a name="296"><span class="lineNum">     296 </span>            :   }</a>
 <a name="297"><span class="lineNum">     297 </span>            : </a>
 <a name="298"><span class="lineNum">     298 </span>            :   /// The amount of space required to paint this text.</a>
 <a name="299"><span class="lineNum">     299 </span>            :   ///</a>
 <a name="300"><span class="lineNum">     300 </span>            :   /// Valid only after [layout] has been called.</a>
-<a name="301"><span class="lineNum">     301 </span><span class="lineCov">         10 :   Size get size {</span></a>
-<a name="302"><span class="lineNum">     302 </span><span class="lineCov">         10 :     assert(!_needsLayout);</span></a>
-<a name="303"><span class="lineNum">     303 </span><span class="lineCov">         30 :     return Size(width, height);</span></a>
+<a name="301"><span class="lineNum">     301 </span><span class="lineCov">         11 :   Size get size {</span></a>
+<a name="302"><span class="lineNum">     302 </span><span class="lineCov">         11 :     assert(!_needsLayout);</span></a>
+<a name="303"><span class="lineNum">     303 </span><span class="lineCov">         33 :     return Size(width, height);</span></a>
 <a name="304"><span class="lineNum">     304 </span>            :   }</a>
 <a name="305"><span class="lineNum">     305 </span>            : </a>
 <a name="306"><span class="lineNum">     306 </span>            :   /// Even though the text is rotated, it is still useful to have a baseline</a>
@@ -390,9 +390,9 @@
 <a name="328"><span class="lineNum">     328 </span>            :   /// [layout]; otherwise it is false.</a>
 <a name="329"><span class="lineNum">     329 </span>            :   ///</a>
 <a name="330"><span class="lineNum">     330 </span>            :   /// Valid only after [layout] has been called.</a>
-<a name="331"><span class="lineNum">     331 </span><span class="lineCov">          7 :   bool get didExceedMaxLines {</span></a>
-<a name="332"><span class="lineNum">     332 </span><span class="lineCov">          7 :     assert(!_needsLayout);</span></a>
-<a name="333"><span class="lineNum">     333 </span><span class="lineCov">         14 :     return _paragraph!.didExceedMaxLines;</span></a>
+<a name="331"><span class="lineNum">     331 </span><span class="lineCov">          8 :   bool get didExceedMaxLines {</span></a>
+<a name="332"><span class="lineNum">     332 </span><span class="lineCov">          8 :     assert(!_needsLayout);</span></a>
+<a name="333"><span class="lineNum">     333 </span><span class="lineCov">         16 :     return _paragraph!.didExceedMaxLines;</span></a>
 <a name="334"><span class="lineNum">     334 </span>            :   }</a>
 <a name="335"><span class="lineNum">     335 </span>            : </a>
 <a name="336"><span class="lineNum">     336 </span>            :   double? _lastMinHeight;</a>
@@ -405,58 +405,58 @@
 <a name="343"><span class="lineNum">     343 </span>            :   /// and less than or equal to `maxHeight`.</a>
 <a name="344"><span class="lineNum">     344 </span>            :   ///</a>
 <a name="345"><span class="lineNum">     345 </span>            :   /// The [text] property must be non-null before this is called.</a>
-<a name="346"><span class="lineNum">     346 </span><span class="lineCov">         10 :   void layout({double minHeight = 0.0, double maxHeight = double.infinity}) {</span></a>
-<a name="347"><span class="lineNum">     347 </span><span class="lineCov">         10 :     assert(text != null);</span></a>
-<a name="348"><span class="lineNum">     348 </span><span class="lineCov">         10 :     if (!_needsLayout &amp;&amp;</span></a>
-<a name="349"><span class="lineNum">     349 </span><span class="lineCov">         20 :         minHeight == _lastMinHeight &amp;&amp;</span></a>
-<a name="350"><span class="lineNum">     350 </span><span class="lineCov">         20 :         maxHeight == _lastMaxHeight) return;</span></a>
-<a name="351"><span class="lineNum">     351 </span><span class="lineCov">         10 :     _needsLayout = false;</span></a>
-<a name="352"><span class="lineNum">     352 </span><span class="lineCov">         10 :     if (_paragraph == null) {</span></a>
-<a name="353"><span class="lineNum">     353 </span><span class="lineCov">         10 :       final builder = MongolParagraphBuilder(</span></a>
-<a name="354"><span class="lineNum">     354 </span><span class="lineCov">         10 :         _createParagraphStyle(),</span></a>
-<a name="355"><span class="lineNum">     355 </span><span class="lineCov">         10 :         textAlign: _textAlign,</span></a>
-<a name="356"><span class="lineNum">     356 </span><span class="lineCov">         10 :         textScaleFactor: _textScaleFactor,</span></a>
-<a name="357"><span class="lineNum">     357 </span><span class="lineCov">         10 :         maxLines: _maxLines,</span></a>
-<a name="358"><span class="lineNum">     358 </span><span class="lineCov">         10 :         ellipsis: _ellipsis,</span></a>
+<a name="346"><span class="lineNum">     346 </span><span class="lineCov">         11 :   void layout({double minHeight = 0.0, double maxHeight = double.infinity}) {</span></a>
+<a name="347"><span class="lineNum">     347 </span><span class="lineCov">         11 :     assert(text != null);</span></a>
+<a name="348"><span class="lineNum">     348 </span><span class="lineCov">         11 :     if (!_needsLayout &amp;&amp;</span></a>
+<a name="349"><span class="lineNum">     349 </span><span class="lineCov">         22 :         minHeight == _lastMinHeight &amp;&amp;</span></a>
+<a name="350"><span class="lineNum">     350 </span><span class="lineCov">         22 :         maxHeight == _lastMaxHeight) return;</span></a>
+<a name="351"><span class="lineNum">     351 </span><span class="lineCov">         11 :     _needsLayout = false;</span></a>
+<a name="352"><span class="lineNum">     352 </span><span class="lineCov">         11 :     if (_paragraph == null) {</span></a>
+<a name="353"><span class="lineNum">     353 </span><span class="lineCov">         11 :       final builder = MongolParagraphBuilder(</span></a>
+<a name="354"><span class="lineNum">     354 </span><span class="lineCov">         11 :         _createParagraphStyle(),</span></a>
+<a name="355"><span class="lineNum">     355 </span><span class="lineCov">         11 :         textAlign: _textAlign,</span></a>
+<a name="356"><span class="lineNum">     356 </span><span class="lineCov">         11 :         textScaleFactor: _textScaleFactor,</span></a>
+<a name="357"><span class="lineNum">     357 </span><span class="lineCov">         11 :         maxLines: _maxLines,</span></a>
+<a name="358"><span class="lineNum">     358 </span><span class="lineCov">         11 :         ellipsis: _ellipsis,</span></a>
 <a name="359"><span class="lineNum">     359 </span>            :       );</a>
-<a name="360"><span class="lineNum">     360 </span><span class="lineCov">         20 :       _addStyleToText(builder, _text!);</span></a>
-<a name="361"><span class="lineNum">     361 </span><span class="lineCov">         20 :       _paragraph = builder.build();</span></a>
+<a name="360"><span class="lineNum">     360 </span><span class="lineCov">         22 :       _addStyleToText(builder, _text!);</span></a>
+<a name="361"><span class="lineNum">     361 </span><span class="lineCov">         22 :       _paragraph = builder.build();</span></a>
 <a name="362"><span class="lineNum">     362 </span>            :     }</a>
-<a name="363"><span class="lineNum">     363 </span><span class="lineCov">         10 :     _lastMinHeight = minHeight;</span></a>
-<a name="364"><span class="lineNum">     364 </span><span class="lineCov">         10 :     _lastMaxHeight = maxHeight;</span></a>
+<a name="363"><span class="lineNum">     363 </span><span class="lineCov">         11 :     _lastMinHeight = minHeight;</span></a>
+<a name="364"><span class="lineNum">     364 </span><span class="lineCov">         11 :     _lastMaxHeight = maxHeight;</span></a>
 <a name="365"><span class="lineNum">     365 </span>            :     // A change in layout invalidates the cached caret metrics as well.</a>
-<a name="366"><span class="lineNum">     366 </span><span class="lineCov">         10 :     _previousCaretPosition = null;</span></a>
-<a name="367"><span class="lineNum">     367 </span><span class="lineCov">         10 :     _previousCaretPrototype = null;</span></a>
-<a name="368"><span class="lineNum">     368 </span><span class="lineCov">         30 :     _paragraph!.layout(MongolParagraphConstraints(height: maxHeight));</span></a>
-<a name="369"><span class="lineNum">     369 </span><span class="lineCov">         10 :     if (minHeight != maxHeight) {</span></a>
-<a name="370"><span class="lineNum">     370 </span><span class="lineCov">         18 :       final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight);</span></a>
-<a name="371"><span class="lineNum">     371 </span><span class="lineCov">         18 :       if (newHeight != height) {</span></a>
-<a name="372"><span class="lineNum">     372 </span><span class="lineCov">         27 :         _paragraph!.layout(MongolParagraphConstraints(height: newHeight));</span></a>
+<a name="366"><span class="lineNum">     366 </span><span class="lineCov">         11 :     _previousCaretPosition = null;</span></a>
+<a name="367"><span class="lineNum">     367 </span><span class="lineCov">         11 :     _previousCaretPrototype = null;</span></a>
+<a name="368"><span class="lineNum">     368 </span><span class="lineCov">         33 :     _paragraph!.layout(MongolParagraphConstraints(height: maxHeight));</span></a>
+<a name="369"><span class="lineNum">     369 </span><span class="lineCov">         11 :     if (minHeight != maxHeight) {</span></a>
+<a name="370"><span class="lineNum">     370 </span><span class="lineCov">         20 :       final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight);</span></a>
+<a name="371"><span class="lineNum">     371 </span><span class="lineCov">         20 :       if (newHeight != height) {</span></a>
+<a name="372"><span class="lineNum">     372 </span><span class="lineCov">         30 :         _paragraph!.layout(MongolParagraphConstraints(height: newHeight));</span></a>
 <a name="373"><span class="lineNum">     373 </span>            :       }</a>
 <a name="374"><span class="lineNum">     374 </span>            :     }</a>
 <a name="375"><span class="lineNum">     375 </span>            :   }</a>
 <a name="376"><span class="lineNum">     376 </span>            : </a>
-<a name="377"><span class="lineNum">     377 </span><span class="lineCov">         10 :   void _addStyleToText(</span></a>
+<a name="377"><span class="lineNum">     377 </span><span class="lineCov">         11 :   void _addStyleToText(</span></a>
 <a name="378"><span class="lineNum">     378 </span>            :     MongolParagraphBuilder builder,</a>
 <a name="379"><span class="lineNum">     379 </span>            :     InlineSpan inlineSpan,</a>
 <a name="380"><span class="lineNum">     380 </span>            :   ) {</a>
-<a name="381"><span class="lineNum">     381 </span><span class="lineCov">         10 :     if (inlineSpan is! TextSpan) {</span></a>
+<a name="381"><span class="lineNum">     381 </span><span class="lineCov">         11 :     if (inlineSpan is! TextSpan) {</span></a>
 <a name="382"><span class="lineNum">     382 </span><span class="lineNoCov">          0 :       throw UnimplementedError(</span></a>
 <a name="383"><span class="lineNum">     383 </span>            :           'Inline span support has not yet been implemented for MongolTextPainter');</a>
 <a name="384"><span class="lineNum">     384 </span>            :     }</a>
 <a name="385"><span class="lineNum">     385 </span>            :     final textSpan = inlineSpan;</a>
-<a name="386"><span class="lineNum">     386 </span><span class="lineCov">         10 :     final style = textSpan.style;</span></a>
-<a name="387"><span class="lineNum">     387 </span><span class="lineCov">         10 :     final text = textSpan.text;</span></a>
-<a name="388"><span class="lineNum">     388 </span><span class="lineCov">         10 :     final children = textSpan.children;</span></a>
+<a name="386"><span class="lineNum">     386 </span><span class="lineCov">         11 :     final style = textSpan.style;</span></a>
+<a name="387"><span class="lineNum">     387 </span><span class="lineCov">         11 :     final text = textSpan.text;</span></a>
+<a name="388"><span class="lineNum">     388 </span><span class="lineCov">         11 :     final children = textSpan.children;</span></a>
 <a name="389"><span class="lineNum">     389 </span>            :     final hasStyle = style != null;</a>
-<a name="390"><span class="lineNum">     390 </span><span class="lineCov">         10 :     if (hasStyle) builder.pushStyle(style!);</span></a>
-<a name="391"><span class="lineNum">     391 </span><span class="lineCov">         10 :     if (text != null) builder.addText(text);</span></a>
+<a name="390"><span class="lineNum">     390 </span><span class="lineCov">         11 :     if (hasStyle) builder.pushStyle(style!);</span></a>
+<a name="391"><span class="lineNum">     391 </span><span class="lineCov">         11 :     if (text != null) builder.addText(text);</span></a>
 <a name="392"><span class="lineNum">     392 </span>            :     if (children != null) {</a>
 <a name="393"><span class="lineNum">     393 </span><span class="lineCov">         10 :       for (final child in children) {</span></a>
 <a name="394"><span class="lineNum">     394 </span><span class="lineCov">          5 :         _addStyleToText(builder, child);</span></a>
 <a name="395"><span class="lineNum">     395 </span>            :       }</a>
 <a name="396"><span class="lineNum">     396 </span>            :     }</a>
-<a name="397"><span class="lineNum">     397 </span><span class="lineCov">         10 :     if (hasStyle) builder.pop();</span></a>
+<a name="397"><span class="lineNum">     397 </span><span class="lineCov">         11 :     if (hasStyle) builder.pop();</span></a>
 <a name="398"><span class="lineNum">     398 </span>            :   }</a>
 <a name="399"><span class="lineNum">     399 </span>            : </a>
 <a name="400"><span class="lineNum">     400 </span>            :   /// Paints the text onto the given canvas at the given offset.</a>
@@ -472,16 +472,16 @@
 <a name="410"><span class="lineNum">     410 </span>            :   /// To set the text style, specify a [TextStyle] when creating the [TextSpan]</a>
 <a name="411"><span class="lineNum">     411 </span>            :   /// that you pass to the [MongolTextPainter] constructor or to the [text]</a>
 <a name="412"><span class="lineNum">     412 </span>            :   /// property.</a>
-<a name="413"><span class="lineNum">     413 </span><span class="lineCov">         10 :   void paint(Canvas canvas, Offset offset) {</span></a>
-<a name="414"><span class="lineNum">     414 </span><span class="lineCov">         10 :     assert(() {</span></a>
-<a name="415"><span class="lineNum">     415 </span><span class="lineCov">         10 :       if (_needsLayout) {</span></a>
+<a name="413"><span class="lineNum">     413 </span><span class="lineCov">         11 :   void paint(Canvas canvas, Offset offset) {</span></a>
+<a name="414"><span class="lineNum">     414 </span><span class="lineCov">         11 :     assert(() {</span></a>
+<a name="415"><span class="lineNum">     415 </span><span class="lineCov">         11 :       if (_needsLayout) {</span></a>
 <a name="416"><span class="lineNum">     416 </span><span class="lineCov">          1 :         throw FlutterError(</span></a>
 <a name="417"><span class="lineNum">     417 </span>            :             'TextPainter.paint called when text geometry was not yet calculated.\n'</a>
 <a name="418"><span class="lineNum">     418 </span>            :             'Please call layout() before paint() to position the text before painting it.');</a>
 <a name="419"><span class="lineNum">     419 </span>            :       }</a>
 <a name="420"><span class="lineNum">     420 </span>            :       return true;</a>
-<a name="421"><span class="lineNum">     421 </span><span class="lineCov">         10 :     }());</span></a>
-<a name="422"><span class="lineNum">     422 </span><span class="lineCov">         18 :     _paragraph!.draw(canvas, offset);</span></a>
+<a name="421"><span class="lineNum">     421 </span><span class="lineCov">         11 :     }());</span></a>
+<a name="422"><span class="lineNum">     422 </span><span class="lineCov">         20 :     _paragraph!.draw(canvas, offset);</span></a>
 <a name="423"><span class="lineNum">     423 </span>            :   }</a>
 <a name="424"><span class="lineNum">     424 </span>            : </a>
 <a name="425"><span class="lineNum">     425 </span>            :   // Returns true iff the given value is a valid UTF-16 surrogate. The value</a>
@@ -698,9 +698,9 @@
 <a name="636"><span class="lineNum">     636 </span>            :   }</a>
 <a name="637"><span class="lineNum">     637 </span>            : </a>
 <a name="638"><span class="lineNum">     638 </span>            :   /// Returns the position within the text for the given pixel offset.</a>
-<a name="639"><span class="lineNum">     639 </span><span class="lineCov">          6 :   TextPosition getPositionForOffset(Offset offset) {</span></a>
-<a name="640"><span class="lineNum">     640 </span><span class="lineCov">          6 :     assert(!_needsLayout);</span></a>
-<a name="641"><span class="lineNum">     641 </span><span class="lineCov">         12 :     return _paragraph!.getPositionForOffset(offset);</span></a>
+<a name="639"><span class="lineNum">     639 </span><span class="lineCov">          7 :   TextPosition getPositionForOffset(Offset offset) {</span></a>
+<a name="640"><span class="lineNum">     640 </span><span class="lineCov">          7 :     assert(!_needsLayout);</span></a>
+<a name="641"><span class="lineNum">     641 </span><span class="lineCov">         14 :     return _paragraph!.getPositionForOffset(offset);</span></a>
 <a name="642"><span class="lineNum">     642 </span>            :   }</a>
 <a name="643"><span class="lineNum">     643 </span>            : </a>
 <a name="644"><span class="lineNum">     644 </span>            :   /// Returns the text range of the word at the given offset. Characters not</a>
