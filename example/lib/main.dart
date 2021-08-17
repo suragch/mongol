@@ -24,7 +24,9 @@ class DemoApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'mongol',
-      theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'MenksoftQagan'),
+      theme: ThemeData(
+        fontFamily: 'MenksoftQagan',
+      ),
       home: Scaffold(
         appBar: AppBar(title: const Text('Flutter mongol package 2.1.0')),
         body: const HomeScreen(),
