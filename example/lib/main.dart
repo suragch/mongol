@@ -28,7 +28,7 @@ class DemoApp extends StatelessWidget {
         fontFamily: 'MenksoftQagan',
       ),
       home: Scaffold(
-        appBar: AppBar(title: const Text('Flutter mongol package 2.1.0')),
+        appBar: AppBar(title: const Text('Flutter mongol package 2.2.0')),
         body: const HomeScreen(),
       ),
     );
