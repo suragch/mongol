@@ -104,7 +104,6 @@ class _BodyWidgetState extends State<BodyWidget> {
     }
 
     // Delete the previous character
-    // TODO: Handle deleting invisible characters like MVS, FVS, etc.
     final newStart = textSelection.start - 1;
     final newEnd = textSelection.start;
     final newText = text.replaceRange(newStart, newEnd, '');

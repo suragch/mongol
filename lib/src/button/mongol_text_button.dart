@@ -26,6 +26,8 @@ import 'package:flutter/material.dart'
         kThemeChangeDuration;
 import 'package:flutter/widgets.dart';
 
+import 'mongol_button_style_button.dart';
+
 /// A vertical Material Design "Text Button".
 ///
 /// Use text buttons on toolbars, in dialogs, or inline with other
@@ -125,7 +127,7 @@ import 'package:flutter/widgets.dart';
 ///  * [MongolOutlinedButton], a [MongolTextButton] with a border outline.
 ///  * [MongolElevatedButton], a filled button whose material elevates when pressed.
 ///  * <https://material.io/design/components/buttons.html>
-class MongolTextButton extends ButtonStyleButton {
+class MongolTextButton extends MongolButtonStyleButton {
   /// Create a MongolTextButton.
   ///
   /// The [autofocus] and [clipBehavior] arguments must not be null.

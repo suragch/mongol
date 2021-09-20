@@ -67,9 +67,12 @@ class MongolTextSelectionControls extends TextSelectionControls {
   }
 
   /// Builder for material-style text selection handles.
+  ///
+  /// Width and height terms are in vertical text layout context
   @override
   Widget buildHandle(
-      BuildContext context, TextSelectionHandleType type, double textHeight) {
+      BuildContext context, TextSelectionHandleType type, double textLineWidth,
+      [VoidCallback? onTap, double? startGlyphWidth, double? endGlyphWidth]) {
     final theme = Theme.of(context);
     final handleColor = TextSelectionTheme.of(context).selectionHandleColor ??
         theme.colorScheme.primary;
@@ -104,12 +107,14 @@ class MongolTextSelectionControls extends TextSelectionControls {
 
   /// Gets anchor for material-style text selection handles.
   ///
+  /// Width and height terms are in vertical text layout context.
+  ///
   /// See [TextSelectionControls.getHandleAnchor].
   @override
-  Offset getHandleAnchor(TextSelectionHandleType type, double textLineWidth) {
+  Offset getHandleAnchor(TextSelectionHandleType type, double textLineWidth,
+      [double? startGlyphWidth, double? endGlyphWidth]) {
     switch (type) {
       case TextSelectionHandleType.left:
-        //return const Offset(0, 0);
         return const Offset(_kHandleSize, _kHandleSize);
       case TextSelectionHandleType.right:
         return Offset.zero;
@@ -243,8 +248,7 @@ class _TextSelectionControlsToolbarState
 
     // Determine which buttons will appear so that the order and total number is
     // known.
-    final itemDatas =
-        <_TextSelectionToolbarItemData>[
+    final itemDatas = <_TextSelectionToolbarItemData>[
       if (widget.handleCut != null)
         _TextSelectionToolbarItemData(
           icon: Icons.cut,

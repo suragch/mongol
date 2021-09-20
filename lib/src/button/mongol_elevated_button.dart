@@ -25,6 +25,8 @@ import 'package:flutter/material.dart'
         VisualDensity,
         kThemeChangeDuration;
 
+import 'mongol_button_style_button.dart';
+
 /// A vertical Material Design "elevated button".
 ///
 /// Use elevated buttons to add dimension to otherwise mostly flat
@@ -90,7 +92,7 @@ import 'package:flutter/material.dart'
 ///  * [MongolTextButton], a simple flat button without a shadow.
 ///  * [MongolOutlinedButton], a [MongolTextButton] with a border outline.
 ///  * <https://material.io/design/components/buttons.html>
-class MongolElevatedButton extends ButtonStyleButton {
+class MongolElevatedButton extends MongolButtonStyleButton {
   /// Create a MongolElevatedButton.
   ///
   /// The [autofocus] and [clipBehavior] arguments must not be null.

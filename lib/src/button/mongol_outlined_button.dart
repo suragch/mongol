@@ -26,6 +26,8 @@ import 'package:flutter/material.dart'
         VisualDensity,
         kThemeChangeDuration;
 
+import 'mongol_button_style_button.dart';
+
 /// A vertical Material Design "Outlined Button"; essentially a [MongolTextButton]
 /// with an outlined border.
 ///
@@ -78,7 +80,7 @@ import 'package:flutter/material.dart'
 ///  * [MongolElevatedButton], a filled vertical material design button with a shadow.
 ///  * [MongolTextButton], a vertical material design button without a shadow.
 ///  * <https://material.io/design/components/buttons.html>
-class MongolOutlinedButton extends ButtonStyleButton {
+class MongolOutlinedButton extends MongolButtonStyleButton {
   /// Create a MongolOutlinedButton.
   ///
   /// The [autofocus] and [clipBehavior] arguments must not be null.

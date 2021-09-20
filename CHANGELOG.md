@@ -1,3 +1,10 @@
+## [2.2.1] - 2021.9.20
+
+- Fix the errors caused by the Flutter 2.5 update.
+- Removed lots of tests (unfortunately) because the Flutter 2.5 update broke something internally with the custom Flutter testing implementation for the Mongol widgets.
+- Fixed the buttons.
+- Known issue: MongolTextField still crashes when text content needs to scroll.
+
 ## [2.2.0] - 2021.8.2
 
 - Added buttons: `MongolTextButton`, `MongolOutlineButton`, and `MongolElevatedButton`

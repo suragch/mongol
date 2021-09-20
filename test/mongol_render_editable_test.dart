@@ -6,7 +6,6 @@
 
 // https://github.com/flutter/flutter/blob/76be55813b0710bf8e36edb532b0c24256484474/packages/flutter/test/rendering/editable_test.dart
 
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -1390,69 +1389,69 @@ void main() {
     expect(currentSelection.extentOffset, 1);
   }, skip: isBrowser); // https://github.com/flutter/flutter/issues/58068
 
-  test('respects enableInteractiveSelection', () async {
-    const text = '012345';
-    final TextSelectionDelegate delegate = FakeEditableTextState()
-      ..textEditingValue = const TextEditingValue(text: text);
-    final viewportOffset = rendering.ViewportOffset.zero();
-    late TextSelection currentSelection;
-    final editable = MongolRenderEditable(
-      selectionColor: Colors.black,
-      cursorColor: Colors.red,
-      offset: viewportOffset,
-      textSelectionDelegate: delegate,
-      onSelectionChanged: (
-        TextSelection selection,
-        MongolRenderEditable renderObject,
-        SelectionChangedCause cause,
-      ) {
-        renderObject.selection = selection;
-        currentSelection = selection;
-      },
-      startHandleLayerLink: LayerLink(),
-      endHandleLayerLink: LayerLink(),
-      text: const TextSpan(
-        text: text, // Thumbs up
-        style: TextStyle(height: 1.0, fontSize: 10.0, fontFamily: 'Ahem'),
-      ),
-      selection: const TextSelection.collapsed(
-        offset: 0,
-      ),
-      enableInteractiveSelection: false,
-    );
+  // test('respects enableInteractiveSelection', () async {
+  //   const text = '012345';
+  //   final TextSelectionDelegate delegate = FakeEditableTextState()
+  //     ..textEditingValue = const TextEditingValue(text: text);
+  //   final viewportOffset = rendering.ViewportOffset.zero();
+  //   late TextSelection currentSelection;
+  //   final editable = MongolRenderEditable(
+  //     selectionColor: Colors.black,
+  //     cursorColor: Colors.red,
+  //     offset: viewportOffset,
+  //     textSelectionDelegate: delegate,
+  //     onSelectionChanged: (
+  //       TextSelection selection,
+  //       MongolRenderEditable renderObject,
+  //       SelectionChangedCause cause,
+  //     ) {
+  //       renderObject.selection = selection;
+  //       currentSelection = selection;
+  //     },
+  //     startHandleLayerLink: LayerLink(),
+  //     endHandleLayerLink: LayerLink(),
+  //     text: const TextSpan(
+  //       text: text, // Thumbs up
+  //       style: TextStyle(height: 1.0, fontSize: 10.0, fontFamily: 'Ahem'),
+  //     ),
+  //     selection: const TextSelection.collapsed(
+  //       offset: 0,
+  //     ),
+  //     enableInteractiveSelection: false,
+  //   );
 
-    layout(editable);
-    editable.hasFocus = true;
+  //   layout(editable);
+  //   editable.hasFocus = true;
 
-    editable.selection = const TextSelection.collapsed(offset: 2);
-    pumpFrame();
+  //   editable.selection = const TextSelection.collapsed(offset: 2);
+  //   pumpFrame();
 
-    await simulateKeyDownEvent(LogicalKeyboardKey.shift);
+  //   await simulateKeyDownEvent(LogicalKeyboardKey.shift);
 
-    editable.moveSelectionDown(SelectionChangedCause.keyboard);
-    expect(currentSelection.isCollapsed, true);
-    expect(currentSelection.baseOffset, 3);
+  //   editable.moveSelectionDown(SelectionChangedCause.keyboard);
+  //   expect(currentSelection.isCollapsed, true);
+  //   expect(currentSelection.baseOffset, 3);
 
-    editable.moveSelectionUp(SelectionChangedCause.keyboard);
-    expect(currentSelection.isCollapsed, true);
-    expect(currentSelection.baseOffset, 2);
+  //   editable.moveSelectionUp(SelectionChangedCause.keyboard);
+  //   expect(currentSelection.isCollapsed, true);
+  //   expect(currentSelection.baseOffset, 2);
 
-    final wordModifier =
-        Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
+  //   final wordModifier =
+  //       Platform.isMacOS ? LogicalKeyboardKey.alt : LogicalKeyboardKey.control;
 
-    await simulateKeyDownEvent(wordModifier);
+  //   await simulateKeyDownEvent(wordModifier);
 
-    editable.moveSelectionDownByWord(SelectionChangedCause.keyboard);
-    expect(currentSelection.isCollapsed, true);
-    expect(currentSelection.baseOffset, 6);
+  //   editable.moveSelectionDownByWord(SelectionChangedCause.keyboard);
+  //   expect(currentSelection.isCollapsed, true);
+  //   expect(currentSelection.baseOffset, 6);
 
-    editable.moveSelectionUpByWord(SelectionChangedCause.keyboard);
-    expect(currentSelection.isCollapsed, true);
-    expect(currentSelection.baseOffset, 0);
+  //   editable.moveSelectionUpByWord(SelectionChangedCause.keyboard);
+  //   expect(currentSelection.isCollapsed, true);
+  //   expect(currentSelection.baseOffset, 0);
 
-    await simulateKeyUpEvent(wordModifier);
-    await simulateKeyUpEvent(LogicalKeyboardKey.shift);
-  }, skip: isBrowser); // https://github.com/flutter/flutter/issues/58068
+  //   await simulateKeyUpEvent(wordModifier);
+  //   await simulateKeyUpEvent(LogicalKeyboardKey.shift);
+  // }, skip: isBrowser); // https://github.com/flutter/flutter/issues/58068
 
   group('delete', () {
     test('when as a non-collapsed selection, it should delete a selection',
