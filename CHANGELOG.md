@@ -1,3 +1,7 @@
+## [2.2.2] - 2021.11.7
+
+- Attempted to fix the issue with `MongolTextField` crashing when text content needs to scroll. However, since the issue is still not fixed, there is a deprecation warning on this class. Hopefully the error can be fixed with a future update or a replacement can be found, but currently there is nothing.
+
 ## [2.2.1] - 2021.9.20
 
 - Fix the errors caused by the Flutter 2.5 update.

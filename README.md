@@ -5,8 +5,7 @@ This library is a collection of Flutter widgets for displaying and editing tradi
 The primary ones include:
 
 - `MongolText`: vertical version of `Text`
-- `MongolTextField`: vertical version of `TextField`
-- `MongolListTile`: vertical version of `ListTile`, for use in horizontal listviews and menus
+- `MongolListTile`: vertical version of `ListTile`, for use in horizontal list views and menus
 - `MongolPopupMenuButton`: vertical version of `PopupMenuButton`, for displaying menus
 - `MongolAlertDialog`: vertical version of `AlertDialog`
 
@@ -121,7 +120,9 @@ Now you won't have to manually set the font for every Mongolian text widget. If 
 
 You may also consider using [mongol_code](https://pub.dev/packages/mongol_code) with a Menksoft font if your users have devices that don't support OpenType Unicode font rendering. `mongol_code` converts Unicode to Menksoft code, which a Menksoft font can display without any special rendering requirements.
 
-## Editing vertical text
+## Editing vertical text [BROKEN]
+
+> **Notice**: Unfortunately `MongolTextField` is currently not working. You shouldn't use it in a production app. Something in the Flutter 2.5 update broke this widget and causes your app to freeze if the cursor has to scroll out of view. As a workaround for single line text you can rotate a standard TextField. There is no current workaround for multiline text. If you can find the source of the error please open an issue on GitHub. The error is apparently in EditableText. I'm looking at other options such as possibly cloning [SuperEditor](https://github.com/superlistapp/super_editor).
 
 You can use `MongolTextField` to receive and edit text from the system keyboard. This widget includes most of the functionality of the standard Flutter `TextField` widget.
 
@@ -141,7 +142,7 @@ If you discover any other problems please open an issue. And if you have time to
 
 ## Horizontal lists
 
-You can display horizontally scrolling lists with the standard `Listview` widget. All you need to do is set the scroll direction to horizontal.
+You can display horizontally scrolling lists with the standard `ListView` widget. All you need to do is set the scroll direction to horizontal.
 
 ```dart
 ListView(
@@ -171,7 +172,7 @@ Card(
 
 ## Menus
 
-To add a popup menu with horizontal items, you can use `MongolPopupMenuButton`. It is customizeable in all the ways that the standard `PopupMenuButton` is.
+To add a popup menu with horizontal items, you can use `MongolPopupMenuButton`. It is customizable in all the ways that the standard `PopupMenuButton` is.
 
 ```dart
 Scaffold(
@@ -181,7 +182,7 @@ Scaffold(
       MongolPopupMenuButton(
         itemBuilder: (context) => const [
           MongolPopupMenuItem(child: MongolText('ᠨᠢᠭᠡ'), value: 1),
-          MongolPopupMenuItem(child: MongolText('ᠬᠤᠶᠠᠷ'), value: 2),
+          MongolPopupMenuItem(child: MongolText('ᠬᠣᠶᠠᠷ'), value: 2),
           MongolPopupMenuItem(child: MongolText('ᠭᠤᠷᠪᠠ'), value: 3),
         ],
         tooltip: 'vertical tooltip text',

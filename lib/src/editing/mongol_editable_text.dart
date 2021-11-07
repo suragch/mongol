@@ -4,17 +4,68 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'dart:async' show Timer;
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui hide TextStyle;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart' show kMinInteractiveDimension;
-import 'package:flutter/rendering.dart' show RevealedOffset, ViewportOffset, CaretChangedHandler;
-import 'package:flutter/scheduler.dart' show SchedulerBinding;
+import 'package:flutter/rendering.dart'
+    show RevealedOffset, ViewportOffset, CaretChangedHandler;
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
+import 'package:flutter/widgets.dart'
+    show
+        StatefulWidget,
+        EdgeInsets,
+        Scrollable,
+        ClipboardStatusNotifier,
+        GlobalKey,
+        AnimationController,
+        CompositedTransformTarget,
+        debugCheckHasMediaQuery,
+        FocusScope,
+        LeafRenderObjectWidget,
+        Curve,
+        Curves,
+        TextSpan,
+        MouseRegion,
+        AxisDirection,
+        ClipboardStatus,
+        ToolbarOptions,
+        Clip,
+        TextEditingController,
+        Semantics,
+        ScrollConfiguration,
+        ScrollPhysics,
+        ScrollBehavior,
+        FocusNode,
+        TextStyle,
+        TextSelectionHandleType,
+        BuildContext,
+        State,
+        Color,
+        MediaQuery,
+        Offset,
+        ScrollController,
+        LayerLink,
+        WidgetsBinding,
+        Radius,
+        Rect,
+        Widget,
+        TextAlign,
+        TextDirection,
+        AutofillGroupState,
+        FocusAttachment,
+        AutofillGroup,
+        SelectionChangedCallback,
+        TextSelectionControls,
+        AutomaticKeepAliveClientMixin,
+        WidgetsBindingObserver,
+        TickerProviderStateMixin,
+        AppPrivateCommandCallback;
+//import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
 
 import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
@@ -22,7 +73,14 @@ import 'package:mongol/src/editing/text_selection/mongol_text_selection.dart';
 
 import 'mongol_text_editing_action.dart';
 
-// ignore_for_file: todo
+export 'package:flutter/services.dart'
+    show
+        SelectionChangedCause,
+        TextEditingValue,
+        TextSelection,
+        TextInputType,
+        SmartQuotesType,
+        SmartDashesType;
 
 // The time it takes for the cursor to fade from fully opaque to fully
 // transparent and vice versa. A full cursor blink, from transparent to opaque
@@ -103,6 +161,11 @@ const int _kObscureShowLatestCharCursorTicks = 3;
 ///
 ///  * [MongolTextField], which is a full-featured, material-design text input
 ///    field with placeholder text, labels, and [Form] integration.
+@Deprecated("Don't use this class with Flutter 2.5 or higher. Something in the"
+    "Flutter 2.5 update causes your app to freeze if the cursor has to scroll out"
+    "of view. As a workaround for single line text you can rotate a standard"
+    "TextField. There is no current workaround for multiline text. If you can find"
+    "the source of the error please open an issue on GitHub.")
 class MongolEditableText extends StatefulWidget {
   /// Creates a basic text input control.
   ///
@@ -150,8 +213,8 @@ class MongolEditableText extends StatefulWidget {
     List<TextInputFormatter>? inputFormatters,
     this.mouseCursor,
     this.rendererIgnoresPointer = false,
-    this.cursorWidth,
     this.cursorHeight = 2.0,
+    this.cursorWidth,
     this.cursorRadius,
     this.cursorOpacityAnimates = false,
     this.cursorOffset,
@@ -864,7 +927,8 @@ class MongolEditableText extends StatefulWidget {
       switch (defaultTargetPlatform) {
         case TargetPlatform.iOS:
         case TargetPlatform.macOS:
-          const iOSKeyboardType = <String, TextInputType>{
+          const Map<String, TextInputType> iOSKeyboardType =
+              <String, TextInputType>{
             AutofillHints.addressCity: TextInputType.name,
             AutofillHints.addressCityAndState:
                 TextInputType.name, // Autofill not working.
@@ -1174,12 +1238,11 @@ class MongolEditableTextState extends State<MongolEditableText>
       widget.focusNode.addListener(_handleFocusChanged);
       updateKeepAlive();
     }
+
     if (!_shouldCreateInputConnection) {
       _closeInputConnectionIfNeeded();
-    } else {
-      if (oldWidget.readOnly && _hasFocus) {
-        _openInputConnection();
-      }
+    } else if (oldWidget.readOnly && _hasFocus) {
+      _openInputConnection();
     }
 
     if (kIsWeb && _hasInputConnection) {
@@ -1352,7 +1415,7 @@ class MongolEditableTextState extends State<MongolEditableText>
   void updateFloatingCursor(RawFloatingCursorPoint point) {
     // unimplemented
   }
-  
+
   @pragma('vm:notify-debugger-on-exception')
   void _finalizeEditing(TextInputAction action, {required bool shouldUnfocus}) {
     // Take any actions necessary now that the user has completed editing.
@@ -1472,7 +1535,6 @@ class MongolEditableTextState extends State<MongolEditableText>
     final Offset unitOffset;
 
     if (!_isMultiline) {
-      // singleline
       additionalOffset = rect.height >= editableSize.height
           // Center `rect` if it's oversized.
           ? editableSize.height / 2 - rect.center.dy
@@ -1539,6 +1601,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       _textInputConnection!.show();
       _updateSizeAndTransform();
       _updateComposingRectIfNeeded();
+      _updateCaretRectIfNeeded();
       if (_needsAutofill) {
         // Request autofill AFTER the size and the transform have been sent to
         // the platform text input plugin.
@@ -1612,7 +1675,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       }
     }
   }
-  
+
   @pragma('vm:notify-debugger-on-exception')
   void _handleSelectionChanged(
       TextSelection selection, SelectionChangedCause? cause) {
@@ -1627,7 +1690,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     // editable widget, not just changes triggered by user gestures.
     requestKeyboard();
     if (widget.selectionControls == null) {
-      _selectionOverlay?.hide();
+      _selectionOverlay?.dispose();
       _selectionOverlay = null;
     } else {
       if (_selectionOverlay == null) {
@@ -1737,15 +1800,23 @@ class MongolEditableTextState extends State<MongolEditableText>
     });
   }
 
-  late double _lastRightViewInset;
+  // keeping "bottom" rather than changing it to "right" because it likely refers
+  // to the keyboard location. But this might be wrong.
+  late double _lastBottomViewInset;
 
   @override
   void didChangeMetrics() {
-    if (_lastRightViewInset <
-        WidgetsBinding.instance!.window.viewInsets.right) {
-      _scheduleShowCaretOnScreen();
+    if (_lastBottomViewInset !=
+        WidgetsBinding.instance!.window.viewInsets.bottom) {
+      SchedulerBinding.instance!.addPostFrameCallback((Duration _) {
+        _selectionOverlay?.updateForScroll();
+      });
+      if (_lastBottomViewInset <
+          WidgetsBinding.instance!.window.viewInsets.bottom) {
+        _scheduleShowCaretOnScreen();
+      }
     }
-    _lastRightViewInset = WidgetsBinding.instance!.window.viewInsets.right;
+    _lastBottomViewInset = WidgetsBinding.instance!.window.viewInsets.bottom;
   }
 
   @pragma('vm:notify-debugger-on-exception')
@@ -1784,11 +1855,11 @@ class MongolEditableTextState extends State<MongolEditableText>
         (userInteraction &&
             (cause == SelectionChangedCause.longPress ||
                 cause == SelectionChangedCause.keyboard))) {
-      _handleSelectionChanged(value.selection, cause);
+      _handleSelectionChanged(_value.selection, cause);
     }
     if (textChanged) {
       try {
-        widget.onChanged?.call(value.text);
+        widget.onChanged?.call(_value.text);
       } catch (exception, stack) {
         FlutterError.reportError(FlutterErrorDetails(
           exception: exception,
@@ -1853,11 +1924,13 @@ class MongolEditableTextState extends State<MongolEditableText>
 
   void _cursorWaitForStart(Timer timer) {
     assert(_kCursorBlinkHalfPeriod > _fadeDuration);
+    assert(!MongolEditableText.debugDeterministicCursor);
     _cursorTimer?.cancel();
     _cursorTimer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
   }
 
   void _startCursorTimer() {
+    assert(_cursorTimer == null);
     _targetCursorVisibility = true;
     _cursorBlinkOpacityController.value = 1.0;
     if (MongolEditableText.debugDeterministicCursor) return;
@@ -1907,7 +1980,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     if (_hasFocus) {
       // Listen for changing viewInsets, which indicates keyboard showing up.
       WidgetsBinding.instance!.addObserver(this);
-      _lastRightViewInset = WidgetsBinding.instance!.window.viewInsets.right;
+      _lastBottomViewInset = WidgetsBinding.instance!.window.viewInsets.bottom;
       if (!widget.readOnly) {
         _scheduleShowCaretOnScreen();
       }
@@ -1955,6 +2028,22 @@ class MongolEditableTextState extends State<MongolEditableText>
       _textInputConnection!.setComposingRect(composingRect);
       SchedulerBinding.instance!
           .addPostFrameCallback((Duration _) => _updateComposingRectIfNeeded());
+    }
+  }
+
+  void _updateCaretRectIfNeeded() {
+    if (_hasInputConnection) {
+      if (renderEditable.selection != null &&
+          renderEditable.selection!.isValid &&
+          renderEditable.selection!.isCollapsed) {
+        final TextPosition currentTextPosition =
+            TextPosition(offset: renderEditable.selection!.baseOffset);
+        final Rect caretRect =
+            renderEditable.getLocalRectForCaret(currentTextPosition);
+        _textInputConnection!.setCaretRect(caretRect);
+      }
+      SchedulerBinding.instance!
+          .addPostFrameCallback((Duration _) => _updateCaretRectIfNeeded());
     }
   }
 

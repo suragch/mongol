@@ -277,6 +277,12 @@ class _TextFieldSelectionGestureDetectorBuilder
 ///    [MongolTextField]. The [MongolEditableText] widget is rarely used directly unless
 ///    you are implementing an entirely different design language, such as
 ///    Cupertino.
+@Deprecated("Don't use this class with Flutter 2.5 or higher. Something in the "
+    "Flutter 2.5 update causes your app to freeze if the cursor has to scroll out "
+    "of view. As a workaround for single line text you can rotate a standard "
+    "TextField. There is no current workaround for multiline text. If you can find "
+    "the source of the error please open an issue on GitHub. The error is "
+    "apparently in EditableText")
 class MongolTextField extends StatefulWidget {
   /// Creates a Material Design text field for vertical Mongolian text.
   ///
