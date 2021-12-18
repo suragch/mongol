@@ -5,7 +5,6 @@
 // found in the LICENSE file.
 
 import 'dart:math' as math;
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show
         IconButton,

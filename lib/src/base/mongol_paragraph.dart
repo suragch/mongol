@@ -899,24 +899,23 @@ class LineBreaker implements Iterator<RotatableString> {
     return (character == ' ' || character == '\n');
   }
 
-  // TODO: rename these in the next major version
-  static const MONGOL_QUICKCHECK_START = 0x1800;
-  static const MONGOL_QUICKCHECK_END = 0x2060;
-  static const KOREAN_JAMO_START = 0x1100;
-  static const KOREAN_JAMO_END = 0x11FF;
-  static const CJK_RADICAL_SUPPLEMENT_START = 0x2E80;
-  static const CJK_SYMBOLS_AND_PUNCTUATION_START = 0x3000;
-  static const CJK_SYMBOLS_AND_PUNCTUATION_MENKSOFT_END = 0x301C;
-  static const CIRCLE_NUMBER_21 = 0x3251;
-  static const CIRCLE_NUMBER_35 = 0x325F;
-  static const CIRCLE_NUMBER_36 = 0x32B1;
-  static const CIRCLE_NUMBER_50 = 0x32BF;
-  static const CJK_UNIFIED_IDEOGRAPHS_END = 0x9FFF;
-  static const HANGUL_SYLLABLES_START = 0xAC00;
-  static const HANGUL_JAMO_EXTENDED_B_END = 0xD7FF;
-  static const CJK_COMPATIBILITY_IDEOGRAPHS_START = 0xF900;
-  static const CJK_COMPATIBILITY_IDEOGRAPHS_END = 0xFAFF;
-  static const UNICODE_EMOJI_START = 0x1F000;
+  static const _mongolQuickcheckStart = 0x1800;
+  static const _mongolQuickcheckEnd = 0x2060;
+  static const _koreanJamoStart = 0x1100;
+  static const _koreanJamoEnd = 0x11FF;
+  static const _cjkRadicalSupplementStart = 0x2E80;
+  static const _cjkSymbolsAndPunctuationStart = 0x3000;
+  static const _cjkSymbolsAndPunctuationMenksoftEnd = 0x301C;
+  static const _circleNumber21 = 0x3251;
+  static const _circleNumber35 = 0x325F;
+  static const _circleNumber36 = 0x32B1;
+  static const _circleNumber50 = 0x32BF;
+  static const _cjkUnifiedIdeographsEnd = 0x9FFF;
+  static const _hangulSyllablesStart = 0xAC00;
+  static const _hangulJamoExtendedBEnd = 0xD7FF;
+  static const _cjkCompatibilityIdeographsStart = 0xF900;
+  static const _cjkCompatibilityIdeographsEnd = 0xFAFF;
+  static const _unicodeEmojiStart = 0x1F000;
 
   bool _isRotatable(String character) {
     //if (character.runes.length > 1) return true;
@@ -924,36 +923,38 @@ class LineBreaker implements Iterator<RotatableString> {
     final codePoint = character.runes.first;
 
     // Quick return: most Mongol chars should be in this range
-    if (codePoint >= MONGOL_QUICKCHECK_START &&
-        codePoint < MONGOL_QUICKCHECK_END) return false;
+    if (codePoint >= _mongolQuickcheckStart &&
+        codePoint < _mongolQuickcheckEnd) {
+      return false;
+    }
 
     // Korean Jamo
-    if (codePoint < KOREAN_JAMO_START) return false; // latin, etc
-    if (codePoint <= KOREAN_JAMO_END) return true;
+    if (codePoint < _koreanJamoStart) return false; // latin, etc
+    if (codePoint <= _koreanJamoEnd) return true;
 
     // Chinese and Japanese
-    if (codePoint >= CJK_RADICAL_SUPPLEMENT_START &&
-        codePoint <= CJK_UNIFIED_IDEOGRAPHS_END) {
+    if (codePoint >= _cjkRadicalSupplementStart &&
+        codePoint <= _cjkUnifiedIdeographsEnd) {
       // exceptions for font handled punctuation
-      if (codePoint >= CJK_SYMBOLS_AND_PUNCTUATION_START &&
-          codePoint <= CJK_SYMBOLS_AND_PUNCTUATION_MENKSOFT_END) return false;
-      if (codePoint >= CIRCLE_NUMBER_21 && codePoint <= CIRCLE_NUMBER_35) {
+      if (codePoint >= _cjkSymbolsAndPunctuationStart &&
+          codePoint <= _cjkSymbolsAndPunctuationMenksoftEnd) return false;
+      if (codePoint >= _circleNumber21 && codePoint <= _circleNumber35) {
         return false;
       }
 
-      if (codePoint >= CIRCLE_NUMBER_36 && codePoint <= CIRCLE_NUMBER_50) {
+      if (codePoint >= _circleNumber36 && codePoint <= _circleNumber50) {
         return false;
       }
       return true;
     }
 
     // Korean Hangul
-    if (codePoint >= HANGUL_SYLLABLES_START &&
-        codePoint <= HANGUL_JAMO_EXTENDED_B_END) return true;
+    if (codePoint >= _hangulSyllablesStart &&
+        codePoint <= _hangulJamoExtendedBEnd) return true;
 
     // More Chinese
-    if (codePoint >= CJK_COMPATIBILITY_IDEOGRAPHS_START &&
-        codePoint <= CJK_COMPATIBILITY_IDEOGRAPHS_END) return true;
+    if (codePoint >= _cjkCompatibilityIdeographsStart &&
+        codePoint <= _cjkCompatibilityIdeographsEnd) return true;
 
     // Emoji
     if (_isEmoji(codePoint)) return true;
@@ -963,7 +964,7 @@ class LineBreaker implements Iterator<RotatableString> {
   }
 
   bool _isEmoji(int codePoint) {
-    return codePoint > UNICODE_EMOJI_START;
+    return codePoint > _unicodeEmojiStart;
   }
 }
 

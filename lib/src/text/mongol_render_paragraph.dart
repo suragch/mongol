@@ -13,7 +13,7 @@ import 'package:mongol/src/base/mongol_text_align.dart';
 
 import '../base/mongol_text_painter.dart';
 
-// TODO: This is a horizontal elipsis. Should we use a Mongolian elipsis U+1801?
+// This is a horizontal elipsis. Could use a Mongolian elipsis U+1801 instead.
 const String _kEllipsis = '\u2026';
 
 /// A render object that displays a paragraph of vertical Mongolian text.

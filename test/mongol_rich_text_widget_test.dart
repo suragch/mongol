@@ -9,7 +9,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:mongol/mongol.dart';
 import 'package:mongol/src/text/mongol_render_paragraph.dart';
-import 'package:mongol/src/text/mongol_rich_text.dart';
 
 void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized()

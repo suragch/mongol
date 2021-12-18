@@ -1,15 +1,15 @@
 # mongol
 
-This library is a collection of Flutter widgets for displaying and editing traditional Mongolian vertical text.
+This library is a collection of Flutter widgets for displaying traditional Mongolian vertical text.
 
-The primary ones include:
+The primary widgets include:
 
 - `MongolText`: vertical version of `Text`
 - `MongolListTile`: vertical version of `ListTile`, for use in horizontal list views and menus
 - `MongolPopupMenuButton`: vertical version of `PopupMenuButton`, for displaying menus
 - `MongolAlertDialog`: vertical version of `AlertDialog`
 
-Browse the sections below to see images of what the widgets look like. Check out the [live web version](https://suragch.dev/apps/mongol) of the [example project](https://github.com/suragch/mongol/tree/master/example) for a more detailed demonstration.
+> **NOTE**: Version 3.0.0 removed `MongolTextField` because recent Flutter updates broke it. The plan is to recreate it from scratch.
 
 ## Displaying vertical text
 
@@ -120,26 +120,6 @@ Now you won't have to manually set the font for every Mongolian text widget. If 
 
 You may also consider using [mongol_code](https://pub.dev/packages/mongol_code) with a Menksoft font if your users have devices that don't support OpenType Unicode font rendering. `mongol_code` converts Unicode to Menksoft code, which a Menksoft font can display without any special rendering requirements.
 
-## Editing vertical text [BROKEN]
-
-> **Notice**: Unfortunately `MongolTextField` is currently not working. You shouldn't use it in a production app. Something in the Flutter 2.5 update broke this widget and causes your app to freeze if the cursor has to scroll out of view. As a workaround for single line text you can rotate a standard TextField. There is no current workaround for multiline text. If you can find the source of the error please open an issue on GitHub. The error is apparently in EditableText. I'm looking at other options such as possibly cloning [SuperEditor](https://github.com/superlistapp/super_editor).
-
-You can use `MongolTextField` to receive and edit text from the system keyboard. This widget includes most of the functionality of the standard Flutter `TextField` widget.
-
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field.gif)
-
-Here is it on iOS and Android interacting with a system keyboard:
-
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field_large.gif)
-
-There are a few known issues with `MongolTextField`:
-
-- The cursor shows up on the right side of hint text.
-- The gesture detection region for the left text selection handle does not appear directly on the handle.
-- On web and desktop the arrow keys don't move in the expected direction.
-  
-If you discover any other problems please open an issue. And if you have time to find the source of the known issues, that would be very helpful.
-
 ## Horizontal lists
 
 You can display horizontally scrolling lists with the standard `ListView` widget. All you need to do is set the scroll direction to horizontal.
@@ -220,18 +200,12 @@ This alert dialog works mostly the same as the Flutter `AlertDialog`.
 
 ![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_alert_dialog.png)
 
-### Keyboard
-
-This are not part of `mongol` library yet, but you can see an example of how to make a custom in-app keyboard in the example app that's included with this library. Here is a screenshot from the demo app:
-
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/keyboard.png)
-
 ### TODO
 
+- Recreate `MongolTextField`
 - Improve keyboard (this may be better as a separate package)
 - Various other text based widgets
 - Support `WidgetSpan`.
 - Add missing tests (currently commented out)
 - For `MongolTextAlign.bottom` don't count final space in line height
-- Fix known issues with `MongolTextField`
 - Add `MongolSelectableText` widget

@@ -496,8 +496,8 @@ class MongolTextPainter {
       final box = boxes.first;
 
       // If the upstream character is a newline, cursor is at start of next line
-      const NEWLINE_CODE_UNIT = 10;
-      if (prevCodeUnit == NEWLINE_CODE_UNIT) {
+      const _newlineCodeUnit = 10;
+      if (prevCodeUnit == _newlineCodeUnit) {
         return Rect.fromLTRB(box.right, _emptyOffset.dy,
             box.right + box.right - box.left, _emptyOffset.dy);
       }

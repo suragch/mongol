@@ -1,3 +1,7 @@
+## [3.0.0] - 2021.12.18
+
+- Removed `MongolTextField` and related classes from the library. The Flutter 2.8 update broke the editing widgets again. Even if we fixed this break, there was still the major issue of crashing when scrolling `MongolTextField`. It is easier to remove `MongolTextField` now and start over from scratch, either with the Flutter text editing widgets or with something like SuperEditor.
+
 ## [2.2.2] - 2021.11.7
 
 - Attempted to fix the issue with `MongolTextField` crashing when text content needs to scroll. However, since the issue is still not fixed, there is a deprecation warning on this class. Hopefully the error can be fixed with a future update or a replacement can be found, but currently there is nothing.

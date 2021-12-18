@@ -6,10 +6,8 @@ import 'demos/button_demo.dart';
 import 'demos/emoji_cjk_demo.dart';
 import 'demos/list_tile_demo.dart';
 import 'demos/max_lines_demo.dart';
-import 'demos/mongol_text_field_demo.dart';
 import 'demos/popup_menu_demo.dart';
 import 'demos/text_demo.dart';
-import 'demos/keyboard_demo.dart';
 import 'demos/text_span_demo.dart';
 import 'demos/resizable_text_demo.dart';
 
@@ -50,20 +48,12 @@ class HomeScreen extends StatelessWidget {
           destination: RichTextDemo(),
         ),
         DemoTile(
-          title: 'MongolTextField',
-          destination: MongolTextFieldDemo(),
-        ),
-        DemoTile(
           title: 'Emoji and CJK',
           destination: EmojiCjkDemo(),
         ),
         DemoTile(
           title: 'MongolAlertDialog',
           destination: AlertDialogDemo(),
-        ),
-        DemoTile(
-          title: 'Keyboard',
-          destination: KeyboardDemo(),
         ),
         DemoTile(
           title: 'Horizontal Listview',
