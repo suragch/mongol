@@ -1,3 +1,7 @@
+## [3.0.1] - 2022.01.10
+
+- Exported `MongolTextPainter` so that it is public now.
+
 ## [3.0.0] - 2021.12.18
 
 - Removed `MongolTextField` and related classes from the library. The Flutter 2.8 update broke the editing widgets again. Even if we fixed this break, there was still the major issue of crashing when scrolling `MongolTextField`. It is easier to remove `MongolTextField` now and start over from scratch, either with the Flutter text editing widgets or with something like SuperEditor.
