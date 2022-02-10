@@ -148,7 +148,7 @@ class MongolIconButton extends IconButton {
         radius: splashRadius ??
             math.max(
               Material.defaultSplashRadius,
-              (iconSize + math.min(padding.horizontal, padding.vertical)) * 0.7,
+              ((iconSize ?? 24) + math.min(padding.horizontal, padding.vertical)) * 0.7,
               // x 0.5 for diameter -> radius and + 40% overflow derived from other Material apps.
             ),
       ),
