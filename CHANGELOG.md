@@ -1,3 +1,7 @@
+## [3.0.2] - 2022.02.10
+
+- Fix for bug caused by Flutter 2.10 upgrade (#20) (@azhansy)
+
 ## [3.0.1] - 2022.01.10
 
 - Exported `MongolTextPainter` so that it is public now.
