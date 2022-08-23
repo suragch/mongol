@@ -10,7 +10,7 @@ import 'dart:ui' as ui hide TextStyle;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
-import 'package:flutter/material.dart' show Size, kMinInteractiveDimension;
+import 'package:flutter/material.dart' show ReplaceTextIntent, Size, kMinInteractiveDimension;
 import 'package:flutter/rendering.dart'
     show RevealedOffset, ViewportOffset, CaretChangedHandler;
 import 'package:flutter/scheduler.dart';
@@ -1186,6 +1186,144 @@ class MongolEditableTextState extends State<MongolEditableText>
     });
   }
 
+  // todo editor-fixes copy from [EditableTextState]
+  /// Copy current selection to [Clipboard].
+  @override
+  void copySelection(SelectionChangedCause cause) {
+    final TextSelection selection = textEditingValue.selection;
+    assert(selection != null);
+    if (selection.isCollapsed || widget.obscureText) {
+      return;
+    }
+    final String text = textEditingValue.text;
+    Clipboard.setData(ClipboardData(text: selection.textInside(text)));
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+      hideToolbar(false);
+
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.iOS:
+          break;
+        case TargetPlatform.macOS:
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.linux:
+        case TargetPlatform.windows:
+        // Collapse the selection and hide the toolbar and handles.
+          userUpdateTextEditingValue(
+            TextEditingValue(
+              text: textEditingValue.text,
+              selection: TextSelection.collapsed(offset: textEditingValue.selection.end),
+            ),
+            SelectionChangedCause.toolbar,
+          );
+          break;
+      }
+    }
+    _clipboardStatus?.update();
+  }
+
+  // todo editor-fixes copy from [EditableTextState]
+  /// Cut current selection to [Clipboard].
+  @override
+  void cutSelection(SelectionChangedCause cause) {
+    if (widget.readOnly || widget.obscureText) {
+      return;
+    }
+    final TextSelection selection = textEditingValue.selection;
+    final String text = textEditingValue.text;
+    assert(selection != null);
+    if (selection.isCollapsed) {
+      return;
+    }
+    Clipboard.setData(ClipboardData(text: selection.textInside(text)));
+    _replaceText(ReplaceTextIntent(textEditingValue, '', selection, cause));
+    if (cause == SelectionChangedCause.toolbar) {
+      // Schedule a call to bringIntoView() after renderEditable updates.
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          bringIntoView(textEditingValue.selection.extent);
+        }
+      });
+      hideToolbar();
+    }
+    _clipboardStatus?.update();
+  }
+
+  // todo editor-fixes copy from [EditableTextState]
+  /// Paste text from [Clipboard].
+  @override
+  Future<void> pasteText(SelectionChangedCause cause) async {
+    if (widget.readOnly) {
+      return;
+    }
+    final TextSelection selection = textEditingValue.selection;
+    assert(selection != null);
+    if (!selection.isValid) {
+      return;
+    }
+    // Snapshot the input before using `await`.
+    // See https://github.com/flutter/flutter/issues/11427
+    final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (data == null) {
+      return;
+    }
+
+    // After the paste, the cursor should be collapsed and located after the
+    // pasted content.
+    final int lastSelectionIndex = math.max(selection.baseOffset, selection.extentOffset);
+    final TextEditingValue collapsedTextEditingValue = textEditingValue.copyWith(
+      selection: TextSelection.collapsed(offset: lastSelectionIndex),
+    );
+
+    userUpdateTextEditingValue(
+      collapsedTextEditingValue.replaced(selection, data.text!),
+      cause,
+    );
+    if (cause == SelectionChangedCause.toolbar) {
+      // Schedule a call to bringIntoView() after renderEditable updates.
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          bringIntoView(textEditingValue.selection.extent);
+        }
+      });
+      hideToolbar();
+    }
+  }
+
+  // todo editor-fixes copy from [EditableTextState]
+  /// Select the entire text value.
+  @override
+  void selectAll(SelectionChangedCause cause) {
+    if (widget.readOnly && widget.obscureText) {
+      // If we can't modify it, and we can't copy it, there's no point in
+      // selecting it.
+      return;
+    }
+    userUpdateTextEditingValue(
+      textEditingValue.copyWith(
+        selection: TextSelection(baseOffset: 0, extentOffset: textEditingValue.text.length),
+      ),
+      cause,
+    );
+    if (cause == SelectionChangedCause.toolbar) {
+      bringIntoView(textEditingValue.selection.extent);
+    }
+  }
+
+  // todo editor-fixes copy from [EditableTextState]
+  @override
+  void autofill(TextEditingValue value) => updateEditingValue(value);
+
+  @override
+  void insertTextPlaceholder(Size size) {
+    // todo editor-fixes should we implement it?
+  }
+
+  @override
+  void removeTextPlaceholder() {
+    // todo editor-fixes should we implement it?
+  }
   // State lifecycle:
 
   @override
@@ -2107,6 +2245,7 @@ class MongolEditableTextState extends State<MongolEditableText>
   ///
   /// Returns `false` if a toolbar couldn't be shown, such as when the toolbar
   /// is already shown, or when no text selection currently exists.
+  @override
   bool showToolbar() {
     // Web is using native dom elements to enable clipboard functionality of the
     // toolbar: copy, paste, select, cut. It might also provide additional
@@ -2239,6 +2378,25 @@ class MongolEditableTextState extends State<MongolEditableText>
         : null;
   }
 
+  // --------------------------- Text Editing Actions ---------------------------
+
+  void _replaceText(ReplaceTextIntent intent) {
+    final TextEditingValue oldValue = _value;
+    final TextEditingValue newValue = intent.currentTextEditingValue.replaced(
+      intent.replacementRange,
+      intent.replacementText,
+    );
+    userUpdateTextEditingValue(newValue, intent.cause);
+
+    // If there's no change in text and selection (e.g. when selecting and
+    // pasting identical text), the widget won't be rebuilt on value update.
+    // Handle this by calling _didChangeTextEditingValue() so caret and scroll
+    // updates can happen.
+    if (newValue == oldValue) {
+      _didChangeTextEditingValue();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
@@ -2339,41 +2497,6 @@ class MongolEditableTextState extends State<MongolEditableText>
     );
   }
 
-  @override
-  void autofill(TextEditingValue newEditingValue) {
-    // TODO: implement autofill
-  }
-
-  @override
-  void copySelection(SelectionChangedCause cause) {
-    // TODO: implement copySelection
-  }
-
-  @override
-  void cutSelection(SelectionChangedCause cause) {
-    // TODO: implement cutSelection
-  }
-
-  @override
-  void insertTextPlaceholder(Size size) {
-    // TODO: implement insertTextPlaceholder
-  }
-
-  @override
-  Future<void> pasteText(SelectionChangedCause cause) {
-    // TODO: implement pasteText
-    throw UnimplementedError();
-  }
-
-  @override
-  void removeTextPlaceholder() {
-    // TODO: implement removeTextPlaceholder
-  }
-
-  @override
-  void selectAll(SelectionChangedCause cause) {
-    // TODO: implement selectAll
-  }
 }
 
 class _MongolEditable extends LeafRenderObjectWidget {
