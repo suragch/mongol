@@ -1357,7 +1357,7 @@ class MongolEditableTextState extends State<MongolEditableText>
 
     if (!_didAutoFocus && widget.autofocus) {
       _didAutoFocus = true;
-      SchedulerBinding.instance!.addPostFrameCallback((_) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
           FocusScope.of(context).autofocus(widget.focusNode);
         }
@@ -1446,7 +1446,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     _selectionOverlay = null;
     _focusAttachment!.detach();
     widget.focusNode.removeListener(_handleFocusChanged);
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     _clipboardStatus?.removeListener(_onChangedClipboardStatus);
     _clipboardStatus?.dispose();
     super.dispose();
@@ -1909,7 +1909,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       return;
     }
     _showCaretOnScreenScheduled = true;
-    SchedulerBinding.instance!.addPostFrameCallback((Duration _) {
+    SchedulerBinding.instance.addPostFrameCallback((Duration _) {
       _showCaretOnScreenScheduled = false;
       if (_currentCaretRect == null || !_scrollController!.hasClients) {
         return;
@@ -1964,16 +1964,16 @@ class MongolEditableTextState extends State<MongolEditableText>
   @override
   void didChangeMetrics() {
     if (_lastBottomViewInset !=
-        WidgetsBinding.instance!.window.viewInsets.bottom) {
-      SchedulerBinding.instance!.addPostFrameCallback((Duration _) {
+        WidgetsBinding.instance.window.viewInsets.bottom) {
+      SchedulerBinding.instance.addPostFrameCallback((Duration _) {
         _selectionOverlay?.updateForScroll();
       });
       if (_lastBottomViewInset <
-          WidgetsBinding.instance!.window.viewInsets.bottom) {
+          WidgetsBinding.instance.window.viewInsets.bottom) {
         _scheduleShowCaretOnScreen();
       }
     }
-    _lastBottomViewInset = WidgetsBinding.instance!.window.viewInsets.bottom;
+    _lastBottomViewInset = WidgetsBinding.instance.window.viewInsets.bottom;
   }
 
   @pragma('vm:notify-debugger-on-exception')
@@ -2138,8 +2138,8 @@ class MongolEditableTextState extends State<MongolEditableText>
     _updateOrDisposeSelectionOverlayIfNeeded();
     if (_hasFocus) {
       // Listen for changing viewInsets, which indicates keyboard showing up.
-      WidgetsBinding.instance!.addObserver(this);
-      _lastBottomViewInset = WidgetsBinding.instance!.window.viewInsets.bottom;
+      WidgetsBinding.instance.addObserver(this);
+      _lastBottomViewInset = WidgetsBinding.instance.window.viewInsets.bottom;
       if (!widget.readOnly) {
         _scheduleShowCaretOnScreen();
       }
@@ -2149,7 +2149,7 @@ class MongolEditableTextState extends State<MongolEditableText>
             TextSelection.collapsed(offset: _value.text.length), null);
       }
     } else {
-      WidgetsBinding.instance!.removeObserver(this);
+      WidgetsBinding.instance.removeObserver(this);
       // Clear the selection and composition state if this widget lost focus.
       _value = TextEditingValue(text: _value.text);
     }
@@ -2161,7 +2161,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       final size = renderEditable.size;
       final transform = renderEditable.getTransformTo(null);
       _textInputConnection!.setEditableSizeAndTransform(size, transform);
-      SchedulerBinding.instance!
+      SchedulerBinding.instance
           .addPostFrameCallback((Duration _) => _updateSizeAndTransform());
     }
   }
@@ -2185,7 +2185,7 @@ class MongolEditableTextState extends State<MongolEditableText>
             renderEditable.getLocalRectForCaret(TextPosition(offset: offset));
       }
       _textInputConnection!.setComposingRect(composingRect);
-      SchedulerBinding.instance!
+      SchedulerBinding.instance
           .addPostFrameCallback((Duration _) => _updateComposingRectIfNeeded());
     }
   }
@@ -2201,7 +2201,7 @@ class MongolEditableTextState extends State<MongolEditableText>
             renderEditable.getLocalRectForCaret(currentTextPosition);
         _textInputConnection!.setCaretRect(caretRect);
       }
-      SchedulerBinding.instance!
+      SchedulerBinding.instance
           .addPostFrameCallback((Duration _) => _updateCaretRectIfNeeded());
     }
   }
