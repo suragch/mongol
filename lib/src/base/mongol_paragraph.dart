@@ -120,17 +120,8 @@ class MongolLineMetrics {
   }
 
   @override
-  int get hashCode =>
-      hashValues(
-          hardBreak,
-          ascent,
-          descent,
-          unscaledAscent,
-          height,
-          width,
-          top,
-          baseline,
-          lineNumber);
+  int get hashCode => hashValues(hardBreak, ascent, descent, unscaledAscent,
+      height, width, top, baseline, lineNumber);
 
   @override
   String toString() {
@@ -163,11 +154,13 @@ class MongolParagraph {
   /// or extended directly.
   ///
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
-  MongolParagraph._(this._runs,
-      this._text,
-      this._maxLines,
-      this._ellipsis,
-      this._textAlign,);
+  MongolParagraph._(
+    this._runs,
+    this._text,
+    this._maxLines,
+    this._ellipsis,
+    this._textAlign,
+  );
 
   final String _text;
   final List<_TextRun> _runs;
@@ -415,7 +408,7 @@ class MongolParagraph {
     // find the afinity
     final lineEndCharOffset = matchedRun.end;
     final textAfinity =
-    (textOffset == lineEndCharOffset) ? upstream : downstream;
+        (textOffset == lineEndCharOffset) ? upstream : downstream;
     return [textOffset, textAfinity];
   }
 
@@ -447,8 +440,8 @@ class MongolParagraph {
     canvas.restore();
   }
 
-  void _drawEachRunInCurrentLine(Canvas canvas, _LineInfo line,
-      bool shouldDrawEllipsis, bool isLastLine) {
+  void _drawEachRunInCurrentLine(
+      Canvas canvas, _LineInfo line, bool shouldDrawEllipsis, bool isLastLine) {
     canvas.save();
 
     var runSpacing = 0.0;
@@ -764,9 +757,7 @@ class MongolParagraph {
       double baseline = 0;
       for (int j = line.textRunStart; j < line.textRunEnd; j += 1) {
         final textRun = _runs[j];
-        final runMetrics = textRun.paragraph
-            .computeLineMetrics()
-            .first;
+        final runMetrics = textRun.paragraph.computeLineMetrics().first;
 
         // last textRun of this line
         if (j == line.textRunEnd - 1) {
@@ -781,6 +772,18 @@ class MongolParagraph {
         final previousLineAscent = previousMetrics?.ascent ?? 0.0;
         final previousLineBaseline = previousMetrics?.baseline ?? 0.0;
         baseline = previousLineBaseline + previousLineAscent + descent;
+      }
+
+      // ends with new line
+      if (line.textRunStart == -1 && line.textRunEnd == -1) {
+        final previousMetrics = metrics[index - 1];
+        hardBreak = true;
+        ascent = previousMetrics.ascent;
+        descent = previousMetrics.descent;
+        unscaledAscent = previousMetrics.unscaledAscent;
+        height = previousMetrics.height;
+        width = previousMetrics.width;
+        baseline = previousMetrics.baseline + previousMetrics.ascent + descent;
       }
 
       double top = 0;
@@ -848,13 +851,13 @@ class MongolParagraphConstraints {
 /// After constructing a [MongolParagraph], call [MongolParagraph.layout] on
 /// it and then paint it with [MongolParagraph.draw].
 class MongolParagraphBuilder {
-  MongolParagraphBuilder(ui.ParagraphStyle style, {
+  MongolParagraphBuilder(
+    ui.ParagraphStyle style, {
     MongolTextAlign textAlign = MongolTextAlign.top,
     double textScaleFactor = 1.0,
     int? maxLines,
     String? ellipsis,
-  })
-      : _paragraphStyle = style,
+  })  : _paragraphStyle = style,
         _textAlign = textAlign,
         _textScaleFactor = textScaleFactor,
         _maxLines = maxLines,
@@ -947,7 +950,7 @@ class MongolParagraphBuilder {
       final paragraph = builder.build();
       paragraph.layout(const ui.ParagraphConstraints(width: double.infinity));
       final run =
-      _TextRun(startIndex, endIndex, segment.isRotatable, paragraph);
+          _TextRun(startIndex, endIndex, segment.isRotatable, paragraph);
       runs.add(run);
       builder = null;
       startIndex = endIndex;

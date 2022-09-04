@@ -39,11 +39,11 @@ typedef MongolSelectionChangedHandler = void Function(
 );
 
 /// The consecutive sequence of [TextPosition]s that the caret should move to
-/// when the user navigates the paragraph using the upward arrow key or the
-/// downward arrow key.
+/// when the user navigates the paragraph using the left arrow key or the
+/// right arrow key.
 ///
 /// {@template flutter.rendering.RenderEditable.verticalArrowKeyMovement}
-/// When the user presses the upward arrow key or the downward arrow key, on
+/// When the user presses the left arrow key or the right arrow key, on
 /// many platforms (macOS for instance), the caret will move to the previous
 /// line or the next line, while maintaining its original horizontal location.
 /// When it encounters a shorter line, the caret moves to the closest horizontal
@@ -51,10 +51,10 @@ typedef MongolSelectionChangedHandler = void Function(
 /// when a long enough line is encountered.
 ///
 /// Additionally, the caret will move to the beginning of the document if the
-/// upward arrow key is pressed and the caret is already on the first line. If
-/// the downward arrow key is pressed next, the caret will restore its original
+/// left arrow key is pressed and the caret is already on the first line. If
+/// the right arrow key is pressed next, the caret will restore its original
 /// horizontal location and move to the second line. Similarly the caret moves
-/// to the end of the document if the downward arrow key is pressed when it's
+/// to the end of the document if the right arrow key is pressed when it's
 /// already on the last line.
 ///
 /// Consider a top-aligned paragraph:
@@ -62,17 +62,17 @@ typedef MongolSelectionChangedHandler = void Function(
 ///   a     a
 ///  ——     a
 /// where the caret was initially placed at the end of the first line. Pressing
-/// the downward arrow key once will move the caret to the end of the second
+/// the right arrow key once will move the caret to the end of the second
 /// line, and twice the arrow key moves to the third line after the second "a"
-/// on that line. Pressing the downward arrow key again, the caret will move to
-/// the end of the third line (the end of the document). Pressing the upward
+/// on that line. Pressing the right arrow key again, the caret will move to
+/// the end of the third line (the end of the document). Pressing the left
 /// arrow key in this state will result in the caret moving to the end of the
 /// second line.
 ///
 /// Horizontal caret runs are typically interrupted when the layout of the text
 /// changes (including when the text itself changes), or when the selection is
 /// changed by other input events or programmatically (for example, when the
-/// user pressed the left arrow key).
+/// user pressed the up arrow key).
 /// {@endtemplate}
 ///
 /// The [movePrevious] method moves the caret location (which is
@@ -85,7 +85,7 @@ typedef MongolSelectionChangedHandler = void Function(
 /// the [HorizontalCaretMovementRun] must not be used. The [isValid] property must
 /// be checked before calling [movePrevious] and [moveNext], or accessing
 /// [current].
-class HorizontalCaretMovementRun extends BidirectionalIterator<TextPosition> {
+class HorizontalCaretMovementRun extends Iterator<TextPosition> {
   HorizontalCaretMovementRun._(
       this._editable,
       this._lineMetrics,
@@ -159,7 +159,6 @@ class HorizontalCaretMovementRun extends BidirectionalIterator<TextPosition> {
     return true;
   }
 
-  @override
   bool movePrevious() {
     assert(isValid);
     if (_currentLine <= 0) {
@@ -1996,7 +1995,7 @@ class MongolRenderEditable extends RenderBox
   /// Starts a [HorizontalCaretMovementRun] at the given location in the text, for
   /// handling consecutive horizontal caret movements.
   ///
-  /// This can be used to handle consecutive upward/downward arrow key movements
+  /// This can be used to handle consecutive left/right arrow key movements
   /// in an input field.
   ///
   /// {@macro flutter.rendering.RenderEditable.verticalArrowKeyMovement}

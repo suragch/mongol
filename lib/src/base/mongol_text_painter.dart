@@ -664,13 +664,13 @@ class MongolTextPainter {
   }
 
   List<MongolLineMetrics>? _lineMetricsCache;
-  /// Returns the full list of [LineMetrics] that describe in detail the various
+  /// Returns the full list of [MongolLineMetrics] that describe in detail the various
   /// metrics of each laid out line.
   ///
-  /// The [LineMetrics] list is presented in the order of the lines they represent.
+  /// The [MongolLineMetrics] list is presented in the order of the lines they represent.
   /// For example, the first line is in the zeroth index.
   ///
-  /// [LineMetrics] contains measurements such as ascent, descent, baseline, and
+  /// [MongolLineMetrics] contains measurements such as ascent, descent, baseline, and
   /// width for the line as a whole, and may be useful for aligning additional
   /// widgets to a particular line.
   ///
