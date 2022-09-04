@@ -8,10 +8,143 @@ import 'dart:collection';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:characters/characters.dart';
 
 import 'mongol_text_align.dart';
+
+/// [MongolLineMetrics] stores the measurements and statistics of a single line in the
+/// paragraph.
+///
+/// The measurements here are for the line as a whole, and represent the maximum
+/// extent of the line instead of per-run or per-glyph metrics. For more detailed
+/// metrics, [MongolParagraph.getBoxesForRange].
+///
+/// [MongolLineMetrics] should be obtained directly from the [MongolParagraph.computeLineMetrics]
+/// method.
+class MongolLineMetrics {
+  /// Creates a [MongolLineMetrics] object with only the specified values.
+  MongolLineMetrics({
+    required this.hardBreak,
+    required this.ascent,
+    required this.descent,
+    required this.unscaledAscent,
+    required this.height,
+    required this.width,
+    required this.top,
+    required this.baseline,
+    required this.lineNumber,
+  });
+
+  /// True if this line ends with an explicit line break (e.g. '\n') or is the end
+  /// of the paragraph. False otherwise.
+  final bool hardBreak;
+
+  /// The rise from the [baseline] as calculated from the font and style for this line.
+  ///
+  /// This is the final computed ascent and can be impacted by the strut, width(horizontal layout height),
+  /// scaling, as well as outlying runs that are very tall.
+  ///
+  /// The [ascent] is provided as a positive value, even though it is typically defined
+  /// in fonts as negative. This is to ensure the signage of operations with these
+  /// metrics directly reflects the intended signage of the value. For example,
+  /// the x coordinate of the right edge of the line is `baseline + ascent`.
+  final double ascent;
+
+  /// The drop from the [baseline] as calculated from the font and style for this line.
+  ///
+  /// This is the final computed ascent and can be impacted by the strut, width(horizontal layout height),
+  /// scaling, as well as outlying runs that are very tall.
+  ///
+  /// The x coordinate of the left edge of the line is `baseline - descent`.
+  final double descent;
+
+  /// The rise from the [baseline] as calculated from the font and style for this line
+  /// ignoring the [TextStyle.height].
+  ///
+  /// The [unscaledAscent] is provided as a positive value, even though it is typically
+  /// defined in fonts as negative. This is to ensure the signage of operations with
+  /// these metrics directly reflects the intended signage of the value.
+  final double unscaledAscent;
+
+  /// Height of the line from the top edge of the topmost glyph to the bottom
+  /// edge of the bottommost glyph.
+  ///
+  /// This is not the same as the height of the paragraph.
+  ///
+  /// See also:
+  ///
+  ///  * [MongolParagraph.height], the max height passed in during layout.
+  final double height;
+
+  /// Total width of the line from the left edge to the right edge.
+  ///
+  /// This is equivalent to `round(ascent + descent)`. This value is provided
+  /// separately due to rounding causing sub-pixel differences from the unrounded
+  /// values.
+  final double width;
+
+  /// The y coordinate of top edge of the line.
+  ///
+  /// The bottom edge can be obtained with `top + height`.
+  final double top;
+
+  /// The x coordinate of the baseline for this line from the left of the paragraph.
+  ///
+  /// The right edge of the paragraph up to and including this line may be obtained
+  /// through `baseline + ascent`.
+  final double baseline;
+
+  /// The number of this line in the overall paragraph, with the first line being
+  /// index zero.
+  ///
+  /// For example, the first line is line 0, second line is line 1.
+  final int lineNumber;
+
+  @override
+  bool operator ==(Object other) {
+    if (other.runtimeType != runtimeType) {
+      return false;
+    }
+    return other is MongolLineMetrics &&
+        other.hardBreak == hardBreak &&
+        other.ascent == ascent &&
+        other.descent == descent &&
+        other.unscaledAscent == unscaledAscent &&
+        other.height == height &&
+        other.width == width &&
+        other.top == top &&
+        other.baseline == baseline &&
+        other.lineNumber == lineNumber;
+  }
+
+  @override
+  int get hashCode =>
+      hashValues(
+          hardBreak,
+          ascent,
+          descent,
+          unscaledAscent,
+          height,
+          width,
+          top,
+          baseline,
+          lineNumber);
+
+  @override
+  String toString() {
+    return 'LineMetrics(hardBreak: $hardBreak, '
+        'ascent: $ascent, '
+        'descent: $descent, '
+        'unscaledAscent: $unscaledAscent, '
+        'height: $height, '
+        'width: $width, '
+        'top: $top, '
+        'baseline: $baseline, '
+        'lineNumber: $lineNumber)';
+  }
+}
 
 /// A paragraph of vertical Mongolian layout text.
 ///
@@ -30,13 +163,11 @@ class MongolParagraph {
   /// or extended directly.
   ///
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
-  MongolParagraph._(
-    this._runs,
-    this._text,
-    this._maxLines,
-    this._ellipsis,
-    this._textAlign,
-  );
+  MongolParagraph._(this._runs,
+      this._text,
+      this._maxLines,
+      this._ellipsis,
+      this._textAlign,);
 
   final String _text;
   final List<_TextRun> _runs;
@@ -243,6 +374,8 @@ class MongolParagraph {
     var rotatedRunDy = 0.0;
     for (var line in _lines) {
       rightEdgeAfterRotation += line.bounds.bottom;
+      // todo rotatedRunDx always = 0 ?
+      // maybe rotatedRunDx = rightEdgeAfterRotation; before the previous line code?
       rotatedRunDx = line.bounds.top;
       if (dx <= rightEdgeAfterRotation) {
         matchedLine = line;
@@ -282,7 +415,7 @@ class MongolParagraph {
     // find the afinity
     final lineEndCharOffset = matchedRun.end;
     final textAfinity =
-        (textOffset == lineEndCharOffset) ? upstream : downstream;
+    (textOffset == lineEndCharOffset) ? upstream : downstream;
     return [textOffset, textAfinity];
   }
 
@@ -314,8 +447,8 @@ class MongolParagraph {
     canvas.restore();
   }
 
-  void _drawEachRunInCurrentLine(
-      Canvas canvas, _LineInfo line, bool shouldDrawEllipsis, bool isLastLine) {
+  void _drawEachRunInCurrentLine(Canvas canvas, _LineInfo line,
+      bool shouldDrawEllipsis, bool isLastLine) {
     canvas.save();
 
     var runSpacing = 0.0;
@@ -610,6 +743,68 @@ class MongolParagraph {
     }
     return TextRange(start: start, end: end);
   }
+
+  /// Returns the full list of [MongolLineMetrics] that describe in detail the various
+  /// metrics of each laid out line.
+  ///
+  /// Not valid until after layout.
+  ///
+  /// This can potentially return a large amount of data, so it is not recommended
+  /// to repeatedly call this. Instead, cache the results.
+  List<MongolLineMetrics> computeLineMetrics() {
+    final List<MongolLineMetrics> metrics = <MongolLineMetrics>[];
+    for (int index = 0; index < _lines.length; index += 1) {
+      final line = _lines[index];
+      bool hardBreak = false;
+      double ascent = 0;
+      double descent = 0;
+      double unscaledAscent = 0;
+      double height = 0;
+      double width = 0;
+      double baseline = 0;
+      for (int j = line.textRunStart; j < line.textRunEnd; j += 1) {
+        final textRun = _runs[j];
+        final runMetrics = textRun.paragraph
+            .computeLineMetrics()
+            .first;
+
+        // last textRun of this line
+        if (j == line.textRunEnd - 1) {
+          hardBreak = _runEndsWithNewLine(textRun);
+        }
+        ascent = math.max(runMetrics.ascent, ascent);
+        descent = math.max(runMetrics.descent, descent);
+        unscaledAscent = math.max(runMetrics.unscaledAscent, unscaledAscent);
+        width = math.max(runMetrics.height, width);
+        height += runMetrics.width;
+        final previousMetrics = index > 0 ? metrics[index - 1] : null;
+        final previousLineAscent = previousMetrics?.ascent ?? 0.0;
+        final previousLineBaseline = previousMetrics?.baseline ?? 0.0;
+        baseline = previousLineBaseline + previousLineAscent + descent;
+      }
+
+      double top = 0;
+      if (_textAlign == MongolTextAlign.center) {
+        top = (this.height - height) / 2;
+      } else if (_textAlign == MongolTextAlign.bottom) {
+        top = this.height - height;
+      }
+
+      final lineMetrics = MongolLineMetrics(
+        hardBreak: hardBreak,
+        ascent: ascent,
+        descent: descent,
+        unscaledAscent: unscaledAscent,
+        height: height,
+        width: width,
+        top: top,
+        baseline: baseline,
+        lineNumber: index,
+      );
+      metrics.add(lineMetrics);
+    }
+    return metrics;
+  }
 }
 
 /// Layout constraints for [MongolParagraph] objects.
@@ -653,13 +848,13 @@ class MongolParagraphConstraints {
 /// After constructing a [MongolParagraph], call [MongolParagraph.layout] on
 /// it and then paint it with [MongolParagraph.draw].
 class MongolParagraphBuilder {
-  MongolParagraphBuilder(
-    ui.ParagraphStyle style, {
+  MongolParagraphBuilder(ui.ParagraphStyle style, {
     MongolTextAlign textAlign = MongolTextAlign.top,
     double textScaleFactor = 1.0,
     int? maxLines,
     String? ellipsis,
-  })  : _paragraphStyle = style,
+  })
+      : _paragraphStyle = style,
         _textAlign = textAlign,
         _textScaleFactor = textScaleFactor,
         _maxLines = maxLines,
@@ -670,6 +865,7 @@ class MongolParagraphBuilder {
   final double _textScaleFactor;
   final int? _maxLines;
   final String? _ellipsis;
+
   //_TextRun? _ellipsisRun;
   final _styleStack = _Stack<TextStyle>();
   final _rawStyledTextRuns = <_RawStyledTextRun>[];
@@ -751,7 +947,7 @@ class MongolParagraphBuilder {
       final paragraph = builder.build();
       paragraph.layout(const ui.ParagraphConstraints(width: double.infinity));
       final run =
-          _TextRun(startIndex, endIndex, segment.isRotatable, paragraph);
+      _TextRun(startIndex, endIndex, segment.isRotatable, paragraph);
       runs.add(run);
       builder = null;
       startIndex = endIndex;
@@ -818,6 +1014,7 @@ class MongolParagraphBuilder {
 /// that line breaks are allowed.
 class BreakSegments extends Iterable<RotatableString> {
   BreakSegments(this.text);
+
   final String text;
 
   @override
@@ -826,6 +1023,7 @@ class BreakSegments extends Iterable<RotatableString> {
 
 class RotatableString {
   const RotatableString(this.text, this.isRotatable);
+
   final String text;
   final bool isRotatable;
 }
@@ -971,6 +1169,7 @@ class LineBreaker implements Iterator<RotatableString> {
 // A data object to associate a text run with its style
 class _RawStyledTextRun {
   _RawStyledTextRun(this.style, this.text);
+
   final TextStyle? style;
   final RotatableString text;
 }

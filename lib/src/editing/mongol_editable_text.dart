@@ -12,7 +12,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart' show DeleteToNextWordBoundaryIntent, ExpandSelectionToDocumentBoundaryIntent, ExtendSelectionVerticallyToAdjacentLineIntent, ReplaceTextIntent, ScrollToDocumentBoundaryIntent, Size, kMinInteractiveDimension;
 import 'package:flutter/rendering.dart'
-    show RevealedOffset, ViewportOffset, CaretChangedHandler;
+    show CaretChangedHandler, RevealedOffset, VerticalCaretMovementRun, ViewportOffset;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart'
@@ -113,11 +113,6 @@ const int _kObscureShowLatestCharCursorTicks = 3;
 ///
 ///  * [MongolTextField], which is a full-featured, material-design text input
 ///    field with placeholder text, labels, and [Form] integration.
-@Deprecated("Don't use this class with Flutter 2.5 or higher. Something in the"
-    "Flutter 2.5 update causes your app to freeze if the cursor has to scroll out"
-    "of view. As a workaround for single line text you can rotate a standard"
-    "TextField. There is no current workaround for multiline text. If you can find"
-    "the source of the error please open an issue on GitHub.")
 class MongolEditableText extends StatefulWidget {
   /// Creates a basic text input control.
   ///
@@ -2090,6 +2085,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     setState(() {
       /* We use widget.controller.value in build(). */
     });
+    _adjacentLineAction.stopCurrentVerticalRunIfSelectionChanges();
   }
 
   void _handleFocusChanged() {
@@ -2399,6 +2395,8 @@ class MongolEditableTextState extends State<MongolEditableText>
   }
   late final Action<UpdateSelectionIntent> _updateSelectionAction = CallbackAction<UpdateSelectionIntent>(onInvoke: _updateSelection);
 
+  late final _UpdateTextSelectionToAdjacentLineAction<ExtendSelectionVerticallyToAdjacentLineIntent> _adjacentLineAction = _UpdateTextSelectionToAdjacentLineAction<ExtendSelectionVerticallyToAdjacentLineIntent>(this);
+
   _TextBoundary _documentBoundary(DirectionalTextEditingIntent intent) => _DocumentBoundary(_value);
 
   Action<T> _makeOverridable<T extends Intent>(Action<T> defaultAction) {
@@ -2422,6 +2420,16 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
   }
   late final Action<ReplaceTextIntent> _replaceTextAction = CallbackAction<ReplaceTextIntent>(onInvoke: _replaceText);
+
+  // Scrolls either to the beginning or end of the document depending on the
+  // intent's `forward` parameter.
+  void _scrollToDocumentBoundary(ScrollToDocumentBoundaryIntent intent) {
+    if (intent.forward) {
+      bringIntoView(TextPosition(offset: _value.text.length));
+    } else {
+      bringIntoView(const TextPosition(offset: 0));
+    }
+  }
 
   void _expandSelectionToDocumentBoundary(ExpandSelectionToDocumentBoundaryIntent intent) {
     final _TextBoundary textBoundary = _documentBoundary(intent);
@@ -2483,10 +2491,10 @@ class MongolEditableTextState extends State<MongolEditableText>
     ExtendSelectionToLineBreakIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToLineBreakIntent>(this, true, _linebreak)),
     ExpandSelectionToLineBreakIntent: _makeOverridable(CallbackAction<ExpandSelectionToLineBreakIntent>(onInvoke: _expandSelectionToLinebreak)),
     ExpandSelectionToDocumentBoundaryIntent: _makeOverridable(CallbackAction<ExpandSelectionToDocumentBoundaryIntent>(onInvoke: _expandSelectionToDocumentBoundary)),
-    // ExtendSelectionVerticallyToAdjacentLineIntent: _makeOverridable(_adjacentLineAction),
+    ExtendSelectionVerticallyToAdjacentLineIntent: _makeOverridable(_adjacentLineAction),
     ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(this, true, _documentBoundary)),
     ExtendSelectionToNextWordBoundaryOrCaretLocationIntent: _makeOverridable(_ExtendSelectionOrCaretPositionAction(this, _nextWordBoundary)),
-    // ScrollToDocumentBoundaryIntent: _makeOverridable(CallbackAction<ScrollToDocumentBoundaryIntent>(onInvoke: _scrollToDocumentBoundary)),
+    ScrollToDocumentBoundaryIntent: _makeOverridable(CallbackAction<ScrollToDocumentBoundaryIntent>(onInvoke: _scrollToDocumentBoundary)),
 
     // Copy Paste
     SelectAllTextIntent: _makeOverridable(_SelectAllAction(this)),
@@ -3230,6 +3238,71 @@ class _ExtendSelectionOrCaretPositionAction extends ContextAction<ExtendSelectio
 
   @override
   bool get isActionEnabled => state.widget.selectionEnabled && state._value.selection.isValid;
+}
+
+class _UpdateTextSelectionToAdjacentLineAction<T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
+  _UpdateTextSelectionToAdjacentLineAction(this.state);
+
+  final MongolEditableTextState state;
+
+  HorizontalCaretMovementRun? _horizontalMovementRun;
+  TextSelection? _runSelection;
+
+  void stopCurrentVerticalRunIfSelectionChanges() {
+    final TextSelection? runSelection = _runSelection;
+    if (runSelection == null) {
+      assert(_horizontalMovementRun == null);
+      return;
+    }
+    _runSelection = state._value.selection;
+    final TextSelection currentSelection = state.widget.controller.selection;
+    final bool continueCurrentRun = currentSelection.isValid && currentSelection.isCollapsed
+        && currentSelection.baseOffset == runSelection.baseOffset
+        && currentSelection.extentOffset == runSelection.extentOffset;
+    if (!continueCurrentRun) {
+      _horizontalMovementRun = null;
+      _runSelection = null;
+    }
+  }
+
+  @override
+  void invoke(T intent, [BuildContext? context]) {
+    assert(state._value.selection.isValid);
+
+    final bool collapseSelection = intent.collapseSelection || !state.widget.selectionEnabled;
+    final TextEditingValue value = state._textEditingValueforTextLayoutMetrics;
+    if (!value.selection.isValid) {
+      return;
+    }
+
+    if (_horizontalMovementRun?.isValid == false) {
+      _horizontalMovementRun = null;
+      _runSelection = null;
+    }
+
+    final HorizontalCaretMovementRun currentRun = _horizontalMovementRun
+        ?? state.renderEditable.startHorizontalCaretMovement(state.renderEditable.selection!.extent);
+
+    final bool shouldMove = intent.forward ? currentRun.moveNext() : currentRun.movePrevious();
+    final TextPosition newExtent = shouldMove
+        ? currentRun.current
+        : (intent.forward ? TextPosition(offset: state._value.text.length) : const TextPosition(offset: 0));
+    final TextSelection newSelection = collapseSelection
+        ? TextSelection.fromPosition(newExtent)
+        : value.selection.extendTo(newExtent);
+
+    Actions.invoke(
+      context!,
+      UpdateSelectionIntent(value, newSelection, SelectionChangedCause.keyboard),
+    );
+    if (state._value.selection == newSelection) {
+      _horizontalMovementRun = currentRun;
+      _runSelection = newSelection;
+    }
+  }
+
+  @override
+  bool get isActionEnabled => state._value.selection.isValid;
 }
 
 class _SelectAllAction extends ContextAction<SelectAllTextIntent> {

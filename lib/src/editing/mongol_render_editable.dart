@@ -15,6 +15,8 @@ import 'package:flutter/services.dart';
 import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/base/mongol_text_painter.dart';
 
+import '../base/mongol_paragraph.dart';
+
 // ignore_for_file: deprecated_member_use_from_same_package
 // ignore_for_file: todo
 
@@ -35,6 +37,141 @@ typedef MongolSelectionChangedHandler = void Function(
   MongolRenderEditable renderObject,
   SelectionChangedCause cause,
 );
+
+/// The consecutive sequence of [TextPosition]s that the caret should move to
+/// when the user navigates the paragraph using the upward arrow key or the
+/// downward arrow key.
+///
+/// {@template flutter.rendering.RenderEditable.verticalArrowKeyMovement}
+/// When the user presses the upward arrow key or the downward arrow key, on
+/// many platforms (macOS for instance), the caret will move to the previous
+/// line or the next line, while maintaining its original horizontal location.
+/// When it encounters a shorter line, the caret moves to the closest horizontal
+/// location within that line, and restores the original horizontal location
+/// when a long enough line is encountered.
+///
+/// Additionally, the caret will move to the beginning of the document if the
+/// upward arrow key is pressed and the caret is already on the first line. If
+/// the downward arrow key is pressed next, the caret will restore its original
+/// horizontal location and move to the second line. Similarly the caret moves
+/// to the end of the document if the downward arrow key is pressed when it's
+/// already on the last line.
+///
+/// Consider a top-aligned paragraph:
+///   a  a  a
+///   a     a
+///  ——     a
+/// where the caret was initially placed at the end of the first line. Pressing
+/// the downward arrow key once will move the caret to the end of the second
+/// line, and twice the arrow key moves to the third line after the second "a"
+/// on that line. Pressing the downward arrow key again, the caret will move to
+/// the end of the third line (the end of the document). Pressing the upward
+/// arrow key in this state will result in the caret moving to the end of the
+/// second line.
+///
+/// Horizontal caret runs are typically interrupted when the layout of the text
+/// changes (including when the text itself changes), or when the selection is
+/// changed by other input events or programmatically (for example, when the
+/// user pressed the left arrow key).
+/// {@endtemplate}
+///
+/// The [movePrevious] method moves the caret location (which is
+/// [HorizontalCaretMovementRun.current]) to the previous line, and in case
+/// the caret is already on the first line, the method does nothing and returns
+/// false. Similarly the [moveNext] method moves the caret to the next line, and
+/// returns false if the caret is already on the last line.
+///
+/// If the underlying paragraph's layout changes, [isValid] becomes false and
+/// the [HorizontalCaretMovementRun] must not be used. The [isValid] property must
+/// be checked before calling [movePrevious] and [moveNext], or accessing
+/// [current].
+class HorizontalCaretMovementRun extends BidirectionalIterator<TextPosition> {
+  HorizontalCaretMovementRun._(
+      this._editable,
+      this._lineMetrics,
+      this._currentTextPosition,
+      this._currentLine,
+      this._currentOffset,
+      );
+
+  Offset _currentOffset;
+  int _currentLine;
+  TextPosition _currentTextPosition;
+
+  final List<MongolLineMetrics> _lineMetrics;
+  final MongolRenderEditable _editable;
+
+  bool _isValid = true;
+  /// Whether this [HorizontalCaretMovementRun] can still continue.
+  ///
+  /// A [HorizontalCaretMovementRun] run is valid if the underlying text layout
+  /// hasn't changed.
+  ///
+  /// The [current] value and the [movePrevious] and [moveNext] methods must not
+  /// be accessed when [isValid] is false.
+  bool get isValid {
+    if (!_isValid) {
+      return false;
+    }
+    final List<MongolLineMetrics> newLineMetrics = _editable._textPainter.computeLineMetrics();
+    // Use the implementation detail of the computeLineMetrics method to figure
+    // out if the current text layout has been invalidated.
+    if (!identical(newLineMetrics, _lineMetrics)) {
+      _isValid = false;
+    }
+    return _isValid;
+  }
+
+  final Map<int, MapEntry<Offset, TextPosition>> _positionCache = <int, MapEntry<Offset, TextPosition>>{};
+
+  MapEntry<Offset, TextPosition> _getTextPositionForLine(int lineNumber) {
+    assert(isValid);
+    assert(lineNumber >= 0);
+    final MapEntry<Offset, TextPosition>? cachedPosition = _positionCache[lineNumber];
+    if (cachedPosition != null) {
+      return cachedPosition;
+    }
+    assert(lineNumber != _currentLine);
+
+    final Offset newOffset = Offset(_lineMetrics[lineNumber].baseline, _currentOffset.dy);
+    final TextPosition closestPosition = _editable._textPainter.getPositionForOffset(newOffset);
+    final MapEntry<Offset, TextPosition> position = MapEntry<Offset, TextPosition>(newOffset, closestPosition);
+    _positionCache[lineNumber] = position;
+    return position;
+  }
+
+  @override
+  TextPosition get current {
+    assert(isValid);
+    return _currentTextPosition;
+  }
+
+  @override
+  bool moveNext() {
+    assert(isValid);
+    if (_currentLine + 1 >= _lineMetrics.length) {
+      return false;
+    }
+    final MapEntry<Offset, TextPosition> position = _getTextPositionForLine(_currentLine + 1);
+    _currentLine += 1;
+    _currentOffset = position.key;
+    _currentTextPosition = position.value;
+    return true;
+  }
+
+  @override
+  bool movePrevious() {
+    assert(isValid);
+    if (_currentLine <= 0) {
+      return false;
+    }
+    final MapEntry<Offset, TextPosition> position = _getTextPositionForLine(_currentLine - 1);
+    _currentLine -= 1;
+    _currentOffset = position.key;
+    _currentTextPosition = position.value;
+    return true;
+  }
+}
 
 /// Displays some text in a scrollable container with a potentially blinking
 /// cursor and with gesture recognizers.
@@ -1832,6 +1969,54 @@ class MongolRenderEditable extends RenderBox
     _maxScrollExtent = _getMaxScrollExtent(contentSize);
     offset.applyViewportDimension(_viewportExtent);
     offset.applyContentDimensions(0.0, _maxScrollExtent);
+  }
+
+  MapEntry<int, Offset> _lineNumberFor(TextPosition startPosition, List<MongolLineMetrics> metrics) {
+    // TODO(LongCatIsLooong): include line boundaries information in
+    // MongolLineMetrics, then we can get rid of this.
+    final Offset offset = _textPainter.getOffsetForCaret(startPosition, Rect.zero);
+    if (kDebugMode) {
+      print('MongolRenderEditable -> offset: ${offset.dx} ${offset.dy}');
+    }
+    for (final MongolLineMetrics lineMetrics in metrics) {
+      if (kDebugMode) {
+        print('MongolRenderEditable -> lineMetrics: $lineMetrics');
+      }
+      if (lineMetrics.baseline > offset.dx) {
+        return MapEntry<int, Offset>(lineMetrics.lineNumber, Offset(lineMetrics.baseline, offset.dy));
+      }
+    }
+    assert(startPosition.offset == 0, 'unable to find the line for $startPosition');
+    return MapEntry<int, Offset>(
+      math.max(0, metrics.length - 1),
+      Offset(metrics.isNotEmpty ? metrics.last.baseline + metrics.last.ascent : 0.0,offset.dy),
+    );
+  }
+
+  /// Starts a [HorizontalCaretMovementRun] at the given location in the text, for
+  /// handling consecutive horizontal caret movements.
+  ///
+  /// This can be used to handle consecutive upward/downward arrow key movements
+  /// in an input field.
+  ///
+  /// {@macro flutter.rendering.RenderEditable.verticalArrowKeyMovement}
+  ///
+  /// The [HorizontalCaretMovementRun.isValid] property indicates whether the text
+  /// layout has changed and the horizontal caret run is invalidated.
+  ///
+  /// The caller should typically discard a [HorizontalCaretMovementRun] when
+  /// its [HorizontalCaretMovementRun.isValid] becomes false, or on other
+  /// occasions where the horizontal caret run should be interrupted.
+  HorizontalCaretMovementRun startHorizontalCaretMovement(TextPosition startPosition) {
+    final List<MongolLineMetrics> metrics = _textPainter.computeLineMetrics();
+    final MapEntry<int, Offset> currentLine = _lineNumberFor(startPosition, metrics);
+    return HorizontalCaretMovementRun._(
+      this,
+      metrics,
+      startPosition,
+      currentLine.key,
+      currentLine.value,
+    );
   }
 
   void _paintContents(PaintingContext context, Offset offset) {
