@@ -97,6 +97,7 @@ class MongolTextPainter {
   /// in framework will automatically invoke this method.
   void markNeedsLayout() {
     _paragraph = null;
+    _lineMetricsCache = null;
     _needsLayout = true;
     _previousCaretPosition = null;
     _previousCaretPrototype = null;
@@ -363,6 +364,7 @@ class MongolTextPainter {
     _lastMinHeight = minHeight;
     _lastMaxHeight = maxHeight;
     // A change in layout invalidates the cached caret metrics as well.
+    _lineMetricsCache = null;
     _previousCaretPosition = null;
     _previousCaretPrototype = null;
     _paragraph!.layout(MongolParagraphConstraints(height: maxHeight));
@@ -659,5 +661,22 @@ class MongolTextPainter {
   TextRange getLineBoundary(TextPosition position) {
     assert(!_needsLayout);
     return _paragraph!.getLineBoundary(position);
+  }
+
+  List<MongolLineMetrics>? _lineMetricsCache;
+  /// Returns the full list of [MongolLineMetrics] that describe in detail the various
+  /// metrics of each laid out line.
+  ///
+  /// The [MongolLineMetrics] list is presented in the order of the lines they represent.
+  /// For example, the first line is in the zeroth index.
+  ///
+  /// [MongolLineMetrics] contains measurements such as ascent, descent, baseline, and
+  /// width for the line as a whole, and may be useful for aligning additional
+  /// widgets to a particular line.
+  ///
+  /// Valid only after [layout] has been called.
+  List<MongolLineMetrics> computeLineMetrics() {
+    assert(!_needsLayout);
+    return  _lineMetricsCache ??= _paragraph!.computeLineMetrics();
   }
 }
