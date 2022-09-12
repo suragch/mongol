@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
           destination: HorizontalListviewDemo(),
         ),
         DemoTile(
-          title: 'Maxlines demo',
+          title: 'Max lines demo',
           destination: MaxLinesDemo(),
         ),
         DemoTile(

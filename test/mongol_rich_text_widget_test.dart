@@ -11,8 +11,7 @@ import 'package:mongol/mongol.dart';
 import 'package:mongol/src/text/mongol_render_paragraph.dart';
 
 void main() {
-  final binding = TestWidgetsFlutterBinding.ensureInitialized()
-      as TestWidgetsFlutterBinding;
+  final binding = TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('MongolRichText has text', (WidgetTester tester) async {
     await tester.pumpWidget(const MongolRichText(
@@ -110,7 +109,7 @@ void main() {
     expect(baseSize.height, equals(182.0));
   });
 
-  testWidgets('MongolRichText has correct instrinsic width',
+  testWidgets('MongolRichText has correct intrinsic width',
       (WidgetTester tester) async {
     final paragraph = MongolRenderParagraph(const TextSpan(text: 'A string'));
 
@@ -193,7 +192,7 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(42.0));
-    expect(baseSize.height, equals(287.0));
+    expect(baseSize.height, equals(283.0));
   });
 
   testWidgets('MongolText handles embedded formatting characters',

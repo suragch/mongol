@@ -10,13 +10,95 @@ import 'dart:ui' as ui hide TextStyle;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
-import 'package:flutter/material.dart' show DeleteToNextWordBoundaryIntent, ExpandSelectionToDocumentBoundaryIntent, ExtendSelectionVerticallyToAdjacentLineIntent, ReplaceTextIntent, ScrollToDocumentBoundaryIntent, Size, kMinInteractiveDimension;
+import 'package:flutter/material.dart'
+    show
+        DeleteToNextWordBoundaryIntent,
+        ExpandSelectionToDocumentBoundaryIntent,
+        ExtendSelectionVerticallyToAdjacentLineIntent,
+        ReplaceTextIntent,
+        ScrollToDocumentBoundaryIntent,
+        Size,
+        kMinInteractiveDimension;
 import 'package:flutter/rendering.dart'
-    show CaretChangedHandler, RevealedOffset, VerticalCaretMovementRun, ViewportOffset;
+    show CaretChangedHandler, RevealedOffset, ViewportOffset;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart'
-    show Action, Actions, AnimationController, AppPrivateCommandCallback, AutofillGroup, AutofillGroupState, AutomaticKeepAliveClientMixin, AxisDirection, BuildContext, CallbackAction, CharacterRange, Clip, ClipboardStatus, ClipboardStatusNotifier, Color, CompositedTransformTarget, ContextAction, CopySelectionTextIntent, Curve, Curves, DeleteCharacterIntent, DeleteToLineBreakIntent, DirectionalCaretMovementIntent, DirectionalFocusAction, DirectionalFocusIntent, DirectionalTextEditingIntent, DismissIntent, DoNothingAction, DoNothingAndStopPropagationTextIntent, EdgeInsets, ExpandSelectionToLineBreakIntent, ExtendSelectionByCharacterIntent, ExtendSelectionToDocumentBoundaryIntent, ExtendSelectionToLineBreakIntent, ExtendSelectionToNextWordBoundaryIntent, ExtendSelectionToNextWordBoundaryOrCaretLocationIntent, Focus, FocusAttachment, FocusNode, FocusScope, GlobalKey, Intent, LayerLink, LeafRenderObjectWidget, MediaQuery, MouseRegion, Offset, PasteTextIntent, Radius, Rect, ScrollBehavior, ScrollConfiguration, ScrollController, ScrollPhysics, Scrollable, SelectAllTextIntent, SelectionChangedCallback, Semantics, State, StatefulWidget, TextAlign, TextDirection, TextEditingController, TextSelectionControls, TextSelectionHandleType, TextSpan, TextStyle, TickerProviderStateMixin, ToolbarOptions, UpdateSelectionIntent, Widget, WidgetsBinding, WidgetsBindingObserver, debugCheckHasMediaQuery;
+    show
+        Action,
+        Actions,
+        AnimationController,
+        AppPrivateCommandCallback,
+        AutofillGroup,
+        AutofillGroupState,
+        AutomaticKeepAliveClientMixin,
+        AxisDirection,
+        BuildContext,
+        CallbackAction,
+        CharacterRange,
+        Clip,
+        ClipboardStatus,
+        ClipboardStatusNotifier,
+        Color,
+        CompositedTransformTarget,
+        ContextAction,
+        CopySelectionTextIntent,
+        Curve,
+        Curves,
+        DeleteCharacterIntent,
+        DeleteToLineBreakIntent,
+        DirectionalCaretMovementIntent,
+        DirectionalFocusAction,
+        DirectionalFocusIntent,
+        DirectionalTextEditingIntent,
+        DismissIntent,
+        DoNothingAction,
+        DoNothingAndStopPropagationTextIntent,
+        EdgeInsets,
+        ExpandSelectionToLineBreakIntent,
+        ExtendSelectionByCharacterIntent,
+        ExtendSelectionToDocumentBoundaryIntent,
+        ExtendSelectionToLineBreakIntent,
+        ExtendSelectionToNextWordBoundaryIntent,
+        ExtendSelectionToNextWordBoundaryOrCaretLocationIntent,
+        Focus,
+        FocusAttachment,
+        FocusNode,
+        FocusScope,
+        GlobalKey,
+        Intent,
+        LayerLink,
+        LeafRenderObjectWidget,
+        MediaQuery,
+        MouseRegion,
+        Offset,
+        PasteTextIntent,
+        Radius,
+        Rect,
+        ScrollBehavior,
+        ScrollConfiguration,
+        ScrollController,
+        ScrollPhysics,
+        Scrollable,
+        SelectAllTextIntent,
+        SelectionChangedCallback,
+        Semantics,
+        State,
+        StatefulWidget,
+        TextAlign,
+        TextDirection,
+        TextEditingController,
+        TextSelectionControls,
+        TextSelectionHandleType,
+        TextSpan,
+        TextStyle,
+        TickerProviderStateMixin,
+        ToolbarOptions,
+        UpdateSelectionIntent,
+        Widget,
+        WidgetsBinding,
+        WidgetsBindingObserver,
+        debugCheckHasMediaQuery;
 //import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
 
 import 'package:mongol/src/base/mongol_text_align.dart';
@@ -1134,8 +1216,8 @@ class MongolEditableTextState extends State<MongolEditableText>
     });
   }
 
-  TextEditingValue get _textEditingValueforTextLayoutMetrics {
-    final Widget? editableWidget =_editableKey.currentContext?.widget;
+  TextEditingValue get _textEditingValueForTextLayoutMetrics {
+    final Widget? editableWidget = _editableKey.currentContext?.widget;
     if (editableWidget is! _MongolEditable) {
       throw StateError('_Editable must be mounted.');
     }
@@ -1147,7 +1229,6 @@ class MongolEditableTextState extends State<MongolEditableText>
   @override
   void copySelection(SelectionChangedCause cause) {
     final TextSelection selection = textEditingValue.selection;
-    assert(selection != null);
     if (selection.isCollapsed || widget.obscureText) {
       return;
     }
@@ -1165,11 +1246,12 @@ class MongolEditableTextState extends State<MongolEditableText>
         case TargetPlatform.fuchsia:
         case TargetPlatform.linux:
         case TargetPlatform.windows:
-        // Collapse the selection and hide the toolbar and handles.
+          // Collapse the selection and hide the toolbar and handles.
           userUpdateTextEditingValue(
             TextEditingValue(
               text: textEditingValue.text,
-              selection: TextSelection.collapsed(offset: textEditingValue.selection.end),
+              selection: TextSelection.collapsed(
+                  offset: textEditingValue.selection.end),
             ),
             SelectionChangedCause.toolbar,
           );
@@ -1188,7 +1270,6 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
     final TextSelection selection = textEditingValue.selection;
     final String text = textEditingValue.text;
-    assert(selection != null);
     if (selection.isCollapsed) {
       return;
     }
@@ -1214,7 +1295,6 @@ class MongolEditableTextState extends State<MongolEditableText>
       return;
     }
     final TextSelection selection = textEditingValue.selection;
-    assert(selection != null);
     if (!selection.isValid) {
       return;
     }
@@ -1227,8 +1307,10 @@ class MongolEditableTextState extends State<MongolEditableText>
 
     // After the paste, the cursor should be collapsed and located after the
     // pasted content.
-    final int lastSelectionIndex = math.max(selection.baseOffset, selection.extentOffset);
-    final TextEditingValue collapsedTextEditingValue = textEditingValue.copyWith(
+    final int lastSelectionIndex =
+        math.max(selection.baseOffset, selection.extentOffset);
+    final TextEditingValue collapsedTextEditingValue =
+        textEditingValue.copyWith(
       selection: TextSelection.collapsed(offset: lastSelectionIndex),
     );
 
@@ -1258,7 +1340,8 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
     userUpdateTextEditingValue(
       textEditingValue.copyWith(
-        selection: TextSelection(baseOffset: 0, extentOffset: textEditingValue.text.length),
+        selection: TextSelection(
+            baseOffset: 0, extentOffset: textEditingValue.text.length),
       ),
       cause,
     );
@@ -1708,8 +1791,10 @@ class MongolEditableTextState extends State<MongolEditableText>
       //         _createTextInputConfiguration(
       //             _isInAutofillContext || _needsAutofill));
       _textInputConnection = _needsAutofill && currentAutofillScope != null
-          ? currentAutofillScope!.attach(this, _effectiveAutofillClient.textInputConfiguration)
-          : TextInput.attach(this, _effectiveAutofillClient.textInputConfiguration);
+          ? currentAutofillScope!
+              .attach(this, _effectiveAutofillClient.textInputConfiguration)
+          : TextInput.attach(
+              this, _effectiveAutofillClient.textInputConfiguration);
       _textInputConnection!.show();
       _updateSizeAndTransform();
       _updateComposingRectIfNeeded();
@@ -2308,7 +2393,9 @@ class MongolEditableTextState extends State<MongolEditableText>
   // --------------------------- Text Editing Actions ---------------------------
 
   _TextBoundary _characterBoundary(DirectionalTextEditingIntent intent) {
-    final _TextBoundary atomicTextBoundary = widget.obscureText ? _CodeUnitBoundary(_value) : _CharacterBoundary(_value);
+    final _TextBoundary atomicTextBoundary = widget.obscureText
+        ? _CodeUnitBoundary(_value)
+        : _CharacterBoundary(_value);
     return _CollapsedSelectionBoundary(atomicTextBoundary, intent.forward);
   }
 
@@ -2320,10 +2407,12 @@ class MongolEditableTextState extends State<MongolEditableText>
       atomicTextBoundary = _CodeUnitBoundary(_value);
       boundary = _DocumentBoundary(_value);
     } else {
-      final TextEditingValue textEditingValue = _textEditingValueforTextLayoutMetrics;
+      final TextEditingValue textEditingValue =
+          _textEditingValueForTextLayoutMetrics;
       atomicTextBoundary = _CharacterBoundary(textEditingValue);
       // This isn't enough. Newline characters.
-      boundary = _ExpandedTextBoundary(_WhitespaceBoundary(textEditingValue), _WordBoundary(renderEditable, textEditingValue));
+      boundary = _ExpandedTextBoundary(_WhitespaceBoundary(textEditingValue),
+          _WordBoundary(renderEditable, textEditingValue));
     }
 
     final _MixedBoundary mixedBoundary = intent.forward
@@ -2342,7 +2431,8 @@ class MongolEditableTextState extends State<MongolEditableText>
       atomicTextBoundary = _CodeUnitBoundary(_value);
       boundary = _DocumentBoundary(_value);
     } else {
-      final TextEditingValue textEditingValue = _textEditingValueforTextLayoutMetrics;
+      final TextEditingValue textEditingValue =
+          _textEditingValueForTextLayoutMetrics;
       atomicTextBoundary = _CharacterBoundary(textEditingValue);
       boundary = _LineBreak(renderEditable, textEditingValue);
     }
@@ -2353,8 +2443,10 @@ class MongolEditableTextState extends State<MongolEditableText>
     // since the document boundary is unique and the linebreak boundary is
     // already caret-location based.
     return intent.forward
-        ? _MixedBoundary(_CollapsedSelectionBoundary(atomicTextBoundary, true), boundary)
-        : _MixedBoundary(boundary, _CollapsedSelectionBoundary(atomicTextBoundary, false));
+        ? _MixedBoundary(
+            _CollapsedSelectionBoundary(atomicTextBoundary, true), boundary)
+        : _MixedBoundary(
+            boundary, _CollapsedSelectionBoundary(atomicTextBoundary, false));
   }
 
   void _updateSelection(UpdateSelectionIntent intent) {
@@ -2364,14 +2456,21 @@ class MongolEditableTextState extends State<MongolEditableText>
       intent.cause,
     );
   }
-  late final Action<UpdateSelectionIntent> _updateSelectionAction = CallbackAction<UpdateSelectionIntent>(onInvoke: _updateSelection);
 
-  late final _UpdateTextSelectionToAdjacentLineAction<ExtendSelectionVerticallyToAdjacentLineIntent> _adjacentLineAction = _UpdateTextSelectionToAdjacentLineAction<ExtendSelectionVerticallyToAdjacentLineIntent>(this);
+  late final Action<UpdateSelectionIntent> _updateSelectionAction =
+      CallbackAction<UpdateSelectionIntent>(onInvoke: _updateSelection);
 
-  _TextBoundary _documentBoundary(DirectionalTextEditingIntent intent) => _DocumentBoundary(_value);
+  late final _UpdateTextSelectionToAdjacentLineAction<
+          ExtendSelectionVerticallyToAdjacentLineIntent> _adjacentLineAction =
+      _UpdateTextSelectionToAdjacentLineAction<
+          ExtendSelectionVerticallyToAdjacentLineIntent>(this);
+
+  _TextBoundary _documentBoundary(DirectionalTextEditingIntent intent) =>
+      _DocumentBoundary(_value);
 
   Action<T> _makeOverridable<T extends Intent>(Action<T> defaultAction) {
-    return Action<T>.overridable(context: context, defaultAction: defaultAction);
+    return Action<T>.overridable(
+        context: context, defaultAction: defaultAction);
   }
 
   void _replaceText(ReplaceTextIntent intent) {
@@ -2390,7 +2489,9 @@ class MongolEditableTextState extends State<MongolEditableText>
       _didChangeTextEditingValue();
     }
   }
-  late final Action<ReplaceTextIntent> _replaceTextAction = CallbackAction<ReplaceTextIntent>(onInvoke: _replaceText);
+
+  late final Action<ReplaceTextIntent> _replaceTextAction =
+      CallbackAction<ReplaceTextIntent>(onInvoke: _replaceText);
 
   // Scrolls either to the beginning or end of the document depending on the
   // intent's `forward` parameter.
@@ -2402,7 +2503,8 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
   }
 
-  void _expandSelectionToDocumentBoundary(ExpandSelectionToDocumentBoundaryIntent intent) {
+  void _expandSelectionToDocumentBoundary(
+      ExpandSelectionToDocumentBoundaryIntent intent) {
     final _TextBoundary textBoundary = _documentBoundary(intent);
     _expandSelection(intent.forward, textBoundary, true);
   }
@@ -2412,13 +2514,16 @@ class MongolEditableTextState extends State<MongolEditableText>
     _expandSelection(intent.forward, textBoundary);
   }
 
-  void _expandSelection(bool forward, _TextBoundary textBoundary, [bool extentAtIndex = false]) {
-    final TextSelection textBoundarySelection = textBoundary.textEditingValue.selection;
+  void _expandSelection(bool forward, _TextBoundary textBoundary,
+      [bool extentAtIndex = false]) {
+    final TextSelection textBoundarySelection =
+        textBoundary.textEditingValue.selection;
     if (!textBoundarySelection.isValid) {
       return;
     }
 
-    final bool inOrder = textBoundarySelection.baseOffset <= textBoundarySelection.extentOffset;
+    final bool inOrder =
+        textBoundarySelection.baseOffset <= textBoundarySelection.extentOffset;
     final bool towardsExtent = forward == inOrder;
     final TextPosition position = towardsExtent
         ? textBoundarySelection.extent
@@ -2428,7 +2533,8 @@ class MongolEditableTextState extends State<MongolEditableText>
         ? textBoundary.getTrailingTextBoundaryAt(position)
         : textBoundary.getLeadingTextBoundaryAt(position);
 
-    final TextSelection newSelection = textBoundarySelection.expandTo(newExtent, textBoundarySelection.isCollapsed || extentAtIndex);
+    final TextSelection newSelection = textBoundarySelection.expandTo(
+        newExtent, textBoundarySelection.isCollapsed || extentAtIndex);
     userUpdateTextEditingValue(
       _value.copyWith(selection: newSelection),
       SelectionChangedCause.keyboard,
@@ -2449,28 +2555,53 @@ class MongolEditableTextState extends State<MongolEditableText>
     ReplaceTextIntent: _replaceTextAction,
     UpdateSelectionIntent: _updateSelectionAction,
     DirectionalFocusIntent: DirectionalFocusAction.forTextField(),
-    DismissIntent: CallbackAction<DismissIntent>(onInvoke: _hideToolbarIfVisible),
+    DismissIntent:
+        CallbackAction<DismissIntent>(onInvoke: _hideToolbarIfVisible),
 
     // Delete
-    DeleteCharacterIntent: _makeOverridable(_DeleteTextAction<DeleteCharacterIntent>(this, _characterBoundary)),
-    DeleteToNextWordBoundaryIntent: _makeOverridable(_DeleteTextAction<DeleteToNextWordBoundaryIntent>(this, _nextWordBoundary)),
-    DeleteToLineBreakIntent: _makeOverridable(_DeleteTextAction<DeleteToLineBreakIntent>(this, _linebreak)),
+    DeleteCharacterIntent: _makeOverridable(
+        _DeleteTextAction<DeleteCharacterIntent>(this, _characterBoundary)),
+    DeleteToNextWordBoundaryIntent: _makeOverridable(
+        _DeleteTextAction<DeleteToNextWordBoundaryIntent>(
+            this, _nextWordBoundary)),
+    DeleteToLineBreakIntent: _makeOverridable(
+        _DeleteTextAction<DeleteToLineBreakIntent>(this, _linebreak)),
 
     // Extend/Move Selection
-    ExtendSelectionByCharacterIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionByCharacterIntent>(this, false, _characterBoundary,)),
-    ExtendSelectionToNextWordBoundaryIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToNextWordBoundaryIntent>(this, true, _nextWordBoundary)),
-    ExtendSelectionToLineBreakIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToLineBreakIntent>(this, true, _linebreak)),
-    ExpandSelectionToLineBreakIntent: _makeOverridable(CallbackAction<ExpandSelectionToLineBreakIntent>(onInvoke: _expandSelectionToLinebreak)),
-    ExpandSelectionToDocumentBoundaryIntent: _makeOverridable(CallbackAction<ExpandSelectionToDocumentBoundaryIntent>(onInvoke: _expandSelectionToDocumentBoundary)),
-    ExtendSelectionVerticallyToAdjacentLineIntent: _makeOverridable(_adjacentLineAction),
-    ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(_UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(this, true, _documentBoundary)),
-    ExtendSelectionToNextWordBoundaryOrCaretLocationIntent: _makeOverridable(_ExtendSelectionOrCaretPositionAction(this, _nextWordBoundary)),
-    ScrollToDocumentBoundaryIntent: _makeOverridable(CallbackAction<ScrollToDocumentBoundaryIntent>(onInvoke: _scrollToDocumentBoundary)),
+    ExtendSelectionByCharacterIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionByCharacterIntent>(
+      this,
+      false,
+      _characterBoundary,
+    )),
+    ExtendSelectionToNextWordBoundaryIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionToNextWordBoundaryIntent>(
+            this, true, _nextWordBoundary)),
+    ExtendSelectionToLineBreakIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionToLineBreakIntent>(
+            this, true, _linebreak)),
+    ExpandSelectionToLineBreakIntent: _makeOverridable(
+        CallbackAction<ExpandSelectionToLineBreakIntent>(
+            onInvoke: _expandSelectionToLinebreak)),
+    ExpandSelectionToDocumentBoundaryIntent: _makeOverridable(
+        CallbackAction<ExpandSelectionToDocumentBoundaryIntent>(
+            onInvoke: _expandSelectionToDocumentBoundary)),
+    ExtendSelectionVerticallyToAdjacentLineIntent:
+        _makeOverridable(_adjacentLineAction),
+    ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(
+            this, true, _documentBoundary)),
+    ExtendSelectionToNextWordBoundaryOrCaretLocationIntent: _makeOverridable(
+        _ExtendSelectionOrCaretPositionAction(this, _nextWordBoundary)),
+    ScrollToDocumentBoundaryIntent: _makeOverridable(
+        CallbackAction<ScrollToDocumentBoundaryIntent>(
+            onInvoke: _scrollToDocumentBoundary)),
 
     // Copy Paste
     SelectAllTextIntent: _makeOverridable(_SelectAllAction(this)),
     CopySelectionTextIntent: _makeOverridable(_CopySelectionAction(this)),
-    PasteTextIntent: _makeOverridable(CallbackAction<PasteTextIntent>(onInvoke: (PasteTextIntent intent) => pasteText(intent.cause))),
+    PasteTextIntent: _makeOverridable(CallbackAction<PasteTextIntent>(
+        onInvoke: (PasteTextIntent intent) => pasteText(intent.cause))),
   };
 
   @override
@@ -2491,7 +2622,8 @@ class MongolEditableTextState extends State<MongolEditableText>
             debugLabel: 'MongolEditableText',
             child: Scrollable(
               excludeFromSemantics: true,
-              axisDirection: _isMultiline ? AxisDirection.right : AxisDirection.down,
+              axisDirection:
+                  _isMultiline ? AxisDirection.right : AxisDirection.down,
               controller: _scrollController,
               physics: widget.scrollPhysics,
               dragStartBehavior: widget.dragStartBehavior,
@@ -2500,7 +2632,8 @@ class MongolEditableTextState extends State<MongolEditableText>
                   // Remove scrollbars if only single line
                   (_isMultiline
                       ? null
-                      : ScrollConfiguration.of(context).copyWith(scrollbars: false)),
+                      : ScrollConfiguration.of(context)
+                          .copyWith(scrollbars: false)),
               viewportBuilder: (BuildContext context, ViewportOffset offset) {
                 return CompositedTransformTarget(
                   link: _toolbarLayerLink,
@@ -2540,7 +2673,8 @@ class MongolEditableTextState extends State<MongolEditableText>
                       cursorHeight: widget.cursorHeight,
                       cursorRadius: widget.cursorRadius,
                       cursorOffset: widget.cursorOffset ?? Offset.zero,
-                      enableInteractiveSelection: widget.enableInteractiveSelection,
+                      enableInteractiveSelection:
+                          widget.enableInteractiveSelection,
                       textSelectionDelegate: this,
                       devicePixelRatio: _devicePixelRatio,
                       clipBehavior: widget.clipBehavior,
@@ -2582,7 +2716,6 @@ class MongolEditableTextState extends State<MongolEditableText>
       withComposing: !widget.readOnly,
     );
   }
-
 }
 
 class _MongolEditable extends LeafRenderObjectWidget {
@@ -2719,7 +2852,7 @@ class _MongolEditable extends LeafRenderObjectWidget {
   }
 }
 
-/// An interface for retriving the logical text boundary (left-closed-right-open)
+/// An interface for retrieving the logical text boundary (left-closed-right-open)
 /// at a given location in a document.
 ///
 /// Depending on the implementation of the [_TextBoundary], the input
@@ -2765,9 +2898,11 @@ class _CodeUnitBoundary extends _TextBoundary {
   final TextEditingValue textEditingValue;
 
   @override
-  TextPosition getLeadingTextBoundaryAt(TextPosition position) => TextPosition(offset: position.offset);
+  TextPosition getLeadingTextBoundaryAt(TextPosition position) =>
+      TextPosition(offset: position.offset);
   @override
-  TextPosition getTrailingTextBoundaryAt(TextPosition position) => TextPosition(offset: math.min(position.offset + 1, textEditingValue.text.length));
+  TextPosition getTrailingTextBoundaryAt(TextPosition position) => TextPosition(
+      offset: math.min(position.offset + 1, textEditingValue.text.length));
 }
 
 // The word modifier generally removes the word boundaries around white spaces
@@ -2782,7 +2917,8 @@ class _WhitespaceBoundary extends _TextBoundary {
   @override
   TextPosition getLeadingTextBoundaryAt(TextPosition position) {
     for (int index = position.offset; index >= 0; index -= 1) {
-      if (!TextLayoutMetrics.isWhitespace(textEditingValue.text.codeUnitAt(index))) {
+      if (!TextLayoutMetrics.isWhitespace(
+          textEditingValue.text.codeUnitAt(index))) {
         return TextPosition(offset: index);
       }
     }
@@ -2791,8 +2927,11 @@ class _WhitespaceBoundary extends _TextBoundary {
 
   @override
   TextPosition getTrailingTextBoundaryAt(TextPosition position) {
-    for (int index = position.offset; index < textEditingValue.text.length; index += 1) {
-      if (!TextLayoutMetrics.isWhitespace(textEditingValue.text.codeUnitAt(index))) {
+    for (int index = position.offset;
+        index < textEditingValue.text.length;
+        index += 1) {
+      if (!TextLayoutMetrics.isWhitespace(
+          textEditingValue.text.codeUnitAt(index))) {
         return TextPosition(offset: index + 1);
       }
     }
@@ -2811,16 +2950,21 @@ class _CharacterBoundary extends _TextBoundary {
 
   @override
   TextPosition getLeadingTextBoundaryAt(TextPosition position) {
-    final int endOffset = math.min(position.offset + 1, textEditingValue.text.length);
+    final int endOffset =
+        math.min(position.offset + 1, textEditingValue.text.length);
     return TextPosition(
-      offset: CharacterRange.at(textEditingValue.text, position.offset, endOffset).stringBeforeLength,
+      offset:
+          CharacterRange.at(textEditingValue.text, position.offset, endOffset)
+              .stringBeforeLength,
     );
   }
 
   @override
   TextPosition getTrailingTextBoundaryAt(TextPosition position) {
-    final int endOffset = math.min(position.offset + 1, textEditingValue.text.length);
-    final CharacterRange range = CharacterRange.at(textEditingValue.text, position.offset, endOffset);
+    final int endOffset =
+        math.min(position.offset + 1, textEditingValue.text.length);
+    final CharacterRange range =
+        CharacterRange.at(textEditingValue.text, position.offset, endOffset);
     return TextPosition(
       offset: textEditingValue.text.length - range.stringAfterLength,
     );
@@ -2828,8 +2972,10 @@ class _CharacterBoundary extends _TextBoundary {
 
   @override
   TextRange getTextBoundaryAt(TextPosition position) {
-    final int endOffset = math.min(position.offset + 1, textEditingValue.text.length);
-    final CharacterRange range = CharacterRange.at(textEditingValue.text, position.offset, endOffset);
+    final int endOffset =
+        math.min(position.offset + 1, textEditingValue.text.length);
+    final CharacterRange range =
+        CharacterRange.at(textEditingValue.text, position.offset, endOffset);
     return TextRange(
       start: range.stringBeforeLength,
       end: textEditingValue.text.length - range.stringAfterLength,
@@ -2851,15 +2997,18 @@ class _WordBoundary extends _TextBoundary {
     return TextPosition(
       offset: textLayout.getWordBoundary(position).start,
       // Word boundary seems to always report downstream on many platforms.
-      affinity: TextAffinity.downstream,  // ignore: avoid_redundant_argument_values
+      affinity:
+          TextAffinity.downstream, // ignore: avoid_redundant_argument_values
     );
   }
+
   @override
   TextPosition getTrailingTextBoundaryAt(TextPosition position) {
     return TextPosition(
       offset: textLayout.getWordBoundary(position).end,
       // Word boundary seems to always report downstream on many platforms.
-      affinity: TextAffinity.downstream,  // ignore: avoid_redundant_argument_values
+      affinity:
+          TextAffinity.downstream, // ignore: avoid_redundant_argument_values
     );
   }
 }
@@ -2869,9 +3018,9 @@ class _WordBoundary extends _TextBoundary {
 // text-affinity-aware.
 class _LineBreak extends _TextBoundary {
   const _LineBreak(
-      this.textLayout,
-      this.textEditingValue,
-      );
+    this.textLayout,
+    this.textEditingValue,
+  );
 
   final TextLayoutMetrics textLayout;
 
@@ -2903,7 +3052,8 @@ class _DocumentBoundary extends _TextBoundary {
   final TextEditingValue textEditingValue;
 
   @override
-  TextPosition getLeadingTextBoundaryAt(TextPosition position) => const TextPosition(offset: 0);
+  TextPosition getLeadingTextBoundaryAt(TextPosition position) =>
+      const TextPosition(offset: 0);
   @override
   TextPosition getTrailingTextBoundaryAt(TextPosition position) {
     return TextPosition(
@@ -2924,7 +3074,8 @@ class _ExpandedTextBoundary extends _TextBoundary {
 
   @override
   TextEditingValue get textEditingValue {
-    assert(innerTextBoundary.textEditingValue == outerTextBoundary.textEditingValue);
+    assert(innerTextBoundary.textEditingValue ==
+        outerTextBoundary.textEditingValue);
     return innerTextBoundary.textEditingValue;
   }
 
@@ -2961,14 +3112,20 @@ class _CollapsedSelectionBoundary extends _TextBoundary {
   TextPosition getLeadingTextBoundaryAt(TextPosition position) {
     return isForward
         ? innerTextBoundary.getLeadingTextBoundaryAt(position)
-        : position.offset <= 0 ? const TextPosition(offset: 0) : innerTextBoundary.getLeadingTextBoundaryAt(TextPosition(offset: position.offset - 1));
+        : position.offset <= 0
+            ? const TextPosition(offset: 0)
+            : innerTextBoundary.getLeadingTextBoundaryAt(
+                TextPosition(offset: position.offset - 1));
   }
 
   @override
   TextPosition getTrailingTextBoundaryAt(TextPosition position) {
     return isForward
         ? innerTextBoundary.getTrailingTextBoundaryAt(position)
-        : position.offset <= 0 ? const TextPosition(offset: 0) : innerTextBoundary.getTrailingTextBoundaryAt(TextPosition(offset: position.offset - 1));
+        : position.offset <= 0
+            ? const TextPosition(offset: 0)
+            : innerTextBoundary.getTrailingTextBoundaryAt(
+                TextPosition(offset: position.offset - 1));
   }
 }
 
@@ -2983,19 +3140,23 @@ class _MixedBoundary extends _TextBoundary {
 
   @override
   TextEditingValue get textEditingValue {
-    assert(leadingTextBoundary.textEditingValue == trailingTextBoundary.textEditingValue);
+    assert(leadingTextBoundary.textEditingValue ==
+        trailingTextBoundary.textEditingValue);
     return leadingTextBoundary.textEditingValue;
   }
 
   @override
-  TextPosition getLeadingTextBoundaryAt(TextPosition position) => leadingTextBoundary.getLeadingTextBoundaryAt(position);
+  TextPosition getLeadingTextBoundaryAt(TextPosition position) =>
+      leadingTextBoundary.getLeadingTextBoundaryAt(position);
 
   @override
-  TextPosition getTrailingTextBoundaryAt(TextPosition position) => trailingTextBoundary.getTrailingTextBoundaryAt(position);
+  TextPosition getTrailingTextBoundaryAt(TextPosition position) =>
+      trailingTextBoundary.getTrailingTextBoundaryAt(position);
 }
 
 // -------------------------------  Text Actions -------------------------------
-class _DeleteTextAction<T extends DirectionalTextEditingIntent> extends ContextAction<T> {
+class _DeleteTextAction<T extends DirectionalTextEditingIntent>
+    extends ContextAction<T> {
   _DeleteTextAction(this.state, this.getTextBoundariesForIntent);
 
   final MongolEditableTextState state;
@@ -3010,8 +3171,12 @@ class _DeleteTextAction<T extends DirectionalTextEditingIntent> extends ContextA
         : _CharacterBoundary(value);
 
     return TextRange(
-      start: atomicBoundary.getLeadingTextBoundaryAt(TextPosition(offset: selection.start)).offset,
-      end: atomicBoundary.getTrailingTextBoundaryAt(TextPosition(offset: selection.end - 1)).offset,
+      start: atomicBoundary
+          .getLeadingTextBoundaryAt(TextPosition(offset: selection.start))
+          .offset,
+      end: atomicBoundary
+          .getTrailingTextBoundaryAt(TextPosition(offset: selection.end - 1))
+          .offset,
     );
   }
 
@@ -3026,7 +3191,11 @@ class _DeleteTextAction<T extends DirectionalTextEditingIntent> extends ContextA
     if (!selection.isCollapsed) {
       return Actions.invoke(
         context!,
-        ReplaceTextIntent(state._value, '', _expandNonCollapsedRange(state._value), SelectionChangedCause.keyboard),
+        ReplaceTextIntent(
+            state._value,
+            '',
+            _expandNonCollapsedRange(state._value),
+            SelectionChangedCause.keyboard),
       );
     }
 
@@ -3037,7 +3206,11 @@ class _DeleteTextAction<T extends DirectionalTextEditingIntent> extends ContextA
     if (!textBoundary.textEditingValue.selection.isCollapsed) {
       return Actions.invoke(
         context!,
-        ReplaceTextIntent(state._value, '', _expandNonCollapsedRange(textBoundary.textEditingValue), SelectionChangedCause.keyboard),
+        ReplaceTextIntent(
+            state._value,
+            '',
+            _expandNonCollapsedRange(textBoundary.textEditingValue),
+            SelectionChangedCause.keyboard),
       );
     }
 
@@ -3046,28 +3219,31 @@ class _DeleteTextAction<T extends DirectionalTextEditingIntent> extends ContextA
       ReplaceTextIntent(
         textBoundary.textEditingValue,
         '',
-        textBoundary.getTextBoundaryAt(textBoundary.textEditingValue.selection.base),
+        textBoundary
+            .getTextBoundaryAt(textBoundary.textEditingValue.selection.base),
         SelectionChangedCause.keyboard,
       ),
     );
   }
 
   @override
-  bool get isActionEnabled => !state.widget.readOnly && state._value.selection.isValid;
+  bool get isActionEnabled =>
+      !state.widget.readOnly && state._value.selection.isValid;
 }
 
-class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
+class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent>
+    extends ContextAction<T> {
   _UpdateTextSelectionAction(
-      this.state,
-      this.ignoreNonCollapsedSelection,
-      this.getTextBoundariesForIntent,
-      );
+    this.state,
+    this.ignoreNonCollapsedSelection,
+    this.getTextBoundariesForIntent,
+  );
 
   final MongolEditableTextState state;
   final bool ignoreNonCollapsedSelection;
   final _TextBoundary Function(T intent) getTextBoundariesForIntent;
 
-  static const int NEWLINE_CODE_UNIT = 10;
+  static const int newlineCodeUnit = 10;
 
   // Returns true iff the given position is at a wordwrap boundary in the
   // upstream position.
@@ -3076,8 +3252,10 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
       offset: state.renderEditable.getLineAtOffset(position).end,
       affinity: TextAffinity.upstream,
     );
-    return end == position && end.offset != state.textEditingValue.text.length
-        && state.textEditingValue.text.codeUnitAt(position.offset) != NEWLINE_CODE_UNIT;
+    return end == position &&
+        end.offset != state.textEditingValue.text.length &&
+        state.textEditingValue.text.codeUnitAt(position.offset) !=
+            newlineCodeUnit;
   }
 
   // Returns true iff the given position at a wordwrap boundary in the
@@ -3086,8 +3264,10 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
     final TextPosition start = TextPosition(
       offset: state.renderEditable.getLineAtOffset(position).start,
     );
-    return start == position && start.offset != 0
-        && state.textEditingValue.text.codeUnitAt(position.offset - 1) != NEWLINE_CODE_UNIT;
+    return start == position &&
+        start.offset != 0 &&
+        state.textEditingValue.text.codeUnitAt(position.offset - 1) !=
+            newlineCodeUnit;
   }
 
   @override
@@ -3095,7 +3275,8 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
     final TextSelection selection = state._value.selection;
     assert(selection.isValid);
 
-    final bool collapseSelection = intent.collapseSelection || !state.widget.selectionEnabled;
+    final bool collapseSelection =
+        intent.collapseSelection || !state.widget.selectionEnabled;
     // Collapse to the logical start/end.
     TextSelection _collapse(TextSelection selection) {
       assert(selection.isValid);
@@ -3106,22 +3287,29 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
       );
     }
 
-    if (!selection.isCollapsed && !ignoreNonCollapsedSelection && collapseSelection) {
+    if (!selection.isCollapsed &&
+        !ignoreNonCollapsedSelection &&
+        collapseSelection) {
       return Actions.invoke(
         context!,
-        UpdateSelectionIntent(state._value, _collapse(selection), SelectionChangedCause.keyboard),
+        UpdateSelectionIntent(
+            state._value, _collapse(selection), SelectionChangedCause.keyboard),
       );
     }
 
     final _TextBoundary textBoundary = getTextBoundariesForIntent(intent);
-    final TextSelection textBoundarySelection = textBoundary.textEditingValue.selection;
+    final TextSelection textBoundarySelection =
+        textBoundary.textEditingValue.selection;
     if (!textBoundarySelection.isValid) {
       return null;
     }
-    if (!textBoundarySelection.isCollapsed && !ignoreNonCollapsedSelection && collapseSelection) {
+    if (!textBoundarySelection.isCollapsed &&
+        !ignoreNonCollapsedSelection &&
+        collapseSelection) {
       return Actions.invoke(
         context!,
-        UpdateSelectionIntent(state._value, _collapse(textBoundarySelection), SelectionChangedCause.keyboard),
+        UpdateSelectionIntent(state._value, _collapse(textBoundarySelection),
+            SelectionChangedCause.keyboard),
       );
     }
 
@@ -3151,8 +3339,9 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
         : textBoundarySelection.extendTo(newExtent);
 
     // If collapseAtReversal is true and would have an effect, collapse it.
-    if (!selection.isCollapsed && intent.collapseAtReversal
-        && (selection.baseOffset < selection.extentOffset !=
+    if (!selection.isCollapsed &&
+        intent.collapseAtReversal &&
+        (selection.baseOffset < selection.extentOffset !=
             newSelection.baseOffset < newSelection.extentOffset)) {
       return Actions.invoke(
         context!,
@@ -3166,7 +3355,8 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
 
     return Actions.invoke(
       context!,
-      UpdateSelectionIntent(textBoundary.textEditingValue, newSelection, SelectionChangedCause.keyboard),
+      UpdateSelectionIntent(textBoundary.textEditingValue, newSelection,
+          SelectionChangedCause.keyboard),
     );
   }
 
@@ -3174,19 +3364,25 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent> exten
   bool get isActionEnabled => state._value.selection.isValid;
 }
 
-class _ExtendSelectionOrCaretPositionAction extends ContextAction<ExtendSelectionToNextWordBoundaryOrCaretLocationIntent> {
-  _ExtendSelectionOrCaretPositionAction(this.state, this.getTextBoundariesForIntent);
+class _ExtendSelectionOrCaretPositionAction extends ContextAction<
+    ExtendSelectionToNextWordBoundaryOrCaretLocationIntent> {
+  _ExtendSelectionOrCaretPositionAction(
+      this.state, this.getTextBoundariesForIntent);
 
   final MongolEditableTextState state;
-  final _TextBoundary Function(ExtendSelectionToNextWordBoundaryOrCaretLocationIntent intent) getTextBoundariesForIntent;
+  final _TextBoundary Function(
+          ExtendSelectionToNextWordBoundaryOrCaretLocationIntent intent)
+      getTextBoundariesForIntent;
 
   @override
-  Object? invoke(ExtendSelectionToNextWordBoundaryOrCaretLocationIntent intent, [BuildContext? context]) {
+  Object? invoke(ExtendSelectionToNextWordBoundaryOrCaretLocationIntent intent,
+      [BuildContext? context]) {
     final TextSelection selection = state._value.selection;
     assert(selection.isValid);
 
     final _TextBoundary textBoundary = getTextBoundariesForIntent(intent);
-    final TextSelection textBoundarySelection = textBoundary.textEditingValue.selection;
+    final TextSelection textBoundarySelection =
+        textBoundary.textEditingValue.selection;
     if (!textBoundarySelection.isValid) {
       return null;
     }
@@ -3196,24 +3392,34 @@ class _ExtendSelectionOrCaretPositionAction extends ContextAction<ExtendSelectio
         ? textBoundary.getTrailingTextBoundaryAt(extent)
         : textBoundary.getLeadingTextBoundaryAt(extent);
 
-    final TextSelection newSelection = (newExtent.offset - textBoundarySelection.baseOffset) * (textBoundarySelection.extentOffset - textBoundarySelection.baseOffset) < 0
-        ? textBoundarySelection.copyWith(
-      extentOffset: textBoundarySelection.baseOffset,
-      affinity: textBoundarySelection.extentOffset > textBoundarySelection.baseOffset ? TextAffinity.downstream : TextAffinity.upstream,
-    )
-        : textBoundarySelection.extendTo(newExtent);
+    final TextSelection newSelection =
+        (newExtent.offset - textBoundarySelection.baseOffset) *
+                    (textBoundarySelection.extentOffset -
+                        textBoundarySelection.baseOffset) <
+                0
+            ? textBoundarySelection.copyWith(
+                extentOffset: textBoundarySelection.baseOffset,
+                affinity: textBoundarySelection.extentOffset >
+                        textBoundarySelection.baseOffset
+                    ? TextAffinity.downstream
+                    : TextAffinity.upstream,
+              )
+            : textBoundarySelection.extendTo(newExtent);
 
     return Actions.invoke(
       context!,
-      UpdateSelectionIntent(textBoundary.textEditingValue, newSelection, SelectionChangedCause.keyboard),
+      UpdateSelectionIntent(textBoundary.textEditingValue, newSelection,
+          SelectionChangedCause.keyboard),
     );
   }
 
   @override
-  bool get isActionEnabled => state.widget.selectionEnabled && state._value.selection.isValid;
+  bool get isActionEnabled =>
+      state.widget.selectionEnabled && state._value.selection.isValid;
 }
 
-class _UpdateTextSelectionToAdjacentLineAction<T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
+class _UpdateTextSelectionToAdjacentLineAction<
+    T extends DirectionalCaretMovementIntent> extends ContextAction<T> {
   _UpdateTextSelectionToAdjacentLineAction(this.state);
 
   final MongolEditableTextState state;
@@ -3229,9 +3435,10 @@ class _UpdateTextSelectionToAdjacentLineAction<T extends DirectionalCaretMovemen
     }
     _runSelection = state._value.selection;
     final TextSelection currentSelection = state.widget.controller.selection;
-    final bool continueCurrentRun = currentSelection.isValid && currentSelection.isCollapsed
-        && currentSelection.baseOffset == runSelection.baseOffset
-        && currentSelection.extentOffset == runSelection.extentOffset;
+    final bool continueCurrentRun = currentSelection.isValid &&
+        currentSelection.isCollapsed &&
+        currentSelection.baseOffset == runSelection.baseOffset &&
+        currentSelection.extentOffset == runSelection.extentOffset;
     if (!continueCurrentRun) {
       _horizontalMovementRun = null;
       _runSelection = null;
@@ -3242,8 +3449,9 @@ class _UpdateTextSelectionToAdjacentLineAction<T extends DirectionalCaretMovemen
   void invoke(T intent, [BuildContext? context]) {
     assert(state._value.selection.isValid);
 
-    final bool collapseSelection = intent.collapseSelection || !state.widget.selectionEnabled;
-    final TextEditingValue value = state._textEditingValueforTextLayoutMetrics;
+    final bool collapseSelection =
+        intent.collapseSelection || !state.widget.selectionEnabled;
+    final TextEditingValue value = state._textEditingValueForTextLayoutMetrics;
     if (!value.selection.isValid) {
       return;
     }
@@ -3253,20 +3461,25 @@ class _UpdateTextSelectionToAdjacentLineAction<T extends DirectionalCaretMovemen
       _runSelection = null;
     }
 
-    final HorizontalCaretMovementRun currentRun = _horizontalMovementRun
-        ?? state.renderEditable.startHorizontalCaretMovement(state.renderEditable.selection!.extent);
+    final HorizontalCaretMovementRun currentRun = _horizontalMovementRun ??
+        state.renderEditable.startHorizontalCaretMovement(
+            state.renderEditable.selection!.extent);
 
-    final bool shouldMove = intent.forward ? currentRun.moveNext() : currentRun.movePrevious();
+    final bool shouldMove =
+        intent.forward ? currentRun.moveNext() : currentRun.movePrevious();
     final TextPosition newExtent = shouldMove
         ? currentRun.current
-        : (intent.forward ? TextPosition(offset: state._value.text.length) : const TextPosition(offset: 0));
+        : (intent.forward
+            ? TextPosition(offset: state._value.text.length)
+            : const TextPosition(offset: 0));
     final TextSelection newSelection = collapseSelection
         ? TextSelection.fromPosition(newExtent)
         : value.selection.extendTo(newExtent);
 
     Actions.invoke(
       context!,
-      UpdateSelectionIntent(value, newSelection, SelectionChangedCause.keyboard),
+      UpdateSelectionIntent(
+          value, newSelection, SelectionChangedCause.keyboard),
     );
     if (state._value.selection == newSelection) {
       _horizontalMovementRun = currentRun;
@@ -3314,5 +3527,6 @@ class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
   }
 
   @override
-  bool get isActionEnabled => state._value.selection.isValid && !state._value.selection.isCollapsed;
+  bool get isActionEnabled =>
+      state._value.selection.isValid && !state._value.selection.isCollapsed;
 }

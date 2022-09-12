@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:mongol/mongol.dart';
 
 class KeyboardDemo extends StatelessWidget {
@@ -56,12 +55,8 @@ class _BodyWidgetState extends State<BodyWidget> {
         Align(
           alignment: Alignment.bottomCenter,
           child: MongolKeyboard(
-            onTextInput: (myText) {
-              _insertText(myText);
-            },
-            onBackspace: () {
-              _backspace();
-            },
+            onTextInput: _insertText,
+            onBackspace: _backspace,
           ),
         ),
       ],
@@ -70,6 +65,10 @@ class _BodyWidgetState extends State<BodyWidget> {
 
   void _insertText(String myText) {
     final text = _textEditingController.text;
+    if (!_textEditingController.selection.isValid) {
+      _textEditingController.selection =
+          const TextSelection.collapsed(offset: 0);
+    }
     final textSelection = _textEditingController.selection;
     final newText =
         text.replaceRange(textSelection.start, textSelection.end, myText);

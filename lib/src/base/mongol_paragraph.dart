@@ -8,7 +8,6 @@ import 'dart:collection';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:characters/characters.dart';
 
@@ -145,7 +144,7 @@ class MongolLineMetrics {
 ///
 /// The text is divided into a list of [_runs] where each run is a short
 /// substring (usually a word or CJK/emoji character). Sometimes a run includes
-/// multiple styles in which case [_rawStyledTextRuns] are used temorarily
+/// multiple styles in which case [_rawStyledTextRuns] are used temporarily
 /// before they can be combined into single [_runs] just based on words. The
 /// [_runs] are then measured and layed out in [_lines] based on the given
 /// constraints.
@@ -400,16 +399,16 @@ class MongolParagraph {
 
     // find the offset
     final paragraphDx = dy - rotatedRunDy;
-    final paragrpahDy = dx - rotatedRunDx;
-    final offset = Offset(paragraphDx, paragrpahDy);
+    final paragraphDy = dx - rotatedRunDx;
+    final offset = Offset(paragraphDx, paragraphDy);
     final runPosition = matchedRun.paragraph.getPositionForOffset(offset);
     final textOffset = matchedRun.start + runPosition.offset;
 
-    // find the afinity
+    // find the affinity
     final lineEndCharOffset = matchedRun.end;
-    final textAfinity =
+    final textAffinity =
         (textOffset == lineEndCharOffset) ? upstream : downstream;
-    return [textOffset, textAfinity];
+    return [textOffset, textAffinity];
   }
 
   /// Draws the precomputed text on a [canvas] one line at a time in vertical
@@ -644,7 +643,7 @@ class MongolParagraph {
 
   /// Returns the [TextRange] of the word at the given [TextPosition].
   ///
-  /// The current implementation just returns the currect text run, which is
+  /// The current implementation just returns the correct text run, which is
   /// generally a word.
   TextRange getWordBoundary(TextPosition position) {
     final offset = position.offset;
@@ -1100,8 +1099,8 @@ class LineBreaker implements Iterator<RotatableString> {
     return (character == ' ' || character == '\n');
   }
 
-  static const _mongolQuickcheckStart = 0x1800;
-  static const _mongolQuickcheckEnd = 0x2060;
+  static const _mongolQuickCheckStart = 0x1800;
+  static const _mongolQuickCheckEnd = 0x2060;
   static const _koreanJamoStart = 0x1100;
   static const _koreanJamoEnd = 0x11FF;
   static const _cjkRadicalSupplementStart = 0x2E80;
@@ -1124,8 +1123,8 @@ class LineBreaker implements Iterator<RotatableString> {
     final codePoint = character.runes.first;
 
     // Quick return: most Mongol chars should be in this range
-    if (codePoint >= _mongolQuickcheckStart &&
-        codePoint < _mongolQuickcheckEnd) {
+    if (codePoint >= _mongolQuickCheckStart &&
+        codePoint < _mongolQuickCheckEnd) {
       return false;
     }
 

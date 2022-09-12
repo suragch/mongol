@@ -8,8 +8,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart' show Theme, TextSelectionTheme, Icons;
 import 'package:flutter/rendering.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart' show TextSelectionDelegate;
 import 'package:flutter/widgets.dart';
 
 import 'mongol_text_selection_toolbar.dart';
@@ -211,7 +209,7 @@ class _TextSelectionControlsToolbarState
     // creator has already disposed _clipboardStatus.
     // todo editor-fixes should remove if(...) expression?
     // if (!widget.clipboardStatus.disposed) {
-      widget.clipboardStatus?.removeListener(_onChangedClipboardStatus);
+    widget.clipboardStatus?.removeListener(_onChangedClipboardStatus);
     // }
   }
 
@@ -250,7 +248,7 @@ class _TextSelectionControlsToolbarState
 
     // Determine which buttons will appear so that the order and total number is
     // known.
-    final itemDatas = <_TextSelectionToolbarItemData>[
+    final itemData = <_TextSelectionToolbarItemData>[
       if (widget.handleCut != null)
         _TextSelectionToolbarItemData(
           icon: Icons.cut,
@@ -275,20 +273,20 @@ class _TextSelectionControlsToolbarState
     ];
 
     // If there is no option available, build an empty widget.
-    if (itemDatas.isEmpty) {
+    if (itemData.isEmpty) {
       return const SizedBox(width: 0.0, height: 0.0);
     }
 
     return MongolTextSelectionToolbar(
       anchorLeft: anchorLeft,
       anchorRight: anchorRight,
-      children: itemDatas
+      children: itemData
           .asMap()
           .entries
           .map((MapEntry<int, _TextSelectionToolbarItemData> entry) {
         return MongolTextSelectionToolbarButton(
           padding: MongolTextSelectionToolbarButton.getPadding(
-              entry.key, itemDatas.length),
+              entry.key, itemData.length),
           onPressed: entry.value.onPressed,
           child: Icon(entry.value.icon),
         );
