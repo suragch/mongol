@@ -1,3 +1,7 @@
+## [3.1.0] - 2022.09.13
+
+- Added `MongolTextField` back in with fixes. (@Satsrag)
+
 ## [3.0.2] - 2022.02.10
 
 - Fix for bug caused by Flutter 2.10 upgrade (#20) (@azhansy)
