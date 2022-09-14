@@ -120,6 +120,16 @@ Now you won't have to manually set the font for every Mongolian text widget. If 
 
 You may also consider using [mongol_code](https://pub.dev/packages/mongol_code) with a Menksoft font if your users have devices that don't support OpenType Unicode font rendering. `mongol_code` converts Unicode to Menksoft code, which a Menksoft font can display without any special rendering requirements.
 
+## Editing vertical text
+
+You can use `MongolTextField` to receive and edit text from the system keyboard. This widget includes most of the functionality of the standard Flutter `TextField` widget.
+
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field.gif)
+
+Here is it on iOS and Android interacting with a system keyboard:
+
+![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field_large.gif)
+
 ## Horizontal lists
 
 You can display horizontally scrolling lists with the standard `ListView` widget. All you need to do is set the scroll direction to horizontal.
@@ -202,7 +212,6 @@ This alert dialog works mostly the same as the Flutter `AlertDialog`.
 
 ### TODO
 
-- Recreate `MongolTextField`
 - Improve keyboard (this may be better as a separate package)
 - Various other text based widgets
 - Support `WidgetSpan`.
