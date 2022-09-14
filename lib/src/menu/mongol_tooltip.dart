@@ -214,7 +214,7 @@ class MongolTooltip extends StatefulWidget {
   final Duration? showDuration;
 
   @override
-  _MongolTooltipState createState() => _MongolTooltipState();
+  State<MongolTooltip> createState() => _MongolTooltipState();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {

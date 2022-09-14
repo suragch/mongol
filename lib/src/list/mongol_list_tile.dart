@@ -786,13 +786,13 @@ class MongolListTile extends StatelessWidget {
       );
     }
 
-    const EdgeInsets _defaultContentPadding =
+    const EdgeInsets defaultContentPadding =
         EdgeInsets.symmetric(vertical: 16.0);
     const TextDirection textDirection = TextDirection.ltr;
     final EdgeInsets resolvedContentPadding =
         contentPadding?.resolve(textDirection) ??
             tileTheme.contentPadding?.resolve(textDirection) ??
-            _defaultContentPadding;
+            defaultContentPadding;
 
     final MouseCursor resolvedMouseCursor =
         MaterialStateProperty.resolveAs<MouseCursor>(

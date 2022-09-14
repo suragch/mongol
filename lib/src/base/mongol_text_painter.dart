@@ -498,8 +498,8 @@ class MongolTextPainter {
       final box = boxes.first;
 
       // If the upstream character is a newline, cursor is at start of next line
-      const _newlineCodeUnit = 10;
-      if (prevCodeUnit == _newlineCodeUnit) {
+      const newlineCodeUnit = 10;
+      if (prevCodeUnit == newlineCodeUnit) {
         return Rect.fromLTRB(box.right, _emptyOffset.dy,
             box.right + box.right - box.left, _emptyOffset.dy);
       }
@@ -664,6 +664,7 @@ class MongolTextPainter {
   }
 
   List<MongolLineMetrics>? _lineMetricsCache;
+
   /// Returns the full list of [MongolLineMetrics] that describe in detail the various
   /// metrics of each laid out line.
   ///
@@ -677,6 +678,6 @@ class MongolTextPainter {
   /// Valid only after [layout] has been called.
   List<MongolLineMetrics> computeLineMetrics() {
     assert(!_needsLayout);
-    return  _lineMetricsCache ??= _paragraph!.computeLineMetrics();
+    return _lineMetricsCache ??= _paragraph!.computeLineMetrics();
   }
 }

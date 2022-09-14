@@ -8,7 +8,7 @@ The example app demonstrates various features of the mongol package.
 - Emoji/CJK in `MongolText`
 - Horizontal Listview
 - Custom keyboard
-- Maxlines and overflow functionality in `MongolText`
+- Max lines and overflow functionality in `MongolText`
 - Popup menu
 - `MongolListTile` widget
 - Resizable text in `MongolText`

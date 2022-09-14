@@ -555,58 +555,6 @@ class MongolEditableText extends StatefulWidget {
   /// and selection, one can add a listener to its [controller] with
   /// [TextEditingController.addListener].
   ///
-  /// {@tool dartpad --template=stateful_widget_material}
-  ///
-  /// This example shows how onChanged could be used to check the MongolTextField's
-  /// current value each time the user inserts or deletes a character.
-  ///
-  /// ```dart
-  /// // TODO: test this snippet to make sure it works
-  ///
-  /// final TextEditingController _controller = TextEditingController();
-  ///
-  /// void dispose() {
-  ///   _controller.dispose();
-  ///   super.dispose();
-  /// }
-  ///
-  /// Widget build(BuildContext context) {
-  ///   return Scaffold(
-  ///     body: Row(
-  ///       mainAxisAlignment: MainAxisAlignment.center,
-  ///       children: <Widget>[
-  ///         const MongolText('What number comes next in the sequence?'),
-  ///         const MongolText('1, 1, 2, 3, 5, 8...?'),
-  ///         MongolTextField(
-  ///           controller: _controller,
-  ///           onChanged: (String value) async {
-  ///             if (value != '13') {
-  ///               return;
-  ///             }
-  ///             await showDialog<void>(
-  ///               context: context,
-  ///               builder: (BuildContext context) {
-  ///                 return MongolAlertDialog(
-  ///                   title: const Text('That is correct!'),
-  ///                   content: Text ('13 is the right answer.'),
-  ///                   actions: <Widget>[
-  ///                     MongolTextButton(
-  ///                       onPressed: () { Navigator.pop(context); },
-  ///                       child: const Text('OK'),
-  ///                     ),
-  ///                   ],
-  ///                 );
-  ///               },
-  ///             );
-  ///           },
-  ///         ),
-  ///       ],
-  ///     ),
-  ///   );
-  /// }
-  /// ```
-  /// {@end-tool}
-  ///
   /// ## Handling emojis and other complex characters
   ///
   /// It's important to always use
@@ -730,8 +678,6 @@ class MongolEditableText extends StatefulWidget {
   ///
   /// By default, the cursor opacity will animate on iOS platforms and will not
   /// animate on Android platforms.
-  ///
-  // TODO: can we remove this or use one setting for both platforms?
   final bool cursorOpacityAnimates;
 
   /// The offset that is used, in pixels, when painting the cursor on screen.
@@ -1911,9 +1857,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       _selectionOverlay!.handlesVisible = widget.showSelectionHandles;
       _selectionOverlay!.showHandles();
     }
-    // TODO(chunhtai): we should make sure selection actually changed before
-    // we call the onSelectionChanged.
-    // https://github.com/flutter/flutter/issues/76349.
+
     try {
       widget.onSelectionChanged?.call(selection, cause);
     } catch (exception, stack) {
@@ -2166,8 +2110,6 @@ class MongolEditableTextState extends State<MongolEditableText>
     _updateRemoteEditingValueIfNeeded();
     _startOrStopCursorTimerIfNeeded();
     _updateOrDisposeSelectionOverlayIfNeeded();
-    // TODO(abarth): Teach RenderEditable about ValueNotifier<TextEditingValue>
-    // to avoid this setState().
     setState(() {
       /* We use widget.controller.value in build(). */
     });
@@ -3278,7 +3220,7 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent>
     final bool collapseSelection =
         intent.collapseSelection || !state.widget.selectionEnabled;
     // Collapse to the logical start/end.
-    TextSelection _collapse(TextSelection selection) {
+    TextSelection collapse(TextSelection selection) {
       assert(selection.isValid);
       assert(!selection.isCollapsed);
       return selection.copyWith(
@@ -3293,7 +3235,7 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent>
       return Actions.invoke(
         context!,
         UpdateSelectionIntent(
-            state._value, _collapse(selection), SelectionChangedCause.keyboard),
+            state._value, collapse(selection), SelectionChangedCause.keyboard),
       );
     }
 
@@ -3308,7 +3250,7 @@ class _UpdateTextSelectionAction<T extends DirectionalCaretMovementIntent>
         collapseSelection) {
       return Actions.invoke(
         context!,
-        UpdateSelectionIntent(state._value, _collapse(textBoundarySelection),
+        UpdateSelectionIntent(state._value, collapse(textBoundarySelection),
             SelectionChangedCause.keyboard),
       );
     }

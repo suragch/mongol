@@ -422,7 +422,7 @@ class _TextSelectionHandleOverlayState
     super.initState();
 
     _controller = AnimationController(
-        duration: TextSelectionOverlay.fadeDuration, vsync: this);
+        duration: SelectionOverlay.fadeDuration, vsync: this);
 
     _handleVisibilityChanged();
     widget._visibility.addListener(_handleVisibilityChanged);

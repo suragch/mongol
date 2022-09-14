@@ -70,7 +70,7 @@ class _InputBorderGap extends ChangeNotifier {
 
   @override
   // ignore: avoid_equals_and_hash_code_on_mutable_classes, this class is not used in collection
-  int get hashCode => hashValues(start, extent);
+  int get hashCode => Object.hash(start, extent);
 }
 
 // Used to interpolate between two InputBorders.
@@ -153,6 +153,7 @@ class _BorderContainer extends StatefulWidget {
     required this.fillColor,
     required this.hoverColor,
     required this.isHovering,
+    // ignore: unused_element
     this.child,
   }) : super(key: key);
 
@@ -576,7 +577,7 @@ class _Decoration {
 
   @override
   int get hashCode {
-    return hashValues(
+    return Object.hash(
       contentPadding,
       floatingLabelWidth,
       floatingLabelProgress,
@@ -1787,7 +1788,7 @@ class MongolInputDecorator extends StatefulWidget {
       !isEmpty || (isFocused && decoration.enabled);
 
   @override
-  _InputDecoratorState createState() => _InputDecoratorState();
+  State<MongolInputDecorator> createState() => _InputDecoratorState();
 
   /// The RenderBox that defines this decorator's "container". That's the
   /// area which is filled if [InputDecoration.filled] is true. It's the area

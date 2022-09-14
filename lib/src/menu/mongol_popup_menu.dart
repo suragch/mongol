@@ -28,7 +28,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import '../button/mongol_icon_button.dart';
-import 'mongol_instrinsic_height.dart';
+import 'mongol_intrinsic_height.dart';
 import 'mongol_tooltip.dart';
 
 // Examples can assume:
@@ -124,7 +124,7 @@ class MongolPopupMenuDivider extends MongolPopupMenuEntry<Never> {
   bool represents(void value) => false;
 
   @override
-  _MongolPopupMenuDividerState createState() => _MongolPopupMenuDividerState();
+  State<MongolPopupMenuDivider> createState() => _MongolPopupMenuDividerState();
 }
 
 class _MongolPopupMenuDividerState extends State<MongolPopupMenuDivider> {
@@ -1019,8 +1019,8 @@ class MongolPopupMenuButtonState<T> extends State<MongolPopupMenuButton<T>> {
         child: InkWell(
           onTap: widget.enabled ? showButtonMenu : null,
           canRequestFocus: _canRequestFocus,
-          child: widget.child,
           enableFeedback: enableFeedback,
+          child: widget.child,
         ),
       );
     }

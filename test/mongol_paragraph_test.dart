@@ -8,7 +8,7 @@ import 'package:mongol/src/base/mongol_text_align.dart';
 // ignore_for_file: todo
 
 void main() {
-  MongolParagraph _getParagraph(
+  MongolParagraph getParagraph(
     String text,
     double height, {
     MongolTextAlign? textAlign,
@@ -52,7 +52,7 @@ void main() {
   // ```
   group('getBoxesForRange', () {
     test('single character gives correct ranges', () {
-      final paragraph = _getParagraph('A', 300);
+      final paragraph = getParagraph('A', 300);
 
       var boxes = paragraph.getBoxesForRange(0, 1);
       expect(boxes.length, 1);
@@ -68,7 +68,7 @@ void main() {
       boxes = paragraph.getBoxesForRange(1, 2);
       expect(boxes.length, 0);
 
-      // range that includes text but also goes beyond returns inluded text
+      // range that includes text but also goes beyond returns included text
       boxes = paragraph.getBoxesForRange(0, 2);
       expect(boxes.length, 1);
       expect(boxes.first.bottom, 14.0);
@@ -83,7 +83,7 @@ void main() {
     });
 
     test('single line with single run gives correct ranges', () {
-      final paragraph = _getParagraph('ABC', 300);
+      final paragraph = getParagraph('ABC', 300);
 
       var boxes = paragraph.getBoxesForRange(0, 1);
       expect(boxes.length, 1);
@@ -115,7 +115,7 @@ void main() {
     });
 
     test('single line with multiple runs gives correct ranges', () {
-      final paragraph = _getParagraph('ABC 123', 300);
+      final paragraph = getParagraph('ABC 123', 300);
 
       // first run (ABC )
 
@@ -180,7 +180,7 @@ void main() {
           'ABC DEF 123 456\n' //  32-48
           'ABC DEF 123 456\n' //  48-64
           'ABC DEF 123 456\n'; // 64-80
-      final paragraph = _getParagraph(multipleLines, 300);
+      final paragraph = getParagraph(multipleLines, 300);
 
       var boxes = paragraph.getBoxesForRange(21, 58); // 2nd row E to 4th row 2
       expect(boxes.length, 3);
@@ -226,7 +226,7 @@ void main() {
           '👨‍👩‍👦' // man + zwj + woman + zwj + boy                       0-8
           '👨‍👩‍👧‍👧' // man + zwj + woman + zwj + girl + zwj + girl         8-19
           '👏🏽'; // clapping + medium_skin_tone                       19-23
-      final paragraph = _getParagraph(graphemeClusters, 300);
+      final paragraph = getParagraph(graphemeClusters, 300);
       expect(graphemeClusters.length, 23);
 
       var boxes = paragraph.getBoxesForRange(0, 23);
@@ -315,7 +315,7 @@ void main() {
 
     test('handles newlines well', () {
       const text = '\n';
-      final paragraph = _getParagraph(text, 300);
+      final paragraph = getParagraph(text, 300);
 
       var boxes = paragraph.getBoxesForRange(0, 1);
       expect(boxes.length, 1);
@@ -349,7 +349,7 @@ void main() {
       const text = 'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
 
-      final paragraph = _getParagraph(text, 1000);
+      final paragraph = getParagraph(text, 1000);
 
       final position20 =
           paragraph.getPositionForOffset(const Offset(5.0, 20.0));
@@ -366,7 +366,7 @@ void main() {
 
     test('empty content does not crash', () {
       const text = '';
-      final paragraph = _getParagraph(text, 1000);
+      final paragraph = getParagraph(text, 1000);
       final position = paragraph.getPositionForOffset(const Offset(400, 300));
       expect(position,
           const TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
@@ -374,7 +374,7 @@ void main() {
 
     test('ending with new line does not crash', () {
       const text = 'hello\n';
-      final paragraph = _getParagraph(text, 1000);
+      final paragraph = getParagraph(text, 1000);
       final position = paragraph.getPositionForOffset(const Offset(400, 300));
       expect(position,
           const TextPosition(offset: 5, affinity: ui.TextAffinity.downstream));
@@ -386,7 +386,7 @@ void main() {
       const text = 'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
 
-      final paragraph = _getParagraph(text, 1000);
+      final paragraph = getParagraph(text, 1000);
 
       final range5 = paragraph.getWordBoundary(const TextPosition(offset: 5));
       expect(range5.textInside(text), equals('polished'));
@@ -414,7 +414,7 @@ void main() {
       const text = 'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
 
-      final paragraph = _getParagraph(text, 1000);
+      final paragraph = getParagraph(text, 1000);
 
       final range5 = paragraph.getLineBoundary(const TextPosition(offset: 5));
       expect(
@@ -450,7 +450,7 @@ void main() {
       // test for https://github.com/flutter/flutter/issues/83392
       const text = 'aaa\nbbb';
 
-      final paragraph = _getParagraph(text, 1000);
+      final paragraph = getParagraph(text, 1000);
 
       var range = paragraph.getLineBoundary(const TextPosition(offset: 0));
       expect(
@@ -505,28 +505,28 @@ void main() {
       const text = 'this is some long text that should break over 3 lines';
 
       // multiline
-      var paragraph = _getParagraph(text, 300, maxLines: null);
+      var paragraph = getParagraph(text, 300, maxLines: null);
       var exceededMaxLines = paragraph.didExceedMaxLines;
       expect(exceededMaxLines, false);
       var width = paragraph.width;
       expect(width, 42);
 
       // single line
-      paragraph = _getParagraph(text, 300, maxLines: 1);
+      paragraph = getParagraph(text, 300, maxLines: 1);
       exceededMaxLines = paragraph.didExceedMaxLines;
       expect(exceededMaxLines, true);
       width = paragraph.width;
       expect(width, 14);
 
       // two lines
-      paragraph = _getParagraph(text, 300, maxLines: 2);
+      paragraph = getParagraph(text, 300, maxLines: 2);
       exceededMaxLines = paragraph.didExceedMaxLines;
       expect(exceededMaxLines, true);
       width = paragraph.width;
       expect(width, 28);
 
       // three lines
-      paragraph = _getParagraph(text, 300, maxLines: 3);
+      paragraph = getParagraph(text, 300, maxLines: 3);
       exceededMaxLines = paragraph.didExceedMaxLines;
       expect(exceededMaxLines, false);
       width = paragraph.width;

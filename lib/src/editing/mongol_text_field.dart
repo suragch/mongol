@@ -199,55 +199,6 @@ class _TextFieldSelectionGestureDetectorBuilder
 /// callback. This callback is applied to the text field's current value when
 /// the user finishes editing.
 ///
-/// {@tool dartpad --template=stateful_widget_material}
-///
-/// This sample shows how to get a value from a MongolTextField via the [onSubmitted]
-/// callback.
-///
-/// ```dart
-/// // TODO: update the example with Mongol alert and Mongol button
-///
-/// late TextEditingController _controller;
-///
-/// void initState() {
-///   super.initState();
-///   _controller = TextEditingController();
-/// }
-///
-/// void dispose() {
-///   _controller.dispose();
-///   super.dispose();
-/// }
-///
-/// Widget build(BuildContext context) {
-///   return Scaffold(
-///     body: Center(
-///       child: MongolTextField(
-///         controller: _controller,
-///         onSubmitted: (String value) async {
-///           await showDialog<void>(
-///             context: context,
-///             builder: (BuildContext context) {
-///               return AlertDialog(
-///                 title: const Text('Thanks!'),
-///                 content: Text ('You typed "$value", which has length ${value.characters.length}.'),
-///                 actions: <Widget>[
-///                   TextButton(
-///                     onPressed: () { Navigator.pop(context); },
-///                     child: const Text('OK'),
-///                   ),
-///                 ],
-///               );
-///             },
-///           );
-///         },
-///       ),
-///     ),
-///   );
-/// }
-/// ```
-/// {@end-tool}
-///
 /// For most applications the [onSubmitted] callback will be sufficient for
 /// reacting to user input.
 ///
@@ -473,7 +424,7 @@ class MongolTextField extends StatefulWidget {
   /// Defaults to [MongolTextAlign.top].
   final MongolTextAlign textAlign;
 
-  /// The horizontal alignment of verical Mongolian text within an input box.
+  /// The horizontal alignment of vertical Mongolian text within an input box.
   final TextAlignHorizontal? textAlignHorizontal;
 
   /// Whether this text field should focus itself if nothing else is already
@@ -714,58 +665,6 @@ class MongolTextField extends StatefulWidget {
   /// To be notified of all changes to the MongolTextField's text, cursor,
   /// and selection, one can add a listener to its [controller] with
   /// [TextEditingController.addListener].
-  ///
-  /// {@tool dartpad --template=stateful_widget_material}
-  ///
-  /// This example shows how onChanged could be used to check the MongolTextField's
-  /// current value each time the user inserts or deletes a character.
-  ///
-  /// ```dart
-  /// // TODO: test this snippet to make sure it works
-  ///
-  /// final TextEditingController _controller = TextEditingController();
-  ///
-  /// void dispose() {
-  ///   _controller.dispose();
-  ///   super.dispose();
-  /// }
-  ///
-  /// Widget build(BuildContext context) {
-  ///   return Scaffold(
-  ///     body: Row(
-  ///       mainAxisAlignment: MainAxisAlignment.center,
-  ///       children: <Widget>[
-  ///         const MongolText('What number comes next in the sequence?'),
-  ///         const MongolText('1, 1, 2, 3, 5, 8...?'),
-  ///         MongolTextField(
-  ///           controller: _controller,
-  ///           onChanged: (String value) async {
-  ///             if (value != '13') {
-  ///               return;
-  ///             }
-  ///             await showDialog<void>(
-  ///               context: context,
-  ///               builder: (BuildContext context) {
-  ///                 return MongolAlertDialog(
-  ///                   title: const Text('That is correct!'),
-  ///                   content: Text ('13 is the right answer.'),
-  ///                   actions: <Widget>[
-  ///                     MongolTextButton(
-  ///                       onPressed: () { Navigator.pop(context); },
-  ///                       child: const Text('OK'),
-  ///                     ),
-  ///                   ],
-  ///                 );
-  ///               },
-  ///             );
-  ///           },
-  ///         ),
-  ///       ],
-  ///     ),
-  ///   );
-  /// }
-  /// ```
-  /// {@end-tool}
   ///
   /// ## Handling emojis and other complex characters
   ///
@@ -1163,7 +1062,7 @@ class MongolTextField extends StatefulWidget {
   final String? restorationId;
 
   @override
-  _TextFieldState createState() => _TextFieldState();
+  State<MongolTextField> createState() => _TextFieldState();
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {

@@ -7,7 +7,8 @@
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart' show listEquals;
-import 'package:flutter/material.dart' show Icons, Material, MaterialType, IconButton;
+import 'package:flutter/material.dart'
+    show Icons, Material, MaterialType, IconButton;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -38,7 +39,7 @@ class MongolTextSelectionToolbar extends StatelessWidget {
     required this.anchorRight,
     this.toolbarBuilder = _defaultToolbarBuilder,
     required this.children,
-  })   : assert(children.length > 0),
+  })  : assert(children.length > 0),
         super(key: key);
 
   /// The focal point to the left of which the toolbar attempts to position
@@ -120,7 +121,7 @@ class _TextSelectionToolbarOverflowable extends StatefulWidget {
     required this.isLeft,
     required this.toolbarBuilder,
     required this.children,
-  })   : assert(children.length > 0),
+  })  : assert(children.length > 0),
         super(key: key);
 
   final List<Widget> children;
@@ -238,7 +239,7 @@ class _TextSelectionToolbarTrailingEdgeAlign
 class _TextSelectionToolbarTrailingEdgeAlignRenderBox extends RenderProxyBox {
   _TextSelectionToolbarTrailingEdgeAlignRenderBox({
     required bool overflowOpen,
-  })   : _overflowOpen = overflowOpen,
+  })  : _overflowOpen = overflowOpen,
         super();
 
   // The height of the menu when it was closed. This is used to achieve the
@@ -382,7 +383,7 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
   _RenderTextSelectionToolbarItemsLayout({
     required bool isLeft,
     required bool overflowOpen,
-  })   : _isLeft = isLeft,
+  })  : _isLeft = isLeft,
         _overflowOpen = overflowOpen,
         super();
 
@@ -603,8 +604,7 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
   void visitChildrenForSemantics(RenderObjectVisitor visitor) {
     visitChildren((RenderObject renderObjectChild) {
       final child = renderObjectChild as RenderBox;
-      final childParentData =
-          child.parentData! as ToolbarItemsParentData;
+      final childParentData = child.parentData! as ToolbarItemsParentData;
       if (childParentData.shouldPaint) {
         visitor(renderObjectChild);
       }
@@ -643,6 +643,7 @@ class _TextSelectionToolbarOverflowButton extends StatelessWidget {
     Key? key,
     required this.icon,
     this.onPressed,
+    // ignore: unused_element
     this.tooltip,
   }) : super(key: key);
 

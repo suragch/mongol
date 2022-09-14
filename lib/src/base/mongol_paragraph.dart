@@ -119,7 +119,7 @@ class MongolLineMetrics {
   }
 
   @override
-  int get hashCode => hashValues(hardBreak, ascent, descent, unscaledAscent,
+  int get hashCode => Object.hash(hardBreak, ascent, descent, unscaledAscent,
       height, width, top, baseline, lineNumber);
 
   @override
