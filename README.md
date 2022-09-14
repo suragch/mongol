@@ -5,11 +5,10 @@ This library is a collection of Flutter widgets for displaying traditional Mongo
 The primary widgets include:
 
 - `MongolText`: vertical version of `Text`
+- `MongolTextField`: vertical version of `TextField`
 - `MongolListTile`: vertical version of `ListTile`, for use in horizontal list views and menus
 - `MongolPopupMenuButton`: vertical version of `PopupMenuButton`, for displaying menus
 - `MongolAlertDialog`: vertical version of `AlertDialog`
-
-> **NOTE**: Version 3.0.0 removed `MongolTextField` because recent Flutter updates broke it. The plan is to recreate it from scratch.
 
 ## Displaying vertical text
 
