@@ -1286,7 +1286,7 @@ class _RenderDecoration extends RenderBox
         _isOutlineAligned ? layout.outlineBaseline : layout.inputBaseline;
 
     if (icon != null) {
-      final double y = 0.0;
+      const double y = 0.0;
       centerLayout(icon!, y);
     }
 

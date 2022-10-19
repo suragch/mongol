@@ -286,6 +286,7 @@ class MongolTextField extends StatefulWidget {
     this.minLines,
     this.expands = false,
     this.maxLength,
+    this.maxLengthEnforcement,
     this.onChanged,
     this.onEditingComplete,
     this.onSubmitted,
@@ -604,8 +605,6 @@ class MongolTextField extends StatefulWidget {
   /// The maximum number of characters (Unicode scalar values) to allow in the
   /// text field.
   ///
-  /// TODO: add support for maxLengthEnforcement.
-  ///
   /// If set, a character counter will be displayed to the right of the
   /// field showing how many characters have been entered. If set to a number
   /// greater than 0, it will also display the maximum number allowed. If set
@@ -653,6 +652,9 @@ class MongolTextField extends StatefulWidget {
   /// a single character, even though it is a combination of two Unicode scalar
   /// values, '\u{1F44D}\u{1F3FD}'.
   final int? maxLength;
+
+  /// Determines how the [maxLength] limit should be enforced.
+  final MaxLengthEnforcement? maxLengthEnforcement;
 
   /// Called when the user initiates a change to the MongolTextField's
   /// value: when they have inserted or deleted text.
@@ -785,7 +787,7 @@ class MongolTextField extends StatefulWidget {
   ///
   /// This setting is only honored on iOS devices.
   ///
-  /// If unset, defaults to the brightness of [ThemeData.primaryColorBrightness].
+  /// If unset, defaults to [ThemeData.brightness].
   final Brightness? keyboardAppearance;
 
   /// Configures padding to edges surrounding a [Scrollable] when the
@@ -1099,6 +1101,9 @@ class MongolTextField extends StatefulWidget {
     properties.add(
         DiagnosticsProperty<bool>('expands', expands, defaultValue: false));
     properties.add(IntProperty('maxLength', maxLength, defaultValue: null));
+    properties.add(EnumProperty<MaxLengthEnforcement>(
+        'maxLengthEnforcement', maxLengthEnforcement,
+        defaultValue: null));
     properties.add(EnumProperty<TextInputAction>(
         'textInputAction', textInputAction,
         defaultValue: null));
@@ -1147,6 +1152,11 @@ class _TextFieldState extends State<MongolTextField>
   FocusNode? _focusNode;
   FocusNode get _effectiveFocusNode =>
       widget.focusNode ?? (_focusNode ??= FocusNode());
+
+  MaxLengthEnforcement get _effectiveMaxLengthEnforcement =>
+      widget.maxLengthEnforcement ??
+      LengthLimitingTextInputFormatter.getDefaultMaxLengthEnforcement(
+          Theme.of(context).platform);
 
   bool _isHovering = false;
 
@@ -1414,15 +1424,21 @@ class _TextFieldState extends State<MongolTextField>
       'inherit false style must supply fontSize and textBaseline',
     );
 
-    final theme = Theme.of(context);
-    final selectionTheme = TextSelectionTheme.of(context);
-    final style = theme.textTheme.subtitle1!.merge(widget.style);
-    final keyboardAppearance =
-        widget.keyboardAppearance ?? theme.primaryColorBrightness;
-    final controller = _effectiveController;
-    final focusNode = _effectiveFocusNode;
-    final formatters = <TextInputFormatter>[
+    final ThemeData theme = Theme.of(context);
+    final DefaultSelectionStyle selectionStyle =
+        DefaultSelectionStyle.of(context);
+    final TextStyle style = theme.textTheme.subtitle1!.merge(widget.style);
+    final Brightness keyboardAppearance =
+        widget.keyboardAppearance ?? theme.brightness;
+    final TextEditingController controller = _effectiveController;
+    final FocusNode focusNode = _effectiveFocusNode;
+    final List<TextInputFormatter> formatters = <TextInputFormatter>[
       ...?widget.inputFormatters,
+      if (widget.maxLength != null)
+        LengthLimitingTextInputFormatter(
+          widget.maxLength,
+          maxLengthEnforcement: _effectiveMaxLengthEnforcement,
+        ),
     ];
 
     var textSelectionControls = widget.selectionControls;
@@ -1438,9 +1454,10 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = true;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
-        cursorColor ??=
-            selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
-        selectionColor = selectionTheme.selectionColor ??
+        cursorColor = widget.cursorColor ??
+            selectionStyle.cursorColor ??
+            cupertinoTheme.primaryColor;
+        selectionColor = selectionStyle.selectionColor ??
             cupertinoTheme.primaryColor.withOpacity(0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
@@ -1452,9 +1469,10 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = false;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
-        cursorColor ??=
-            selectionTheme.cursorColor ?? cupertinoTheme.primaryColor;
-        selectionColor = selectionTheme.selectionColor ??
+        cursorColor = widget.cursorColor ??
+            selectionStyle.cursorColor ??
+            cupertinoTheme.primaryColor;
+        selectionColor = selectionStyle.selectionColor ??
             cupertinoTheme.primaryColor.withOpacity(0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
@@ -1466,8 +1484,10 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = false;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
-        cursorColor ??= selectionTheme.cursorColor ?? theme.colorScheme.primary;
-        selectionColor = selectionTheme.selectionColor ??
+        cursorColor = widget.cursorColor ??
+            selectionStyle.cursorColor ??
+            theme.colorScheme.primary;
+        selectionColor = selectionStyle.selectionColor ??
             theme.colorScheme.primary.withOpacity(0.40);
         break;
 
@@ -1476,8 +1496,10 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = false;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
-        cursorColor ??= selectionTheme.cursorColor ?? theme.colorScheme.primary;
-        selectionColor = selectionTheme.selectionColor ??
+        cursorColor = widget.cursorColor ??
+            selectionStyle.cursorColor ??
+            theme.colorScheme.primary;
+        selectionColor = selectionStyle.selectionColor ??
             theme.colorScheme.primary.withOpacity(0.40);
         break;
     }
@@ -1566,7 +1588,9 @@ class _TextFieldState extends State<MongolTextField>
     );
 
     final int? semanticsMaxValueLength;
-    if (widget.maxLength != null && widget.maxLength! > 0) {
+    if (_effectiveMaxLengthEnforcement != MaxLengthEnforcement.none &&
+        widget.maxLength != null &&
+        widget.maxLength! > 0) {
       semanticsMaxValueLength = widget.maxLength;
     } else {
       semanticsMaxValueLength = null;
