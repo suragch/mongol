@@ -21,7 +21,6 @@ import 'package:flutter/material.dart'
         debugCheckHasMaterial,
         debugCheckHasMaterialLocalizations,
         TextSelectionThemeData,
-        TextSelectionTheme,
         iOSHorizontalOffset,
         MaterialStateProperty,
         MaterialStateMouseCursor,

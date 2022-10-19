@@ -180,7 +180,6 @@ class _TextSelectionToolbarOverflowableState
       key: _containerKey,
       overflowOpen: _overflowOpen,
       child: AnimatedSize(
-        vsync: this,
         // This duration was eyeballed on a Pixel 2 emulator running Android
         // API 28.
         duration: const Duration(milliseconds: 140),

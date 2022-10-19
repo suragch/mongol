@@ -389,7 +389,7 @@ class MongolTextPainter {
     final text = textSpan.text;
     final children = textSpan.children;
     final hasStyle = style != null;
-    if (hasStyle) builder.pushStyle(style!);
+    if (hasStyle) builder.pushStyle(style);
     if (text != null) builder.addText(text);
     if (children != null) {
       for (final child in children) {
