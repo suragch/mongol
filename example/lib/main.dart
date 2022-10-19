@@ -4,6 +4,7 @@ import 'demos/horizontal_listview_demo.dart';
 import 'demos/alert_dialog_demo.dart';
 import 'demos/button_demo.dart';
 import 'demos/emoji_cjk_demo.dart';
+import 'demos/input_decorations_demo.dart';
 import 'demos/keyboard_demo.dart';
 import 'demos/list_tile_demo.dart';
 import 'demos/max_lines_demo.dart';
@@ -52,6 +53,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'MongolTextField',
           destination: MongolTextFieldDemo(),
+        ),
+        DemoTile(
+          title: 'MongolTextField with input decorations',
+          destination: InputDecorationsDemo(),
         ),
         DemoTile(
           title: 'Emoji and CJK',
