@@ -51,16 +51,16 @@ class HomeScreen extends StatelessWidget {
           destination: RichTextDemo(),
         ),
         DemoTile(
+          title: 'Emoji and CJK',
+          destination: EmojiCjkDemo(),
+        ),
+        DemoTile(
           title: 'MongolTextField',
           destination: MongolTextFieldDemo(),
         ),
         DemoTile(
-          title: 'MongolTextField with input decorations',
+          title: 'Input decoration',
           destination: InputDecorationsDemo(),
-        ),
-        DemoTile(
-          title: 'Emoji and CJK',
-          destination: EmojiCjkDemo(),
         ),
         DemoTile(
           title: 'MongolAlertDialog',
@@ -75,7 +75,7 @@ class HomeScreen extends StatelessWidget {
           destination: HorizontalListviewDemo(),
         ),
         DemoTile(
-          title: 'Max lines demo',
+          title: 'Max lines',
           destination: MaxLinesDemo(),
         ),
         DemoTile(
