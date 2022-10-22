@@ -243,7 +243,7 @@ class _InputDecorationsBodyState extends State<InputDecorationsBody> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.fromLTRB(8, 20, 8, 0),
                 child: Container(
                   decoration: (_showSize) ? redBorder : null,
                   child: TextField(

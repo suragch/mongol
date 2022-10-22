@@ -878,7 +878,7 @@ class _RenderDecoration extends RenderBox
       0.0,
       constraints.maxHeight -
           (_boxSize(icon).height +
-              contentPadding.left +
+              contentPadding.top +
               _boxSize(prefixIcon).height +
               _boxSize(prefix).height +
               _boxSize(suffix).height +

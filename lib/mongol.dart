@@ -6,6 +6,7 @@ export 'package:mongol/src/base/mongol_text_align.dart';
 export 'package:mongol/src/base/mongol_text_painter.dart';
 export 'package:mongol/src/dialog/mongol_alert_dialog.dart';
 export 'package:mongol/src/editing/mongol_text_field.dart';
+export 'package:mongol/src/editing/mongol_render_editable.dart';
 export 'package:mongol/src/editing/input_border.dart' show SidelineInputBorder;
 export 'package:mongol/src/menu/mongol_popup_menu.dart';
 export 'package:mongol/src/menu/mongol_tooltip.dart';

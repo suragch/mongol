@@ -1,3 +1,9 @@
+## [3.2.0] - 2022.10.22
+
+- Updating internal code to remove compiler warnings. Required minimum of Flutter 2.17.
+- Added example app demo for `MongolTextField` to show options for input decorations.
+- Export `MongolRenderEditable` to get cursor location (#31).
+
 ## [3.1.0] - 2022.09.13
 
 - Added `MongolTextField` back in with fixes. (@Satsrag)
