@@ -94,7 +94,7 @@ class _InputDecorationsBodyState extends State<InputDecorationsBody> {
                   _showSidelineBorder = newValue!;
                   if (_showSidelineBorder) {
                     _showOutlineBorder = false;
-                    _borderValue = BorderType.sideline;
+                    _borderValue = BorderType.line;
                   } else {
                     _borderValue = BorderType.none;
                   }
@@ -248,9 +248,7 @@ class _InputDecorationsBodyState extends State<InputDecorationsBody> {
                   decoration: (_showSize) ? redBorder : null,
                   child: TextField(
                     decoration: InputDecoration(
-                      border: (_borderValue == BorderType.sideline)
-                          ? const UnderlineInputBorder()
-                          : _borderValue.border,
+                      border: _getBorder('TextField', _borderValue),
                       filled: _filled,
                       fillColor: Colors.blue.shade100,
                       labelText: (_showLabelText) ? text : null,
@@ -277,7 +275,7 @@ class _InputDecorationsBodyState extends State<InputDecorationsBody> {
                     decoration: (_showSize) ? redBorder : null,
                     child: MongolTextField(
                       decoration: InputDecoration(
-                        border: _borderValue.border,
+                        border: _getBorder('MongolTextField', _borderValue),
                         filled: _filled,
                         fillColor: Colors.blue.shade100,
                         labelText: (_showLabelText) ? text : null,
@@ -304,17 +302,23 @@ class _InputDecorationsBodyState extends State<InputDecorationsBody> {
       ],
     );
   }
+
+  InputBorder _getBorder(String widgetName, BorderType type) {
+    if (widgetName == 'TextField') {
+      if (type == BorderType.line) return const UnderlineInputBorder();
+      if (type == BorderType.outline) return const OutlineInputBorder();
+    } else if (widgetName == 'MongolTextField') {
+      if (type == BorderType.line) return const SidelineInputBorder();
+      if (type == BorderType.outline) return const MongolOutlineInputBorder();
+    }
+    return InputBorder.none;
+  }
 }
 
 enum BorderType {
-  none('InputBorder.none', InputBorder.none),
-  sideline('SidelineInputBorder', SidelineInputBorder()),
-  outline('OutlineInputBorder', OutlineInputBorder());
-
-  const BorderType(this.name, this.border);
-
-  final String name;
-  final InputBorder border;
+  none,
+  line, // underline or sideline
+  outline;
 }
 
 class CheckboxItem extends StatelessWidget {
