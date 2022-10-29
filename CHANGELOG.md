@@ -1,3 +1,7 @@
+## [3.2.1] - unpublished
+
+- Fix label problems on outlined input border with `MongolOutlineInputBorder` (#28).
+
 ## [3.2.0] - 2022.10.22
 
 - Updating internal code to remove compiler warnings. Required minimum of Flutter 2.17.
