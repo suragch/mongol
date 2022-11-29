@@ -6,7 +6,7 @@
 
 import 'package:flutter/foundation.dart';
 
-/// The horizontal alignment of verical Mongolian text within an input box.
+/// The horizontal alignment of vertical Mongolian text within an input box.
 ///
 /// A single [x] value that can range from -1.0 to 1.0. -1.0 aligns to the left side
 /// of an input box so that the left side of the first line of text fits within the
@@ -24,8 +24,7 @@ class TextAlignHorizontal {
   /// Creates a TextAlignHorizontal from any x value between -1.0 and 1.0.
   const TextAlignHorizontal({
     required this.x,
-  }) : 
-       assert(x >= -1.0 && x <= 1.0);
+  }) : assert(x >= -1.0 && x <= 1.0);
 
   /// A value ranging from -1.0 to 1.0 that defines the leftmost and rightmost
   /// locations of the left and right sides of the input box.
@@ -34,8 +33,10 @@ class TextAlignHorizontal {
   /// Aligns a MongolTextField's input text with the leftmost location within a
   /// MongolTextField's input box.
   static const TextAlignHorizontal left = TextAlignHorizontal(x: -1.0);
+
   /// Aligns a MongolTextField's input text to the center of the MongolTextField.
   static const TextAlignHorizontal center = TextAlignHorizontal(x: 0.0);
+
   /// Aligns a MongolTextField's input text with the rightmost location within a
   /// MongolTextField.
   static const TextAlignHorizontal right = TextAlignHorizontal(x: 1.0);

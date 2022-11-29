@@ -1,6 +1,7 @@
-## [3.2.1] - unpublished
+## [3.3.0] - 2022.11.29
 
 - Fix label problems on outlined input border with `MongolOutlineInputBorder` (#28).
+- Export `TextAlignHorizontal` for `MongolTextField`.
 
 ## [3.2.0] - 2022.10.22
 

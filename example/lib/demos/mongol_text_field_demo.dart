@@ -19,7 +19,8 @@ class SearchBody extends StatefulWidget {
 }
 
 class _SearchBodyState extends State<SearchBody> {
-  TextEditingController controller = TextEditingController();
+  TextEditingController controller1 = TextEditingController();
+  TextEditingController controller2 = TextEditingController();
 
   @override
   void initState() {
@@ -28,26 +29,47 @@ class _SearchBodyState extends State<SearchBody> {
 
   @override
   void dispose() {
-    controller.dispose();
+    controller1.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Center(
-        child: SizedBox(
-          width: 200,
-          height: 200,
-          child: MongolTextField(
-            style: const TextStyle(fontSize: 24),
-            controller: controller,
-            maxLines: null,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 200,
+              height: 200,
+              child: MongolTextField(
+                style: const TextStyle(fontSize: 24),
+                controller: controller1,
+                maxLines: null,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+              ),
             ),
           ),
-        ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: MongolTextField(
+                style: const TextStyle(fontSize: 24),
+                controller: controller2,
+                textAlignHorizontal: TextAlignHorizontal.left,
+                maxLines: null,
+                expands: true,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
