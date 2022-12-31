@@ -1,3 +1,7 @@
+## [3.3.1] - 2022.12.31
+
+-  Fix: crash when MongolTextField contain a line end with ' \n' (#34) (@Satsrag)
+
 ## [3.3.0] - 2022.11.29
 
 - Fix label problems on outlined input border with `MongolOutlineInputBorder` (#28).
