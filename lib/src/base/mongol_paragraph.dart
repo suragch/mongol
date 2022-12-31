@@ -8,8 +8,8 @@ import 'dart:collection';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:flutter/painting.dart';
 import 'package:characters/characters.dart';
+import 'package:flutter/painting.dart';
 
 import 'mongol_text_align.dart';
 
@@ -756,17 +756,19 @@ class MongolParagraph {
       double baseline = 0;
       for (int j = line.textRunStart; j < line.textRunEnd; j += 1) {
         final textRun = _runs[j];
-        final runMetrics = textRun.paragraph.computeLineMetrics().first;
+        final metricsList = textRun.paragraph.computeLineMetrics();
+        final runMetrics = metricsList.isEmpty ? null : metricsList.first;
 
         // last textRun of this line
         if (j == line.textRunEnd - 1) {
           hardBreak = _runEndsWithNewLine(textRun);
         }
-        ascent = math.max(runMetrics.ascent, ascent);
-        descent = math.max(runMetrics.descent, descent);
-        unscaledAscent = math.max(runMetrics.unscaledAscent, unscaledAscent);
-        width = math.max(runMetrics.height, width);
-        height += runMetrics.width;
+        ascent = math.max(runMetrics?.ascent ?? 0, ascent);
+        descent = math.max(runMetrics?.descent ?? 0, descent);
+        unscaledAscent =
+            math.max(runMetrics?.unscaledAscent ?? 0, unscaledAscent);
+        width = math.max(runMetrics?.height ?? 0, width);
+        height += runMetrics?.width ?? textRun.width;
         final previousMetrics = index > 0 ? metrics[index - 1] : null;
         final previousLineAscent = previousMetrics?.ascent ?? 0.0;
         final previousLineBaseline = previousMetrics?.baseline ?? 0.0;
