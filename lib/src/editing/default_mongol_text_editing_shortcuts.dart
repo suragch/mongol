@@ -4,19 +4,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
-/// Swap up/down arrow keys and left/right arrow keys on platforms other than the web.
-/// [DefaultTextEditingShortcuts._webDisablingTextShortcuts] said, "Web handles
-/// its text selection natively and doesn't use any of these shortcuts in Flutter".
-/// so maybe there is no way to swap these keys, but I'm not sure.
+import 'mongol_text_editing_intents.dart';
+
+/// Switch up/down arrow keys and left/right arrow keys
 class DefaultMongolTextEditingShortcuts extends StatelessWidget {
   const DefaultMongolTextEditingShortcuts({Key? key, required this.child})
       : super(key: key);
 
-  final Widget child;
+  final Widget? child;
 
   // These are shortcuts are shared between most platforms except macOS for it
   // uses different modifier keys as the line/word modifier.
@@ -24,73 +23,73 @@ class DefaultMongolTextEditingShortcuts extends StatelessWidget {
       <ShortcutActivator, Intent>{
     // Arrow: Move Selection.
     const SingleActivator(LogicalKeyboardKey.arrowUp):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowDown):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: true, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowLeft):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowRight):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: true, collapseSelection: true),
 
     // Shift + Arrow: Extend Selection.
     const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: true, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowRight, shift: true):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: true, collapseSelection: false),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowDown, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: true, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: true, collapseSelection: true),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: true, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowRight,
             shift: true, alt: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: true, collapseSelection: false),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp, control: true):
-        const ExtendSelectionToNextWordBoundaryIntent(
+        const MongolExtendSelectionToNextWordBoundaryIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowDown, control: true):
-        const ExtendSelectionToNextWordBoundaryIntent(
+        const MongolExtendSelectionToNextWordBoundaryIntent(
             forward: true, collapseSelection: true),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp,
             shift: true, control: true):
-        const ExtendSelectionToNextWordBoundaryIntent(
+        const MongolExtendSelectionToNextWordBoundaryIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowDown,
             shift: true, control: true):
-        const ExtendSelectionToNextWordBoundaryIntent(
+        const MongolExtendSelectionToNextWordBoundaryIntent(
             forward: true, collapseSelection: false),
   };
 
@@ -126,84 +125,84 @@ class DefaultMongolTextEditingShortcuts extends StatelessWidget {
   static final Map<ShortcutActivator, Intent> _macShortcuts =
       <ShortcutActivator, Intent>{
     const SingleActivator(LogicalKeyboardKey.arrowUp):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowDown):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: true, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowLeft):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowRight):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: true, collapseSelection: true),
 
     // Shift + Arrow: Extend Selection.
     const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true):
-        const ExtendSelectionByCharacterIntent(
+        const MongolExtendSelectionByCharacterIntent(
             forward: true, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowRight, shift: true):
-        const ExtendSelectionVerticallyToAdjacentLineIntent(
+        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
             forward: true, collapseSelection: false),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp, alt: true):
-        const ExtendSelectionToNextWordBoundaryIntent(
+        const MongolExtendSelectionToNextWordBoundaryIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowDown, alt: true):
-        const ExtendSelectionToNextWordBoundaryIntent(
+        const MongolExtendSelectionToNextWordBoundaryIntent(
             forward: true, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: true, collapseSelection: true),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, alt: true):
-        const ExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
+        const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
             forward: false),
     const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true, alt: true):
-        const ExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
+        const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
             forward: true),
     const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: false, collapseSelection: false, collapseAtReversal: true),
     const SingleActivator(LogicalKeyboardKey.arrowRight,
             shift: true, alt: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: true, collapseSelection: false, collapseAtReversal: true),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp, meta: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowDown, meta: true):
-        const ExtendSelectionToLineBreakIntent(
+        const MongolExtendSelectionToLineBreakIntent(
             forward: true, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowLeft, meta: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: false, collapseSelection: true),
     const SingleActivator(LogicalKeyboardKey.arrowRight, meta: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: true, collapseSelection: true),
 
     const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, meta: true):
-        const ExpandSelectionToLineBreakIntent(forward: false),
+        const MongolExpandSelectionToLineBreakIntent(forward: false),
     const SingleActivator(LogicalKeyboardKey.arrowDown,
-        shift: true,
-        meta: true): const ExpandSelectionToLineBreakIntent(forward: true),
+            shift: true, meta: true):
+        const MongolExpandSelectionToLineBreakIntent(forward: true),
     const SingleActivator(LogicalKeyboardKey.arrowLeft,
             shift: true, meta: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: false, collapseSelection: false),
     const SingleActivator(LogicalKeyboardKey.arrowRight,
             shift: true, meta: true):
-        const ExtendSelectionToDocumentBoundaryIntent(
+        const MongolExtendSelectionToDocumentBoundaryIntent(
             forward: true, collapseSelection: false),
   };
 
@@ -214,7 +213,7 @@ class DefaultMongolTextEditingShortcuts extends StatelessWidget {
   static final Map<ShortcutActivator, Intent> _windowsShortcuts =
       _commonShortcuts;
 
-  static Map<ShortcutActivator, Intent> get _shortcuts {
+  static Map<ShortcutActivator, Intent> get shortcuts {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return _androidShortcuts;
@@ -231,147 +230,11 @@ class DefaultMongolTextEditingShortcuts extends StatelessWidget {
     }
   }
 
-  // Web handles its text selection natively and doesn't use any of these
-  // shortcuts in Flutter.
-  static final Map<ShortcutActivator, Intent> _webDisablingTextShortcuts =
-      <ShortcutActivator, Intent>{
-    for (final bool pressShift in const <bool>[
-      true,
-      false
-    ]) ...<SingleActivator, Intent>{
-      SingleActivator(LogicalKeyboardKey.backspace, shift: pressShift):
-          const DoNothingAndStopPropagationTextIntent(),
-      SingleActivator(LogicalKeyboardKey.delete, shift: pressShift):
-          const DoNothingAndStopPropagationTextIntent(),
-      SingleActivator(LogicalKeyboardKey.backspace,
-          alt: true,
-          shift: pressShift): const DoNothingAndStopPropagationTextIntent(),
-      SingleActivator(LogicalKeyboardKey.delete, alt: true, shift: pressShift):
-          const DoNothingAndStopPropagationTextIntent(),
-      SingleActivator(LogicalKeyboardKey.backspace,
-          control: true,
-          shift: pressShift): const DoNothingAndStopPropagationTextIntent(),
-      SingleActivator(LogicalKeyboardKey.delete,
-          control: true,
-          shift: pressShift): const DoNothingAndStopPropagationTextIntent(),
-      SingleActivator(LogicalKeyboardKey.backspace,
-          meta: true,
-          shift: pressShift): const DoNothingAndStopPropagationTextIntent(),
-      SingleActivator(LogicalKeyboardKey.delete, meta: true, shift: pressShift):
-          const DoNothingAndStopPropagationTextIntent(),
-    },
-    const SingleActivator(LogicalKeyboardKey.arrowDown, alt: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowUp, alt: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true, alt: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight,
-        shift: true, alt: true): const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, alt: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowDown):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowUp):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft,
-        shift: true,
-        control: true): const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight,
-        shift: true,
-        control: true): const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.end):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.home):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowUp, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowDown,
-        shift: true, meta: true): const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft,
-        shift: true, meta: true): const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight,
-        shift: true, meta: true): const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, shift: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.end, shift: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.home, shift: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.end, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.home, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.space):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.enter):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyX, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyX, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyC, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyC, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyV, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyV, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyA, control: true):
-        const DoNothingAndStopPropagationTextIntent(),
-    const SingleActivator(LogicalKeyboardKey.keyA, meta: true):
-        const DoNothingAndStopPropagationTextIntent(),
-  };
-
   @override
   Widget build(BuildContext context) {
-    Widget result = child;
-    if (kIsWeb) {
-      // On the web, these shortcuts make sure of the following:
-      //
-      // 1. Shortcuts fired when an EditableText is focused are ignored and
-      //    forwarded to the browser by the EditableText's Actions, because it
-      //    maps DoNothingAndStopPropagationTextIntent to DoNothingAction.
-      // 2. Shortcuts fired when no EditableText is focused will still trigger
-      //    _shortcuts assuming DoNothingAndStopPropagationTextIntent is
-      //    unhandled elsewhere.
-      result = Shortcuts(
-          debugLabel: '<Web Disabling Text Editing Shortcuts>',
-          shortcuts: _webDisablingTextShortcuts,
-          child: result);
-    }
     return Shortcuts(
-        debugLabel: '<Default Text Editing Shortcuts>',
-        shortcuts: _shortcuts,
-        child: result);
+        debugLabel: '<Default Mongol Text Editing Shortcuts>',
+        shortcuts: shortcuts,
+        child: child ?? const SizedBox.shrink());
   }
 }

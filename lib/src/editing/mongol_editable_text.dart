@@ -102,11 +102,11 @@ import 'package:flutter/widgets.dart'
 //import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
 
 import 'package:mongol/src/base/mongol_text_align.dart';
-import 'package:mongol/src/editing/default_mongol_text_editing_shortcuts.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
 import 'package:mongol/src/editing/text_selection/mongol_text_selection.dart';
 
 import 'mongol_text_editing_action.dart';
+import 'mongol_text_editing_intents.dart';
 
 export 'package:flutter/services.dart'
     show
@@ -2516,13 +2516,28 @@ class MongolEditableTextState extends State<MongolEditableText>
       false,
       _characterBoundary,
     )),
+    MongolExtendSelectionByCharacterIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionByCharacterIntent>(
+      this,
+      false,
+      _characterBoundary,
+    )),
     ExtendSelectionToNextWordBoundaryIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionToNextWordBoundaryIntent>(
+            this, true, _nextWordBoundary)),
+    MongolExtendSelectionToNextWordBoundaryIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionToNextWordBoundaryIntent>(
             this, true, _nextWordBoundary)),
     ExtendSelectionToLineBreakIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionToLineBreakIntent>(
             this, true, _linebreak)),
+    MongolExtendSelectionToLineBreakIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionToLineBreakIntent>(
+            this, true, _linebreak)),
     ExpandSelectionToLineBreakIntent: _makeOverridable(
+        CallbackAction<ExpandSelectionToLineBreakIntent>(
+            onInvoke: _expandSelectionToLinebreak)),
+    MongolExpandSelectionToLineBreakIntent: _makeOverridable(
         CallbackAction<ExpandSelectionToLineBreakIntent>(
             onInvoke: _expandSelectionToLinebreak)),
     ExpandSelectionToDocumentBoundaryIntent: _makeOverridable(
@@ -2530,11 +2545,19 @@ class MongolEditableTextState extends State<MongolEditableText>
             onInvoke: _expandSelectionToDocumentBoundary)),
     ExtendSelectionVerticallyToAdjacentLineIntent:
         _makeOverridable(_adjacentLineAction),
+    MongolExtendSelectionHorizontallyToAdjacentLineIntent:
+        _makeOverridable(_adjacentLineAction),
     ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(
+        _UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(
+            this, true, _documentBoundary)),
+    MongolExtendSelectionToDocumentBoundaryIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(
             this, true, _documentBoundary)),
     ExtendSelectionToNextWordBoundaryOrCaretLocationIntent: _makeOverridable(
         _ExtendSelectionOrCaretPositionAction(this, _nextWordBoundary)),
+    MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent:
+        _makeOverridable(
+            _ExtendSelectionOrCaretPositionAction(this, _nextWordBoundary)),
     ScrollToDocumentBoundaryIntent: _makeOverridable(
         CallbackAction<ScrollToDocumentBoundaryIntent>(
             onInvoke: _scrollToDocumentBoundary)),
@@ -2555,76 +2578,74 @@ class MongolEditableTextState extends State<MongolEditableText>
     final controls = widget.selectionControls;
     return MouseRegion(
       cursor: widget.mouseCursor ?? SystemMouseCursors.text,
-      child: DefaultMongolTextEditingShortcuts(
-        child: Actions(
-          actions: _actions,
-          child: Focus(
-            focusNode: widget.focusNode,
-            includeSemantics: false,
-            debugLabel: 'MongolEditableText',
-            child: Scrollable(
-              excludeFromSemantics: true,
-              axisDirection:
-                  _isMultiline ? AxisDirection.right : AxisDirection.down,
-              controller: _scrollController,
-              physics: widget.scrollPhysics,
-              dragStartBehavior: widget.dragStartBehavior,
-              restorationId: widget.restorationId,
-              scrollBehavior: widget.scrollBehavior ??
-                  // Remove scrollbars if only single line
-                  (_isMultiline
-                      ? null
-                      : ScrollConfiguration.of(context)
-                          .copyWith(scrollbars: false)),
-              viewportBuilder: (BuildContext context, ViewportOffset offset) {
-                return CompositedTransformTarget(
-                  link: _toolbarLayerLink,
-                  child: Semantics(
-                    onCopy: _semanticsOnCopy(controls),
-                    onCut: _semanticsOnCut(controls),
-                    onPaste: _semanticsOnPaste(controls),
-                    textDirection: TextDirection.ltr,
-                    child: _MongolEditable(
-                      key: _editableKey,
-                      startHandleLayerLink: _startHandleLayerLink,
-                      endHandleLayerLink: _endHandleLayerLink,
-                      textSpan: buildTextSpan(),
-                      value: _value,
-                      cursorColor: _cursorColor,
-                      showCursor: MongolEditableText.debugDeterministicCursor
-                          ? ValueNotifier<bool>(widget.showCursor)
-                          : _cursorVisibilityNotifier,
-                      forceLine: widget.forceLine,
-                      readOnly: widget.readOnly,
-                      hasFocus: _hasFocus,
-                      maxLines: widget.maxLines,
-                      minLines: widget.minLines,
-                      expands: widget.expands,
-                      selectionColor: widget.selectionColor,
-                      textScaleFactor: widget.textScaleFactor ??
-                          MediaQuery.textScaleFactorOf(context),
-                      textAlign: widget.textAlign,
-                      obscuringCharacter: widget.obscuringCharacter,
-                      obscureText: widget.obscureText,
-                      autocorrect: widget.autocorrect,
-                      enableSuggestions: widget.enableSuggestions,
-                      offset: offset,
-                      onCaretChanged: _handleCaretChanged,
-                      rendererIgnoresPointer: widget.rendererIgnoresPointer,
-                      cursorWidth: widget.cursorWidth,
-                      cursorHeight: widget.cursorHeight,
-                      cursorRadius: widget.cursorRadius,
-                      cursorOffset: widget.cursorOffset ?? Offset.zero,
-                      enableInteractiveSelection:
-                          widget.enableInteractiveSelection,
-                      textSelectionDelegate: this,
-                      devicePixelRatio: _devicePixelRatio,
-                      clipBehavior: widget.clipBehavior,
-                    ),
+      child: Actions(
+        actions: _actions,
+        child: Focus(
+          focusNode: widget.focusNode,
+          includeSemantics: false,
+          debugLabel: 'MongolEditableText',
+          child: Scrollable(
+            excludeFromSemantics: true,
+            axisDirection:
+                _isMultiline ? AxisDirection.right : AxisDirection.down,
+            controller: _scrollController,
+            physics: widget.scrollPhysics,
+            dragStartBehavior: widget.dragStartBehavior,
+            restorationId: widget.restorationId,
+            scrollBehavior: widget.scrollBehavior ??
+                // Remove scrollbars if only single line
+                (_isMultiline
+                    ? null
+                    : ScrollConfiguration.of(context)
+                        .copyWith(scrollbars: false)),
+            viewportBuilder: (BuildContext context, ViewportOffset offset) {
+              return CompositedTransformTarget(
+                link: _toolbarLayerLink,
+                child: Semantics(
+                  onCopy: _semanticsOnCopy(controls),
+                  onCut: _semanticsOnCut(controls),
+                  onPaste: _semanticsOnPaste(controls),
+                  textDirection: TextDirection.ltr,
+                  child: _MongolEditable(
+                    key: _editableKey,
+                    startHandleLayerLink: _startHandleLayerLink,
+                    endHandleLayerLink: _endHandleLayerLink,
+                    textSpan: buildTextSpan(),
+                    value: _value,
+                    cursorColor: _cursorColor,
+                    showCursor: MongolEditableText.debugDeterministicCursor
+                        ? ValueNotifier<bool>(widget.showCursor)
+                        : _cursorVisibilityNotifier,
+                    forceLine: widget.forceLine,
+                    readOnly: widget.readOnly,
+                    hasFocus: _hasFocus,
+                    maxLines: widget.maxLines,
+                    minLines: widget.minLines,
+                    expands: widget.expands,
+                    selectionColor: widget.selectionColor,
+                    textScaleFactor: widget.textScaleFactor ??
+                        MediaQuery.textScaleFactorOf(context),
+                    textAlign: widget.textAlign,
+                    obscuringCharacter: widget.obscuringCharacter,
+                    obscureText: widget.obscureText,
+                    autocorrect: widget.autocorrect,
+                    enableSuggestions: widget.enableSuggestions,
+                    offset: offset,
+                    onCaretChanged: _handleCaretChanged,
+                    rendererIgnoresPointer: widget.rendererIgnoresPointer,
+                    cursorWidth: widget.cursorWidth,
+                    cursorHeight: widget.cursorHeight,
+                    cursorRadius: widget.cursorRadius,
+                    cursorOffset: widget.cursorOffset ?? Offset.zero,
+                    enableInteractiveSelection:
+                        widget.enableInteractiveSelection,
+                    textSelectionDelegate: this,
+                    devicePixelRatio: _devicePixelRatio,
+                    clipBehavior: widget.clipBehavior,
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
         ),
       ),
