@@ -28,7 +28,7 @@ class DemoApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       builder: (context, child) {
-        return DefaultMongolTextEditingShortcuts(child: child);
+        return MongolTextEditingShortcuts(child: child);
       },
       title: 'mongol',
       theme: ThemeData(

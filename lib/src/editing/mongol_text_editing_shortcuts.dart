@@ -11,8 +11,8 @@ import 'package:flutter/widgets.dart';
 import 'mongol_text_editing_intents.dart';
 
 /// Switch up/down arrow keys and left/right arrow keys
-class DefaultMongolTextEditingShortcuts extends StatelessWidget {
-  const DefaultMongolTextEditingShortcuts({Key? key, required this.child})
+class MongolTextEditingShortcuts extends StatelessWidget {
+  const MongolTextEditingShortcuts({Key? key, required this.child})
       : super(key: key);
 
   final Widget? child;
@@ -233,7 +233,7 @@ class DefaultMongolTextEditingShortcuts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shortcuts(
-        debugLabel: '<Default Mongol Text Editing Shortcuts>',
+        debugLabel: '<Mongol Text Editing Shortcuts>',
         shortcuts: shortcuts,
         child: child ?? const SizedBox.shrink());
   }
