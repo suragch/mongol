@@ -27,15 +27,13 @@ class DemoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      builder: (context, child) {
-        return MongolTextEditingShortcuts(child: child);
-      },
+      builder: (context, child) => MongolTextEditingShortcuts(child: child),
       title: 'mongol',
       theme: ThemeData(
         fontFamily: 'MenksoftQagan',
       ),
       home: Scaffold(
-        appBar: AppBar(title: const Text('Flutter mongol package 3.3.1')),
+        appBar: AppBar(title: const Text('Flutter mongol package 3.4.0')),
         body: const HomeScreen(),
       ),
     );

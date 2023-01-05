@@ -11,14 +11,23 @@ import 'package:flutter/widgets.dart';
 import 'mongol_text_editing_intents.dart';
 
 /// Switch up/down arrow keys and left/right arrow keys
+///
+/// Insert this widget just below the MaterialApp (or WidgetsApp or
+/// CupertinoApp) in order to cause the arrow keys to behave as expected
+/// in a `MongolTextField`.
+///
+/// ```
+/// MaterialApp(
+///   builder: (context, child) => MongolTextEditingShortcuts(child: child),
+/// ```
 class MongolTextEditingShortcuts extends StatelessWidget {
   const MongolTextEditingShortcuts({Key? key, required this.child})
       : super(key: key);
 
   final Widget? child;
 
-  // These are shortcuts are shared between most platforms except macOS for it
-  // uses different modifier keys as the line/word modifier.
+  // These shortcuts are shared between most platforms except macOS, which
+  // uses different modifier keys for the line/word modifier.
   static final Map<ShortcutActivator, Intent> _commonShortcuts =
       <ShortcutActivator, Intent>{
     // Arrow: Move Selection.

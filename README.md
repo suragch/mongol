@@ -81,11 +81,13 @@ Since it's likely that some of your users' devices won't have a Mongolian font i
 
 ### 1. Get a font
 
-You can find a font from the following companies:
+You can find a font from the following sources:
 
-- [Menksoft](http://www.menksoft.com/site/alias__menkcms/2805/Default.aspx)
-- [Delehi](http://www.delehi.com/cn/2693.html)
-- [One BolorSoft font](https://www.mngl.net/downloads/fonts/MongolianScript.ttf)
+- [Menksoft](https://www.mklai.cn/download-font?productId=a0ec7735b5714334934ff3c094ca0a5e)
+- [MongolFont](http://www.mongolfont.com/en/font/index.html)
+- [BolorSoft](https://www.mngl.net/#download)
+- [Z Mongol Code](https://install.zcodetech.com/)
+- [CMs font](https://phabricator.wikimedia.org/T130502)
 
 ### 2. Add the font to your project
 
@@ -109,9 +111,8 @@ In your `main.dart` file, set the `fontFamily` for the app theme.
 
 ```dart
 MaterialApp(
-  title: 'My App',
   theme: ThemeData(fontFamily: 'MenksoftQagan'),
-  home: MyHomePage(),
+  // ...
 );
 ```
 
@@ -140,6 +141,15 @@ MongolTextField(
     labelText: 'ᠨᠢᠭᠡ ᠬᠤᠶᠠᠷ ᠭᠤᠷᠪᠠ',
   ),
 ),
+```
+
+In order to correctly handle right/left and up/down keys on the web and desktop (or for physical keyboards connected to a mobile app), you need to return the `MongolTextEditingShortcuts` widget from the `builder` method of your `MaterialApp` (or `CupertinoApp` or `WidgetsApp`) at the top of your widget tree:
+
+```dart
+MaterialApp(
+  builder: (context, child) => MongolTextEditingShortcuts(child: child),
+  // ...
+)
 ```
 
 ## Horizontal lists
@@ -227,6 +237,6 @@ This alert dialog works mostly the same as the Flutter `AlertDialog`.
 - Improve keyboard (this may be better as a separate package)
 - Various other text based widgets
 - Support `WidgetSpan`.
-- Add missing tests (currently commented out)
+- Add more tests
 - For `MongolTextAlign.bottom` don't count final space in line height
 - Add `MongolSelectableText` widget

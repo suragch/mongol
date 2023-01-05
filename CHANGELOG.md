@@ -1,3 +1,8 @@
+## [3.4.0] - 2023.01.05
+
+- Remove `DefaultMongolTextEditingShortcuts` from `MongolEditableTextState` (#35) (@Satsrag)
+- To switch the behavior of left/right and up/down keys in `MongolEditableText`, developers now need to add `MongolTextEditingShortcuts` at the top of the widget tree. See [#33](https://github.com/suragch/mongol/issues/33) for discussion.
+
 ## [3.3.1] - 2022.12.31
 
 -  Fix: crash when MongolTextField contain a line end with ' \n' (#34) (@Satsrag)
