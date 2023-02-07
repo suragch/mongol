@@ -8,6 +8,8 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui hide TextStyle;
 
+import 'package:characters/characters.dart'
+    show CharacterRange, StringCharacters;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart'
@@ -72,28 +74,41 @@ import 'package:flutter/widgets.dart'
         MediaQuery,
         MouseRegion,
         Offset,
+        Orientation,
         PasteTextIntent,
+        PointerDownEvent,
         Radius,
         Rect,
+        RedoTextIntent,
         ScrollBehavior,
         ScrollConfiguration,
         ScrollController,
         ScrollPhysics,
         Scrollable,
+        ScrollableState,
+        ScrollIntent,
+        ScrollIncrementType,
+        ScrollPosition,
+        ScrollAction,
         SelectAllTextIntent,
         SelectionChangedCallback,
         Semantics,
+        Simulation,
         State,
         StatefulWidget,
+        TapRegionCallback,
         TextAlign,
         TextDirection,
         TextEditingController,
+        TextFieldTapRegion,
         TextSelectionControls,
         TextSelectionHandleType,
         TextSpan,
         TextStyle,
         TickerProviderStateMixin,
         ToolbarOptions,
+        TransposeCharactersIntent,
+        UndoTextIntent,
         UpdateSelectionIntent,
         Widget,
         WidgetsBinding,
@@ -117,6 +132,18 @@ export 'package:flutter/services.dart'
         SmartQuotesType,
         SmartDashesType;
 
+/// Signature for a widget builder that builds a context menu for the given
+/// [MongolEditableTextState].
+///
+/// See also:
+///
+///  * [SelectableRegionContextMenuBuilder], which performs the same role for
+///    [SelectableRegion].
+typedef MongolEditableTextContextMenuBuilder = Widget Function(
+  BuildContext context,
+  MongolEditableTextState editableTextState,
+);
+
 // The time it takes for the cursor to fade from fully opaque to fully
 // transparent and vice versa. A full cursor blink, from transparent to opaque
 // to transparent, is twice this duration.
@@ -129,6 +156,92 @@ const Duration _kCursorBlinkWaitForStart = Duration(milliseconds: 150);
 // Number of cursor ticks during which the most recently entered character
 // is shown in an obscured text field.
 const int _kObscureShowLatestCharCursorTicks = 3;
+
+// A time-value pair that represents a key frame in an animation.
+class _KeyFrame {
+  const _KeyFrame(this.time, this.value);
+  // Values extracted from iOS 15.4 UIKit.
+  static const List<_KeyFrame> iOSBlinkingCaretKeyFrames = <_KeyFrame>[
+    _KeyFrame(0, 1), // 0
+    _KeyFrame(0.5, 1), // 1
+    _KeyFrame(0.5375, 0.75), // 2
+    _KeyFrame(0.575, 0.5), // 3
+    _KeyFrame(0.6125, 0.25), // 4
+    _KeyFrame(0.65, 0), // 5
+    _KeyFrame(0.85, 0), // 6
+    _KeyFrame(0.8875, 0.25), // 7
+    _KeyFrame(0.925, 0.5), // 8
+    _KeyFrame(0.9625, 0.75), // 9
+    _KeyFrame(1, 1), // 10
+  ];
+
+  // The timing, in seconds, of the specified animation `value`.
+  final double time;
+  final double value;
+}
+
+class _DiscreteKeyFrameSimulation extends Simulation {
+  _DiscreteKeyFrameSimulation.iOSBlinkingCaret()
+      : this._(_KeyFrame.iOSBlinkingCaretKeyFrames, 1);
+  _DiscreteKeyFrameSimulation._(this._keyFrames, this.maxDuration)
+      : assert(_keyFrames.isNotEmpty),
+        assert(_keyFrames.last.time <= maxDuration),
+        assert(() {
+          for (int i = 0; i < _keyFrames.length - 1; i += 1) {
+            if (_keyFrames[i].time > _keyFrames[i + 1].time) {
+              return false;
+            }
+          }
+          return true;
+        }(), 'The key frame sequence must be sorted by time.');
+
+  final double maxDuration;
+
+  final List<_KeyFrame> _keyFrames;
+
+  @override
+  double dx(double time) => 0;
+
+  @override
+  bool isDone(double time) => time >= maxDuration;
+
+  // The index of the KeyFrame corresponds to the most recent input `time`.
+  int _lastKeyFrameIndex = 0;
+
+  @override
+  double x(double time) {
+    final int length = _keyFrames.length;
+
+    // Perform a linear search in the sorted key frame list, starting from the
+    // last key frame found, since the input `time` usually monotonically
+    // increases by a small amount.
+    int searchIndex;
+    final int endIndex;
+    if (_keyFrames[_lastKeyFrameIndex].time > time) {
+      // The simulation may have restarted. Search within the index range
+      // [0, _lastKeyFrameIndex).
+      searchIndex = 0;
+      endIndex = _lastKeyFrameIndex;
+    } else {
+      searchIndex = _lastKeyFrameIndex;
+      endIndex = length;
+    }
+
+    // Find the target key frame. Don't have to check (endIndex - 1): if
+    // (endIndex - 2) doesn't work we'll have to pick (endIndex - 1) anyways.
+    while (searchIndex < endIndex - 1) {
+      assert(_keyFrames[searchIndex].time <= time);
+      final _KeyFrame next = _keyFrames[searchIndex + 1];
+      if (time < next.time) {
+        break;
+      }
+      searchIndex += 1;
+    }
+
+    _lastKeyFrameIndex = searchIndex;
+    return _keyFrames[_lastKeyFrameIndex].value;
+  }
+}
 
 /// A basic text input field.
 ///
@@ -240,6 +353,7 @@ class MongolEditableText extends StatefulWidget {
     this.onAppPrivateCommand,
     this.onSelectionChanged,
     this.onSelectionHandleTapped,
+    this.onTapOutside,
     List<TextInputFormatter>? inputFormatters,
     this.mouseCursor,
     this.rendererIgnoresPointer = false,
@@ -254,17 +368,17 @@ class MongolEditableText extends StatefulWidget {
     this.enableInteractiveSelection = true,
     this.scrollController,
     this.scrollPhysics,
-    this.toolbarOptions = const ToolbarOptions(
-      copy: true,
-      cut: true,
-      paste: true,
-      selectAll: true,
-    ),
+    @Deprecated(
+      'Use `contextMenuBuilder` instead. '
+      'This feature was deprecated after v3.3.0-0.5.pre.',
+    )
+        ToolbarOptions? toolbarOptions,
     this.autofillHints,
     this.autofillClient,
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
     this.scrollBehavior,
+    this.contextMenuBuilder,
   })  : assert(obscuringCharacter.length == 1),
         assert(maxLines == null || maxLines > 0),
         assert(minLines == null || minLines > 0),
@@ -282,6 +396,33 @@ class MongolEditableText extends StatefulWidget {
           !readOnly || autofillHints == null,
           "Read-only fields can't have autofill hints.",
         ),
+        toolbarOptions = selectionControls is TextSelectionHandleControls &&
+                toolbarOptions == null
+            ? ToolbarOptions.empty
+            : toolbarOptions ??
+                (obscureText
+                    ? (readOnly
+                        // No point in even offering "Select All" in a read-only obscured
+                        // field.
+                        ? ToolbarOptions.empty
+                        // Writable, but obscured.
+                        : const ToolbarOptions(
+                            selectAll: true,
+                            paste: true,
+                          ))
+                    : (readOnly
+                        // Read-only, not obscured.
+                        ? const ToolbarOptions(
+                            selectAll: true,
+                            copy: true,
+                          )
+                        // Writable, not obscured.
+                        : const ToolbarOptions(
+                            copy: true,
+                            cut: true,
+                            selectAll: true,
+                            paste: true,
+                          ))),
         keyboardType = keyboardType ??
             _inferKeyboardType(
                 autofillHints: autofillHints, maxLines: maxLines),
@@ -524,7 +665,7 @@ class MongolEditableText extends StatefulWidget {
   ///
   /// The [MongolEditableText] widget used on its own will not trigger the display
   /// of the selection toolbar by itself. The toolbar is shown by calling
-  /// [EditableTextState.showToolbar] in response to an appropriate user event.
+  /// [MongolEditableTextState.showToolbar] in response to an appropriate user event.
   ///
   /// See also:
   ///
@@ -626,6 +767,33 @@ class MongolEditableText extends StatefulWidget {
   /// Both regular taps and long presses invoke this callback, but a drag
   /// gesture won't.
   final VoidCallback? onSelectionHandleTapped;
+
+  /// Called for each tap that occurs outside of the [TextFieldTapRegion]
+  /// group when the text field is focused.
+  ///
+  /// If this is null, [FocusNode.unfocus] will be called on the [focusNode] for
+  /// this text field when a [PointerDownEvent] is received on another part of
+  /// the UI. However, it will not unfocus as a result of mobile application
+  /// touch events (which does not include mouse clicks), to conform with the
+  /// platform conventions. To change this behavior, a callback may be set here
+  /// that operates differently from the default.
+  ///
+  /// When adding additional controls to a text field (for example, a spinner, a
+  /// button that copies the selected text, or modifies formatting), it is
+  /// helpful if tapping on that control doesn't unfocus the text field. In
+  /// order for an external widget to be considered as part of the text field
+  /// for the purposes of tapping "outside" of the field, wrap the control in a
+  /// [TextFieldTapRegion].
+  ///
+  /// The [PointerDownEvent] passed to the function is the event that caused the
+  /// notification. It is possible that the event may occur outside of the
+  /// immediate bounding box defined by the text field, although it will be
+  /// within the bounding box of a [TextFieldTapRegion] member.
+  ///
+  /// See also:
+  ///
+  ///  * [TapRegion] for how the region group is determined.
+  final TapRegionCallback? onTapOutside;
 
   /// Optional input validation and formatting overrides.
   ///
@@ -765,6 +933,17 @@ class MongolEditableText extends StatefulWidget {
   /// [ScrollPhysics] provided by that behavior will take precedence after
   /// [scrollPhysics].
   final ScrollPhysics? scrollPhysics;
+
+  /// Builds the text selection toolbar when requested by the user.
+  ///
+  /// `primaryAnchor` is the desired anchor position for the context menu, while
+  /// `secondaryAnchor` is the fallback location if the menu doesn't fit.
+  ///
+  /// `buttonItems` represents the buttons that would be built by default for
+  /// this widget.
+  ///
+  /// If not provided, no context menu will be shown.
+  final MongolEditableTextContextMenuBuilder? contextMenuBuilder;
 
   /// Same as [enableInteractiveSelection].
   ///
@@ -1088,17 +1267,32 @@ class MongolEditableTextState extends State<MongolEditableText>
         TextSelectionDelegate
     implements TextInputClient, AutofillClient, MongolTextEditingActionTarget {
   Timer? _cursorTimer;
-  bool _targetCursorVisibility = false;
+  AnimationController get _cursorBlinkOpacityController {
+    return _backingCursorBlinkOpacityController ??= AnimationController(
+      vsync: this,
+    )..addListener(_onCursorColorTick);
+  }
+
+  AnimationController? _backingCursorBlinkOpacityController;
+  late final Simulation _iosBlinkCursorSimulation =
+      _DiscreteKeyFrameSimulation.iOSBlinkingCaret();
+
   final ValueNotifier<bool> _cursorVisibilityNotifier =
       ValueNotifier<bool>(true);
   final GlobalKey _editableKey = GlobalKey();
-  final ClipboardStatusNotifier? _clipboardStatus =
+
+  /// Detects whether the clipboard can paste.
+  final ClipboardStatusNotifier? clipboardStatus =
       kIsWeb ? null : ClipboardStatusNotifier();
 
   TextInputConnection? _textInputConnection;
   MongolTextSelectionOverlay? _selectionOverlay;
 
-  ScrollController? _scrollController;
+  final GlobalKey _scrollableKey = GlobalKey();
+  ScrollController? _internalScrollController;
+  ScrollController get _scrollController =>
+      widget.scrollController ??
+      (_internalScrollController ??= ScrollController());
 
   late AnimationController _cursorBlinkOpacityController;
 
@@ -1137,6 +1331,8 @@ class MongolEditableTextState extends State<MongolEditableText>
   // This value is an eyeball estimation of the time it takes for the iOS cursor
   // to ease in and out.
   static const Duration _fadeDuration = Duration(milliseconds: 250);
+
+  Orientation? _lastOrientation;
 
   @override
   bool get wantKeepAlive => widget.focusNode.hasFocus;
@@ -1314,39 +1510,71 @@ class MongolEditableTextState extends State<MongolEditableText>
   @override
   void initState() {
     super.initState();
-    _clipboardStatus?.addListener(_onChangedClipboardStatus);
+    clipboardStatus?.addListener(_onChangedClipboardStatus);
     widget.controller.addListener(_didChangeTextEditingValue);
-    _focusAttachment = widget.focusNode.attach(context);
     widget.focusNode.addListener(_handleFocusChanged);
-    _scrollController = widget.scrollController ?? ScrollController();
-    _scrollController!.addListener(() {
-      _selectionOverlay?.updateForScroll();
-    });
-    _cursorBlinkOpacityController =
-        AnimationController(vsync: this, duration: _fadeDuration);
-    _cursorBlinkOpacityController.addListener(_onCursorColorTick);
+    _scrollController.addListener(_onEditableScroll);
     _cursorVisibilityNotifier.value = widget.showCursor;
+    _spellCheckConfiguration =
+        _inferSpellCheckConfiguration(widget.spellCheckConfiguration);
   }
+
+  // Whether `TickerMode.of(context)` is true and animations (like blinking the
+  // cursor) are supposed to run.
+  bool _tickersEnabled = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final newAutofillGroup = AutofillGroup.of(context);
+    final AutofillGroupState? newAutofillGroup = AutofillGroup.maybeOf(context);
     if (currentAutofillScope != newAutofillGroup) {
       _currentAutofillScope?.unregister(autofillId);
       _currentAutofillScope = newAutofillGroup;
-      newAutofillGroup?.register(this);
-      _isInAutofillContext = _isInAutofillContext || _shouldBeInAutofillContext;
+      _currentAutofillScope?.register(_effectiveAutofillClient);
     }
 
     if (!_didAutoFocus && widget.autofocus) {
       _didAutoFocus = true;
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
+        if (mounted && renderEditable.hasSize) {
           FocusScope.of(context).autofocus(widget.focusNode);
         }
       });
+    }
+
+    // Restart or stop the blinking cursor when TickerMode changes.
+    final bool newTickerEnabled = TickerMode.of(context);
+    if (_tickersEnabled != newTickerEnabled) {
+      _tickersEnabled = newTickerEnabled;
+      if (_tickersEnabled && _cursorActive) {
+        _startCursorBlink();
+      } else if (!_tickersEnabled && _cursorTimer != null) {
+        // Cannot use _stopCursorTimer because it would reset _cursorActive.
+        _cursorTimer!.cancel();
+        _cursorTimer = null;
+      }
+    }
+
+    if (defaultTargetPlatform != TargetPlatform.iOS &&
+        defaultTargetPlatform != TargetPlatform.android) {
+      return;
+    }
+
+    // Hide the text selection toolbar on mobile when orientation changes.
+    final Orientation orientation = MediaQuery.of(context).orientation;
+    if (_lastOrientation == null) {
+      _lastOrientation = orientation;
+      return;
+    }
+    if (orientation != _lastOrientation) {
+      _lastOrientation = orientation;
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
+        hideToolbar(false);
+      }
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        hideToolbar();
+      }
     }
   }
 
@@ -1362,14 +1590,23 @@ class MongolEditableTextState extends State<MongolEditableText>
       _selectionOverlay?.update(_value);
     }
     _selectionOverlay?.handlesVisible = widget.showSelectionHandles;
-    _isInAutofillContext = _isInAutofillContext || _shouldBeInAutofillContext;
+
+    if (widget.autofillClient != oldWidget.autofillClient) {
+      _currentAutofillScope
+          ?.unregister(oldWidget.autofillClient?.autofillId ?? autofillId);
+      _currentAutofillScope?.register(_effectiveAutofillClient);
+    }
 
     if (widget.focusNode != oldWidget.focusNode) {
       oldWidget.focusNode.removeListener(_handleFocusChanged);
-      _focusAttachment?.detach();
-      _focusAttachment = widget.focusNode.attach(context);
       widget.focusNode.addListener(_handleFocusChanged);
       updateKeepAlive();
+    }
+
+    if (widget.scrollController != oldWidget.scrollController) {
+      (oldWidget.scrollController ?? _internalScrollController)
+          ?.removeListener(_onEditableScroll);
+      _scrollController.addListener(_onEditableScroll);
     }
 
     if (!_shouldCreateInputConnection) {
@@ -1380,12 +1617,13 @@ class MongolEditableTextState extends State<MongolEditableText>
 
     if (kIsWeb && _hasInputConnection) {
       if (oldWidget.readOnly != widget.readOnly) {
-        _textInputConnection!.updateConfig(textInputConfiguration);
+        _textInputConnection!
+            .updateConfig(_effectiveAutofillClient.textInputConfiguration);
       }
     }
 
     if (widget.style != oldWidget.style) {
-      final style = widget.style;
+      final TextStyle style = widget.style;
       // The _textInputConnection will pick up the new style when it attaches in
       // _openInputConnection.
       if (_hasInputConnection) {
@@ -1398,10 +1636,15 @@ class MongolEditableTextState extends State<MongolEditableText>
         );
       }
     }
+    final bool canPaste =
+        widget.selectionControls is TextSelectionHandleControls
+            ? pasteEnabled
+            : widget.selectionControls?.canPaste(this) ?? false;
     if (widget.selectionEnabled &&
         pasteEnabled &&
-        widget.selectionControls?.canPaste(this) == true) {
-      _clipboardStatus?.update();
+        clipboardStatus != null &&
+        canPaste) {
+      clipboardStatus!.update();
     }
   }
 
@@ -1642,13 +1885,11 @@ class MongolEditableTextState extends State<MongolEditableText>
   }
 
   TextEditingValue get _value => widget.controller.value;
-
   set _value(TextEditingValue value) {
     widget.controller.value = value;
   }
 
   bool get _hasFocus => widget.focusNode.hasFocus;
-
   bool get _isMultiline => widget.maxLines != 1;
 
   // Finds the closest scroll offset to the current scroll offset that fully
@@ -1819,6 +2060,38 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
   }
 
+  void _onEditableScroll() {
+    _selectionOverlay?.updateForScroll();
+  }
+
+  MongolTextSelectionOverlay _createSelectionOverlay() {
+    final selectionOverlay = MongolTextSelectionOverlay(
+      clipboardStatus: clipboardStatus,
+      context: context,
+      value: _value,
+      debugRequiredFor: widget,
+      toolbarLayerLink: _toolbarLayerLink,
+      startHandleLayerLink: _startHandleLayerLink,
+      endHandleLayerLink: _endHandleLayerLink,
+      renderObject: renderEditable,
+      selectionControls: widget.selectionControls,
+      selectionDelegate: this,
+      dragStartBehavior: widget.dragStartBehavior,
+      onSelectionHandleTapped: widget.onSelectionHandleTapped,
+      contextMenuBuilder: widget.contextMenuBuilder == null
+          ? null
+          : (BuildContext context) {
+              return widget.contextMenuBuilder!(
+                context,
+                this,
+              );
+            },
+      magnifierConfiguration: widget.magnifierConfiguration,
+    );
+
+    return selectionOverlay;
+  }
+
   @pragma('vm:notify-debugger-on-exception')
   void _handleSelectionChanged(
       TextSelection selection, SelectionChangedCause? cause) {
@@ -1830,50 +2103,50 @@ class MongolEditableTextState extends State<MongolEditableText>
     widget.controller.selection = selection;
 
     // This will show the keyboard for all selection changes on the
-    // editable widget, not just changes triggered by user gestures.
-    requestKeyboard();
-    if (widget.selectionControls == null) {
+    // MongolEditableText except for those triggered by a keyboard input.
+    // Typically MongolEditableText shouldn't take user keyboard input if
+    // it's not focused already. If the MongolEditableText is being
+    // autofilled it shouldn't request focus.
+    switch (cause) {
+      case null:
+      case SelectionChangedCause.doubleTap:
+      case SelectionChangedCause.drag:
+      case SelectionChangedCause.forcePress:
+      case SelectionChangedCause.longPress:
+      case SelectionChangedCause.scribble:
+      case SelectionChangedCause.tap:
+      case SelectionChangedCause.toolbar:
+        requestKeyboard();
+        break;
+      case SelectionChangedCause.keyboard:
+        if (_hasFocus) {
+          requestKeyboard();
+        }
+        break;
+    }
+    if (widget.selectionControls == null && widget.contextMenuBuilder == null) {
       _selectionOverlay?.dispose();
       _selectionOverlay = null;
     } else {
       if (_selectionOverlay == null) {
-        _selectionOverlay = MongolTextSelectionOverlay(
-          clipboardStatus: _clipboardStatus,
-          context: context,
-          value: _value,
-          debugRequiredFor: widget,
-          toolbarLayerLink: _toolbarLayerLink,
-          startHandleLayerLink: _startHandleLayerLink,
-          endHandleLayerLink: _endHandleLayerLink,
-          renderObject: renderEditable,
-          selectionControls: widget.selectionControls,
-          selectionDelegate: this,
-          dragStartBehavior: widget.dragStartBehavior,
-          onSelectionHandleTapped: widget.onSelectionHandleTapped,
-        );
+        _selectionOverlay = _createSelectionOverlay();
       } else {
         _selectionOverlay!.update(_value);
       }
       _selectionOverlay!.handlesVisible = widget.showSelectionHandles;
       _selectionOverlay!.showHandles();
     }
-
     try {
       widget.onSelectionChanged?.call(selection, cause);
     } catch (exception, stack) {
-      FlutterError.reportError(FlutterErrorDetails(
-        exception: exception,
-        stack: stack,
-        library: 'widgets',
-        context:
-            ErrorDescription('while calling onSelectionChanged for $cause'),
-      ));
+      debugPrint('Error while calling onSelectionChanged for $cause');
+      debugPrint(stack.toString());
     }
 
     // To keep the cursor from blinking while it moves, restart the timer here.
     if (_cursorTimer != null) {
-      _stopCursorTimer(resetCharTicks: false);
-      _startCursorTimer();
+      _stopCursorBlink(resetCharTicks: false);
+      _startCursorBlink();
     }
   }
 
@@ -2040,69 +2313,79 @@ class MongolEditableTextState extends State<MongolEditableText>
   int _obscureShowCharTicksPending = 0;
   int? _obscureLatestCharIndex;
 
-  void _cursorTick(Timer timer) {
-    _targetCursorVisibility = !_targetCursorVisibility;
-    final targetOpacity = _targetCursorVisibility ? 1.0 : 0.0;
-    if (widget.cursorOpacityAnimates) {
-      // If we want to show the cursor, we will animate the opacity to the value
-      // of 1.0, and likewise if we want to make it disappear, to 0.0. An easing
-      // curve is used for the animation to mimic the aesthetics of the native
-      // iOS cursor.
-      //
-      // These values and curves have been obtained through eyeballing, so are
-      // likely not exactly the same as the values for native iOS.
-      _cursorBlinkOpacityController.animateTo(targetOpacity,
-          curve: Curves.easeOut);
-    } else {
-      _cursorBlinkOpacityController.value = targetOpacity;
-    }
+  // Indicates whether the cursor should be blinking right now (but it may
+  // actually not blink because it's disabled via TickerMode.of(context)).
+  bool _cursorActive = false;
 
-    if (_obscureShowCharTicksPending > 0) {
-      setState(() {
-        _obscureShowCharTicksPending--;
+  void _startCursorBlink() {
+    assert(!(_cursorTimer?.isActive ?? false) ||
+        !(_backingCursorBlinkOpacityController?.isAnimating ?? false));
+    _cursorActive = true;
+    if (!_tickersEnabled) {
+      return;
+    }
+    _cursorTimer?.cancel();
+    _cursorBlinkOpacityController.value = 1.0;
+    if (MongolEditableText.debugDeterministicCursor) {
+      return;
+    }
+    if (widget.cursorOpacityAnimates) {
+      _cursorBlinkOpacityController
+          .animateWith(_iosBlinkCursorSimulation)
+          .whenComplete(_onCursorTick);
+    } else {
+      _cursorTimer = Timer.periodic(_kCursorBlinkHalfPeriod, (Timer timer) {
+        _onCursorTick();
       });
     }
   }
 
-  void _cursorWaitForStart(Timer timer) {
-    assert(_kCursorBlinkHalfPeriod > _fadeDuration);
-    assert(!MongolEditableText.debugDeterministicCursor);
-    _cursorTimer?.cancel();
-    _cursorTimer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
-  }
+  void _onCursorTick() {
+    if (_obscureShowCharTicksPending > 0) {
+      _obscureShowCharTicksPending =
+          WidgetsBinding.instance.platformDispatcher.brieflyShowPassword
+              ? _obscureShowCharTicksPending - 1
+              : 0;
+      if (_obscureShowCharTicksPending == 0) {
+        setState(() {});
+      }
+    }
 
-  void _startCursorTimer() {
-    assert(_cursorTimer == null);
-    _targetCursorVisibility = true;
-    _cursorBlinkOpacityController.value = 1.0;
-    if (MongolEditableText.debugDeterministicCursor) return;
     if (widget.cursorOpacityAnimates) {
-      _cursorTimer =
-          Timer.periodic(_kCursorBlinkWaitForStart, _cursorWaitForStart);
+      _cursorTimer?.cancel();
+      // Schedule this as an async task to avoid blocking tester.pumpAndSettle
+      // indefinitely.
+      _cursorTimer = Timer(
+          Duration.zero,
+          () => _cursorBlinkOpacityController
+              .animateWith(_iosBlinkCursorSimulation)
+              .whenComplete(_onCursorTick));
     } else {
-      _cursorTimer = Timer.periodic(_kCursorBlinkHalfPeriod, _cursorTick);
+      if (!(_cursorTimer?.isActive ?? false) && _tickersEnabled) {
+        _cursorTimer = Timer.periodic(_kCursorBlinkHalfPeriod, (Timer timer) {
+          _onCursorTick();
+        });
+      }
+      _cursorBlinkOpacityController.value =
+          _cursorBlinkOpacityController.value == 0 ? 1 : 0;
     }
   }
 
-  void _stopCursorTimer({bool resetCharTicks = true}) {
+  void _stopCursorBlink({bool resetCharTicks = true}) {
+    _cursorActive = false;
+    _cursorBlinkOpacityController.value = 0.0;
     _cursorTimer?.cancel();
     _cursorTimer = null;
-    _targetCursorVisibility = false;
-    _cursorBlinkOpacityController.value = 0.0;
-    if (MongolEditableText.debugDeterministicCursor) return;
-    if (resetCharTicks) _obscureShowCharTicksPending = 0;
-    if (widget.cursorOpacityAnimates) {
-      _cursorBlinkOpacityController.stop();
-      _cursorBlinkOpacityController.value = 0.0;
+    if (resetCharTicks) {
+      _obscureShowCharTicksPending = 0;
     }
   }
 
   void _startOrStopCursorTimerIfNeeded() {
     if (_cursorTimer == null && _hasFocus && _value.selection.isCollapsed) {
-      _startCursorTimer();
-    } else if (_cursorTimer != null &&
-        (!_hasFocus || !_value.selection.isCollapsed)) {
-      _stopCursorTimer();
+      _startCursorBlink();
+    } else if (_cursorActive && (!_hasFocus || !_value.selection.isCollapsed)) {
+      _stopCursorBlink();
     }
   }
 
@@ -2415,6 +2698,52 @@ class MongolEditableTextState extends State<MongolEditableText>
         context: context, defaultAction: defaultAction);
   }
 
+  /// Transpose the characters immediately before and after the current
+  /// collapsed selection.
+  ///
+  /// When the cursor is at the end of the text, transposes the last two
+  /// characters, if they exist.
+  ///
+  /// When the cursor is at the start of the text, does nothing.
+  void _transposeCharacters(TransposeCharactersIntent intent) {
+    if (_value.text.characters.length <= 1 ||
+        _value.selection == null ||
+        !_value.selection.isCollapsed ||
+        _value.selection.baseOffset == 0) {
+      return;
+    }
+
+    final String text = _value.text;
+    final TextSelection selection = _value.selection;
+    final bool atEnd = selection.baseOffset == text.length;
+    final CharacterRange transposing =
+        CharacterRange.at(text, selection.baseOffset);
+    if (atEnd) {
+      transposing.moveBack(2);
+    } else {
+      transposing
+        ..moveBack()
+        ..expandNext();
+    }
+    assert(transposing.currentCharacters.length == 2);
+
+    userUpdateTextEditingValue(
+      TextEditingValue(
+        text: transposing.stringBefore +
+            transposing.currentCharacters.last +
+            transposing.currentCharacters.first +
+            transposing.stringAfter,
+        selection: TextSelection.collapsed(
+          offset: transposing.stringBeforeLength + transposing.current.length,
+        ),
+      ),
+      SelectionChangedCause.keyboard,
+    );
+  }
+
+  late final Action<TransposeCharactersIntent> _transposeCharactersAction =
+      CallbackAction<TransposeCharactersIntent>(onInvoke: _transposeCharacters);
+
   void _replaceText(ReplaceTextIntent intent) {
     final TextEditingValue oldValue = _value;
     final TextEditingValue newValue = intent.currentTextEditingValue.replaced(
@@ -2443,6 +2772,40 @@ class MongolEditableTextState extends State<MongolEditableText>
     } else {
       bringIntoView(const TextPosition(offset: 0));
     }
+  }
+
+  /// Handles [ScrollIntent] by scrolling the [Scrollable] inside of
+  /// [MongolEditableText].
+  void _scroll(ScrollIntent intent) {
+    if (intent.type != ScrollIncrementType.page) {
+      return;
+    }
+
+    final ScrollPosition position = _scrollController.position;
+    if (widget.maxLines == 1) {
+      _scrollController.jumpTo(position.maxScrollExtent);
+      return;
+    }
+
+    // If the field isn't scrollable, do nothing. For example, when the lines of
+    // text is less than maxLines, the field has nothing to scroll.
+    if (position.maxScrollExtent == 0.0 && position.minScrollExtent == 0.0) {
+      return;
+    }
+
+    final ScrollableState? state =
+        _scrollableKey.currentState as ScrollableState?;
+    final double increment =
+        ScrollAction.getDirectionalIncrement(state!, intent);
+    final double destination = clampDouble(
+      position.pixels + increment,
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+    if (destination == position.pixels) {
+      return;
+    }
+    _scrollController.jumpTo(destination);
   }
 
   void _expandSelectionToDocumentBoundary(
@@ -2490,6 +2853,43 @@ class MongolEditableTextState extends State<MongolEditableText>
       return null;
     }
     return Actions.invoke(context, intent);
+  }
+
+  /// The default behavior used if [onTapOutside] is null.
+  ///
+  /// The `event` argument is the [PointerDownEvent] that caused the notification.
+  void _defaultOnTapOutside(PointerDownEvent event) {
+    /// The focus dropping behavior is only present on desktop platforms
+    /// and mobile browsers.
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+      case TargetPlatform.fuchsia:
+        // On mobile platforms, we don't unfocus on touch events unless they're
+        // in the web browser, but we do unfocus for all other kinds of events.
+        switch (event.kind) {
+          case ui.PointerDeviceKind.touch:
+            if (kIsWeb) {
+              widget.focusNode.unfocus();
+            }
+            break;
+          case ui.PointerDeviceKind.mouse:
+          case ui.PointerDeviceKind.stylus:
+          case ui.PointerDeviceKind.invertedStylus:
+          case ui.PointerDeviceKind.unknown:
+            widget.focusNode.unfocus();
+            break;
+          case ui.PointerDeviceKind.trackpad:
+            throw UnimplementedError(
+                'Unexpected pointer down event for trackpad');
+        }
+        break;
+      case TargetPlatform.linux:
+      case TargetPlatform.macOS:
+      case TargetPlatform.windows:
+        widget.focusNode.unfocus();
+        break;
+    }
   }
 
   late final Map<Type, Action<Intent>> _actions = <Type, Action<Intent>>{
@@ -2561,91 +2961,103 @@ class MongolEditableTextState extends State<MongolEditableText>
     ScrollToDocumentBoundaryIntent: _makeOverridable(
         CallbackAction<ScrollToDocumentBoundaryIntent>(
             onInvoke: _scrollToDocumentBoundary)),
+    ScrollIntent: CallbackAction<ScrollIntent>(onInvoke: _scroll),
 
     // Copy Paste
     SelectAllTextIntent: _makeOverridable(_SelectAllAction(this)),
     CopySelectionTextIntent: _makeOverridable(_CopySelectionAction(this)),
     PasteTextIntent: _makeOverridable(CallbackAction<PasteTextIntent>(
         onInvoke: (PasteTextIntent intent) => pasteText(intent.cause))),
+
+    TransposeCharactersIntent: _makeOverridable(_transposeCharactersAction),
   };
 
   @override
   Widget build(BuildContext context) {
     assert(debugCheckHasMediaQuery(context));
-    _focusAttachment!.reparent();
     super.build(context); // See AutomaticKeepAliveClientMixin.
 
-    final controls = widget.selectionControls;
-    return MouseRegion(
-      cursor: widget.mouseCursor ?? SystemMouseCursors.text,
-      child: Actions(
-        actions: _actions,
-        child: Focus(
-          focusNode: widget.focusNode,
-          includeSemantics: false,
-          debugLabel: 'MongolEditableText',
-          child: Scrollable(
-            excludeFromSemantics: true,
-            axisDirection:
-                _isMultiline ? AxisDirection.right : AxisDirection.down,
-            controller: _scrollController,
-            physics: widget.scrollPhysics,
-            dragStartBehavior: widget.dragStartBehavior,
-            restorationId: widget.restorationId,
-            scrollBehavior: widget.scrollBehavior ??
-                // Remove scrollbars if only single line
-                (_isMultiline
-                    ? null
-                    : ScrollConfiguration.of(context)
-                        .copyWith(scrollbars: false)),
-            viewportBuilder: (BuildContext context, ViewportOffset offset) {
-              return CompositedTransformTarget(
-                link: _toolbarLayerLink,
-                child: Semantics(
-                  onCopy: _semanticsOnCopy(controls),
-                  onCut: _semanticsOnCut(controls),
-                  onPaste: _semanticsOnPaste(controls),
-                  textDirection: TextDirection.ltr,
-                  child: _MongolEditable(
-                    key: _editableKey,
-                    startHandleLayerLink: _startHandleLayerLink,
-                    endHandleLayerLink: _endHandleLayerLink,
-                    textSpan: buildTextSpan(),
-                    value: _value,
-                    cursorColor: _cursorColor,
-                    showCursor: MongolEditableText.debugDeterministicCursor
-                        ? ValueNotifier<bool>(widget.showCursor)
-                        : _cursorVisibilityNotifier,
-                    forceLine: widget.forceLine,
-                    readOnly: widget.readOnly,
-                    hasFocus: _hasFocus,
-                    maxLines: widget.maxLines,
-                    minLines: widget.minLines,
-                    expands: widget.expands,
-                    selectionColor: widget.selectionColor,
-                    textScaleFactor: widget.textScaleFactor ??
-                        MediaQuery.textScaleFactorOf(context),
-                    textAlign: widget.textAlign,
-                    obscuringCharacter: widget.obscuringCharacter,
-                    obscureText: widget.obscureText,
-                    autocorrect: widget.autocorrect,
-                    enableSuggestions: widget.enableSuggestions,
-                    offset: offset,
-                    onCaretChanged: _handleCaretChanged,
-                    rendererIgnoresPointer: widget.rendererIgnoresPointer,
-                    cursorWidth: widget.cursorWidth,
-                    cursorHeight: widget.cursorHeight,
-                    cursorRadius: widget.cursorRadius,
-                    cursorOffset: widget.cursorOffset ?? Offset.zero,
-                    enableInteractiveSelection:
-                        widget.enableInteractiveSelection,
-                    textSelectionDelegate: this,
-                    devicePixelRatio: _devicePixelRatio,
-                    clipBehavior: widget.clipBehavior,
-                  ),
-                ),
-              );
+    final TextSelectionControls? controls = widget.selectionControls;
+    return TextFieldTapRegion(
+      onTapOutside: widget.onTapOutside ?? _defaultOnTapOutside,
+      debugLabel: kReleaseMode ? null : 'MongolEditableText',
+      child: MouseRegion(
+        cursor: widget.mouseCursor ?? SystemMouseCursors.text,
+        child: Actions(
+          actions: _actions,
+          child: _TextEditingHistory(
+            controller: widget.controller,
+            onTriggered: (TextEditingValue value) {
+              userUpdateTextEditingValue(value, SelectionChangedCause.keyboard);
             },
+            child: Focus(
+              focusNode: widget.focusNode,
+              includeSemantics: false,
+              debugLabel: kReleaseMode ? null : 'MongolEditableText',
+              child: Scrollable(
+                key: _scrollableKey,
+                excludeFromSemantics: true,
+                axisDirection:
+                    _isMultiline ? AxisDirection.right : AxisDirection.down,
+                controller: _scrollController,
+                physics: widget.scrollPhysics,
+                dragStartBehavior: widget.dragStartBehavior,
+                restorationId: widget.restorationId,
+                scrollBehavior: widget.scrollBehavior ??
+                    ScrollConfiguration.of(context).copyWith(
+                      scrollbars: _isMultiline,
+                      overscroll: false,
+                    ),
+                viewportBuilder: (BuildContext context, ViewportOffset offset) {
+                  return CompositedTransformTarget(
+                    link: _toolbarLayerLink,
+                    child: Semantics(
+                      onCopy: _semanticsOnCopy(controls),
+                      onCut: _semanticsOnCut(controls),
+                      onPaste: _semanticsOnPaste(controls),
+                      textDirection: TextDirection.ltr,
+                      child: _MongolEditable(
+                        key: _editableKey,
+                        startHandleLayerLink: _startHandleLayerLink,
+                        endHandleLayerLink: _endHandleLayerLink,
+                        textSpan: buildTextSpan(),
+                        value: _value,
+                        cursorColor: _cursorColor,
+                        showCursor: MongolEditableText.debugDeterministicCursor
+                            ? ValueNotifier<bool>(widget.showCursor)
+                            : _cursorVisibilityNotifier,
+                        forceLine: widget.forceLine,
+                        readOnly: widget.readOnly,
+                        hasFocus: _hasFocus,
+                        maxLines: widget.maxLines,
+                        minLines: widget.minLines,
+                        expands: widget.expands,
+                        selectionColor: widget.selectionColor,
+                        textScaleFactor: widget.textScaleFactor ??
+                            MediaQuery.textScaleFactorOf(context),
+                        textAlign: widget.textAlign,
+                        obscuringCharacter: widget.obscuringCharacter,
+                        obscureText: widget.obscureText,
+                        autocorrect: widget.autocorrect,
+                        enableSuggestions: widget.enableSuggestions,
+                        offset: offset,
+                        onCaretChanged: _handleCaretChanged,
+                        rendererIgnoresPointer: widget.rendererIgnoresPointer,
+                        cursorWidth: widget.cursorWidth,
+                        cursorHeight: widget.cursorHeight,
+                        cursorRadius: widget.cursorRadius,
+                        cursorOffset: widget.cursorOffset ?? Offset.zero,
+                        enableInteractiveSelection:
+                            widget.enableInteractiveSelection,
+                        textSelectionDelegate: this,
+                        devicePixelRatio: _devicePixelRatio,
+                        clipBehavior: widget.clipBehavior,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ),
@@ -3492,4 +3904,278 @@ class _CopySelectionAction extends ContextAction<CopySelectionTextIntent> {
   @override
   bool get isActionEnabled =>
       state._value.selection.isValid && !state._value.selection.isCollapsed;
+}
+
+/// A void function that takes a [TextEditingValue].
+@visibleForTesting
+typedef TextEditingValueCallback = void Function(TextEditingValue value);
+
+/// Provides undo/redo capabilities for text editing.
+///
+/// Listens to [controller] as a [ValueNotifier] and saves relevant values for
+/// undoing/redoing. The cadence at which values are saved is a best
+/// approximation of the native behaviors of a hardware keyboard on Flutter's
+/// desktop platforms, as there are subtle differences between each of these
+/// platforms.
+///
+/// Listens to keyboard undo/redo shortcuts and calls [onTriggered] when a
+/// shortcut is triggered that would affect the state of the [controller].
+class _TextEditingHistory extends StatefulWidget {
+  /// Creates an instance of [_TextEditingHistory].
+  const _TextEditingHistory({
+    required this.child,
+    required this.controller,
+    required this.onTriggered,
+  });
+
+  /// The child widget of [_TextEditingHistory].
+  final Widget child;
+
+  /// The [TextEditingController] to save the state of over time.
+  final TextEditingController controller;
+
+  /// Called when an undo or redo causes a state change.
+  ///
+  /// If the state would still be the same before and after the undo/redo, this
+  /// will not be called. For example, receiving a redo when there is nothing
+  /// to redo will not call this method.
+  ///
+  /// It is also not called when the controller is changed for reasons other
+  /// than undo/redo.
+  final TextEditingValueCallback onTriggered;
+
+  @override
+  State<_TextEditingHistory> createState() => _TextEditingHistoryState();
+}
+
+class _TextEditingHistoryState extends State<_TextEditingHistory> {
+  final _UndoStack<TextEditingValue> _stack = _UndoStack<TextEditingValue>();
+  late final _Throttled<TextEditingValue> _throttledPush;
+  Timer? _throttleTimer;
+
+  // This duration was chosen as a best fit for the behavior of Mac, Linux,
+  // and Windows undo/redo state save durations, but it is not perfect for any
+  // of them.
+  static const Duration _kThrottleDuration = Duration(milliseconds: 500);
+
+  void _undo(UndoTextIntent intent) {
+    _update(_stack.undo());
+  }
+
+  void _redo(RedoTextIntent intent) {
+    _update(_stack.redo());
+  }
+
+  void _update(TextEditingValue? nextValue) {
+    if (nextValue == null) {
+      return;
+    }
+    if (nextValue.text == widget.controller.text) {
+      return;
+    }
+    widget.onTriggered(widget.controller.value.copyWith(
+      text: nextValue.text,
+      selection: nextValue.selection,
+    ));
+  }
+
+  void _push() {
+    if (widget.controller.value == TextEditingValue.empty) {
+      return;
+    }
+
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+        // Composing text is not counted in history coalescing.
+        if (!widget.controller.value.composing.isCollapsed) {
+          return;
+        }
+        break;
+      case TargetPlatform.android:
+        // Gboard on Android puts non-CJK words in composing regions. Coalesce
+        // composing text in order to allow the saving of partial words in that
+        // case.
+        break;
+    }
+
+    _throttleTimer = _throttledPush(widget.controller.value);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _throttledPush = _throttle<TextEditingValue>(
+      duration: _kThrottleDuration,
+      function: _stack.push,
+    );
+    _push();
+    widget.controller.addListener(_push);
+  }
+
+  @override
+  void didUpdateWidget(_TextEditingHistory oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != oldWidget.controller) {
+      _stack.clear();
+      oldWidget.controller.removeListener(_push);
+      widget.controller.addListener(_push);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_push);
+    _throttleTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Actions(
+      actions: <Type, Action<Intent>>{
+        UndoTextIntent: Action<UndoTextIntent>.overridable(
+            context: context,
+            defaultAction: CallbackAction<UndoTextIntent>(onInvoke: _undo)),
+        RedoTextIntent: Action<RedoTextIntent>.overridable(
+            context: context,
+            defaultAction: CallbackAction<RedoTextIntent>(onInvoke: _redo)),
+      },
+      child: widget.child,
+    );
+  }
+}
+
+/// A data structure representing a chronological list of states that can be
+/// undone and redone.
+class _UndoStack<T> {
+  /// Creates an instance of [_UndoStack].
+  _UndoStack();
+
+  final List<T> _list = <T>[];
+
+  // The index of the current value, or null if the list is empty.
+  late int _index;
+
+  /// Returns the current value of the stack.
+  T? get currentValue => _list.isEmpty ? null : _list[_index];
+
+  /// Add a new state change to the stack.
+  ///
+  /// Pushing identical objects will not create multiple entries.
+  void push(T value) {
+    if (_list.isEmpty) {
+      _index = 0;
+      _list.add(value);
+      return;
+    }
+
+    assert(_index < _list.length && _index >= 0);
+
+    if (value == currentValue) {
+      return;
+    }
+
+    // If anything has been undone in this stack, remove those irrelevant states
+    // before adding the new one.
+    if (_index != null && _index != _list.length - 1) {
+      _list.removeRange(_index + 1, _list.length);
+    }
+    _list.add(value);
+    _index = _list.length - 1;
+  }
+
+  /// Returns the current value after an undo operation.
+  ///
+  /// An undo operation moves the current value to the previously pushed value,
+  /// if any.
+  ///
+  /// Iff the stack is completely empty, then returns null.
+  T? undo() {
+    if (_list.isEmpty) {
+      return null;
+    }
+
+    assert(_index < _list.length && _index >= 0);
+
+    if (_index != 0) {
+      _index = _index - 1;
+    }
+
+    return currentValue;
+  }
+
+  /// Returns the current value after a redo operation.
+  ///
+  /// A redo operation moves the current value to the value that was last
+  /// undone, if any.
+  ///
+  /// Iff the stack is completely empty, then returns null.
+  T? redo() {
+    if (_list.isEmpty) {
+      return null;
+    }
+
+    assert(_index < _list.length && _index >= 0);
+
+    if (_index < _list.length - 1) {
+      _index = _index + 1;
+    }
+
+    return currentValue;
+  }
+
+  /// Remove everything from the stack.
+  void clear() {
+    _list.clear();
+    _index = -1;
+  }
+
+  @override
+  String toString() {
+    return '_UndoStack $_list';
+  }
+}
+
+/// A function that can be throttled with the throttle function.
+typedef _Throttleable<T> = void Function(T currentArg);
+
+/// A function that has been throttled by [_throttle].
+typedef _Throttled<T> = Timer Function(T currentArg);
+
+/// Returns a _Throttled that will call through to the given function only a
+/// maximum of once per duration.
+///
+/// Only works for functions that take exactly one argument and return void.
+_Throttled<T> _throttle<T>({
+  required Duration duration,
+  required _Throttleable<T> function,
+  // If true, calls at the start of the timer.
+  bool leadingEdge = false,
+}) {
+  Timer? timer;
+  bool calledDuringTimer = false;
+  late T arg;
+
+  return (T currentArg) {
+    arg = currentArg;
+    if (timer != null) {
+      calledDuringTimer = true;
+      return timer!;
+    }
+    if (leadingEdge) {
+      function(arg);
+    }
+    calledDuringTimer = false;
+    timer = Timer(duration, () {
+      if (!leadingEdge || calledDuringTimer) {
+        function(arg);
+      }
+      timer = null;
+    });
+    return timer!;
+  };
 }

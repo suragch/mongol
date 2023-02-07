@@ -109,11 +109,8 @@ class MongolTextPainter {
   /// This must be non-null before you call [layout].
   ///
   /// The [TextSpan] this provides is in the form of a tree that may contain
-  /// multiple instances of [TextSpan]s. To obtain a plain text
-  /// representation of the contents of this [TextPainter], use
-  /// [TextSpan.toPlainText] to get the full contents of all nodes in the tree.
-  /// [TextSpan.text] will only provide the contents of the first node in the
-  /// tree.
+  /// multiple instances of [TextSpan]s. To obtain a plain text representation
+  /// of the contents of this [MongolTextPainter], use [plainText].
   TextSpan? get text => _text;
   TextSpan? _text;
   set text(TextSpan? value) {
@@ -122,9 +119,31 @@ class MongolTextPainter {
     if (_text?.style != value?.style) {
       _layoutTemplate = null;
     }
+
+    final RenderComparison comparison = value == null
+        ? RenderComparison.layout
+        : _text?.compareTo(value) ?? RenderComparison.layout;
+
     _text = value;
-    markNeedsLayout();
+    _cachedPlainText = null;
+
+    if (comparison.index >= RenderComparison.layout.index ||
+        comparison.index >= RenderComparison.paint.index) {
+      markNeedsLayout();
+    }
+    // Neither relayout or repaint is needed.
   }
+
+  /// Returns a plain text version of the text to paint.
+  ///
+  /// This uses [TextSpan.toPlainText] to get the full contents of all nodes
+  /// in the tree.
+  String get plainText {
+    _cachedPlainText ??= _text?.toPlainText(includeSemanticsLabels: false);
+    return _cachedPlainText ?? '';
+  }
+
+  String? _cachedPlainText;
 
   /// How the text should be aligned vertically.
   ///
