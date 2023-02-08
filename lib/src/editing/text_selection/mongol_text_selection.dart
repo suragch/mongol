@@ -18,10 +18,6 @@ import 'package:flutter/widgets.dart';
 import '../mongol_editable_text.dart';
 import '../mongol_render_editable.dart';
 
-/// The text position that a give selection handle manipulates. Dragging the
-/// [start] handle always moves the [start]/[baseOffset] of the selection.
-enum _TextSelectionHandlePosition { start, end }
-
 /// An object that manages a pair of text selection handles.
 ///
 /// The selection handles are displayed in the [Overlay] that most closely
@@ -152,7 +148,6 @@ class MongolTextSelectionOverlay {
   bool get handlesVisible => _handlesVisible;
   bool _handlesVisible = false;
   set handlesVisible(bool visible) {
-    assert(visible != null);
     if (_handlesVisible == visible) {
       return;
     }
@@ -334,7 +329,6 @@ class MongolTextSelectionOverlay {
     // the current frame is different from the previous we fall back to
     // renderObject.preferredLineWidth.
     if (renderObject.plainText == currText &&
-        _selection != null &&
         _selection.isValid &&
         !_selection.isCollapsed) {
       final String selectedGraphemes = _selection.textInside(currText);
@@ -354,7 +348,6 @@ class MongolTextSelectionOverlay {
     Rect? endHandleRect;
     // See the explanation in _getStartGlyphWidth.
     if (renderObject.plainText == currText &&
-        _selection != null &&
         _selection.isValid &&
         !_selection.isCollapsed) {
       final String selectedGraphemes = _selection.textInside(currText);
@@ -650,220 +643,6 @@ class MongolTextSelectionOverlay {
       SelectionChangedCause.drag,
     );
     selectionDelegate.bringIntoView(textPosition);
-  }
-}
-
-/// This widget represents a single draggable text selection handle.
-class _TextSelectionHandleOverlay extends StatefulWidget {
-  const _TextSelectionHandleOverlay({
-    Key? key,
-    required this.selection,
-    required this.position,
-    required this.startHandleLayerLink,
-    required this.endHandleLayerLink,
-    required this.renderObject,
-    required this.onSelectionHandleChanged,
-    required this.onSelectionHandleTapped,
-    required this.selectionControls,
-    this.dragStartBehavior = DragStartBehavior.start,
-  }) : super(key: key);
-
-  final TextSelection selection;
-  final _TextSelectionHandlePosition position;
-  final LayerLink startHandleLayerLink;
-  final LayerLink endHandleLayerLink;
-  final MongolRenderEditable renderObject;
-  final ValueChanged<TextSelection> onSelectionHandleChanged;
-  final VoidCallback? onSelectionHandleTapped;
-  final TextSelectionControls? selectionControls;
-  final DragStartBehavior dragStartBehavior;
-
-  @override
-  _TextSelectionHandleOverlayState createState() =>
-      _TextSelectionHandleOverlayState();
-
-  ValueListenable<bool> get _visibility {
-    switch (position) {
-      case _TextSelectionHandlePosition.start:
-        return renderObject.selectionStartInViewport;
-      case _TextSelectionHandlePosition.end:
-        return renderObject.selectionEndInViewport;
-    }
-  }
-}
-
-class _TextSelectionHandleOverlayState
-    extends State<_TextSelectionHandleOverlay>
-    with SingleTickerProviderStateMixin {
-  late Offset _dragPosition;
-
-  late AnimationController _controller;
-  Animation<double> get _opacity => _controller.view;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-        duration: SelectionOverlay.fadeDuration, vsync: this);
-
-    _handleVisibilityChanged();
-    widget._visibility.addListener(_handleVisibilityChanged);
-  }
-
-  void _handleVisibilityChanged() {
-    if (widget._visibility.value) {
-      _controller.forward();
-    } else {
-      _controller.reverse();
-    }
-  }
-
-  @override
-  void didUpdateWidget(_TextSelectionHandleOverlay oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    oldWidget._visibility.removeListener(_handleVisibilityChanged);
-    _handleVisibilityChanged();
-    widget._visibility.addListener(_handleVisibilityChanged);
-  }
-
-  @override
-  void dispose() {
-    widget._visibility.removeListener(_handleVisibilityChanged);
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _handleDragStart(DragStartDetails details) {
-    final handleSize = widget.selectionControls!.getHandleSize(
-      widget.renderObject.preferredLineWidth,
-    );
-    _dragPosition = details.globalPosition + Offset(-handleSize.width, 0.0);
-  }
-
-  void _handleDragUpdate(DragUpdateDetails details) {
-    _dragPosition += details.delta;
-    final position = widget.renderObject.getPositionForPoint(_dragPosition);
-
-    if (widget.selection.isCollapsed) {
-      widget.onSelectionHandleChanged(TextSelection.fromPosition(position));
-      return;
-    }
-
-    final TextSelection newSelection;
-    switch (widget.position) {
-      case _TextSelectionHandlePosition.start:
-        newSelection = TextSelection(
-          baseOffset: position.offset,
-          extentOffset: widget.selection.extentOffset,
-        );
-        break;
-      case _TextSelectionHandlePosition.end:
-        newSelection = TextSelection(
-          baseOffset: widget.selection.baseOffset,
-          extentOffset: position.offset,
-        );
-        break;
-    }
-
-    if (newSelection.baseOffset >= newSelection.extentOffset) {
-      return; // don't allow order swapping.
-    }
-
-    widget.onSelectionHandleChanged(newSelection);
-  }
-
-  void _handleTap() {
-    if (widget.onSelectionHandleTapped != null) {
-      widget.onSelectionHandleTapped!();
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final LayerLink layerLink;
-    final TextSelectionHandleType type;
-
-    switch (widget.position) {
-      case _TextSelectionHandlePosition.start:
-        layerLink = widget.startHandleLayerLink;
-        type = _chooseType(TextSelectionHandleType.left);
-        break;
-      case _TextSelectionHandlePosition.end:
-        // For collapsed selections, we shouldn't be building the [end] handle.
-        assert(!widget.selection.isCollapsed);
-        layerLink = widget.endHandleLayerLink;
-        type = _chooseType(TextSelectionHandleType.right);
-        break;
-    }
-
-    final handleAnchor = widget.selectionControls!.getHandleAnchor(
-      type,
-      widget.renderObject.preferredLineWidth,
-    );
-    final handleSize = widget.selectionControls!.getHandleSize(
-      widget.renderObject.preferredLineWidth,
-    );
-
-    final handleRect = Rect.fromLTWH(
-      -handleAnchor.dx,
-      -handleAnchor.dy,
-      handleSize.width,
-      handleSize.height,
-    );
-
-    // Make sure the GestureDetector is big enough to be easily interactive.
-    final interactiveRect = handleRect.expandToInclude(
-      Rect.fromCircle(
-          center: handleRect.center, radius: kMinInteractiveDimension / 2),
-    );
-    final padding = RelativeRect.fromLTRB(
-      math.max((interactiveRect.width - handleRect.width) / 2, 0),
-      math.max((interactiveRect.height - handleRect.height) / 2, 0),
-      math.max((interactiveRect.width - handleRect.width) / 2, 0),
-      math.max((interactiveRect.height - handleRect.height) / 2, 0),
-    );
-
-    return CompositedTransformFollower(
-      link: layerLink,
-      offset: interactiveRect.topLeft,
-      showWhenUnlinked: false,
-      child: FadeTransition(
-        opacity: _opacity,
-        child: Container(
-          alignment: Alignment.topLeft,
-          width: interactiveRect.width,
-          height: interactiveRect.height,
-          child: GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            dragStartBehavior: widget.dragStartBehavior,
-            onPanStart: _handleDragStart,
-            onPanUpdate: _handleDragUpdate,
-            onTap: _handleTap,
-            child: Padding(
-              padding: EdgeInsets.only(
-                left: padding.left,
-                top: padding.top,
-                right: padding.right,
-                bottom: padding.bottom,
-              ),
-              child: widget.selectionControls!.buildHandle(
-                context,
-                type,
-                widget.renderObject.preferredLineWidth,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  TextSelectionHandleType _chooseType(TextSelectionHandleType type) {
-    if (widget.selection.isCollapsed) {
-      return TextSelectionHandleType.collapsed;
-    }
-    return type;
   }
 }
 
@@ -1804,9 +1583,7 @@ class _SelectionToolbarWrapper extends StatefulWidget {
     required this.layerLink,
     required this.offset,
     required this.child,
-  })  : assert(layerLink != null),
-        assert(offset != null),
-        assert(child != null);
+  });
 
   final Widget child;
   final Offset offset;

@@ -1937,7 +1937,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
         MaterialStateProperty.resolveAs(
             themeData.inputDecorationTheme.labelStyle, materialState);
 
-    return themeData.textTheme.subtitle1!
+    return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
         .merge(defaultStyle)
         .merge(style)
@@ -1957,7 +1957,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
             MaterialStateProperty.resolveAs(
                 themeData.inputDecorationTheme.hintStyle, materialState);
 
-    return themeData.textTheme.subtitle1!
+    return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
         .merge(defaultStyle)
         .merge(style);
@@ -1966,7 +1966,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   TextStyle _getFloatingLabelStyle(ThemeData themeData) {
     TextStyle getFallbackTextStyle() {
       final Color color = decoration!.errorText != null
-          ? decoration!.errorStyle?.color ?? themeData.errorColor
+          ? decoration!.errorStyle?.color ?? themeData.colorScheme.error
           : _getActiveColor(themeData);
 
       return TextStyle(
@@ -1979,7 +1979,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
         MaterialStateProperty.resolveAs(
             themeData.inputDecorationTheme.floatingLabelStyle, materialState);
 
-    return themeData.textTheme.subtitle1!
+    return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
         .copyWith(height: 1)
         .merge(getFallbackTextStyle())
@@ -1989,15 +1989,15 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   TextStyle _getHelperStyle(ThemeData themeData) {
     final Color color =
         decoration!.enabled ? themeData.hintColor : Colors.transparent;
-    return themeData.textTheme.caption!.copyWith(color: color).merge(
+    return themeData.textTheme.bodySmall!.copyWith(color: color).merge(
         MaterialStateProperty.resolveAs(
             decoration!.helperStyle, materialState));
   }
 
   TextStyle _getErrorStyle(ThemeData themeData) {
     final Color color =
-        decoration!.enabled ? themeData.errorColor : Colors.transparent;
-    return themeData.textTheme.caption!
+        decoration!.enabled ? themeData.colorScheme.error : Colors.transparent;
+    return themeData.textTheme.bodySmall!
         .copyWith(color: color)
         .merge(decoration!.errorStyle);
   }
@@ -2028,7 +2028,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     if (decoration!.enabled || isFocused) {
       borderColor = decoration!.errorText == null
           ? _getDefaultBorderColor(themeData)
-          : themeData.errorColor;
+          : themeData.colorScheme.error;
     } else {
       borderColor = ((decoration!.filled ?? false) &&
               !(decoration!.border?.isOutline ?? false))

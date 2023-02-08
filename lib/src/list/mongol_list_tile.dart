@@ -682,14 +682,14 @@ class MongolListTile extends StatelessWidget {
     if (tileTheme != null) {
       switch (tileTheme.style) {
         case ListTileStyle.drawer:
-          style = theme.textTheme.bodyText1!;
+          style = theme.textTheme.bodyLarge!;
           break;
         case ListTileStyle.list:
-          style = theme.textTheme.subtitle1!;
+          style = theme.textTheme.titleMedium!;
           break;
       }
     } else {
-      style = theme.textTheme.subtitle1!;
+      style = theme.textTheme.titleMedium!;
     }
     final Color? color = _textColor(theme, tileTheme, style.color);
     return _isDenseLayout(tileTheme)
@@ -699,9 +699,9 @@ class MongolListTile extends StatelessWidget {
 
   TextStyle _subtitleTextStyle(
       ThemeData theme, MongolListTileTheme? tileTheme) {
-    final TextStyle style = theme.textTheme.bodyText2!;
+    final TextStyle style = theme.textTheme.bodyMedium!;
     final Color? color =
-        _textColor(theme, tileTheme, theme.textTheme.caption!.color);
+        _textColor(theme, tileTheme, theme.textTheme.bodySmall!.color);
     return _isDenseLayout(tileTheme)
         ? style.copyWith(color: color, fontSize: 12.0)
         : style.copyWith(color: color);
@@ -709,7 +709,7 @@ class MongolListTile extends StatelessWidget {
 
   TextStyle _trailingAndLeadingTextStyle(
       ThemeData theme, MongolListTileTheme? tileTheme) {
-    final TextStyle style = theme.textTheme.bodyText2!;
+    final TextStyle style = theme.textTheme.bodyMedium!;
     final Color? color = _textColor(theme, tileTheme, style.color);
     return style.copyWith(color: color);
   }

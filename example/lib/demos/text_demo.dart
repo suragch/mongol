@@ -4,7 +4,7 @@ import 'package:mongol/mongol.dart';
 class TextDemo extends StatefulWidget {
   const TextDemo({Key? key}) : super(key: key);
   @override
-  _TextDemoState createState() => _TextDemoState();
+  State<TextDemo> createState() => _TextDemoState();
 }
 
 class _TextDemoState extends State<TextDemo> {
@@ -79,8 +79,8 @@ class Button extends StatelessWidget {
         minWidth: 100,
         elevation: 8,
         color: Colors.blue,
-        child: Text(title),
         onPressed: onPressed,
+        child: Text(title),
       ),
     );
   }

@@ -1252,7 +1252,8 @@ class _TextFieldState extends State<MongolTextField>
       return effectiveDecoration.copyWith(
         errorText: effectiveDecoration.errorText ?? '',
         counterStyle: effectiveDecoration.errorStyle ??
-            themeData.textTheme.caption!.copyWith(color: themeData.errorColor),
+            themeData.textTheme.bodySmall!
+                .copyWith(color: themeData.colorScheme.error),
         counterText: counterText,
         semanticCounterText: semanticCounterText,
       );
@@ -1426,7 +1427,7 @@ class _TextFieldState extends State<MongolTextField>
     final ThemeData theme = Theme.of(context);
     final DefaultSelectionStyle selectionStyle =
         DefaultSelectionStyle.of(context);
-    final TextStyle style = theme.textTheme.subtitle1!.merge(widget.style);
+    final TextStyle style = theme.textTheme.titleMedium!.merge(widget.style);
     final Brightness keyboardAppearance =
         widget.keyboardAppearance ?? theme.brightness;
     final TextEditingController controller = _effectiveController;

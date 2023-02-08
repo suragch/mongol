@@ -15,7 +15,7 @@ class KeyboardDemo extends StatelessWidget {
 class BodyWidget extends StatefulWidget {
   const BodyWidget({Key? key}) : super(key: key);
   @override
-  _BodyWidgetState createState() => _BodyWidgetState();
+  State<BodyWidget> createState() => _BodyWidgetState();
 }
 
 class _BodyWidgetState extends State<BodyWidget> {

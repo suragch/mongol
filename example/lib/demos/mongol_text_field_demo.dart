@@ -15,7 +15,7 @@ class MongolTextFieldDemo extends StatelessWidget {
 class SearchBody extends StatefulWidget {
   const SearchBody({Key? key}) : super(key: key);
   @override
-  _SearchBodyState createState() => _SearchBodyState();
+  State<SearchBody> createState() => _SearchBodyState();
 }
 
 class _SearchBodyState extends State<SearchBody> {

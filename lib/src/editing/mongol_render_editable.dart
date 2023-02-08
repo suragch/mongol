@@ -532,13 +532,6 @@ class MongolRenderEditable extends RenderBox
       TextPosition(offset: selection!.start, affinity: selection!.affinity),
       _caretPrototype,
     );
-    // TODO(justinmc): https://github.com/flutter/flutter/issues/31495
-    // Check if the selection is visible with an approximation because a
-    // difference between rounded and unrounded values causes the caret to be
-    // reported as having a slightly (< 0.5) negative y offset. This rounding
-    // happens in paragraph.cc's layout and TextPainer's
-    // _applyFloatingPointHack. Ideally, the rounding mismatch will be fixed and
-    // this can be changed to be a strict check instead of an approximation.
     const visibleRegionSlop = 0.5;
     _selectionStartInViewport.value = visibleRegion
         .inflate(visibleRegionSlop)
@@ -725,7 +718,7 @@ class MongolRenderEditable extends RenderBox
   @override
   void markNeedsPaint() {
     super.markNeedsPaint();
-    // Tell the painers to repaint since text layout may have changed.
+    // Tell the painters to repaint since text layout may have changed.
     _foregroundRenderObject?.markNeedsPaint();
     _backgroundRenderObject?.markNeedsPaint();
   }
@@ -1147,7 +1140,7 @@ class MongolRenderEditable extends RenderBox
   // can be re-used when [assembleSemanticsNode] is called again. This ensures
   // stable ids for the [SemanticsNode]s of [TextSpan]s across
   // [assembleSemanticsNode] invocations.
-  Queue<SemanticsNode>? _cachedChildNodes;
+  LinkedHashMap<Key, SemanticsNode>? _cachedChildNodes;
 
   /// Returns a list of rects that bound the given selection.
   ///
@@ -1164,10 +1157,6 @@ class MongolRenderEditable extends RenderBox
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
     _semanticsInfo = _textPainter.text!.getSemanticsInformation();
-    // TODO(chunhtai): the macOS does not provide a public API to support text
-    // selections across multiple semantics nodes. Remove this platform check
-    // once we can support it.
-    // https://github.com/flutter/flutter/issues/77957
     if (_semanticsInfo!.any(
             (InlineSpanSemanticsInformation info) => info.recognizer != null) &&
         defaultTargetPlatform != TargetPlatform.macOS) {
@@ -1258,10 +1247,11 @@ class MongolRenderEditable extends RenderBox
     Rect currentRect;
     var ordinal = 0.0;
     var start = 0;
-    final newChildCache = Queue<SemanticsNode>();
-    for (final info in combineSemanticsInfo(_semanticsInfo!)) {
-      assert(!info.isPlaceholder);
-      final selection = TextSelection(
+    final LinkedHashMap<Key, SemanticsNode> newChildCache =
+        LinkedHashMap<Key, SemanticsNode>();
+    _cachedCombinedSemanticsInfos ??= combineSemanticsInfo(_semanticsInfo!);
+    for (final info in _cachedCombinedSemanticsInfos!) {
+      final TextSelection selection = TextSelection(
         baseOffset: start,
         extentOffset: start + info.text.length,
       );
@@ -1294,8 +1284,9 @@ class MongolRenderEditable extends RenderBox
       final configuration = SemanticsConfiguration()
         ..sortKey = OrdinalSortKey(ordinal++)
         ..textDirection = TextDirection.ltr
-        ..label = info.semanticsLabel ?? info.text;
-      final recognizer = info.recognizer;
+        ..attributedLabel = AttributedString(info.semanticsLabel ?? info.text,
+            attributes: info.stringAttributes);
+      final GestureRecognizer? recognizer = info.recognizer;
       if (recognizer != null) {
         if (recognizer is TapGestureRecognizer) {
           if (recognizer.onTap != null) {
@@ -1315,17 +1306,35 @@ class MongolRenderEditable extends RenderBox
           assert(false, '${recognizer.runtimeType} is not supported.');
         }
       }
-      final newChild = (_cachedChildNodes?.isNotEmpty == true)
-          ? _cachedChildNodes!.removeFirst()
-          : SemanticsNode();
+      if (node.parentPaintClipRect != null) {
+        final Rect paintRect = node.parentPaintClipRect!.intersect(currentRect);
+        configuration.isHidden = paintRect.isEmpty && !currentRect.isEmpty;
+      }
+      late final SemanticsNode newChild;
+      if (_cachedChildNodes?.isNotEmpty ?? false) {
+        newChild = _cachedChildNodes!.remove(_cachedChildNodes!.keys.first)!;
+      } else {
+        final UniqueKey key = UniqueKey();
+        newChild = SemanticsNode(
+          key: key,
+          showOnScreen: _createShowOnScreenFor(key),
+        );
+      }
       newChild
         ..updateWith(config: configuration)
         ..rect = currentRect;
-      newChildCache.addLast(newChild);
+      newChildCache[newChild.key!] = newChild;
       newChildren.add(newChild);
     }
     _cachedChildNodes = newChildCache;
     node.updateWith(config: config, childrenInInversePaintOrder: newChildren);
+  }
+
+  VoidCallback? _createShowOnScreenFor(Key key) {
+    return () {
+      final SemanticsNode node = _cachedChildNodes![key]!;
+      showOnScreen(descendant: this, rect: node.rect);
+    };
   }
 
   void _handleSetSelection(TextSelection selection) {
@@ -2075,8 +2084,6 @@ class MongolRenderEditable extends RenderBox
 
   MapEntry<int, Offset> _lineNumberFor(
       TextPosition startPosition, List<MongolLineMetrics> metrics) {
-    // TODO(LongCatIsLooong): include line boundaries information in
-    // MongolLineMetrics, then we can get rid of this.
     final Offset offset =
         _textPainter.getOffsetForCaret(startPosition, Rect.zero);
     if (kDebugMode) {

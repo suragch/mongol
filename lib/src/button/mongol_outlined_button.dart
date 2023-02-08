@@ -281,7 +281,7 @@ class MongolOutlinedButton extends MongolButtonStyleButton {
       backgroundColor: Colors.transparent,
       shadowColor: theme.shadowColor,
       elevation: 0,
-      textStyle: theme.textTheme.button,
+      textStyle: theme.textTheme.labelLarge,
       padding: scaledPadding,
       minimumSize: const Size(36, 64),
       maximumSize: Size.infinite,

@@ -11,9 +11,9 @@ class PopupMenuDemo extends StatelessWidget {
         actions: [
           MongolPopupMenuButton(
             itemBuilder: (context) => const [
-              MongolPopupMenuItem(child: MongolText('ᠨᠢᠭᠡ'), value: 1),
-              MongolPopupMenuItem(child: MongolText('ᠬᠤᠶᠠᠷ'), value: 2),
-              MongolPopupMenuItem(child: MongolText('ᠭᠤᠷᠪᠠ'), value: 3),
+              MongolPopupMenuItem(value: 1, child: MongolText('ᠨᠢᠭᠡ')),
+              MongolPopupMenuItem(value: 2, child: MongolText('ᠬᠤᠶᠠᠷ')),
+              MongolPopupMenuItem(value: 3, child: MongolText('ᠭᠤᠷᠪᠠ')),
             ],
             tooltip: 'Mongol Popup Menu Button',
             onSelected: (value) => _showStackBar(context, value),
@@ -24,9 +24,9 @@ class PopupMenuDemo extends StatelessWidget {
         child: MongolPopupMenuButton(
           icon: const Icon(Icons.other_houses),
           itemBuilder: (context) => const [
-            MongolPopupMenuItem(child: MongolText('ᠨᠢᠭᠡ'), value: 1),
-            MongolPopupMenuItem(child: MongolText('ᠬᠤᠶᠠᠷ'), value: 2),
-            MongolPopupMenuItem(child: MongolText('ᠭᠤᠷᠪᠠ'), value: 3),
+            MongolPopupMenuItem(value: 1, child: MongolText('ᠨᠢᠭᠡ')),
+            MongolPopupMenuItem(value: 2, child: MongolText('ᠬᠤᠶᠠᠷ')),
+            MongolPopupMenuItem(value: 3, child: MongolText('ᠭᠤᠷᠪᠠ')),
           ],
           tooltip: 'Mongol Popup Menu Button',
           onSelected: (value) => _showStackBar(context, value),
