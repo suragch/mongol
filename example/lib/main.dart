@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:mongol/mongol.dart';
 
 import 'demos/alert_dialog_demo.dart';
@@ -25,6 +26,7 @@ class DemoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    RenderEditable a;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       builder: (context, child) => MongolTextEditingShortcuts(child: child),

@@ -852,8 +852,15 @@ class MongolRenderEditable extends RenderBox
   /// The value may be null. If it is not null, then it must be greater than zero.
   set maxLines(int? value) {
     assert(value == null || value > 0);
-    if (maxLines == value) return;
+    if (maxLines == value) {
+      return;
+    }
     _maxLines = value;
+
+    // Special case maxLines == 1 to keep only the first line so we can get the
+    // width of the first line in case there are hard line breaks in the text.
+    // See the `_preferredWidth` method.
+    _textPainter.maxLines = value == 1 ? 1 : null;
     markNeedsTextLayout();
   }
 
@@ -2083,23 +2090,22 @@ class MongolRenderEditable extends RenderBox
   }
 
   MapEntry<int, Offset> _lineNumberFor(
-      TextPosition startPosition, List<MongolLineMetrics> metrics) {
-    final Offset offset =
-        _textPainter.getOffsetForCaret(startPosition, Rect.zero);
-    if (kDebugMode) {
-      print('MongolRenderEditable -> offset: ${offset.dx} ${offset.dy}');
-    }
+    TextPosition startPosition,
+    List<MongolLineMetrics> metrics,
+  ) {
+    final offset = _textPainter.getOffsetForCaret(startPosition, Rect.zero);
     for (final MongolLineMetrics lineMetrics in metrics) {
-      if (kDebugMode) {
-        print('MongolRenderEditable -> lineMetrics: $lineMetrics');
-      }
       if (lineMetrics.baseline > offset.dx) {
         return MapEntry<int, Offset>(
-            lineMetrics.lineNumber, Offset(lineMetrics.baseline, offset.dy));
+          lineMetrics.lineNumber,
+          Offset(lineMetrics.baseline, offset.dy),
+        );
       }
     }
-    assert(startPosition.offset == 0,
-        'unable to find the line for $startPosition');
+    assert(
+      startPosition.offset == 0,
+      'unable to find the line for $startPosition',
+    );
     return MapEntry<int, Offset>(
       math.max(0, metrics.length - 1),
       Offset(
@@ -2115,8 +2121,6 @@ class MongolRenderEditable extends RenderBox
   ///
   /// This can be used to handle consecutive left/right arrow key movements
   /// in an input field.
-  ///
-  /// {@macro flutter.rendering.RenderEditable.verticalArrowKeyMovement}
   ///
   /// The [HorizontalCaretMovementRun.isValid] property indicates whether the text
   /// layout has changed and the horizontal caret run is invalidated.
