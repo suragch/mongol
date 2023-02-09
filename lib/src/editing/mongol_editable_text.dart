@@ -61,6 +61,7 @@ import 'package:flutter/widgets.dart'
         EdgeInsets,
         ExpandSelectionToLineBreakIntent,
         ExtendSelectionByCharacterIntent,
+        ExtendSelectionByPageIntent,
         ExtendSelectionToDocumentBoundaryIntent,
         ExtendSelectionToLineBreakIntent,
         ExtendSelectionToNextWordBoundaryIntent,
@@ -1132,12 +1133,11 @@ class MongolEditableText extends StatefulWidget {
     required Iterable<String>? autofillHints,
     required int? maxLines,
   }) {
-    if (autofillHints?.isEmpty ?? true) {
+    if (autofillHints == null || autofillHints.isEmpty) {
       return maxLines == 1 ? TextInputType.text : TextInputType.multiline;
     }
 
-    TextInputType? returnValue;
-    final effectiveHint = autofillHints!.first;
+    final String effectiveHint = autofillHints.first;
 
     // On iOS oftentimes specifying a text content type is not enough to qualify
     // the input field for autofill. The keyboard type also needs to be compatible
@@ -1191,7 +1191,10 @@ class MongolEditableText extends StatefulWidget {
             AutofillHints.username: TextInputType.text,
           };
 
-          returnValue = iOSKeyboardType[effectiveHint];
+          final TextInputType? keyboardType = iOSKeyboardType[effectiveHint];
+          if (keyboardType != null) {
+            return keyboardType;
+          }
           break;
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
@@ -1201,8 +1204,8 @@ class MongolEditableText extends StatefulWidget {
       }
     }
 
-    if (returnValue != null || maxLines != 1) {
-      return returnValue ?? TextInputType.multiline;
+    if (maxLines != 1) {
+      return TextInputType.multiline;
     }
 
     const inferKeyboardType = <String, TextInputType>{
@@ -3209,6 +3212,66 @@ class MongolEditableTextState extends State<MongolEditableText>
     _scrollController.jumpTo(destination);
   }
 
+  /// Extend the selection down by page if the `forward` parameter is true, or
+  /// up by page otherwise.
+  void _extendSelectionByPage(ExtendSelectionByPageIntent intent) {
+    if (widget.maxLines == 1) {
+      return;
+    }
+
+    final TextSelection nextSelection;
+    final Rect extentRect = renderEditable.getLocalRectForCaret(
+      _value.selection.extent,
+    );
+    final ScrollableState? state =
+        _scrollableKey.currentState as ScrollableState?;
+    final double increment = ScrollAction.getDirectionalIncrement(
+      state!,
+      ScrollIntent(
+        direction: intent.forward ? AxisDirection.right : AxisDirection.left,
+        type: ScrollIncrementType.page,
+      ),
+    );
+    final ScrollPosition position = _scrollController.position;
+    if (intent.forward) {
+      if (_value.selection.extentOffset >= _value.text.length) {
+        return;
+      }
+      final Offset nextExtentOffset =
+          Offset(extentRect.left + increment, extentRect.top);
+      final double width = position.maxScrollExtent + renderEditable.size.width;
+      final TextPosition nextExtent =
+          nextExtentOffset.dx + position.pixels >= width
+              ? TextPosition(offset: _value.text.length)
+              : renderEditable.getPositionForPoint(
+                  renderEditable.localToGlobal(nextExtentOffset),
+                );
+      nextSelection = _value.selection.copyWith(
+        extentOffset: nextExtent.offset,
+      );
+    } else {
+      if (_value.selection.extentOffset <= 0) {
+        return;
+      }
+      final Offset nextExtentOffset =
+          Offset(extentRect.left + increment, extentRect.top);
+      final TextPosition nextExtent = nextExtentOffset.dx + position.pixels <= 0
+          ? const TextPosition(offset: 0)
+          : renderEditable.getPositionForPoint(
+              renderEditable.localToGlobal(nextExtentOffset),
+            );
+      nextSelection = _value.selection.copyWith(
+        extentOffset: nextExtent.offset,
+      );
+    }
+
+    bringIntoView(nextSelection.extent);
+    userUpdateTextEditingValue(
+      _value.copyWith(selection: nextSelection),
+      SelectionChangedCause.keyboard,
+    );
+  }
+
   void _expandSelectionToDocumentBoundary(
       ExpandSelectionToDocumentBoundaryIntent intent) {
     final _TextBoundary textBoundary = _documentBoundary(intent);
@@ -3317,6 +3380,9 @@ class MongolEditableTextState extends State<MongolEditableText>
       false,
       _characterBoundary,
     )),
+    ExtendSelectionByPageIntent: _makeOverridable(
+        CallbackAction<ExtendSelectionByPageIntent>(
+            onInvoke: _extendSelectionByPage)),
     MongolExtendSelectionByCharacterIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionByCharacterIntent>(
       this,
