@@ -211,7 +211,6 @@ class _TextFieldSelectionGestureDetectorBuilder
 /// [TextEditingController] using [TextEditingController.text].
 ///
 /// ## Handling emojis and other complex characters
-/// {@macro flutter.widgets.EditableText.onChanged}
 ///
 /// In the live Dartpad example above, try typing the emoji 👨‍👩‍👦
 /// into the field and submitting. Because the example code measures the length
@@ -258,6 +257,10 @@ class MongolTextField extends StatefulWidget {
   ///
   /// The text cursor is not shown if [showCursor] is false or if [showCursor]
   /// is null (the default) and [readOnly] is true.
+  ///
+  /// The [textAlign], [autofocus], [obscureText], [readOnly], [autocorrect],
+  /// [scrollPadding], [maxLines], [maxLength], and [enableSuggestions]
+  /// arguments must not be null.
   ///
   /// See also:
   ///
