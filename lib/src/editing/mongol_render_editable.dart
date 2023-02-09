@@ -42,7 +42,6 @@ typedef MongolSelectionChangedHandler = void Function(
 /// when the user navigates the paragraph using the left arrow key or the
 /// right arrow key.
 ///
-/// {@template flutter.rendering.RenderEditable.verticalArrowKeyMovement}
 /// When the user presses the left arrow key or the right arrow key, on
 /// many platforms (macOS for instance), the caret will move to the previous
 /// line or the next line, while maintaining its original horizontal location.
@@ -73,7 +72,6 @@ typedef MongolSelectionChangedHandler = void Function(
 /// changes (including when the text itself changes), or when the selection is
 /// changed by other input events or programmatically (for example, when the
 /// user pressed the up arrow key).
-/// {@endtemplate}
 ///
 /// The [movePrevious] method moves the caret location (which is
 /// [HorizontalCaretMovementRun.current]) to the previous line, and in case
@@ -270,6 +268,7 @@ class MongolRenderEditable extends RenderBox
           text: text,
           textAlign: textAlign,
           textScaleFactor: textScaleFactor,
+          maxLines: maxLines == 1 ? 1 : null,
         ),
         _showCursor = showCursor ?? ValueNotifier<bool>(false),
         _maxLines = maxLines,
@@ -932,9 +931,10 @@ class MongolRenderEditable extends RenderBox
   /// ```
   bool get expands => _expands;
   bool _expands;
-
   set expands(bool value) {
-    if (expands == value) return;
+    if (expands == value) {
+      return;
+    }
     _expands = value;
     markNeedsTextLayout();
   }
