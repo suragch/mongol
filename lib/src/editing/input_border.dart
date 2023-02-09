@@ -28,7 +28,7 @@ import 'package:flutter/material.dart'
 ///
 ///  * [OutlineInputBorder], an [InputDecorator] border which draws a
 ///    rounded rectangle around the input decorator's container.
-///  * [MongolInputDecoration], which is used to configure a
+///  * [InputDecoration], which is used to configure a
 ///    [MongolInputDecorator].
 class SidelineInputBorder extends InputBorder {
   /// Creates a single line border on the right for a [MongolInputDecorator].
@@ -52,7 +52,7 @@ class SidelineInputBorder extends InputBorder {
   /// The radii of the border's rounded rectangle corners.
   ///
   /// When this border is used with a filled input decorator, see
-  /// [MongolInputDecoration.filled], the border radius defines the shape
+  /// [InputDecoration.filled], the border radius defines the shape
   /// of the background fill as well as the top and bottom right
   /// edges of the sideline itself.
   ///
