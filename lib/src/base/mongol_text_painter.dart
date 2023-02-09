@@ -5,9 +5,29 @@
 // found in the LICENSE file.
 
 import 'dart:math';
-import 'dart:ui' as ui show ParagraphStyle;
+import 'dart:ui' as ui show ParagraphStyle, TextStyle;
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart'
+    show
+        TextAlign,
+        TextSpan,
+        Canvas,
+        RenderComparison,
+        Size,
+        Rect,
+        DiagnosticsNode,
+        TextPosition,
+        Offset,
+        TextRange,
+        TextOverflow,
+        TextSelection,
+        InlineSpan,
+        FlutterError,
+        ErrorSummary,
+        TextDirection,
+        TextBaseline,
+        TextAffinity;
 import 'package:mongol/src/base/mongol_paragraph.dart';
 
 import 'mongol_text_align.dart';
@@ -61,7 +81,14 @@ MongolTextAlign? mapHorizontalToMongolTextAlign(TextAlign? textAlign) {
 ///
 /// 3. Call [paint] as often as desired to paint the paragraph.
 ///
-/// If the width of the area into which the text is being painted
+/// 4. Call [dispose] when the object will no longer be accessed to release
+///    native resources. For [MongolTextPainter] objects that are used repeatedly and
+///    stored on a [State] or [RenderObject], call [dispose] from
+///    [State.dispose] or [RenderObject.dispose] or similar. For [MongolTextPainter]
+///    objects that are only used ephemerally, it is safe to immediately dispose
+///    them after the last call to methods or properties on the object.
+///
+/// If the height of the area into which the text is being painted
 /// changes, return to step 2. If the text to be painted changes,
 /// return to step 1.
 ///
@@ -72,6 +99,8 @@ class MongolTextPainter {
   ///
   /// The `text` argument is optional but [text] must be non-null before
   /// calling [layout].
+  ///
+  /// The [maxLines] property, if non-null, must be greater than zero.
   MongolTextPainter({
     TextSpan? text,
     MongolTextAlign textAlign = MongolTextAlign.top,
@@ -86,8 +115,98 @@ class MongolTextPainter {
         _maxLines = maxLines,
         _ellipsis = ellipsis;
 
+  /// Computes the height of a configured [MongolTextPainter].
+  ///
+  /// This is a convenience method that creates a text painter with the supplied
+  /// parameters, lays it out with the supplied [minHeight] and [maxHeight], and
+  /// returns its [MongolTextPainter.height] making sure to dispose the underlying
+  /// resources. Doing this operation is expensive and should be avoided
+  /// whenever it is possible to preserve the [MongolTextPainter] to paint the
+  /// text or get other information about it.
+  static double computeWidth({
+    required TextSpan text,
+    MongolTextAlign textAlign = MongolTextAlign.top,
+    double textScaleFactor = 1.0,
+    int? maxLines,
+    String? ellipsis,
+    double minHeight = 0.0,
+    double maxHeight = double.infinity,
+  }) {
+    final MongolTextPainter painter = MongolTextPainter(
+      text: text,
+      textAlign: textAlign,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
+      ellipsis: ellipsis,
+    )..layout(minHeight: minHeight, maxHeight: maxHeight);
+
+    try {
+      return painter.width;
+    } finally {
+      painter.dispose();
+    }
+  }
+
+  /// Computes the max intrinsic height of a configured [MongolTextPainter].
+  ///
+  /// This is a convenience method that creates a text painter with the supplied
+  /// parameters, lays it out with the supplied [minHeight] and [maxHeight], and
+  /// returns its [MongolTextPainter.maxIntrinsicHeight] making sure to dispose the
+  /// underlying resources. Doing this operation is expensive and should be avoided
+  /// whenever it is possible to preserve the [MongolTextPainter] to paint the
+  /// text or get other information about it.
+  static double computeMaxIntrinsicHeight({
+    required TextSpan text,
+    MongolTextAlign textAlign = MongolTextAlign.top,
+    double textScaleFactor = 1.0,
+    int? maxLines,
+    String? ellipsis,
+    double minHeight = 0.0,
+    double maxHeight = double.infinity,
+  }) {
+    final MongolTextPainter painter = MongolTextPainter(
+      text: text,
+      textAlign: textAlign,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
+      ellipsis: ellipsis,
+    )..layout(minHeight: minHeight, maxHeight: maxHeight);
+
+    try {
+      return painter.maxIntrinsicHeight;
+    } finally {
+      painter.dispose();
+    }
+  }
+
+  // _paragraph being null means the text needs layout because of style changes.
+  // Setting _paragraph to null invalidates all the layout cache.
+  //
+  // The MongolTextPainter class should not aggressively invalidate the layout as long
+  // as `markNeedsLayout` is not called (i.e., the layout cache is still valid).
+  // See: https://github.com/flutter/flutter/issues/85108
   MongolParagraph? _paragraph;
-  bool _needsLayout = true;
+  // Whether _paragraph contains outdated paint information and needs to be
+  // rebuilt before painting.
+  bool _rebuildParagraphForPaint = true;
+
+  bool get _debugAssertTextLayoutIsValid {
+    assert(!debugDisposed);
+    if (_paragraph == null) {
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary('Text layout not available'),
+        if (_debugMarkNeedsLayoutCallStack != null)
+          DiagnosticsStackTrace(
+              'The calls that first invalidated the text layout were',
+              _debugMarkNeedsLayoutCallStack)
+        else
+          ErrorDescription('The TextPainter has never been laid out.')
+      ]);
+    }
+    return true;
+  }
+
+  StackTrace? _debugMarkNeedsLayoutCallStack;
 
   /// Marks this text painter's layout information as dirty and removes cached
   /// information.
@@ -96,9 +215,15 @@ class MongolTextPainter {
   /// layout changes in engine. In most cases, updating text painter properties
   /// in framework will automatically invoke this method.
   void markNeedsLayout() {
+    assert(() {
+      if (_paragraph != null) {
+        _debugMarkNeedsLayoutCallStack ??= StackTrace.current;
+      }
+      return true;
+    }());
+    _paragraph?.dispose();
     _paragraph = null;
     _lineMetricsCache = null;
-    _needsLayout = true;
     _previousCaretPosition = null;
     _previousCaretPrototype = null;
   }
@@ -115,8 +240,11 @@ class MongolTextPainter {
   TextSpan? _text;
   set text(TextSpan? value) {
     assert(value == null || value.debugAssertIsValid());
-    if (_text == value) return;
+    if (_text == value) {
+      return;
+    }
     if (_text?.style != value?.style) {
+      _layoutTemplate?.dispose();
       _layoutTemplate = null;
     }
 
@@ -127,9 +255,12 @@ class MongolTextPainter {
     _text = value;
     _cachedPlainText = null;
 
-    if (comparison.index >= RenderComparison.layout.index ||
-        comparison.index >= RenderComparison.paint.index) {
+    if (comparison.index >= RenderComparison.layout.index) {
       markNeedsLayout();
+    } else if (comparison.index >= RenderComparison.paint.index) {
+      // Don't clear the _paragraph instance variable just yet. It still
+      // contains valid layout information.
+      _rebuildParagraphForPaint = true;
     }
     // Neither relayout or repaint is needed.
   }
@@ -169,9 +300,12 @@ class MongolTextPainter {
   double get textScaleFactor => _textScaleFactor;
   double _textScaleFactor;
   set textScaleFactor(double value) {
-    if (_textScaleFactor == value) return;
+    if (_textScaleFactor == value) {
+      return;
+    }
     _textScaleFactor = value;
     markNeedsLayout();
+    _layoutTemplate?.dispose();
     _layoutTemplate = null;
   }
 
@@ -222,8 +356,6 @@ class MongolTextPainter {
     markNeedsLayout();
   }
 
-  MongolParagraph? _layoutTemplate;
-
   ui.ParagraphStyle _createParagraphStyle() {
     // textAlign should always be `left` because this is the style for
     // a single text run. MongolTextAlign is handled elsewhere.
@@ -239,7 +371,7 @@ class MongolTextPainter {
         ui.ParagraphStyle(
           textAlign: TextAlign.left,
           textDirection: TextDirection.ltr,
-          // Use the default font size to multiply by as RichText does not
+          // Use the default font size to multiply by as MongolRichText does not
           // perform inheriting [TextStyle]s and would otherwise
           // fail to apply textScaleFactor.
           fontSize: _kDefaultFontSize * textScaleFactor,
@@ -247,6 +379,18 @@ class MongolTextPainter {
           ellipsis: ellipsis,
           locale: null,
         );
+  }
+
+  MongolParagraph? _layoutTemplate;
+  MongolParagraph _createLayoutTemplate() {
+    final builder = MongolParagraphBuilder(_createParagraphStyle());
+    final textStyle = text?.style;
+    if (textStyle != null) {
+      builder.pushStyle(textStyle);
+    }
+    builder.addText(' ');
+    return builder.build()
+      ..layout(const MongolParagraphConstraints(height: double.infinity));
   }
 
   /// The width of a space in [text] in logical pixels.
@@ -264,19 +408,16 @@ class MongolTextPainter {
   /// that contribute to the [preferredLineWidth]. If [text] is null or if it
   /// specifies no styles, the default [TextStyle] values are used (a 10 pixel
   /// sans-serif font).
-  double get preferredLineWidth {
-    if (_layoutTemplate == null) {
-      final builder = MongolParagraphBuilder(_createParagraphStyle());
-      if (text?.style != null) {
-        builder.pushStyle(text!.style!);
-      }
-      builder.addText(' ');
-      _layoutTemplate = builder.build()
-        ..layout(const MongolParagraphConstraints(height: double.infinity));
-    }
-    return _layoutTemplate!.width;
-  }
+  double get preferredLineWidth =>
+      (_layoutTemplate ??= _createLayoutTemplate()).width;
 
+  // Unfortunately, using full precision floating point here causes bad layouts
+  // because floating point math isn't associative. If we add and subtract
+  // padding, for example, we'll get different values when we estimate sizes and
+  // when we actually compute layout because the operations will end up associated
+  // differently. To work around this problem for now, we round fractional pixel
+  // values up to the nearest whole pixel value. The right long-term fix is to do
+  // layout using fixed precision arithmetic.
   double _applyFloatingPointHack(double layoutValue) {
     return layoutValue.ceilToDouble();
   }
@@ -286,7 +427,7 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   double get minIntrinsicHeight {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _applyFloatingPointHack(_paragraph!.minIntrinsicHeight);
   }
 
@@ -295,7 +436,7 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   double get maxIntrinsicHeight {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _applyFloatingPointHack(_paragraph!.maxIntrinsicHeight);
   }
 
@@ -303,7 +444,7 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   double get width {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _applyFloatingPointHack(_paragraph!.width);
   }
 
@@ -311,7 +452,7 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   double get height {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _applyFloatingPointHack(_paragraph!.height);
   }
 
@@ -319,7 +460,7 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   Size get size {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return Size(width, height);
   }
 
@@ -328,7 +469,7 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   double computeDistanceToActualBaseline(TextBaseline baseline) {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     switch (baseline) {
       case TextBaseline.alphabetic:
         return _paragraph!.alphabeticBaseline;
@@ -349,50 +490,36 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   bool get didExceedMaxLines {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _paragraph!.didExceedMaxLines;
   }
 
   double? _lastMinHeight;
   double? _lastMaxHeight;
 
-  /// Computes the visual position of the glyphs for painting the text.
-  ///
-  /// The text will layout with a height that's as close to its max intrinsic
-  /// height as possible while still being greater than or equal to `minHeight`
-  /// and less than or equal to `maxHeight`.
-  ///
-  /// The [text] property must be non-null before this is called.
-  void layout({double minHeight = 0.0, double maxHeight = double.infinity}) {
-    assert(text != null);
-    if (!_needsLayout &&
-        minHeight == _lastMinHeight &&
-        maxHeight == _lastMaxHeight) return;
-    _needsLayout = false;
-    if (_paragraph == null) {
-      final builder = MongolParagraphBuilder(
-        _createParagraphStyle(),
-        textAlign: _textAlign,
-        textScaleFactor: _textScaleFactor,
-        maxLines: _maxLines,
-        ellipsis: _ellipsis,
-      );
-      _addStyleToText(builder, _text!);
-      _paragraph = builder.build();
+  // Creates a MongolParagraph using the current configurations in this class and
+  // assign it to _paragraph.
+  void _createParagraph() {
+    assert(_paragraph == null || _rebuildParagraphForPaint);
+    final TextSpan? text = this.text;
+    if (text == null) {
+      throw StateError(
+          'MongolTextPainter.text must be set to a non-null value before using the MongolTextPainter.');
     }
-    _lastMinHeight = minHeight;
-    _lastMaxHeight = maxHeight;
-    // A change in layout invalidates the cached caret metrics as well.
-    _lineMetricsCache = null;
-    _previousCaretPosition = null;
-    _previousCaretPrototype = null;
-    _paragraph!.layout(MongolParagraphConstraints(height: maxHeight));
-    if (minHeight != maxHeight) {
-      final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight);
-      if (newHeight != height) {
-        _paragraph!.layout(MongolParagraphConstraints(height: newHeight));
-      }
-    }
+    final builder = MongolParagraphBuilder(
+      _createParagraphStyle(),
+      textAlign: _textAlign,
+      textScaleFactor: _textScaleFactor,
+      maxLines: _maxLines,
+      ellipsis: _ellipsis,
+    );
+    _addStyleToText(builder, _text!);
+    assert(() {
+      _debugMarkNeedsLayoutCallStack = null;
+      return true;
+    }());
+    _paragraph = builder.build();
+    _rebuildParagraphForPaint = false;
   }
 
   void _addStyleToText(
@@ -418,6 +545,46 @@ class MongolTextPainter {
     if (hasStyle) builder.pop();
   }
 
+  void _layoutParagraph(double minHeight, double maxHeight) {
+    _paragraph!.layout(MongolParagraphConstraints(height: maxHeight));
+    if (minHeight != maxHeight) {
+      final newHeight = maxIntrinsicHeight.clamp(minHeight, maxHeight);
+      if (newHeight != _applyFloatingPointHack(_paragraph!.height)) {
+        _paragraph!.layout(MongolParagraphConstraints(height: newHeight));
+      }
+    }
+  }
+
+  /// Computes the visual position of the glyphs for painting the text.
+  ///
+  /// The text will layout with a height that's as close to its max intrinsic
+  /// height as possible while still being greater than or equal to `minHeight`
+  /// and less than or equal to `maxHeight`.
+  ///
+  /// The [text] property must be non-null before this is called.
+  void layout({double minHeight = 0.0, double maxHeight = double.infinity}) {
+    assert(text != null,
+        'MongolTextPainter.text must be set to a non-null value before using the MongolTextPainter.');
+    // Return early if the current layout information is not outdated, even if
+    // _needsPaint is true (in which case _paragraph will be rebuilt in paint).
+    if (_paragraph != null &&
+        minHeight == _lastMinHeight &&
+        maxHeight == _lastMaxHeight) {
+      return;
+    }
+
+    if (_rebuildParagraphForPaint || _paragraph == null) {
+      _createParagraph();
+    }
+    _lastMinHeight = minHeight;
+    _lastMaxHeight = maxHeight;
+    // A change in layout invalidates the cached caret and line metrics as well.
+    _lineMetricsCache = null;
+    _previousCaretPosition = null;
+    _previousCaretPrototype = null;
+    _layoutParagraph(minHeight, maxHeight);
+  }
+
   /// Paints the text onto the given canvas at the given offset.
   ///
   /// Valid only after [layout] has been called.
@@ -432,14 +599,30 @@ class MongolTextPainter {
   /// that you pass to the [MongolTextPainter] constructor or to the [text]
   /// property.
   void paint(Canvas canvas, Offset offset) {
-    assert(() {
-      if (_needsLayout) {
-        throw FlutterError(
-            'TextPainter.paint called when text geometry was not yet calculated.\n'
-            'Please call layout() before paint() to position the text before painting it.');
-      }
-      return true;
-    }());
+    final double? minHeight = _lastMinHeight;
+    final double? maxHeight = _lastMaxHeight;
+    if (_paragraph == null || minHeight == null || maxHeight == null) {
+      throw StateError(
+        'MongolTextPainter.paint called when text geometry was not yet calculated.\n'
+        'Please call layout() before paint() to position the text before painting it.',
+      );
+    }
+
+    if (_rebuildParagraphForPaint) {
+      Size? debugSize;
+      assert(() {
+        debugSize = size;
+        return true;
+      }());
+
+      _createParagraph();
+      // Unfortunately we have to redo the layout using the same constraints,
+      // since we've created a new MongolParagraph. But there's no extra work being
+      // done: if _needsPaint is true and _paragraph is not null, the previous
+      // `layout` call didn't invoke _layoutParagraph.
+      _layoutParagraph(minHeight, maxHeight);
+      assert(debugSize == size);
+    }
     _paragraph!.draw(canvas, offset);
   }
 
@@ -574,7 +757,7 @@ class MongolTextPainter {
   }
 
   Offset get _emptyOffset {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     switch (textAlign) {
       case MongolTextAlign.top:
       case MongolTextAlign.justify:
@@ -616,7 +799,7 @@ class MongolTextPainter {
   // Checks if the [position] and [caretPrototype] have changed from the cached
   // version and recomputes the metrics required to position the caret.
   void _computeCaretMetrics(TextPosition position, Rect caretPrototype) {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     if (position == _previousCaretPosition &&
         caretPrototype == _previousCaretPrototype) {
       return;
@@ -649,7 +832,7 @@ class MongolTextPainter {
 
   /// Returns a list of rects that bound the given selection.
   List<Rect> getBoxesForSelection(TextSelection selection) {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _paragraph!.getBoxesForRange(
       selection.start,
       selection.end,
@@ -658,7 +841,7 @@ class MongolTextPainter {
 
   /// Returns the position within the text for the given pixel offset.
   TextPosition getPositionForOffset(Offset offset) {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _paragraph!.getPositionForOffset(offset);
   }
 
@@ -670,7 +853,7 @@ class MongolTextPainter {
   /// Word boundaries are defined more precisely in Unicode Standard Annex #29
   /// <http://www.unicode.org/reports/tr29/#Word_Boundaries>.
   TextRange getWordBoundary(TextPosition position) {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _paragraph!.getWordBoundary(position);
   }
 
@@ -678,7 +861,7 @@ class MongolTextPainter {
   ///
   /// The newline, if any, is included in the range.
   TextRange getLineBoundary(TextPosition position) {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _paragraph!.getLineBoundary(position);
   }
 
@@ -696,7 +879,37 @@ class MongolTextPainter {
   ///
   /// Valid only after [layout] has been called.
   List<MongolLineMetrics> computeLineMetrics() {
-    assert(!_needsLayout);
+    assert(_debugAssertTextLayoutIsValid);
     return _lineMetricsCache ??= _paragraph!.computeLineMetrics();
+  }
+
+  bool _disposed = false;
+
+  /// Whether this object has been disposed or not.
+  ///
+  /// Only for use when asserts are enabled.
+  bool get debugDisposed {
+    bool? disposed;
+    assert(() {
+      disposed = _disposed;
+      return true;
+    }());
+    return disposed ??
+        (throw StateError('debugDisposed only available when asserts are on.'));
+  }
+
+  /// Releases the resources associated with this painter.
+  ///
+  /// After disposal this painter is unusable.
+  void dispose() {
+    assert(() {
+      _disposed = true;
+      return true;
+    }());
+    _layoutTemplate?.dispose();
+    _layoutTemplate = null;
+    _paragraph?.dispose();
+    _paragraph = null;
+    _text = null;
   }
 }
