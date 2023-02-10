@@ -5,7 +5,7 @@
 // found in the LICENSE file.
 
 import 'dart:math';
-import 'dart:ui' as ui show ParagraphStyle, TextStyle;
+import 'dart:ui' as ui show ParagraphStyle;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart'
