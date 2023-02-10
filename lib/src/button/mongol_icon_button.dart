@@ -105,12 +105,12 @@ class MongolIconButton extends IconButton {
     Widget result = ConstrainedBox(
       constraints: adjustedConstraints,
       child: Padding(
-        padding: padding,
+        padding: padding ?? const EdgeInsets.all(8.0),
         child: SizedBox(
           height: iconSize,
           width: iconSize,
           child: Align(
-            alignment: alignment,
+            alignment: alignment ?? Alignment.center,
             child: IconTheme.merge(
               data: IconThemeData(
                 size: iconSize,
@@ -139,7 +139,7 @@ class MongolIconButton extends IconButton {
         canRequestFocus: onPressed != null,
         onTap: onPressed,
         mouseCursor: mouseCursor,
-        enableFeedback: enableFeedback,
+        enableFeedback: enableFeedback ?? true,
         focusColor: focusColor ?? theme.focusColor,
         hoverColor: hoverColor ?? theme.hoverColor,
         highlightColor: highlightColor ?? theme.highlightColor,
@@ -148,7 +148,10 @@ class MongolIconButton extends IconButton {
             math.max(
               Material.defaultSplashRadius,
               ((iconSize ?? 24) +
-                      math.min(padding.horizontal, padding.vertical)) *
+                      math.min(
+                        padding?.horizontal ?? 0,
+                        padding?.vertical ?? 0,
+                      )) *
                   0.7,
               // x 0.5 for diameter -> radius and + 40% overflow derived from other Material apps.
             ),

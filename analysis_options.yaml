@@ -9,5 +9,4 @@ analyzer:
 linter:
   rules:
     camel_case_types: true
-    todo: false
     omit_local_variable_types: false

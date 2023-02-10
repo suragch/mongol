@@ -18,3 +18,4 @@ export 'package:mongol/src/menu/mongol_popup_menu.dart';
 export 'package:mongol/src/menu/mongol_tooltip.dart';
 export 'package:mongol/src/text/mongol_rich_text.dart';
 export 'package:mongol/src/text/mongol_text.dart';
+export 'package:mongol/src/editing/mongol_editable_text.dart';

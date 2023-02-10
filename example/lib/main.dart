@@ -3,6 +3,7 @@ import 'package:mongol/mongol.dart';
 
 import 'demos/alert_dialog_demo.dart';
 import 'demos/button_demo.dart';
+import 'demos/editable_text_demo.dart';
 import 'demos/emoji_cjk_demo.dart';
 import 'demos/horizontal_listview_demo.dart';
 import 'demos/input_decorations_demo.dart';
@@ -70,6 +71,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'Input Shortcuts',
           destination: InputShortcutsDemo(),
+        ),
+        DemoTile(
+          title: 'MongolEditableText',
+          destination: MongolEditableTextDemo(),
         ),
         DemoTile(
           title: 'MongolAlertDialog',

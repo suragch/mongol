@@ -42,7 +42,6 @@ typedef MongolSelectionChangedHandler = void Function(
 /// when the user navigates the paragraph using the left arrow key or the
 /// right arrow key.
 ///
-/// {@template flutter.rendering.RenderEditable.verticalArrowKeyMovement}
 /// When the user presses the left arrow key or the right arrow key, on
 /// many platforms (macOS for instance), the caret will move to the previous
 /// line or the next line, while maintaining its original horizontal location.
@@ -73,7 +72,6 @@ typedef MongolSelectionChangedHandler = void Function(
 /// changes (including when the text itself changes), or when the selection is
 /// changed by other input events or programmatically (for example, when the
 /// user pressed the up arrow key).
-/// {@endtemplate}
 ///
 /// The [movePrevious] method moves the caret location (which is
 /// [HorizontalCaretMovementRun.current]) to the previous line, and in case
@@ -87,12 +85,12 @@ typedef MongolSelectionChangedHandler = void Function(
 /// [current].
 class HorizontalCaretMovementRun extends Iterator<TextPosition> {
   HorizontalCaretMovementRun._(
-      this._editable,
-      this._lineMetrics,
-      this._currentTextPosition,
-      this._currentLine,
-      this._currentOffset,
-      );
+    this._editable,
+    this._lineMetrics,
+    this._currentTextPosition,
+    this._currentLine,
+    this._currentOffset,
+  );
 
   Offset _currentOffset;
   int _currentLine;
@@ -102,6 +100,7 @@ class HorizontalCaretMovementRun extends Iterator<TextPosition> {
   final MongolRenderEditable _editable;
 
   bool _isValid = true;
+
   /// Whether this [HorizontalCaretMovementRun] can still continue.
   ///
   /// A [HorizontalCaretMovementRun] run is valid if the underlying text layout
@@ -113,7 +112,8 @@ class HorizontalCaretMovementRun extends Iterator<TextPosition> {
     if (!_isValid) {
       return false;
     }
-    final List<MongolLineMetrics> newLineMetrics = _editable._textPainter.computeLineMetrics();
+    final List<MongolLineMetrics> newLineMetrics =
+        _editable._textPainter.computeLineMetrics();
     // Use the implementation detail of the computeLineMetrics method to figure
     // out if the current text layout has been invalidated.
     if (!identical(newLineMetrics, _lineMetrics)) {
@@ -122,20 +122,25 @@ class HorizontalCaretMovementRun extends Iterator<TextPosition> {
     return _isValid;
   }
 
-  final Map<int, MapEntry<Offset, TextPosition>> _positionCache = <int, MapEntry<Offset, TextPosition>>{};
+  final Map<int, MapEntry<Offset, TextPosition>> _positionCache =
+      <int, MapEntry<Offset, TextPosition>>{};
 
   MapEntry<Offset, TextPosition> _getTextPositionForLine(int lineNumber) {
     assert(isValid);
     assert(lineNumber >= 0);
-    final MapEntry<Offset, TextPosition>? cachedPosition = _positionCache[lineNumber];
+    final MapEntry<Offset, TextPosition>? cachedPosition =
+        _positionCache[lineNumber];
     if (cachedPosition != null) {
       return cachedPosition;
     }
     assert(lineNumber != _currentLine);
 
-    final Offset newOffset = Offset(_lineMetrics[lineNumber].baseline, _currentOffset.dy);
-    final TextPosition closestPosition = _editable._textPainter.getPositionForOffset(newOffset);
-    final MapEntry<Offset, TextPosition> position = MapEntry<Offset, TextPosition>(newOffset, closestPosition);
+    final Offset newOffset =
+        Offset(_lineMetrics[lineNumber].baseline, _currentOffset.dy);
+    final TextPosition closestPosition =
+        _editable._textPainter.getPositionForOffset(newOffset);
+    final MapEntry<Offset, TextPosition> position =
+        MapEntry<Offset, TextPosition>(newOffset, closestPosition);
     _positionCache[lineNumber] = position;
     return position;
   }
@@ -152,7 +157,8 @@ class HorizontalCaretMovementRun extends Iterator<TextPosition> {
     if (_currentLine + 1 >= _lineMetrics.length) {
       return false;
     }
-    final MapEntry<Offset, TextPosition> position = _getTextPositionForLine(_currentLine + 1);
+    final MapEntry<Offset, TextPosition> position =
+        _getTextPositionForLine(_currentLine + 1);
     _currentLine += 1;
     _currentOffset = position.key;
     _currentTextPosition = position.value;
@@ -164,7 +170,8 @@ class HorizontalCaretMovementRun extends Iterator<TextPosition> {
     if (_currentLine <= 0) {
       return false;
     }
-    final MapEntry<Offset, TextPosition> position = _getTextPositionForLine(_currentLine - 1);
+    final MapEntry<Offset, TextPosition> position =
+        _getTextPositionForLine(_currentLine - 1);
     _currentLine -= 1;
     _currentOffset = position.key;
     _currentTextPosition = position.value;
@@ -261,6 +268,7 @@ class MongolRenderEditable extends RenderBox
           text: text,
           textAlign: textAlign,
           textScaleFactor: textScaleFactor,
+          maxLines: maxLines == 1 ? 1 : null,
         ),
         _showCursor = showCursor ?? ValueNotifier<bool>(false),
         _maxLines = maxLines,
@@ -296,6 +304,23 @@ class MongolRenderEditable extends RenderBox
   /// Child render objects
   _MongolRenderEditableCustomPaint? _foregroundRenderObject;
   _MongolRenderEditableCustomPaint? _backgroundRenderObject;
+
+  @override
+  void dispose() {
+    _foregroundRenderObject?.dispose();
+    _foregroundRenderObject = null;
+    _backgroundRenderObject?.dispose();
+    _backgroundRenderObject = null;
+    _clipRectLayer.layer = null;
+    _cachedBuiltInForegroundPainters?.dispose();
+    _cachedBuiltInPainters?.dispose();
+    _selectionStartInViewport.dispose();
+    _selectionEndInViewport.dispose();
+    _selectionPainter.dispose();
+    _caretPainter.dispose();
+    _textPainter.dispose();
+    super.dispose();
+  }
 
   void _updateForegroundPainter(MongolRenderEditablePainter? newPainter) {
     final effectivePainter = (newPainter == null)
@@ -471,10 +496,12 @@ class MongolRenderEditable extends RenderBox
   /// Whether to hide the text being edited (e.g., for passwords).
   bool get obscureText => _obscureText;
   bool _obscureText;
-
   set obscureText(bool value) {
-    if (_obscureText == value) return;
+    if (_obscureText == value) {
+      return;
+    }
     _obscureText = value;
+    _cachedAttributedValue = null;
     markNeedsSemanticsUpdate();
   }
 
@@ -521,13 +548,6 @@ class MongolRenderEditable extends RenderBox
       TextPosition(offset: selection!.start, affinity: selection!.affinity),
       _caretPrototype,
     );
-    // TODO(justinmc): https://github.com/flutter/flutter/issues/31495
-    // Check if the selection is visible with an approximation because a
-    // difference between rounded and unrounded values causes the caret to be
-    // reported as having a slightly (< 0.5) negative y offset. This rounding
-    // happens in paragraph.cc's layout and TextPainer's
-    // _applyFloatingPointHack. Ideally, the rounding mismatch will be fixed and
-    // this can be changed to be a strict check instead of an approximation.
     const visibleRegionSlop = 0.5;
     _selectionStartInViewport.value = visibleRegion
         .inflate(visibleRegionSlop)
@@ -676,7 +696,7 @@ class MongolRenderEditable extends RenderBox
     final TextRange line = _textPainter.getLineBoundary(position);
     // If text is obscured, the entire string should be treated as one line.
     if (obscureText) {
-      return TextSelection(baseOffset: 0, extentOffset: _plainText.length);
+      return TextSelection(baseOffset: 0, extentOffset: plainText.length);
     }
     return TextSelection(baseOffset: line.start, extentOffset: line.end);
   }
@@ -714,7 +734,7 @@ class MongolRenderEditable extends RenderBox
   @override
   void markNeedsPaint() {
     super.markNeedsPaint();
-    // Tell the painers to repaint since text layout may have changed.
+    // Tell the painters to repaint since text layout may have changed.
     _foregroundRenderObject?.markNeedsPaint();
     _backgroundRenderObject?.markNeedsPaint();
   }
@@ -738,26 +758,28 @@ class MongolRenderEditable extends RenderBox
     _textLayoutLastMinHeight = null;
   }
 
-  String? _cachedPlainText;
+  /// Returns a plain text version of the text in [TextPainter].
+  ///
+  /// If [obscureText] is true, returns the obscured text. See
+  /// [obscureText] and [obscuringCharacter].
+  /// In order to get the styled text as an [TextSpan] tree, use [text].
+  String get plainText => _textPainter.plainText;
 
-  // Returns a plain text version of the text in the painter.
-  //
-  // Returns the obscured text when [obscureText] is true. See
-  // [obscureText] and [obscuringCharacter].
-  String get _plainText {
-    _cachedPlainText ??=
-        _textPainter.text!.toPlainText(includeSemanticsLabels: false);
-    return _cachedPlainText!;
-  }
-
-  /// The text to display.
+  /// The text to paint in the form of a tree of [TextSpan]s.
+  ///
+  /// In order to get the plain text representation, use [plainText].
   TextSpan? get text => _textPainter.text;
   final MongolTextPainter _textPainter;
-
+  AttributedString? _cachedAttributedValue;
+  List<InlineSpanSemanticsInformation>? _cachedCombinedSemanticsInfos;
   set text(TextSpan? value) {
-    if (_textPainter.text == value) return;
+    if (_textPainter.text == value) {
+      return;
+    }
+    _cachedLineBreakCount = null;
     _textPainter.text = value;
-    _cachedPlainText = null;
+    _cachedAttributedValue = null;
+    _cachedCombinedSemanticsInfos = null;
     markNeedsTextLayout();
     markNeedsSemanticsUpdate();
   }
@@ -846,8 +868,15 @@ class MongolRenderEditable extends RenderBox
   /// The value may be null. If it is not null, then it must be greater than zero.
   set maxLines(int? value) {
     assert(value == null || value > 0);
-    if (maxLines == value) return;
+    if (maxLines == value) {
+      return;
+    }
     _maxLines = value;
+
+    // Special case maxLines == 1 to keep only the first line so we can get the
+    // width of the first line in case there are hard line breaks in the text.
+    // See the `_preferredWidth` method.
+    _textPainter.maxLines = value == 1 ? 1 : null;
     markNeedsTextLayout();
   }
 
@@ -919,9 +948,10 @@ class MongolRenderEditable extends RenderBox
   /// ```
   bool get expands => _expands;
   bool _expands;
-
   set expands(bool value) {
-    if (expands == value) return;
+    if (expands == value) {
+      return;
+    }
     _expands = value;
     markNeedsTextLayout();
   }
@@ -1134,16 +1164,23 @@ class MongolRenderEditable extends RenderBox
   // can be re-used when [assembleSemanticsNode] is called again. This ensures
   // stable ids for the [SemanticsNode]s of [TextSpan]s across
   // [assembleSemanticsNode] invocations.
-  Queue<SemanticsNode>? _cachedChildNodes;
+  LinkedHashMap<Key, SemanticsNode>? _cachedChildNodes;
+
+  /// Returns a list of rects that bound the given selection.
+  ///
+  /// See [MongolTextPainter.getBoxesForSelection] for more details.
+  List<Rect> getBoxesForSelection(TextSelection selection) {
+    _computeTextMetricsIfNeeded();
+    return _textPainter
+        .getBoxesForSelection(selection)
+        .map((rect) => rect.shift(_paintOffset))
+        .toList();
+  }
 
   @override
   void describeSemanticsConfiguration(SemanticsConfiguration config) {
     super.describeSemanticsConfiguration(config);
     _semanticsInfo = _textPainter.text!.getSemanticsInformation();
-    // TODO(chunhtai): the macOS does not provide a public API to support text
-    // selections across multiple semantics nodes. Remove this platform check
-    // once we can support it.
-    // https://github.com/flutter/flutter/issues/77957
     if (_semanticsInfo!.any(
             (InlineSpanSemanticsInformation info) => info.recognizer != null) &&
         defaultTargetPlatform != TargetPlatform.macOS) {
@@ -1155,9 +1192,35 @@ class MongolRenderEditable extends RenderBox
         ..explicitChildNodes = true;
       return;
     }
+    if (_cachedAttributedValue == null) {
+      if (obscureText) {
+        _cachedAttributedValue =
+            AttributedString(obscuringCharacter * plainText.length);
+      } else {
+        final StringBuffer buffer = StringBuffer();
+        int offset = 0;
+        final List<StringAttribute> attributes = <StringAttribute>[];
+        for (final InlineSpanSemanticsInformation info in _semanticsInfo!) {
+          final String label = info.semanticsLabel ?? info.text;
+          for (final StringAttribute infoAttribute in info.stringAttributes) {
+            final TextRange originalRange = infoAttribute.range;
+            attributes.add(
+              infoAttribute.copy(
+                range: TextRange(
+                    start: offset + originalRange.start,
+                    end: offset + originalRange.end),
+              ),
+            );
+          }
+          buffer.write(label);
+          offset += label.length;
+        }
+        _cachedAttributedValue =
+            AttributedString(buffer.toString(), attributes: attributes);
+      }
+    }
     config
-      ..value =
-          obscureText ? obscuringCharacter * _plainText.length : _plainText
+      ..attributedValue = _cachedAttributedValue!
       ..isObscured = obscureText
       ..isMultiline = _isMultiline
       ..textDirection = TextDirection.ltr
@@ -1169,9 +1232,11 @@ class MongolRenderEditable extends RenderBox
       config.onSetSelection = _handleSetSelection;
     }
 
-    if (hasFocus && !readOnly) config.onSetText = _handleSetText;
+    if (hasFocus && !readOnly) {
+      config.onSetText = _handleSetText;
+    }
 
-    if (selectionEnabled && selection?.isValid == true) {
+    if (selectionEnabled && (selection?.isValid ?? false)) {
       config.textSelection = selection;
       if (_textPainter.getOffsetBefore(selection!.extentOffset) != null) {
         config
@@ -1206,10 +1271,11 @@ class MongolRenderEditable extends RenderBox
     Rect currentRect;
     var ordinal = 0.0;
     var start = 0;
-    final newChildCache = Queue<SemanticsNode>();
-    for (final info in combineSemanticsInfo(_semanticsInfo!)) {
-      assert(!info.isPlaceholder);
-      final selection = TextSelection(
+    final LinkedHashMap<Key, SemanticsNode> newChildCache =
+        LinkedHashMap<Key, SemanticsNode>();
+    _cachedCombinedSemanticsInfos ??= combineSemanticsInfo(_semanticsInfo!);
+    for (final info in _cachedCombinedSemanticsInfos!) {
+      final TextSelection selection = TextSelection(
         baseOffset: start,
         extentOffset: start + info.text.length,
       );
@@ -1242,8 +1308,9 @@ class MongolRenderEditable extends RenderBox
       final configuration = SemanticsConfiguration()
         ..sortKey = OrdinalSortKey(ordinal++)
         ..textDirection = TextDirection.ltr
-        ..label = info.semanticsLabel ?? info.text;
-      final recognizer = info.recognizer;
+        ..attributedLabel = AttributedString(info.semanticsLabel ?? info.text,
+            attributes: info.stringAttributes);
+      final GestureRecognizer? recognizer = info.recognizer;
       if (recognizer != null) {
         if (recognizer is TapGestureRecognizer) {
           if (recognizer.onTap != null) {
@@ -1263,17 +1330,35 @@ class MongolRenderEditable extends RenderBox
           assert(false, '${recognizer.runtimeType} is not supported.');
         }
       }
-      final newChild = (_cachedChildNodes?.isNotEmpty == true)
-          ? _cachedChildNodes!.removeFirst()
-          : SemanticsNode();
+      if (node.parentPaintClipRect != null) {
+        final Rect paintRect = node.parentPaintClipRect!.intersect(currentRect);
+        configuration.isHidden = paintRect.isEmpty && !currentRect.isEmpty;
+      }
+      late final SemanticsNode newChild;
+      if (_cachedChildNodes?.isNotEmpty ?? false) {
+        newChild = _cachedChildNodes!.remove(_cachedChildNodes!.keys.first)!;
+      } else {
+        final UniqueKey key = UniqueKey();
+        newChild = SemanticsNode(
+          key: key,
+          showOnScreen: _createShowOnScreenFor(key),
+        );
+      }
       newChild
         ..updateWith(config: configuration)
         ..rect = currentRect;
-      newChildCache.addLast(newChild);
+      newChildCache[newChild.key!] = newChild;
       newChildren.add(newChild);
     }
     _cachedChildNodes = newChildCache;
     node.updateWith(config: config, childrenInInversePaintOrder: newChildren);
+  }
+
+  VoidCallback? _createShowOnScreenFor(Key key) {
+    return () {
+      final SemanticsNode node = _cachedChildNodes![key]!;
+      showOnScreen(descendant: this, rect: node.rect);
+    };
   }
 
   void _handleSetSelection(TextSelection selection) {
@@ -1464,8 +1549,7 @@ class MongolRenderEditable extends RenderBox
   ///  * [getLocalRectForCaret], which is the equivalent but for
   ///    a [TextPosition] rather than a [TextSelection].
   List<TextSelectionPoint> getEndpointsForSelection(TextSelection selection) {
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _computeTextMetricsIfNeeded();
 
     final paintOffset = _paintOffset;
 
@@ -1499,8 +1583,7 @@ class MongolRenderEditable extends RenderBox
     if (!range.isValid || range.isCollapsed) {
       return null;
     }
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _computeTextMetricsIfNeeded();
 
     final boxes = _textPainter.getBoxesForSelection(
       TextSelection(baseOffset: range.start, extentOffset: range.end),
@@ -1524,8 +1607,7 @@ class MongolRenderEditable extends RenderBox
   ///  * [MongolTextPainter.getPositionForOffset], which is the equivalent method
   ///    for a [MongolTextPainter] object.
   TextPosition getPositionForPoint(Offset globalPosition) {
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _computeTextMetricsIfNeeded();
     globalPosition += -_paintOffset;
     return _textPainter.getPositionForOffset(globalToLocal(globalPosition));
   }
@@ -1542,8 +1624,7 @@ class MongolRenderEditable extends RenderBox
   ///  * [MongolTextPainter.getOffsetForCaret], the equivalent method for a
   ///    [MongolTextPainter] object.
   Rect getLocalRectForCaret(TextPosition caretPosition) {
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _computeTextMetricsIfNeeded();
     final caretOffset =
         _textPainter.getOffsetForCaret(caretPosition, _caretPrototype);
     // This rect is the same as _caretPrototype but without the horizontal padding.
@@ -1569,42 +1650,64 @@ class MongolRenderEditable extends RenderBox
   /// This does not require the layout to be updated.
   double get preferredLineWidth => _textPainter.preferredLineWidth;
 
+  int? _cachedLineBreakCount;
+  int _countHardLineBreaks(String text) {
+    final int? cachedValue = _cachedLineBreakCount;
+    if (cachedValue != null) {
+      return cachedValue;
+    }
+    int count = 0;
+    for (int index = 0; index < text.length; index += 1) {
+      switch (text.codeUnitAt(index)) {
+        case 0x000A: // LF
+        case 0x0085: // NEL
+        case 0x000B: // VT
+        case 0x000C: // FF, treating it as a regular line separator
+        case 0x2028: // LS
+        case 0x2029: // PS
+          count += 1;
+      }
+    }
+    return _cachedLineBreakCount = count;
+  }
+
   double _preferredWidth(double height) {
-    // Lock width to maxLines if needed.
-    final lockedMax = maxLines != null && minLines == null;
-    final lockedBoth = minLines != null && minLines == maxLines;
-    final singleLine = maxLines == 1;
-    if (singleLine || lockedMax || lockedBoth) {
-      return preferredLineWidth * maxLines!;
+    final int? maxLines = this.maxLines;
+    final int? minLines = this.minLines ?? maxLines;
+    final double minWidth = preferredLineWidth * (minLines ?? 0);
+
+    if (maxLines == null) {
+      final double estimatedWidth;
+      if (height == double.infinity) {
+        estimatedWidth =
+            preferredLineWidth * (_countHardLineBreaks(plainText) + 1);
+      } else {
+        _layoutText(maxHeight: height);
+        estimatedWidth = _textPainter.width;
+      }
+      return math.max(estimatedWidth, minWidth);
     }
 
-    // Clamp width to minLines or maxLines if needed.
-    final minLimited = minLines != null && minLines! > 1;
-    final maxLimited = maxLines != null;
-    if (minLimited || maxLimited) {
+    final bool usePreferredLineHeightHack =
+        maxLines == 1 && text?.codeUnitAt(0) == null;
+
+    // Special case maxLines == 1 since it forces the scrollable direction
+    // to be horizontal. Report the real height to prevent the text from being
+    // clipped.
+    if (maxLines == 1 && !usePreferredLineHeightHack) {
+      // The _layoutText call lays out the paragraph using infinite height when
+      // maxLines == 1. Also _textPainter.maxLines will be set to 1 so should
+      // there be any line breaks only the first line is shown.
+      assert(_textPainter.maxLines == 1);
       _layoutText(maxHeight: height);
-      if (minLimited && _textPainter.width < preferredLineWidth * minLines!) {
-        return preferredLineWidth * minLines!;
-      }
-      if (maxLimited && _textPainter.width > preferredLineWidth * maxLines!) {
-        return preferredLineWidth * maxLines!;
-      }
+      return _textPainter.width;
     }
-
-    // Set the width based on the content.
-    if (height == double.infinity) {
-      final text = _plainText;
-      var lines = 1;
-      for (var index = 0; index < text.length; index += 1) {
-        const newline = 0x0A;
-        if (text.codeUnitAt(index) == newline) {
-          lines += 1;
-        }
-      }
-      return preferredLineWidth * lines;
+    if (minLines == maxLines) {
+      return minWidth;
     }
     _layoutText(maxHeight: height);
-    return math.max(preferredLineWidth, _textPainter.width);
+    final double maxWidth = preferredLineWidth * maxLines;
+    return clampDouble(_textPainter.width, minWidth, maxWidth);
   }
 
   @override
@@ -1619,8 +1722,7 @@ class MongolRenderEditable extends RenderBox
 
   @override
   double computeDistanceToActualBaseline(TextBaseline baseline) {
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _computeTextMetricsIfNeeded();
     return _textPainter.computeDistanceToActualBaseline(baseline);
   }
 
@@ -1767,21 +1869,25 @@ class MongolRenderEditable extends RenderBox
       {required Offset from,
       Offset? to,
       required SelectionChangedCause cause}) {
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
-    final firstPosition =
+    _computeTextMetricsIfNeeded();
+    final TextPosition fromPosition =
         _textPainter.getPositionForOffset(globalToLocal(from - _paintOffset));
-    final firstWord = _selectWordAtOffset(firstPosition);
-    final lastWord = (to == null)
-        ? firstWord
-        : _selectWordAtOffset(_textPainter
-            .getPositionForOffset(globalToLocal(to - _paintOffset)));
+    final TextSelection fromWord = _getWordAtOffset(fromPosition);
+    final TextPosition toPosition = to == null
+        ? fromPosition
+        : _textPainter.getPositionForOffset(globalToLocal(to - _paintOffset));
+    final TextSelection toWord =
+        toPosition == fromPosition ? fromWord : _getWordAtOffset(toPosition);
+    final bool isFromWordBeforeToWord = fromWord.start < toWord.end;
 
     _setSelection(
       TextSelection(
-        baseOffset: firstWord.base.offset,
-        extentOffset: lastWord.extent.offset,
-        affinity: firstWord.affinity,
+        baseOffset: isFromWordBeforeToWord
+            ? fromWord.base.offset
+            : fromWord.extent.offset,
+        extentOffset:
+            isFromWordBeforeToWord ? toWord.extent.offset : toWord.base.offset,
+        affinity: fromWord.affinity,
       ),
       cause,
     );
@@ -1789,52 +1895,58 @@ class MongolRenderEditable extends RenderBox
 
   /// Move the selection to the beginning or end of a word.
   void selectWordEdge({required SelectionChangedCause cause}) {
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _computeTextMetricsIfNeeded();
     assert(_lastTapDownPosition != null);
-    final position = _textPainter.getPositionForOffset(
+    final TextPosition position = _textPainter.getPositionForOffset(
         globalToLocal(_lastTapDownPosition! - _paintOffset));
-    final word = _textPainter.getWordBoundary(position);
-    if (position.offset - word.start <= 1) {
-      _handleSelectionChange(
-        TextSelection.collapsed(
-            offset: word.start, affinity: TextAffinity.downstream),
-        cause,
-      );
+    final TextRange word = _textPainter.getWordBoundary(position);
+    late TextSelection newSelection;
+    if (position.offset <= word.start) {
+      newSelection = TextSelection.collapsed(offset: word.start);
     } else {
-      _handleSelectionChange(
-        TextSelection.collapsed(
-            offset: word.end, affinity: TextAffinity.upstream),
-        cause,
-      );
+      newSelection = TextSelection.collapsed(
+          offset: word.end, affinity: TextAffinity.upstream);
     }
+    _setSelection(newSelection, cause);
   }
 
-  TextSelection _selectWordAtOffset(TextPosition position) {
+  TextSelection _getWordAtOffset(TextPosition position) {
     debugAssertLayoutUpToDate();
-    final word = _textPainter.getWordBoundary(position);
     // When long-pressing past the end of the text, we want a collapsed cursor.
-    if (position.offset >= word.end) {
-      return TextSelection.fromPosition(position);
+    if (position.offset >= plainText.length) {
+      return TextSelection.fromPosition(TextPosition(
+          offset: plainText.length, affinity: TextAffinity.upstream));
     }
     // If text is obscured, the entire sentence should be treated as one word.
     if (obscureText) {
-      return TextSelection(baseOffset: 0, extentOffset: _plainText.length);
-      // On iOS, select the previous word if there is a previous word, or select
-      // to the end of the next word if there is a next word. Select nothing if
-      // there is neither a previous word nor a next word.
-      //
-      // If the platform is Android and the text is read only, try to select the
-      // previous word if there is one; otherwise, select the single whitespace at
-      // the position.
-    } else if (TextLayoutMetrics.isWhitespace(
-            _plainText.codeUnitAt(position.offset)) &&
-        position.offset > 0) {
-      final previousWord = _getPreviousWord(word.start);
+      return TextSelection(baseOffset: 0, extentOffset: plainText.length);
+    }
+    final TextRange word = _textPainter.getWordBoundary(position);
+    final int effectiveOffset;
+    switch (position.affinity) {
+      case TextAffinity.upstream:
+        // upstream affinity is effectively -1 in text position.
+        effectiveOffset = position.offset - 1;
+        break;
+      case TextAffinity.downstream:
+        effectiveOffset = position.offset;
+        break;
+    }
+
+    // On iOS, select the previous word if there is a previous word, or select
+    // to the end of the next word if there is a next word. Select nothing if
+    // there is neither a previous word nor a next word.
+    //
+    // If the platform is Android and the text is read only, try to select the
+    // previous word if there is one; otherwise, select the single whitespace at
+    // the position.
+    if (TextLayoutMetrics.isWhitespace(plainText.codeUnitAt(effectiveOffset)) &&
+        effectiveOffset > 0) {
+      final TextRange? previousWord = _getPreviousWord(word.start);
       switch (defaultTargetPlatform) {
         case TargetPlatform.iOS:
           if (previousWord == null) {
-            final nextWord = _getNextWord(word.start);
+            final TextRange? nextWord = _getNextWord(word.start);
             if (nextWord == null) {
               return TextSelection.collapsed(offset: position.offset);
             }
@@ -1888,6 +2000,30 @@ class MongolRenderEditable extends RenderBox
     _textLayoutLastMaxHeight = maxHeight;
   }
 
+  // Computes the text metrics if `_textPainter`'s layout information was marked
+  // as dirty.
+  //
+  // This method must be called in `RenderEditable`'s public methods that expose
+  // `_textPainter`'s metrics. For instance, `systemFontsDidChange` sets
+  // _textPainter._paragraph to null, so accessing _textPainter's metrics
+  // immediately after `systemFontsDidChange` without first calling this method
+  // may crash.
+  //
+  // This method is also called in various paint methods (`RenderEditable.paint`
+  // as well as its foreground/background painters' `paint`). It's needed
+  // because invisible render objects kept in the tree by `KeepAlive` may not
+  // get a chance to do layout but can still paint.
+  // See https://github.com/flutter/flutter/issues/84896.
+  //
+  // This method only re-computes layout if the underlying `_textPainter`'s
+  // layout cache is invalidated (by calling `TextPainter.markNeedsLayout`), or
+  // the constraints used to layout the `_textPainter` is different. See
+  // `TextPainter.layout`.
+  void _computeTextMetricsIfNeeded() {
+    _layoutText(
+        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+  }
+
   late Rect _caretPrototype;
 
   void _computeCaretPrototype() {
@@ -1938,9 +2074,8 @@ class MongolRenderEditable extends RenderBox
 
   @override
   void performLayout() {
-    final constraints = this.constraints;
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    final BoxConstraints constraints = this.constraints;
+    _computeTextMetricsIfNeeded();
     _computeCaretPrototype();
     // We grab _textPainter.size here because assigning to `size` on the next
     // line will trigger us to validate our intrinsic sizes, which will change
@@ -1950,17 +2085,18 @@ class MongolRenderEditable extends RenderBox
     // Other _textPainter state like didExceedMaxLines will also be affected,
     // though we currently don't use those here.
     // See also MongolRenderParagraph which has a similar issue.
-    final textPainterSize = _textPainter.size;
-    final height = forceLine
+    final Size textPainterSize = _textPainter.size;
+    final double height = forceLine
         ? constraints.maxHeight
-        : constraints.constrainHeight(_textPainter.size.height + _caretMargin);
-    size = Size(
-        constraints.constrainWidth(_preferredWidth(constraints.maxHeight)),
-        height);
-    final contentSize =
-        Size(textPainterSize.width, textPainterSize.height + _caretMargin);
+        : constraints.constrainWidth(_textPainter.size.height + _caretMargin);
+    final double preferredWidth = _preferredWidth(constraints.maxHeight);
+    size = Size(constraints.constrainWidth(preferredWidth), height);
+    final Size contentSize = Size(
+      textPainterSize.width,
+      textPainterSize.height + _caretMargin,
+    );
 
-    final painterConstraints = BoxConstraints.tight(contentSize);
+    final BoxConstraints painterConstraints = BoxConstraints.tight(contentSize);
 
     _foregroundRenderObject?.layout(painterConstraints);
     _backgroundRenderObject?.layout(painterConstraints);
@@ -1970,25 +2106,30 @@ class MongolRenderEditable extends RenderBox
     offset.applyContentDimensions(0.0, _maxScrollExtent);
   }
 
-  MapEntry<int, Offset> _lineNumberFor(TextPosition startPosition, List<MongolLineMetrics> metrics) {
-    // TODO(LongCatIsLooong): include line boundaries information in
-    // MongolLineMetrics, then we can get rid of this.
-    final Offset offset = _textPainter.getOffsetForCaret(startPosition, Rect.zero);
-    if (kDebugMode) {
-      print('MongolRenderEditable -> offset: ${offset.dx} ${offset.dy}');
-    }
+  MapEntry<int, Offset> _lineNumberFor(
+    TextPosition startPosition,
+    List<MongolLineMetrics> metrics,
+  ) {
+    final offset = _textPainter.getOffsetForCaret(startPosition, Rect.zero);
     for (final MongolLineMetrics lineMetrics in metrics) {
-      if (kDebugMode) {
-        print('MongolRenderEditable -> lineMetrics: $lineMetrics');
-      }
       if (lineMetrics.baseline > offset.dx) {
-        return MapEntry<int, Offset>(lineMetrics.lineNumber, Offset(lineMetrics.baseline, offset.dy));
+        return MapEntry<int, Offset>(
+          lineMetrics.lineNumber,
+          Offset(lineMetrics.baseline, offset.dy),
+        );
       }
     }
-    assert(startPosition.offset == 0, 'unable to find the line for $startPosition');
+    assert(
+      startPosition.offset == 0,
+      'unable to find the line for $startPosition',
+    );
     return MapEntry<int, Offset>(
       math.max(0, metrics.length - 1),
-      Offset(metrics.isNotEmpty ? metrics.last.baseline + metrics.last.ascent : 0.0,offset.dy),
+      Offset(
+          metrics.isNotEmpty
+              ? metrics.last.baseline + metrics.last.ascent
+              : 0.0,
+          offset.dy),
     );
   }
 
@@ -1998,17 +2139,17 @@ class MongolRenderEditable extends RenderBox
   /// This can be used to handle consecutive left/right arrow key movements
   /// in an input field.
   ///
-  /// {@macro flutter.rendering.RenderEditable.verticalArrowKeyMovement}
-  ///
   /// The [HorizontalCaretMovementRun.isValid] property indicates whether the text
   /// layout has changed and the horizontal caret run is invalidated.
   ///
   /// The caller should typically discard a [HorizontalCaretMovementRun] when
   /// its [HorizontalCaretMovementRun.isValid] becomes false, or on other
   /// occasions where the horizontal caret run should be interrupted.
-  HorizontalCaretMovementRun startHorizontalCaretMovement(TextPosition startPosition) {
+  HorizontalCaretMovementRun startHorizontalCaretMovement(
+      TextPosition startPosition) {
     final List<MongolLineMetrics> metrics = _textPainter.computeLineMetrics();
-    final MapEntry<int, Offset> currentLine = _lineNumberFor(startPosition, metrics);
+    final MapEntry<int, Offset> currentLine =
+        _lineNumberFor(startPosition, metrics);
     return HorizontalCaretMovementRun._(
       this,
       metrics,
@@ -2039,14 +2180,17 @@ class MongolRenderEditable extends RenderBox
   }
 
   void _paintHandleLayers(
-      PaintingContext context, List<TextSelectionPoint> endpoints) {
+    PaintingContext context,
+    List<TextSelectionPoint> endpoints,
+    Offset offset,
+  ) {
     var startPoint = endpoints[0].point;
     startPoint = Offset(
       startPoint.dx.clamp(0.0, size.width),
       startPoint.dy.clamp(0.0, size.height),
     );
     context.pushLayer(
-      LeaderLayer(link: startHandleLayerLink, offset: startPoint),
+      LeaderLayer(link: startHandleLayerLink, offset: startPoint + offset),
       super.paint,
       Offset.zero,
     );
@@ -2057,7 +2201,7 @@ class MongolRenderEditable extends RenderBox
         endPoint.dy.clamp(0.0, size.height),
       );
       context.pushLayer(
-        LeaderLayer(link: endHandleLayerLink, offset: endPoint),
+        LeaderLayer(link: endHandleLayerLink, offset: endPoint + offset),
         super.paint,
         Offset.zero,
       );
@@ -2066,8 +2210,7 @@ class MongolRenderEditable extends RenderBox
 
   @override
   void paint(PaintingContext context, Offset offset) {
-    _layoutText(
-        minHeight: constraints.minHeight, maxHeight: constraints.maxHeight);
+    _computeTextMetricsIfNeeded();
     if (_hasVisualOverflow && clipBehavior != Clip.none) {
       _clipRectLayer.layer = context.pushClipRect(
         needsCompositing,
@@ -2081,7 +2224,10 @@ class MongolRenderEditable extends RenderBox
       _clipRectLayer.layer = null;
       _paintContents(context, offset);
     }
-    _paintHandleLayers(context, getEndpointsForSelection(selection!));
+    final TextSelection? selection = this.selection;
+    if (selection != null && selection.isValid) {
+      _paintHandleLayers(context, getEndpointsForSelection(selection), offset);
+    }
   }
 
   final LayerHandle<ClipRectLayer> _clipRectLayer =
@@ -2157,6 +2303,7 @@ class _MongolRenderEditableCustomPaint extends RenderBox {
     assert(parent != null);
     final painter = this.painter;
     if (painter != null && parent != null) {
+      parent._computeTextMetricsIfNeeded();
       painter.paint(context.canvas, size, parent);
     }
   }

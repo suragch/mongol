@@ -7,7 +7,6 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart' show Theme, TextSelectionTheme, Icons;
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
 import 'mongol_text_selection_toolbar.dart';

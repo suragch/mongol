@@ -15,7 +15,7 @@ class InputDecorationsDemo extends StatelessWidget {
 class InputDecorationsBody extends StatefulWidget {
   const InputDecorationsBody({Key? key}) : super(key: key);
   @override
-  _InputDecorationsBodyState createState() => _InputDecorationsBodyState();
+  State<InputDecorationsBody> createState() => _InputDecorationsBodyState();
 }
 
 class _InputDecorationsBodyState extends State<InputDecorationsBody> {

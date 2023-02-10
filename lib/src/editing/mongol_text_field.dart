@@ -211,7 +211,6 @@ class _TextFieldSelectionGestureDetectorBuilder
 /// [TextEditingController] using [TextEditingController.text].
 ///
 /// ## Handling emojis and other complex characters
-/// {@macro flutter.widgets.EditableText.onChanged}
 ///
 /// In the live Dartpad example above, try typing the emoji 👨‍👩‍👦
 /// into the field and submitting. Because the example code measures the length
@@ -258,6 +257,10 @@ class MongolTextField extends StatefulWidget {
   ///
   /// The text cursor is not shown if [showCursor] is false or if [showCursor]
   /// is null (the default) and [readOnly] is true.
+  ///
+  /// The [textAlign], [autofocus], [obscureText], [readOnly], [autocorrect],
+  /// [scrollPadding], [maxLines], [maxLength], and [enableSuggestions]
+  /// arguments must not be null.
   ///
   /// See also:
   ///
@@ -1252,7 +1255,8 @@ class _TextFieldState extends State<MongolTextField>
       return effectiveDecoration.copyWith(
         errorText: effectiveDecoration.errorText ?? '',
         counterStyle: effectiveDecoration.errorStyle ??
-            themeData.textTheme.caption!.copyWith(color: themeData.errorColor),
+            themeData.textTheme.bodySmall!
+                .copyWith(color: themeData.colorScheme.error),
         counterText: counterText,
         semanticCounterText: semanticCounterText,
       );
@@ -1426,7 +1430,7 @@ class _TextFieldState extends State<MongolTextField>
     final ThemeData theme = Theme.of(context);
     final DefaultSelectionStyle selectionStyle =
         DefaultSelectionStyle.of(context);
-    final TextStyle style = theme.textTheme.subtitle1!.merge(widget.style);
+    final TextStyle style = theme.textTheme.titleMedium!.merge(widget.style);
     final Brightness keyboardAppearance =
         widget.keyboardAppearance ?? theme.brightness;
     final TextEditingController controller = _effectiveController;

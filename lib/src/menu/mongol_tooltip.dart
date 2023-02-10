@@ -398,7 +398,7 @@ class _MongolTooltipState extends State<MongolTooltip>
     final OverlayState overlayState = Overlay.of(
       context,
       debugRequiredFor: widget,
-    )!;
+    );
 
     final RenderBox box = context.findRenderObject()! as RenderBox;
     final Offset target = box.localToGlobal(
@@ -484,13 +484,12 @@ class _MongolTooltipState extends State<MongolTooltip>
 
   @override
   Widget build(BuildContext context) {
-    assert(Overlay.of(context, debugRequiredFor: widget) != null);
     final ThemeData theme = Theme.of(context);
     final TooltipThemeData tooltipTheme = TooltipTheme.of(context);
     final TextStyle defaultTextStyle;
     final BoxDecoration defaultDecoration;
     if (theme.brightness == Brightness.dark) {
-      defaultTextStyle = theme.textTheme.bodyText2!.copyWith(
+      defaultTextStyle = theme.textTheme.bodyMedium!.copyWith(
         color: Colors.black,
         fontSize: _getDefaultFontSize(),
       );
@@ -499,7 +498,7 @@ class _MongolTooltipState extends State<MongolTooltip>
         borderRadius: const BorderRadius.all(Radius.circular(4)),
       );
     } else {
-      defaultTextStyle = theme.textTheme.bodyText2!.copyWith(
+      defaultTextStyle = theme.textTheme.bodyMedium!.copyWith(
         color: Colors.white,
         fontSize: _getDefaultFontSize(),
       );
@@ -643,7 +642,7 @@ class _MongolTooltipOverlay extends StatelessWidget {
             child: ConstrainedBox(
               constraints: BoxConstraints(minWidth: width),
               child: DefaultTextStyle(
-                style: Theme.of(context).textTheme.bodyText2!,
+                style: Theme.of(context).textTheme.bodyMedium!,
                 child: Container(
                   decoration: decoration,
                   padding: padding,

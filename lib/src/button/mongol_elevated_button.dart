@@ -324,7 +324,7 @@ class MongolElevatedButton extends MongolButtonStyleButton {
       onSurface: colorScheme.onSurface,
       shadowColor: theme.shadowColor,
       elevation: 2,
-      textStyle: theme.textTheme.button,
+      textStyle: theme.textTheme.labelLarge,
       padding: scaledPadding,
       minimumSize: const Size(36, 64),
       maximumSize: Size.infinite,

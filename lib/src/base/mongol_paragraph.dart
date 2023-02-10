@@ -809,6 +809,40 @@ class MongolParagraph {
     }
     return metrics;
   }
+
+  /// Release the resources used by this object. The object is no longer usable
+  /// after this method is called.
+  void dispose() {
+    assert(!_disposed);
+    assert(() {
+      _disposed = true;
+      return true;
+    }());
+
+    // Is this slow? Is it necessary?
+    // Do we need to dispose anything else?
+    for (final run in _runs) {
+      run.paragraph.dispose();
+    }
+    _runs.clear();
+  }
+
+  bool _disposed = false;
+
+  /// Whether this reference to the underlying picture is [dispose]d.
+  ///
+  /// This only returns a valid value if asserts are enabled, and must not be
+  /// used otherwise.
+  bool get debugDisposed {
+    bool? disposed;
+    assert(() {
+      disposed = _disposed;
+      return true;
+    }());
+    return disposed ??
+        (throw StateError(
+            '$runtimeType.debugDisposed is only available when asserts are enabled.'));
+  }
 }
 
 /// Layout constraints for [MongolParagraph] objects.
