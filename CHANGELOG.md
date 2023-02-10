@@ -1,3 +1,9 @@
+## [4.0.0] - 2023.02.10
+
+- Update APIs to match the Flutter 3.7 release. Theoretically this may have added some improvements, but the main reason was that Flutter 3.7 broke the old package. This is a major version bump because some of the API changes were potentially breaking for users of `mongol` 3.4.0. (#38)
+- There are some known issues related to the input decorator for `MongolTextField` (#29, #30, #32, #39, #40, #41). Help requested to fix these. This release exports `MongolEditableText` if anyone needs a more low-level option. 
+- The `MongolText` API appears to be unaffected by this update, but keep an eye on performance for large text strings. `MongolTextPainter` and `MongolParagraph` have a new `dispose` method and it is unclear how this may affect performance/memory for better or worse.
+
 ## [3.4.0] - 2023.01.05
 
 - Remove `DefaultMongolTextEditingShortcuts` from `MongolEditableTextState` (#35) (@Satsrag)

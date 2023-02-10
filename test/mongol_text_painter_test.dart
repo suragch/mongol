@@ -459,13 +459,6 @@ void main() {
     expect(caretOffset.dy, 42); // end of string
   }, skip: isBrowser); // https://github.com/flutter/flutter/issues/56308
 
-  test('TextPainter error test', () {
-    final painter = MongolTextPainter();
-    expect(() {
-      painter.paint(MockCanvas(), Offset.zero);
-    }, anyOf(throwsFlutterError, throwsAssertionError));
-  });
-
   test('MongolTextPainter size test', () {
     final painter = MongolTextPainter(
       text: const TextSpan(

@@ -17,6 +17,8 @@ import 'demos/resizable_text_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/text_span_demo.dart';
 
+const versionTitle = 'Flutter mongol package 4.0.0';
+
 void main() {
   runApp(const DemoApp());
 }
@@ -34,7 +36,7 @@ class DemoApp extends StatelessWidget {
         fontFamily: 'MenksoftQagan',
       ),
       home: Scaffold(
-        appBar: AppBar(title: const Text('Flutter mongol package 3.4.0')),
+        appBar: AppBar(title: const Text(versionTitle)),
         body: const HomeScreen(),
       ),
     );
