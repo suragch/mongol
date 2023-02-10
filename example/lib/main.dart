@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
+import 'package:mongol_demo_app/demos/text_input_control_keyboard_demo.dart';
 
 import 'demos/alert_dialog_demo.dart';
 import 'demos/button_demo.dart';
@@ -85,6 +86,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'Keyboard',
           destination: KeyboardDemo(),
+        ),
+        DemoTile(
+          title: 'TextInputControlKeyboard',
+          destination: TextInputControlKeyboardDemo(),
         ),
         DemoTile(
           title: 'Horizontal Listview',
