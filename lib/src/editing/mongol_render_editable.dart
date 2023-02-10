@@ -305,6 +305,23 @@ class MongolRenderEditable extends RenderBox
   _MongolRenderEditableCustomPaint? _foregroundRenderObject;
   _MongolRenderEditableCustomPaint? _backgroundRenderObject;
 
+  @override
+  void dispose() {
+    _foregroundRenderObject?.dispose();
+    _foregroundRenderObject = null;
+    _backgroundRenderObject?.dispose();
+    _backgroundRenderObject = null;
+    _clipRectLayer.layer = null;
+    _cachedBuiltInForegroundPainters?.dispose();
+    _cachedBuiltInPainters?.dispose();
+    _selectionStartInViewport.dispose();
+    _selectionEndInViewport.dispose();
+    _selectionPainter.dispose();
+    _caretPainter.dispose();
+    _textPainter.dispose();
+    super.dispose();
+  }
+
   void _updateForegroundPainter(MongolRenderEditablePainter? newPainter) {
     final effectivePainter = (newPainter == null)
         ? _builtInForegroundPainters
