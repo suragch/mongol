@@ -54,9 +54,11 @@ class _BodyWidgetState extends State<BodyWidget> {
         ),
         Align(
           alignment: Alignment.bottomCenter,
-          child: MongolKeyboard(
-            onTextInput: _insertText,
-            onBackspace: _backspace,
+          child: TextFieldTapRegion(
+            child: MongolKeyboard(
+              onTextInput: _insertText,
+              onBackspace: _backspace,
+            ),
           ),
         ),
       ],

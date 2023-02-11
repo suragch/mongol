@@ -9,6 +9,7 @@ import 'demos/horizontal_listview_demo.dart';
 import 'demos/input_decorations_demo.dart';
 import 'demos/input_shortcuts_demo.dart';
 import 'demos/keyboard_demo.dart';
+import 'demos/text_input_control_keyboard_demo.dart';
 import 'demos/list_tile_demo.dart';
 import 'demos/max_lines_demo.dart';
 import 'demos/mongol_text_field_demo.dart';
@@ -85,6 +86,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'Keyboard',
           destination: KeyboardDemo(),
+        ),
+        DemoTile(
+          title: 'TextInputControlKeyboard',
+          destination: TextInputControlKeyboardDemo(),
         ),
         DemoTile(
           title: 'Horizontal Listview',
