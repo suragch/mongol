@@ -16,6 +16,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart'
     show
+        ContentInsertionConfiguration,
+        kDefaultContentInsertionMimeTypes,
         DeleteToNextWordBoundaryIntent,
         ExpandSelectionToDocumentBoundaryIntent,
         ExtendSelectionVerticallyToAdjacentLineIntent,
@@ -385,6 +387,7 @@ class MongolEditableText extends StatefulWidget {
     this.clipBehavior = Clip.hardEdge,
     this.restorationId,
     this.scrollBehavior,
+    this.contentInsertionConfiguration,
     this.contextMenuBuilder,
     this.magnifierConfiguration = TextMagnifierConfiguration.disabled,
   })  : assert(obscuringCharacter.length == 1),
@@ -1064,6 +1067,37 @@ class MongolEditableText extends StatefulWidget {
   /// than 1.
   final ScrollBehavior? scrollBehavior;
 
+  /// {@template flutter.widgets.editableText.contentInsertionConfiguration}
+  /// Configuration of handler for media content inserted via the system input
+  /// method.
+  ///
+  /// Defaults to null in which case media content insertion will be disabled,
+  /// and the system will display a message informing the user that the text field
+  /// does not support inserting media content.
+  ///
+  /// Set [ContentInsertionConfiguration.onContentInserted] to provide a handler.
+  /// Additionally, set [ContentInsertionConfiguration.allowedMimeTypes]
+  /// to limit the allowable mime types for inserted content.
+  ///
+  /// {@tool dartpad}
+  ///
+  /// This example shows how to access the data for inserted content in your
+  /// `TextField`.
+  ///
+  /// ** See code in examples/api/lib/widgets/editable_text/editable_text.on_content_inserted.0.dart **
+  /// {@end-tool}
+  ///
+  /// If [contentInsertionConfiguration] is not provided, by default
+  /// an empty list of mime types will be sent to the Flutter Engine.
+  /// A handler function must be provided in order to customize the allowable
+  /// mime types for inserted content.
+  ///
+  /// If rich content is inserted without a handler, the system will display
+  /// a message informing the user that the current text input does not support
+  /// inserting rich content.
+  /// {@endtemplate}
+  final ContentInsertionConfiguration? contentInsertionConfiguration;
+
   /// Builds the text selection toolbar when requested by the user.
   ///
   /// `primaryAnchor` is the desired anchor position for the context menu, while
@@ -1325,6 +1359,11 @@ class MongolEditableText extends StatefulWidget {
     properties.add(DiagnosticsProperty<bool>(
         'enableInteractiveSelection', enableInteractiveSelection,
         defaultValue: true));
+    properties.add(DiagnosticsProperty<List<String>>('contentCommitMimeTypes',
+        contentInsertionConfiguration?.allowedMimeTypes ?? const <String>[],
+        defaultValue: contentInsertionConfiguration == null
+            ? const <String>[]
+            : kDefaultContentInsertionMimeTypes));
   }
 }
 
@@ -2063,6 +2102,14 @@ class MongolEditableTextState extends State<MongolEditableText>
   @override
   void performPrivateCommand(String action, Map<String, dynamic> data) {
     widget.onAppPrivateCommand!(action, data);
+  }
+
+  @override
+  void insertContent(KeyboardInsertedContent content) {
+    assert(widget.contentInsertionConfiguration?.allowedMimeTypes
+            .contains(content.mimeType) ??
+        false);
+    widget.contentInsertionConfiguration?.onContentInserted.call(content);
   }
 
   @override
@@ -2921,10 +2968,12 @@ class MongolEditableTextState extends State<MongolEditableText>
   }
 
   /// Toggles the visibility of the toolbar.
-  void toggleToolbar() {
-    assert(_selectionOverlay != null);
-    if (_selectionOverlay!.toolbarIsVisible) {
-      hideToolbar();
+  void toggleToolbar([bool hideHandles = true]) {
+    final MongolTextSelectionOverlay selectionOverlay =
+        _selectionOverlay ??= _createSelectionOverlay();
+
+    if (selectionOverlay.toolbarIsVisible) {
+      hideToolbar(hideHandles);
     } else {
       showToolbar();
     }

@@ -83,7 +83,7 @@ typedef MongolSelectionChangedHandler = void Function(
 /// the [HorizontalCaretMovementRun] must not be used. The [isValid] property must
 /// be checked before calling [movePrevious] and [moveNext], or accessing
 /// [current].
-class HorizontalCaretMovementRun extends Iterator<TextPosition> {
+class HorizontalCaretMovementRun implements Iterator<TextPosition> {
   HorizontalCaretMovementRun._(
     this._editable,
     this._lineMetrics,
