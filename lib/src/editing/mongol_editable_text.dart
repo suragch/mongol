@@ -2979,6 +2979,37 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
   }
 
+  /// Shows the magnifier at the position given by `positionToShow`,
+  /// if there is no magnifier visible.
+  ///
+  /// Updates the magnifier to the position given by `positionToShow`,
+  /// if there is a magnifier visible.
+  ///
+  /// Does nothing if a magnifier couldn't be shown, such as when the selection
+  /// overlay does not currently exist.
+  void showMagnifier(Offset positionToShow) {
+    if (_selectionOverlay == null) {
+      return;
+    }
+
+    if (_selectionOverlay!.magnifierIsVisible) {
+      _selectionOverlay!.updateMagnifier(positionToShow);
+    } else {
+      _selectionOverlay!.showMagnifier(positionToShow);
+    }
+  }
+
+  /// Hides the magnifier if it is visible.
+  void hideMagnifier() {
+    if (_selectionOverlay == null) {
+      return;
+    }
+
+    if (_selectionOverlay!.magnifierIsVisible) {
+      _selectionOverlay!.hideMagnifier();
+    }
+  }
+
   @override
   void performSelector(String selectorName) {
     final Intent? intent = intentForMacOSSelector(selectorName);
