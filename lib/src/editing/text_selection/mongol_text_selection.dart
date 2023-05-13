@@ -708,6 +708,21 @@ class MongolTextSelectionGestureDetectorBuilder {
   @protected
   final MongolTextSelectionGestureDetectorBuilderDelegate delegate;
 
+  /// Returns true if lastSecondaryTapDownPosition was on selection.
+  bool get _lastSecondaryTapWasOnSelection {
+    assert(renderEditable.lastSecondaryTapDownPosition != null);
+    if (renderEditable.selection == null) {
+      return false;
+    }
+
+    final TextPosition textPosition = renderEditable.getPositionForPoint(
+      renderEditable.lastSecondaryTapDownPosition!,
+    );
+
+    return renderEditable.selection!.start <= textPosition.offset &&
+        renderEditable.selection!.end >= textPosition.offset;
+  }
+
   bool _positionWasOnSelectionExclusive(TextPosition textPosition) {
     final TextSelection? selection = renderEditable.selection;
     if (selection == null) {
@@ -1281,6 +1296,55 @@ class MongolTextSelectionGestureDetectorBuilder {
     _dragStartScrollOffset = 0.0;
   }
 
+  /// Handler for [TextSelectionGestureDetector.onSecondaryTap].
+  ///
+  /// By default, selects the word if possible and shows the toolbar.
+  @protected
+  void onSecondaryTap() {
+    if (!delegate.selectionEnabled) {
+      return;
+    }
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        if (!_lastSecondaryTapWasOnSelection || !renderEditable.hasFocus) {
+          renderEditable.selectWord(cause: SelectionChangedCause.tap);
+        }
+        if (shouldShowSelectionToolbar) {
+          editableText.hideToolbar();
+          editableText.showToolbar();
+        }
+      case TargetPlatform.android:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.windows:
+        if (!renderEditable.hasFocus) {
+          renderEditable.selectPosition(cause: SelectionChangedCause.tap);
+        }
+        editableText.toggleToolbar();
+    }
+  }
+
+  /// Handler for [TextSelectionGestureDetector.onSecondaryTapDown].
+  ///
+  /// See also:
+  ///
+  ///  * [TextSelectionGestureDetector.onSecondaryTapDown], which triggers this
+  ///    callback.
+  ///  * [onSecondaryTap], which is typically called after this.
+  @protected
+  void onSecondaryTapDown(TapDownDetails details) {
+    // TODO(Renzo-Olivares): Migrate text selection gestures away from saving state
+    // in renderEditable. The gesture callbacks can use the details objects directly
+    // in callbacks variants that provide them [TapGestureRecognizer.onSecondaryTap]
+    // vs [TapGestureRecognizer.onSecondaryTapUp] instead of having to track state in
+    // renderEditable. When this migration is complete we should remove this hack.
+    // See https://github.com/flutter/flutter/issues/115130.
+    renderEditable.handleSecondaryTapDown(
+        TapDownDetails(globalPosition: details.globalPosition));
+    _shouldShowSelectionToolbar = true;
+  }
+
   /// Handler for [TextSelectionGestureDetector.onDoubleTapDown].
   ///
   /// By default, it selects a word through [MongolRenderEditable.selectWord] if
@@ -1364,6 +1428,42 @@ class MongolTextSelectionGestureDetectorBuilder {
       editableText.textEditingValue.copyWith(selection: newSelection),
       cause,
     );
+  }
+
+  /// Handler for [TextSelectionGestureDetector.onTripleTapDown].
+  ///
+  /// By default, it selects a paragraph if
+  /// [TextSelectionGestureDetectorBuilderDelegate.selectionEnabled] is true
+  /// and shows the toolbar if necessary.
+  ///
+  /// See also:
+  ///
+  ///  * [TextSelectionGestureDetector.onTripleTapDown], which triggers this
+  ///    callback.
+  @protected
+  void onTripleTapDown(TapDragDownDetails details) {
+    if (!delegate.selectionEnabled) {
+      return;
+    }
+    if (renderEditable.maxLines == 1) {
+      editableText.selectAll(SelectionChangedCause.tap);
+    } else {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.iOS:
+        case TargetPlatform.macOS:
+        case TargetPlatform.windows:
+          _selectParagraphsInRange(
+              from: details.globalPosition, cause: SelectionChangedCause.tap);
+        case TargetPlatform.linux:
+          _selectLinesInRange(
+              from: details.globalPosition, cause: SelectionChangedCause.tap);
+      }
+    }
+    if (shouldShowSelectionToolbar) {
+      editableText.showToolbar();
+    }
   }
 
   /// Handler for [TextSelectionGestureDetector.onDragSelectionStart].
@@ -1679,12 +1779,15 @@ class MongolTextSelectionGestureDetectorBuilder {
       onTapDown: onTapDown,
       onForcePressStart: delegate.forcePressEnabled ? onForcePressStart : null,
       onForcePressEnd: delegate.forcePressEnabled ? onForcePressEnd : null,
+      onSecondaryTap: onSecondaryTap,
+      onSecondaryTapDown: onSecondaryTapDown,
       onSingleTapUp: onSingleTapUp,
       onSingleTapCancel: onSingleTapCancel,
       onSingleLongTapStart: onSingleLongTapStart,
       onSingleLongTapMoveUpdate: onSingleLongTapMoveUpdate,
       onSingleLongTapEnd: onSingleLongTapEnd,
       onDoubleTapDown: onDoubleTapDown,
+      onTripleTapDown: onTripleTapDown,
       onDragSelectionStart: onDragSelectionStart,
       onDragSelectionUpdate: onDragSelectionUpdate,
       onDragSelectionEnd: onDragSelectionEnd,
