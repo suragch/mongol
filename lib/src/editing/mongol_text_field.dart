@@ -83,41 +83,10 @@ class _TextFieldSelectionGestureDetectorBuilder
   }
 
   @override
-  void onSingleTapUp(TapUpDetails details) {
-    editableText.hideToolbar();
-    if (delegate.selectionEnabled) {
-      switch (Theme.of(_state.context).platform) {
-        case TargetPlatform.iOS:
-        case TargetPlatform.macOS:
-        // Disabling this because of issue #12
-        // https://github.com/suragch/mongol/issues/12
-        // switch (details.kind) {
-        //   case PointerDeviceKind.mouse:
-        //   case PointerDeviceKind.stylus:
-        //   case PointerDeviceKind.invertedStylus:
-        //     // Precise devices should place the cursor at a precise position.
-        //     renderEditable.selectPosition(cause: SelectionChangedCause.tap);
-        //     break;
-        //   case PointerDeviceKind.touch:
-        //   case PointerDeviceKind.unknown:
-        //     // On macOS/iOS/iPadOS a touch tap places the cursor at the edge
-        //     // of the word.
-        //     renderEditable.selectWordEdge(cause: SelectionChangedCause.tap);
-        //     break;
-        // }
-        // break;
-        case TargetPlatform.android:
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.linux:
-        case TargetPlatform.windows:
-          renderEditable.selectPosition(cause: SelectionChangedCause.tap);
-          break;
-      }
-    }
+  void onSingleTapUp(TapDragUpDetails details) {
+    super.onSingleTapUp(details);
     _state._requestKeyboard();
-    if (_state.widget.onTap != null) {
-      _state.widget.onTap!();
-    }
+    _state.widget.onTap?.call();
   }
 
   @override
@@ -313,6 +282,7 @@ class MongolTextField extends StatefulWidget {
     this.scrollPhysics,
     this.autofillHints,
     this.restorationId,
+    this.contentInsertionConfiguration,
   })  : assert(obscuringCharacter.length == 1),
         assert(maxLines == null || maxLines > 0),
         assert(minLines == null || minLines > 0),
@@ -1067,6 +1037,8 @@ class MongolTextField extends StatefulWidget {
   ///    Flutter.
   final String? restorationId;
 
+  final ContentInsertionConfiguration? contentInsertionConfiguration;
+
   @override
   State<MongolTextField> createState() => _TextFieldState();
 
@@ -1143,6 +1115,11 @@ class MongolTextField extends StatefulWidget {
     properties.add(DiagnosticsProperty<ScrollPhysics>(
         'scrollPhysics', scrollPhysics,
         defaultValue: null));
+    properties.add(DiagnosticsProperty<List<String>>('contentCommitMimeTypes',
+        contentInsertionConfiguration?.allowedMimeTypes ?? const <String>[],
+        defaultValue: contentInsertionConfiguration == null
+            ? const <String>[]
+            : kDefaultContentInsertionMimeTypes));
   }
 }
 
@@ -1559,6 +1536,7 @@ class _TextFieldState extends State<MongolTextField>
           scrollPhysics: widget.scrollPhysics,
           autofillHints: widget.autofillHints,
           restorationId: 'editable',
+          contentInsertionConfiguration: widget.contentInsertionConfiguration,
         ),
       ),
     );
