@@ -932,12 +932,6 @@ class MongolTextSelectionGestureDetectorBuilder {
     if (!delegate.selectionEnabled) {
       return;
     }
-    // TODO(Renzo-Olivares): Migrate text selection gestures away from saving state
-    // in renderEditable. The gesture callbacks can use the details objects directly
-    // in callbacks variants that provide them [TapGestureRecognizer.onSecondaryTap]
-    // vs [TapGestureRecognizer.onSecondaryTapUp] instead of having to track state in
-    // renderEditable. When this migration is complete we should remove this hack.
-    // See https://github.com/flutter/flutter/issues/115130.
     renderEditable
         .handleTapDown(TapDownDetails(globalPosition: details.globalPosition));
     // The selection overlay should only be shown when the user is interacting
@@ -945,9 +939,6 @@ class MongolTextSelectionGestureDetectorBuilder {
     // trigger the selection overlay.
     // For backwards-compatibility, we treat a null kind the same as touch.
     final PointerDeviceKind? kind = details.kind;
-    // TODO(justinmc): Should a desktop platform show its selection toolbar when
-    // receiving a tap event?  Say a Windows device with a touchscreen.
-    // https://github.com/flutter/flutter/issues/106586
     _shouldShowSelectionToolbar = kind == null ||
         kind == PointerDeviceKind.touch ||
         kind == PointerDeviceKind.stylus;
@@ -1093,10 +1084,6 @@ class MongolTextSelectionGestureDetectorBuilder {
             case PointerDeviceKind.trackpad:
             case PointerDeviceKind.stylus:
             case PointerDeviceKind.invertedStylus:
-              // TODO(camsim99): Determine spell check toolbar behavior in these cases:
-              // https://github.com/flutter/flutter/issues/119573.
-              // Precise devices should place the cursor at a precise position if the
-              // word at the text position is not misspelled.
               renderEditable.selectPosition(cause: SelectionChangedCause.tap);
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
@@ -1334,12 +1321,6 @@ class MongolTextSelectionGestureDetectorBuilder {
   ///  * [onSecondaryTap], which is typically called after this.
   @protected
   void onSecondaryTapDown(TapDownDetails details) {
-    // TODO(Renzo-Olivares): Migrate text selection gestures away from saving state
-    // in renderEditable. The gesture callbacks can use the details objects directly
-    // in callbacks variants that provide them [TapGestureRecognizer.onSecondaryTap]
-    // vs [TapGestureRecognizer.onSecondaryTapUp] instead of having to track state in
-    // renderEditable. When this migration is complete we should remove this hack.
-    // See https://github.com/flutter/flutter/issues/115130.
     renderEditable.handleSecondaryTapDown(
         TapDownDetails(globalPosition: details.globalPosition));
     _shouldShowSelectionToolbar = true;
@@ -1524,7 +1505,7 @@ class MongolTextSelectionGestureDetectorBuilder {
               );
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
-              // For Android, Fucshia, and iOS platforms, a touch drag
+              // For Android, Fuchsia, and iOS platforms, a touch drag
               // does not initiate unless the editable has focus.
               if (renderEditable.hasFocus) {
                 renderEditable.selectPositionAt(

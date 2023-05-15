@@ -23,16 +23,16 @@ import '../base/mongol_text_align.dart';
 /// be merged with the closest enclosing [DefaultTextStyle]. This merging
 /// behavior is useful, for example, to make the text bold while using the
 /// default font family and size.
-/// 
+///
 /// {@tool snippet}
 ///
 /// This example shows how to display text using the [MongolText] widget with the
 /// [overflow] set to [TextOverflow.ellipsis].
 ///
-/// If the text is shorter than the available space, it is displayed in full 
+/// If the text is shorter than the available space, it is displayed in full
 /// without an ellipsis.
 ///
-/// If the text overflows, the Text widget displays an ellipsis to trim the 
+/// If the text overflows, the Text widget displays an ellipsis to trim the
 /// overflowing text.
 ///
 /// ```dart
@@ -73,8 +73,8 @@ class MongolText extends StatelessWidget {
   /// closest enclosing [DefaultTextStyle].
   ///
   /// The [overflow] property's behavior is affected by the [softWrap] argument.
-  /// If the [softWrap] is true or null, the glyph causing overflow, and those 
-  /// that follow, will not be rendered. Otherwise, it will be shown with the 
+  /// If the [softWrap] is true or null, the glyph causing overflow, and those
+  /// that follow, will not be rendered. Otherwise, it will be shown with the
   /// given overflow option.
   const MongolText(
     this.data, {
@@ -132,7 +132,7 @@ class MongolText extends StatelessWidget {
 
   /// Whether the text should break at soft line breaks.
   ///
-  /// If false, the glyphs in the text will be positioned as if there were 
+  /// If false, the glyphs in the text will be positioned as if there were
   /// unlimited vertical space.
   final bool? softWrap;
 
@@ -144,8 +144,8 @@ class MongolText extends StatelessWidget {
   /// Font pixels per logical pixel
   final double? textScaleFactor;
 
-  /// An optional maximum number of lines for the text to span, wrapping if 
-  /// necessary. If the text exceeds the given number of lines, it will be 
+  /// An optional maximum number of lines for the text to span, wrapping if
+  /// necessary. If the text exceeds the given number of lines, it will be
   /// truncated according to [overflow].
   ///
   /// If this is 1, text will not wrap. Otherwise, text will be wrapped at the
@@ -153,8 +153,8 @@ class MongolText extends StatelessWidget {
   ///
   /// If this is null, but there is an ambient [DefaultTextStyle] that specifies
   /// an explicit number for its [DefaultTextStyle.maxLines], then the
-  /// [DefaultTextStyle] value will take precedence. You can use a 
-  /// [MongolRichText] widget directly to entirely override the 
+  /// [DefaultTextStyle] value will take precedence. You can use a
+  /// [MongolRichText] widget directly to entirely override the
   /// [DefaultTextStyle].
   final int? maxLines;
 
@@ -179,11 +179,12 @@ class MongolText extends StatelessWidget {
     if (style == null || style!.inherit) {
       effectiveTextStyle = defaultTextStyle.style.merge(effectiveTextStyle);
     }
-    if (MediaQuery.boldTextOverride(context)) {
+    if (MediaQuery.boldTextOf(context)) {
       effectiveTextStyle = effectiveTextStyle!
           .merge(const TextStyle(fontWeight: FontWeight.bold));
     }
-    final defaultTextAlign = mapHorizontalToMongolTextAlign(defaultTextStyle.textAlign);
+    final defaultTextAlign =
+        mapHorizontalToMongolTextAlign(defaultTextStyle.textAlign);
     Widget result = MongolRichText(
       textAlign: textAlign ?? defaultTextAlign ?? MongolTextAlign.top,
       softWrap: softWrap ?? defaultTextStyle.softWrap,
@@ -217,9 +218,15 @@ class MongolText extends StatelessWidget {
           name: 'textSpan', style: DiagnosticsTreeStyle.transition));
     }
     style?.debugFillProperties(properties);
-    properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign, defaultValue: null));
-    properties.add(FlagProperty('softWrap', value: softWrap, ifTrue: 'wrapping at box height', ifFalse: 'no wrapping except at line break characters', showName: true));
-    properties.add(EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
+    properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
+        defaultValue: null));
+    properties.add(FlagProperty('softWrap',
+        value: softWrap,
+        ifTrue: 'wrapping at box height',
+        ifFalse: 'no wrapping except at line break characters',
+        showName: true));
+    properties.add(
+        EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));

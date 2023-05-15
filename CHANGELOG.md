@@ -1,3 +1,9 @@
+## [5.0.0] - 2023.05.15
+
+- Update APIs to match the Flutter 3.10 and Dart 3.0 release. (#45) (@Satsrag)
+- This is a major version bump because of the breaking changes in the Flutter update and the new requirement to use Dart 3.0.
+- The known issues in the version 4.0.0 changelog notes still exist.
+
 ## [4.0.0] - 2023.02.10
 
 - Update APIs to match the Flutter 3.7 release. Theoretically this may have added some improvements, but the main reason was that Flutter 3.7 broke the old package. This is a major version bump because some of the API changes were potentially breaking for users of `mongol` 3.4.0. (#38)

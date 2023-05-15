@@ -328,7 +328,7 @@ class _TextSelectionToolbarTrailingEdgeAlignRenderBox extends RenderProxyBox {
 // Renders the menu items in the correct positions in the menu and its overflow
 // submenu based on calculating which item would first overflow.
 class _TextSelectionToolbarItemsLayout extends MultiChildRenderObjectWidget {
-  _TextSelectionToolbarItemsLayout({
+  const _TextSelectionToolbarItemsLayout({
     Key? key,
     required this.isLeft,
     required this.overflowOpen,

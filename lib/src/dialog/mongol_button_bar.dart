@@ -109,7 +109,7 @@ class MongolButtonBar extends StatelessWidget {
 class _ButtonBarColumn extends Flex {
   /// Creates a button bar that attempts to display in a column, but displays in
   /// a row if there is insufficient vertical space.
-  _ButtonBarColumn({
+  const _ButtonBarColumn({
     required List<Widget> children,
     Axis direction = Axis.vertical,
     MainAxisSize mainAxisSize = MainAxisSize.max,
