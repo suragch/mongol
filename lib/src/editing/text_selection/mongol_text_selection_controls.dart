@@ -8,6 +8,7 @@
 
 import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show Theme, TextSelectionTheme, Icons;
 import 'package:flutter/widgets.dart';
 
@@ -45,8 +46,7 @@ class MongolTextSelectionControls extends TextSelectionControls {
     Offset selectionMidpoint,
     List<TextSelectionPoint> endpoints,
     TextSelectionDelegate delegate,
-    // todo editor-fixes set it nullable
-    ClipboardStatusNotifier? clipboardStatus,
+    ValueListenable<ClipboardStatus>? clipboardStatus,
     Offset? lastSecondaryTapDownPosition,
   ) {
     return _TextSelectionControlsToolbar(
@@ -57,9 +57,7 @@ class MongolTextSelectionControls extends TextSelectionControls {
       delegate: delegate,
       clipboardStatus: clipboardStatus,
       handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
-      handleCopy: canCopy(delegate)
-          ? () => handleCopy(delegate, clipboardStatus)
-          : null,
+      handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
       handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
       handleSelectAll:
           canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
@@ -162,7 +160,7 @@ class _TextSelectionControlsToolbar extends StatefulWidget {
     required this.textLineWidth,
   }) : super(key: key);
 
-  final ClipboardStatusNotifier? clipboardStatus;
+  final ValueListenable<ClipboardStatus>? clipboardStatus;
   final TextSelectionDelegate delegate;
   final List<TextSelectionPoint> endpoints;
   final Rect globalEditableRegion;
@@ -190,7 +188,6 @@ class _TextSelectionControlsToolbarState
   void initState() {
     super.initState();
     widget.clipboardStatus?.addListener(_onChangedClipboardStatus);
-    widget.clipboardStatus?.update();
   }
 
   @override
@@ -200,18 +197,12 @@ class _TextSelectionControlsToolbarState
       widget.clipboardStatus?.addListener(_onChangedClipboardStatus);
       oldWidget.clipboardStatus?.removeListener(_onChangedClipboardStatus);
     }
-    widget.clipboardStatus?.update();
   }
 
   @override
   void dispose() {
-    super.dispose();
-    // When used in an Overlay, it can happen that this is disposed after its
-    // creator has already disposed _clipboardStatus.
-    // todo editor-fixes should remove if(...) expression?
-    // if (!widget.clipboardStatus.disposed) {
     widget.clipboardStatus?.removeListener(_onChangedClipboardStatus);
-    // }
+    super.dispose();
   }
 
   @override

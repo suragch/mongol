@@ -17,26 +17,8 @@ import 'package:mongol/src/base/mongol_text_painter.dart';
 
 import '../base/mongol_paragraph.dart';
 
-// ignore_for_file: deprecated_member_use_from_same_package
-// ignore_for_file: todo
-
 const double _kCaretGap = 1.0; // pixels
 const double _kCaretWidthOffset = 2.0; // pixels
-
-/// Signature for the callback that reports when the user changes the selection
-/// (including the cursor location).
-///
-/// Used by [MongolRenderEditable.onSelectionChanged].
-@Deprecated(
-  'Signature of a deprecated class method, '
-  'textSelectionDelegate.userUpdateTextEditingValue. '
-  'This feature was deprecated after v1.26.0-17.2.pre.',
-)
-typedef MongolSelectionChangedHandler = void Function(
-  TextSelection selection,
-  MongolRenderEditable renderObject,
-  SelectionChangedCause cause,
-);
 
 /// The consecutive sequence of [TextPosition]s that the caret should move to
 /// when the user navigates the paragraph using the left arrow key or the
@@ -230,12 +212,6 @@ class MongolRenderEditable extends RenderBox
     double textScaleFactor = 1.0,
     TextSelection? selection,
     required ViewportOffset offset,
-    @Deprecated(
-      'Uses the textSelectionDelegate.userUpdateTextEditingValue instead. '
-      'This feature was deprecated after v1.26.0-17.2.pre.',
-    )
-        this.onSelectionChanged,
-    this.onCaretChanged,
     this.ignorePointer = false,
     bool readOnly = false,
     bool forceLine = true,
@@ -393,7 +369,7 @@ class MongolRenderEditable extends RenderBox
   }
 
   // Caret painters:
-  late final _CaretPainter _caretPainter = _CaretPainter(_onCaretChanged);
+  late final _CaretPainter _caretPainter = _CaretPainter();
 
   // Text Highlight painters:
   final _TextHighlightPainter _selectionPainter = _TextHighlightPainter();
@@ -422,15 +398,6 @@ class MongolRenderEditable extends RenderBox
     );
   }
 
-  /// Called when the selection changes.
-  ///
-  /// If this is null, then selection changes will be ignored.
-  @Deprecated(
-    'Uses the textSelectionDelegate.userUpdateTextEditingValue instead. '
-    'This feature was deprecated after v1.26.0-17.2.pre.',
-  )
-  MongolSelectionChangedHandler? onSelectionChanged;
-
   double? _textLayoutLastMaxHeight;
   double? _textLayoutLastMinHeight;
 
@@ -441,16 +408,6 @@ class MongolRenderEditable extends RenderBox
           _textLayoutLastMinHeight == constraints.minHeight,
       'Last height ($_textLayoutLastMinHeight, $_textLayoutLastMaxHeight) not the same as max height constraint (${constraints.minHeight}, ${constraints.maxHeight}).',
     );
-  }
-
-  Rect? _lastCaretRect;
-
-  /// Called during the paint phase when the caret location changes.
-  CaretChangedHandler? onCaretChanged;
-
-  void _onCaretChanged(Rect caretRect) {
-    if (_lastCaretRect != caretRect) onCaretChanged?.call(caretRect);
-    _lastCaretRect = (onCaretChanged == null) ? null : caretRect;
   }
 
   /// Whether the [handleEvent] will propagate pointer events to selection
@@ -569,44 +526,24 @@ class MongolRenderEditable extends RenderBox
 
   void _setSelection(TextSelection nextSelection, SelectionChangedCause cause) {
     if (nextSelection.isValid) {
-      // The nextSelection is calculated based on _plainText, which can be out
+      // The nextSelection is calculated based on plainText, which can be out
       // of sync with the textSelectionDelegate.textEditingValue by one frame.
       // This is due to the render editable and editable text handle pointer
       // event separately. If the editable text changes the text during the
       // event handler, the render editable will use the outdated text stored in
-      // the _plainText when handling the pointer event.
+      // the plainText when handling the pointer event.
       //
       // If this happens, we need to make sure the new selection is still valid.
-      final textLength = textSelectionDelegate.textEditingValue.text.length;
+      final int textLength = textSelectionDelegate.textEditingValue.text.length;
       nextSelection = nextSelection.copyWith(
         baseOffset: math.min(nextSelection.baseOffset, textLength),
         extentOffset: math.min(nextSelection.extentOffset, textLength),
       );
     }
-    _handleSelectionChange(nextSelection, cause);
     _setTextEditingValue(
       textSelectionDelegate.textEditingValue.copyWith(selection: nextSelection),
       cause,
     );
-  }
-
-  void _handleSelectionChange(
-    TextSelection nextSelection,
-    SelectionChangedCause cause,
-  ) {
-    // Changes made by the keyboard can sometimes be "out of band" for listening
-    // components, so always send those events, even if we didn't think it
-    // changed. Also, focusing an empty field is sent as a selection change even
-    // if the selection offset didn't change.
-    final focusingEmpty = (nextSelection.baseOffset == 0) &&
-        (nextSelection.extentOffset == 0) &&
-        !hasFocus;
-    if (nextSelection == selection &&
-        cause != SelectionChangedCause.keyboard &&
-        !focusingEmpty) {
-      return;
-    }
-    onSelectionChanged?.call(nextSelection, this, cause);
   }
 
   /// Returns the index into the string of the next character boundary after the
@@ -1362,38 +1299,44 @@ class MongolRenderEditable extends RenderBox
   }
 
   void _handleSetSelection(TextSelection selection) {
-    _handleSelectionChange(selection, SelectionChangedCause.keyboard);
+    _setSelection(selection, SelectionChangedCause.keyboard);
   }
 
-  void _handleMoveCursorForwardByCharacter(bool extentSelection) {
+  void _handleMoveCursorForwardByCharacter(bool extendSelection) {
     assert(selection != null);
     final extentOffset = _textPainter.getOffsetAfter(selection!.extentOffset);
-    if (extentOffset == null) return;
-    final baseOffset = !extentSelection ? extentOffset : selection!.baseOffset;
-    _handleSelectionChange(
+    if (extentOffset == null) {
+      return;
+    }
+    final baseOffset = !extendSelection ? extentOffset : selection!.baseOffset;
+    _setSelection(
       TextSelection(baseOffset: baseOffset, extentOffset: extentOffset),
       SelectionChangedCause.keyboard,
     );
   }
 
-  void _handleMoveCursorBackwardByCharacter(bool extentSelection) {
+  void _handleMoveCursorBackwardByCharacter(bool extendSelection) {
     assert(selection != null);
     final extentOffset = _textPainter.getOffsetBefore(selection!.extentOffset);
-    if (extentOffset == null) return;
-    final baseOffset = !extentSelection ? extentOffset : selection!.baseOffset;
-    _handleSelectionChange(
+    if (extentOffset == null) {
+      return;
+    }
+    final baseOffset = !extendSelection ? extentOffset : selection!.baseOffset;
+    _setSelection(
       TextSelection(baseOffset: baseOffset, extentOffset: extentOffset),
       SelectionChangedCause.keyboard,
     );
   }
 
-  void _handleMoveCursorForwardByWord(bool extentSelection) {
+  void _handleMoveCursorForwardByWord(bool extendSelection) {
     assert(selection != null);
     final currentWord = _textPainter.getWordBoundary(selection!.extent);
     final nextWord = _getNextWord(currentWord.end);
-    if (nextWord == null) return;
-    final baseOffset = extentSelection ? selection!.baseOffset : nextWord.start;
-    _handleSelectionChange(
+    if (nextWord == null) {
+      return;
+    }
+    final baseOffset = extendSelection ? selection!.baseOffset : nextWord.start;
+    _setSelection(
       TextSelection(
         baseOffset: baseOffset,
         extentOffset: nextWord.start,
@@ -1402,14 +1345,16 @@ class MongolRenderEditable extends RenderBox
     );
   }
 
-  void _handleMoveCursorBackwardByWord(bool extentSelection) {
+  void _handleMoveCursorBackwardByWord(bool extendSelection) {
     assert(selection != null);
     final currentWord = _textPainter.getWordBoundary(selection!.extent);
     final previousWord = _getPreviousWord(currentWord.start - 1);
-    if (previousWord == null) return;
+    if (previousWord == null) {
+      return;
+    }
     final baseOffset =
-        extentSelection ? selection!.baseOffset : previousWord.start;
-    _handleSelectionChange(
+        extendSelection ? selection!.baseOffset : previousWord.start;
+    _setSelection(
       TextSelection(
         baseOffset: baseOffset,
         extentOffset: previousWord.start,
@@ -2435,7 +2380,7 @@ class _TextHighlightPainter extends MongolRenderEditablePainter {
 }
 
 class _CaretPainter extends MongolRenderEditablePainter {
-  _CaretPainter(this.caretPaintCallback);
+  _CaretPainter();
 
   bool get shouldPaint => _shouldPaint;
   bool _shouldPaint = true;
@@ -2446,7 +2391,7 @@ class _CaretPainter extends MongolRenderEditablePainter {
     notifyListeners();
   }
 
-  CaretChangedHandler caretPaintCallback;
+  bool showRegularCaret = false;
 
   final Paint caretPaint = Paint();
   late final Paint floatingCursorPaint = Paint();
@@ -2479,28 +2424,13 @@ class _CaretPainter extends MongolRenderEditablePainter {
     notifyListeners();
   }
 
-  void paintRegularCursor(Canvas canvas, MongolRenderEditable renderEditable,
-      Color caretColor, TextPosition textPosition) {
-    final caretPrototype = renderEditable._caretPrototype;
-    final caretOffset = renderEditable._textPainter
-        .getOffsetForCaret(textPosition, caretPrototype);
-    var caretRect = caretPrototype.shift(caretOffset + cursorOffset);
-
-    final caretWidth = renderEditable._textPainter
-        .getFullWidthForCaret(textPosition, caretPrototype);
-    if (caretWidth != null) {
-      caretRect = Rect.fromLTWH(
-        caretRect.left - _kCaretWidthOffset,
-        caretRect.top,
-        caretWidth,
-        caretRect.height,
-      );
-    }
-
-    caretRect = caretRect.shift(renderEditable._paintOffset);
-    final integralRect =
-        caretRect.shift(renderEditable._snapToPhysicalPixel(caretRect.topLeft));
-
+  void paintRegularCursor(
+    Canvas canvas,
+    MongolRenderEditable renderEditable,
+    Color caretColor,
+    TextPosition textPosition,
+  ) {
+    final integralRect = renderEditable.getLocalRectForCaret(textPosition);
     if (shouldPaint) {
       final radius = cursorRadius;
       caretPaint.color = caretColor;
@@ -2511,7 +2441,6 @@ class _CaretPainter extends MongolRenderEditablePainter {
         canvas.drawRRect(caretRRect, caretPaint);
       }
     }
-    caretPaintCallback(integralRect);
   }
 
   @override

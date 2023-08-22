@@ -13,14 +13,14 @@ import 'package:mongol/src/base/mongol_text_align.dart';
 
 import '../base/mongol_text_painter.dart';
 
-// This is a horizontal elipsis. Could use a Mongolian elipsis U+1801 instead.
+// This is a horizontal ellipsis. Could use a Mongolian ellipsis U+1801 instead.
 const String _kEllipsis = '\u2026';
 
 /// A render object that displays a paragraph of vertical Mongolian text.
 class MongolRenderParagraph extends RenderBox
     with
         ContainerRenderObjectMixin<RenderBox, TextParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, TextParentData>,
+        RenderInlineChildrenContainerDefaults,
         RelayoutWhenSystemFontsChangeMixin {
   /// Creates a vertical paragraph render object.
   ///

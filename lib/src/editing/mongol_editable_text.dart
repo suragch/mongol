@@ -25,8 +25,7 @@ import 'package:flutter/material.dart'
         ScrollToDocumentBoundaryIntent,
         Size,
         kMinInteractiveDimension;
-import 'package:flutter/rendering.dart'
-    show CaretChangedHandler, RevealedOffset, ViewportOffset;
+import 'package:flutter/rendering.dart' show RevealedOffset, ViewportOffset;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart'
@@ -133,7 +132,6 @@ import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
 import 'package:mongol/src/editing/text_selection/mongol_text_selection.dart';
 
-import 'mongol_text_editing_action.dart';
 import 'mongol_text_editing_intents.dart';
 
 export 'package:flutter/services.dart'
@@ -381,7 +379,7 @@ class MongolEditableText extends StatefulWidget {
       'Use `contextMenuBuilder` instead. '
       'This feature was deprecated after v3.3.0-0.5.pre.',
     )
-        ToolbarOptions? toolbarOptions,
+    ToolbarOptions? toolbarOptions,
     this.autofillHints,
     this.autofillClient,
     this.clipBehavior = Clip.hardEdge,
@@ -1373,8 +1371,9 @@ class MongolEditableTextState extends State<MongolEditableText>
         AutomaticKeepAliveClientMixin<MongolEditableText>,
         WidgetsBindingObserver,
         TickerProviderStateMixin<MongolEditableText>,
-        TextSelectionDelegate
-    implements TextInputClient, AutofillClient, MongolTextEditingActionTarget {
+        TextSelectionDelegate,
+        TextInputClient
+    implements AutofillClient {
   Timer? _cursorTimer;
   AnimationController get _cursorBlinkOpacityController {
     return _backingCursorBlinkOpacityController ??= AnimationController(
@@ -2543,12 +2542,6 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
   }
 
-  Rect? _currentCaretRect;
-
-  void _handleCaretChanged(Rect caretRect) {
-    _currentCaretRect = caretRect;
-  }
-
   // Animation configuration for scrolling the caret back on screen.
   static const Duration _caretAnimationDuration = Duration(milliseconds: 100);
   static const Curve _caretAnimationCurve = Curves.fastOutSlowIn;
@@ -2562,7 +2555,13 @@ class MongolEditableTextState extends State<MongolEditableText>
     _showCaretOnScreenScheduled = true;
     SchedulerBinding.instance.addPostFrameCallback((Duration _) {
       _showCaretOnScreenScheduled = false;
-      if (_currentCaretRect == null || !_scrollController.hasClients) {
+      // Since we are in a post frame callback, check currentContext in case
+      // RenderEditable has been disposed (in which case it will be null).
+      final renderEditable = _editableKey.currentContext?.findRenderObject()
+          as MongolRenderEditable?;
+      if (renderEditable == null ||
+          !(renderEditable.selection?.isValid ?? false) ||
+          !_scrollController.hasClients) {
         return;
       }
 
@@ -2592,7 +2591,9 @@ class MongolEditableTextState extends State<MongolEditableText>
 
       final caretPadding = widget.scrollPadding.copyWith(right: rightSpacing);
 
-      final targetOffset = _getOffsetToRevealCaret(_currentCaretRect!);
+      final caretRect =
+          renderEditable.getLocalRectForCaret(renderEditable.selection!.extent);
+      final targetOffset = _getOffsetToRevealCaret(caretRect);
 
       final Rect rectToReveal;
       final TextSelection selection = textEditingValue.selection;
@@ -2891,8 +2892,7 @@ class MongolEditableTextState extends State<MongolEditableText>
   ///
   /// This property is typically used to notify the renderer of input gestures
   /// when [MongolRenderEditable.ignorePointer] is true.
-  @override
-  MongolRenderEditable get renderEditable =>
+  late final MongolRenderEditable renderEditable =
       _editableKey.currentContext!.findRenderObject()! as MongolRenderEditable;
 
   @override
@@ -3590,7 +3590,6 @@ class MongolEditableTextState extends State<MongolEditableText>
                         autocorrect: widget.autocorrect,
                         enableSuggestions: widget.enableSuggestions,
                         offset: offset,
-                        onCaretChanged: _handleCaretChanged,
                         rendererIgnoresPointer: widget.rendererIgnoresPointer,
                         cursorWidth: widget.cursorWidth,
                         cursorHeight: widget.cursorHeight,
@@ -3665,7 +3664,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
     required this.autocorrect,
     required this.enableSuggestions,
     required this.offset,
-    this.onCaretChanged,
     this.rendererIgnoresPointer = false,
     this.cursorWidth,
     required this.cursorHeight,
@@ -3697,7 +3695,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
   final bool autocorrect;
   final bool enableSuggestions;
   final ViewportOffset offset;
-  final CaretChangedHandler? onCaretChanged;
   final bool rendererIgnoresPointer;
   final double? cursorWidth;
   final double cursorHeight;
@@ -3727,7 +3724,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
       textAlign: textAlign,
       selection: value.selection,
       offset: offset,
-      onCaretChanged: onCaretChanged,
       ignorePointer: rendererIgnoresPointer,
       obscuringCharacter: obscuringCharacter,
       obscureText: obscureText,
@@ -3762,7 +3758,6 @@ class _MongolEditable extends LeafRenderObjectWidget {
       ..textAlign = textAlign
       ..selection = value.selection
       ..offset = offset
-      ..onCaretChanged = onCaretChanged
       ..ignorePointer = rendererIgnoresPointer
       ..obscuringCharacter = obscuringCharacter
       ..obscureText = obscureText

@@ -1,3 +1,7 @@
+## [6.0.0] - 2023.08.22
+
+- Fixes for breaking changes in Flutter 2.13, mostly related to the text selection API.
+
 ## [5.0.0] - 2023.05.15
 
 - Update APIs to match the Flutter 3.10 and Dart 3.0 release. (#45) (@Satsrag)

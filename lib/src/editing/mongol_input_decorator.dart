@@ -635,7 +635,7 @@ class _RenderDecorationLayout {
 
 // The workhorse: layout and paint a _Decorator widget's _Decoration.
 class _RenderDecoration extends RenderBox
-    with SlottedContainerRenderObjectMixin<_DecorationSlot> {
+    with SlottedContainerRenderObjectMixin<_DecorationSlot, RenderBox> {
   _RenderDecoration({
     required _Decoration decoration,
     required TextBaseline textBaseline,
@@ -1455,8 +1455,8 @@ class _RenderDecoration extends RenderBox
   }
 }
 
-class _Decorator extends RenderObjectWidget
-    with SlottedMultiChildRenderObjectWidgetMixin<_DecorationSlot> {
+class _Decorator
+    extends SlottedMultiChildRenderObjectWidget<_DecorationSlot, RenderBox> {
   const _Decorator({
     required this.textAlignHorizontal,
     required this.decoration,
