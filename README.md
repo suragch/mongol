@@ -20,13 +20,13 @@ MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠ�
 
 The library supports mobile, web, and desktop.
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text.gif)
+![](./example/supplemental/mongol_text.gif)
 
 ### Emoji and CJK characters
 
 The library rotates emoji and CJK (Chinese, Japanese, and Korean) characters for proper orientation.
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/emoji_cjk.png)
+![](./example/supplemental/emoji_cjk.png)
 
 ### Text styling
 
@@ -69,7 +69,7 @@ const textSpan = TextSpan(
 );
 ```
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_rich_text.png)
+![](./example/supplemental/mongol_rich_text.png)
 
 This all assumes you've added one or more Mongolian fonts to your app assets.
 
@@ -124,15 +124,15 @@ You may also consider using [mongol_code](https://pub.dev/packages/mongol_code) 
 
 You can use `MongolTextField` to receive and edit text from the system keyboard. This widget includes most of the functionality of the standard Flutter `TextField` widget.
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field.gif)
+![](./example/supplemental/mongol_text_field.gif)
 
 Here is it on iOS and Android interacting with a system keyboard:
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_text_field_large.gif)
+![](./example/supplemental/mongol_text_field_large.gif)
 
 If you want to use an outlined text field with a label, use `MongolOutlineInputBorder`:
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_outline_input_border.png)
+![](./example/supplemental/mongol_outline_input_border.png)
 
 ```dart
 MongolTextField(
@@ -180,7 +180,7 @@ Card(
 ),
 ```
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_list_tile.png)
+![](./example/supplemental/mongol_list_tile.png)
 
 ## Menus
 
@@ -206,7 +206,7 @@ Scaffold(
 );
 ```
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_popup_menu_button.gif)
+![](./example/supplemental/mongol_popup_menu_button.gif)
 
 ## Buttons
 
@@ -220,7 +220,7 @@ There are Mongol equivalents to all of the Flutter buttons:
 - `MongolElevatedButton.icon`
 - `MongolIconButton`
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/buttons.png)
+![](./example/supplemental/buttons.png)
 
 The reason for the Mongol icon button is to provide a vertical tooltip that will appear for a longpress on mobile and for a mouse hover on desktop and web.
 
@@ -230,7 +230,7 @@ The reason for the Mongol icon button is to provide a vertical tooltip that will
 
 This alert dialog works mostly the same as the Flutter `AlertDialog`.
 
-![](https://github.com/suragch/mongol/blob/master/example/supplemental/mongol_alert_dialog.png)
+![](./example/supplemental/mongol_alert_dialog.png)
 
 ### TODO
 

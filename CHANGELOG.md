@@ -1,3 +1,7 @@
+## [6.0.1] - 2023.08.22
+
+- Fix images not displaying in pub.dev documentation.
+
 ## [6.0.0] - 2023.08.22
 
 - Fixes for breaking changes in Flutter 2.13, mostly related to the text selection API.
