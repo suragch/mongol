@@ -19,6 +19,7 @@ import 'package:flutter/services.dart'
         LineBoundary,
         LogicalKeyboardKey,
         ParagraphBoundary,
+        HardwareKeyboard,
         TextBoundary;
 export 'package:flutter/services.dart' show TextSelectionDelegate;
 import 'package:flutter/widgets.dart';
@@ -708,6 +709,33 @@ class MongolTextSelectionGestureDetectorBuilder {
   @protected
   final MongolTextSelectionGestureDetectorBuilderDelegate delegate;
 
+  // Shows the magnifier on supported platforms at the given offset, currently
+  // only Android and iOS.
+  void _showMagnifierIfSupportedByPlatform(Offset positionToShow) {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+        editableText.showMagnifier(positionToShow);
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.macOS:
+      case TargetPlatform.windows:
+    }
+  }
+
+  // Hides the magnifier on supported platforms, currently only Android and iOS.
+  void _hideMagnifierIfSupportedByPlatform() {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.iOS:
+        editableText.hideMagnifier();
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+      case TargetPlatform.macOS:
+      case TargetPlatform.windows:
+    }
+  }
+
   /// Returns true if lastSecondaryTapDownPosition was on selection.
   bool get _lastSecondaryTapWasOnSelection {
     assert(renderEditable.lastSecondaryTapDownPosition != null);
@@ -844,6 +872,10 @@ class MongolTextSelectionGestureDetectorBuilder {
   @protected
   MongolRenderEditable get renderEditable => editableText.renderEditable;
 
+  /// Whether the Shift key was pressed when the most recent [PointerDownEvent]
+  /// was tracked by the [BaseTapAndDragGestureRecognizer].
+  bool _isShiftPressed = false;
+
   /// The viewport offset pixels of any [Scrollable] containing the
   /// [MongolRenderEditable] at the last drag start.
   double _dragStartScrollOffset = 0.0;
@@ -881,42 +913,30 @@ class MongolTextSelectionGestureDetectorBuilder {
   // focused, the cursor moves to the long press position.
   bool _longPressStartedWithoutFocus = false;
 
-  // Converts the details.consecutiveTapCount from a TapAndDrag*Details object,
-  // which can grow to be infinitely large, to a value between 1 and 3. The value
-  // that the raw count is converted to is based on the default observed behavior
-  // on the native platforms.
-  //
-  // This method should be used in all instances when details.consecutiveTapCount
-  // would be used.
-  static int _getEffectiveConsecutiveTapCount(int rawCount) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-        // From observation, these platform's reset their tap count to 0 when
-        // the number of consecutive taps exceeds 3. For example on Debian Linux
-        // with GTK, when going past a triple click, on the fourth click the
-        // selection is moved to the precise click position, on the fifth click
-        // the word at the position is selected, and on the sixth click the
-        // paragraph at the position is selected.
-        return rawCount <= 3
-            ? rawCount
-            : (rawCount % 3 == 0 ? 3 : rawCount % 3);
-      case TargetPlatform.iOS:
-      case TargetPlatform.macOS:
-        // From observation, these platform's either hold their tap count at 3.
-        // For example on macOS, when going past a triple click, the selection
-        // should be retained at the paragraph that was first selected on triple
-        // click.
-        return math.min(rawCount, 3);
-      case TargetPlatform.windows:
-        // From observation, this platform's consecutive tap actions alternate
-        // between double click and triple click actions. For example, after a
-        // triple click has selected a paragraph, on the next click the word at
-        // the clicked position will be selected, and on the next click the
-        // paragraph at the position is selected.
-        return rawCount < 2 ? rawCount : 2 + rawCount % 2;
-    }
+  /// Handler for [TextSelectionGestureDetector.onTapTrackStart].
+  ///
+  /// See also:
+  ///
+  ///  * [TextSelectionGestureDetector.onTapTrackStart], which triggers this
+  ///    callback.
+  @protected
+  void onTapTrackStart() {
+    _isShiftPressed = HardwareKeyboard.instance.logicalKeysPressed
+        .intersection(<LogicalKeyboardKey>{
+      LogicalKeyboardKey.shiftLeft,
+      LogicalKeyboardKey.shiftRight
+    }).isNotEmpty;
+  }
+
+  /// Handler for [TextSelectionGestureDetector.onTapTrackReset].
+  ///
+  /// See also:
+  ///
+  ///  * [TextSelectionGestureDetector.onTapTrackReset], which triggers this
+  ///    callback.
+  @protected
+  void onTapTrackReset() {
+    _isShiftPressed = false;
   }
 
   /// Handler for [TextSelectionGestureDetector.onTapDown].
@@ -943,19 +963,20 @@ class MongolTextSelectionGestureDetectorBuilder {
         kind == PointerDeviceKind.touch ||
         kind == PointerDeviceKind.stylus;
 
-    // Handle shift + click selection if needed.
-    final bool isShiftPressed = _containsShift(details.keysPressedOnDown);
     // It is impossible to extend the selection when the shift key is pressed, if the
     // renderEditable.selection is invalid.
     final bool isShiftPressedValid =
-        isShiftPressed && renderEditable.selection?.baseOffset != null;
+        _isShiftPressed && renderEditable.selection?.baseOffset != null;
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
+        // On mobile platforms the selection is set on tap up.
+        editableText.hideToolbar(false);
       case TargetPlatform.iOS:
         // On mobile platforms the selection is set on tap up.
         break;
       case TargetPlatform.macOS:
+        editableText.hideToolbar();
         // On macOS, a shift-tapped unfocused field expands from 0, not from the
         // previous selection.
         if (isShiftPressedValid) {
@@ -976,6 +997,7 @@ class MongolTextSelectionGestureDetectorBuilder {
         renderEditable.selectPosition(cause: SelectionChangedCause.tap);
       case TargetPlatform.linux:
       case TargetPlatform.windows:
+        editableText.hideToolbar();
         if (isShiftPressedValid) {
           _extendSelection(details.globalPosition, SelectionChangedCause.tap);
           return;
@@ -1172,16 +1194,7 @@ class MongolTextSelectionGestureDetectorBuilder {
           renderEditable.selectWord(cause: SelectionChangedCause.longPress);
       }
 
-      switch (defaultTargetPlatform) {
-        case TargetPlatform.android:
-        case TargetPlatform.iOS:
-          editableText.showMagnifier(details.globalPosition);
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.linux:
-        case TargetPlatform.macOS:
-        case TargetPlatform.windows:
-          break;
-      }
+      _showMagnifierIfSupportedByPlatform(details.globalPosition);
 
       _dragStartViewportOffset = renderEditable.offset.pixels;
       _dragStartScrollOffset = _scrollPosition;
@@ -1242,16 +1255,7 @@ class MongolTextSelectionGestureDetectorBuilder {
           );
       }
 
-      switch (defaultTargetPlatform) {
-        case TargetPlatform.android:
-        case TargetPlatform.iOS:
-          editableText.showMagnifier(details.globalPosition);
-        case TargetPlatform.fuchsia:
-        case TargetPlatform.linux:
-        case TargetPlatform.macOS:
-        case TargetPlatform.windows:
-          break;
-      }
+      _showMagnifierIfSupportedByPlatform(details.globalPosition);
     }
   }
 
@@ -1468,15 +1472,17 @@ class MongolTextSelectionGestureDetectorBuilder {
     _dragStartSelection = renderEditable.selection;
     _dragStartScrollOffset = _scrollPosition;
     _dragStartViewportOffset = renderEditable.offset.pixels;
+    _dragBeganOnPreviousSelection =
+        _positionOnSelection(details.globalPosition, _dragStartSelection);
 
-    if (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount) > 1) {
+    if (_TextSelectionGestureDetectorState._getEffectiveConsecutiveTapCount(
+            details.consecutiveTapCount) >
+        1) {
       // Do not set the selection on a consecutive tap and drag.
       return;
     }
 
-    final bool isShiftPressed = _containsShift(details.keysPressedOnDown);
-
-    if (isShiftPressed &&
+    if (_isShiftPressed &&
         renderEditable.selection != null &&
         renderEditable.selection!.isValid) {
       switch (defaultTargetPlatform) {
@@ -1492,29 +1498,52 @@ class MongolTextSelectionGestureDetectorBuilder {
     } else {
       switch (defaultTargetPlatform) {
         case TargetPlatform.iOS:
+          switch (details.kind) {
+            case PointerDeviceKind.mouse:
+            case PointerDeviceKind.trackpad:
+              renderEditable.selectPositionAt(
+                from: details.globalPosition,
+                cause: SelectionChangedCause.drag,
+              );
+            case PointerDeviceKind.stylus:
+            case PointerDeviceKind.invertedStylus:
+            case PointerDeviceKind.touch:
+            case PointerDeviceKind.unknown:
+              // For iOS platforms, a touch drag does not initiate unless the
+              // editable has focus and the drag began on the previous selection.
+              assert(_dragBeganOnPreviousSelection != null);
+              if (renderEditable.hasFocus && _dragBeganOnPreviousSelection!) {
+                renderEditable.selectPositionAt(
+                  from: details.globalPosition,
+                  cause: SelectionChangedCause.drag,
+                );
+                _showMagnifierIfSupportedByPlatform(details.globalPosition);
+              }
+            case null:
+          }
         case TargetPlatform.android:
         case TargetPlatform.fuchsia:
           switch (details.kind) {
             case PointerDeviceKind.mouse:
             case PointerDeviceKind.trackpad:
-            case PointerDeviceKind.stylus:
-            case PointerDeviceKind.invertedStylus:
               renderEditable.selectPositionAt(
                 from: details.globalPosition,
                 cause: SelectionChangedCause.drag,
               );
+            case PointerDeviceKind.stylus:
+            case PointerDeviceKind.invertedStylus:
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
-              // For Android, Fuchsia, and iOS platforms, a touch drag
+              // For Android, Fucshia, and iOS platforms, a touch drag
               // does not initiate unless the editable has focus.
               if (renderEditable.hasFocus) {
                 renderEditable.selectPositionAt(
                   from: details.globalPosition,
                   cause: SelectionChangedCause.drag,
                 );
+                _showMagnifierIfSupportedByPlatform(details.globalPosition);
               }
             case null:
-              break;
           }
         case TargetPlatform.linux:
         case TargetPlatform.macOS:
@@ -1808,7 +1837,7 @@ class MongolSelectionOverlay {
       'Use `contextMenuBuilder` in `showToolbar` instead. '
       'This feature was deprecated after v3.3.0-0.5.pre.',
     )
-        required this.selectionDelegate,
+    required this.selectionDelegate,
     required this.clipboardStatus,
     required this.startHandleLayerLink,
     required this.endHandleLayerLink,
@@ -1819,7 +1848,7 @@ class MongolSelectionOverlay {
       'Use `contextMenuBuilder` in `showToolbar` instead. '
       'This feature was deprecated after v3.3.0-0.5.pre.',
     )
-        Offset? toolbarLocation,
+    Offset? toolbarLocation,
     this.magnifierConfiguration = TextMagnifierConfiguration.disabled,
   })  : _startHandleType = startHandleType,
         _lineWidthAtStart = lineWidthAtStart,
@@ -2622,6 +2651,223 @@ class _SelectionHandleOverlayState extends State<_SelectionHandleOverlay>
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TextSelectionGestureDetectorState
+    extends State<TextSelectionGestureDetector> {
+  // Converts the details.consecutiveTapCount from a TapAndDrag*Details object,
+  // which can grow to be infinitely large, to a value between 1 and 3. The value
+  // that the raw count is converted to is based on the default observed behavior
+  // on the native platforms.
+  //
+  // This method should be used in all instances when details.consecutiveTapCount
+  // would be used.
+  static int _getEffectiveConsecutiveTapCount(int rawCount) {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+      case TargetPlatform.fuchsia:
+      case TargetPlatform.linux:
+        // From observation, these platform's reset their tap count to 0 when
+        // the number of consecutive taps exceeds 3. For example on Debian Linux
+        // with GTK, when going past a triple click, on the fourth click the
+        // selection is moved to the precise click position, on the fifth click
+        // the word at the position is selected, and on the sixth click the
+        // paragraph at the position is selected.
+        return rawCount <= 3
+            ? rawCount
+            : (rawCount % 3 == 0 ? 3 : rawCount % 3);
+      case TargetPlatform.iOS:
+      case TargetPlatform.macOS:
+        // From observation, these platform's either hold their tap count at 3.
+        // For example on macOS, when going past a triple click, the selection
+        // should be retained at the paragraph that was first selected on triple
+        // click.
+        return math.min(rawCount, 3);
+      case TargetPlatform.windows:
+        // From observation, this platform's consecutive tap actions alternate
+        // between double click and triple click actions. For example, after a
+        // triple click has selected a paragraph, on the next click the word at
+        // the clicked position will be selected, and on the next click the
+        // paragraph at the position is selected.
+        return rawCount < 2 ? rawCount : 2 + rawCount % 2;
+    }
+  }
+
+  void _handleTapTrackStart() {
+    widget.onTapTrackStart?.call();
+  }
+
+  void _handleTapTrackReset() {
+    widget.onTapTrackReset?.call();
+  }
+
+  // The down handler is force-run on success of a single tap and optimistically
+  // run before a long press success.
+  void _handleTapDown(TapDragDownDetails details) {
+    widget.onTapDown?.call(details);
+    // This isn't detected as a double tap gesture in the gesture recognizer
+    // because it's 2 single taps, each of which may do different things depending
+    // on whether it's a single tap, the first tap of a double tap, the second
+    // tap held down, a clean double tap etc.
+    if (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount) == 2) {
+      return widget.onDoubleTapDown?.call(details);
+    }
+
+    if (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount) == 3) {
+      return widget.onTripleTapDown?.call(details);
+    }
+  }
+
+  void _handleTapUp(TapDragUpDetails details) {
+    if (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount) == 1) {
+      widget.onSingleTapUp?.call(details);
+    }
+  }
+
+  void _handleTapCancel() {
+    widget.onSingleTapCancel?.call();
+  }
+
+  void _handleDragStart(TapDragStartDetails details) {
+    widget.onDragSelectionStart?.call(details);
+  }
+
+  void _handleDragUpdate(TapDragUpdateDetails details) {
+    widget.onDragSelectionUpdate?.call(details);
+  }
+
+  void _handleDragEnd(TapDragEndDetails details) {
+    widget.onDragSelectionEnd?.call(details);
+  }
+
+  void _forcePressStarted(ForcePressDetails details) {
+    widget.onForcePressStart?.call(details);
+  }
+
+  void _forcePressEnded(ForcePressDetails details) {
+    widget.onForcePressEnd?.call(details);
+  }
+
+  void _handleLongPressStart(LongPressStartDetails details) {
+    if (widget.onSingleLongTapStart != null) {
+      widget.onSingleLongTapStart!(details);
+    }
+  }
+
+  void _handleLongPressMoveUpdate(LongPressMoveUpdateDetails details) {
+    if (widget.onSingleLongTapMoveUpdate != null) {
+      widget.onSingleLongTapMoveUpdate!(details);
+    }
+  }
+
+  void _handleLongPressEnd(LongPressEndDetails details) {
+    if (widget.onSingleLongTapEnd != null) {
+      widget.onSingleLongTapEnd!(details);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final Map<Type, GestureRecognizerFactory> gestures =
+        <Type, GestureRecognizerFactory>{};
+
+    gestures[TapGestureRecognizer] =
+        GestureRecognizerFactoryWithHandlers<TapGestureRecognizer>(
+      () => TapGestureRecognizer(debugOwner: this),
+      (TapGestureRecognizer instance) {
+        instance
+          ..onSecondaryTap = widget.onSecondaryTap
+          ..onSecondaryTapDown = widget.onSecondaryTapDown;
+      },
+    );
+
+    if (widget.onSingleLongTapStart != null ||
+        widget.onSingleLongTapMoveUpdate != null ||
+        widget.onSingleLongTapEnd != null) {
+      gestures[LongPressGestureRecognizer] =
+          GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+        () => LongPressGestureRecognizer(
+            debugOwner: this,
+            supportedDevices: <PointerDeviceKind>{PointerDeviceKind.touch}),
+        (LongPressGestureRecognizer instance) {
+          instance
+            ..onLongPressStart = _handleLongPressStart
+            ..onLongPressMoveUpdate = _handleLongPressMoveUpdate
+            ..onLongPressEnd = _handleLongPressEnd;
+        },
+      );
+    }
+
+    if (widget.onDragSelectionStart != null ||
+        widget.onDragSelectionUpdate != null ||
+        widget.onDragSelectionEnd != null) {
+      switch (defaultTargetPlatform) {
+        case TargetPlatform.android:
+        case TargetPlatform.fuchsia:
+        case TargetPlatform.iOS:
+          gestures[TapAndHorizontalDragGestureRecognizer] =
+              GestureRecognizerFactoryWithHandlers<
+                  TapAndHorizontalDragGestureRecognizer>(
+            () => TapAndHorizontalDragGestureRecognizer(debugOwner: this),
+            (TapAndHorizontalDragGestureRecognizer instance) {
+              instance
+                // Text selection should start from the position of the first pointer
+                // down event.
+                ..dragStartBehavior = DragStartBehavior.down
+                ..onTapTrackStart = _handleTapTrackStart
+                ..onTapTrackReset = _handleTapTrackReset
+                ..onTapDown = _handleTapDown
+                ..onDragStart = _handleDragStart
+                ..onDragUpdate = _handleDragUpdate
+                ..onDragEnd = _handleDragEnd
+                ..onTapUp = _handleTapUp
+                ..onCancel = _handleTapCancel;
+            },
+          );
+        case TargetPlatform.linux:
+        case TargetPlatform.macOS:
+        case TargetPlatform.windows:
+          gestures[TapAndPanGestureRecognizer] =
+              GestureRecognizerFactoryWithHandlers<TapAndPanGestureRecognizer>(
+            () => TapAndPanGestureRecognizer(debugOwner: this),
+            (TapAndPanGestureRecognizer instance) {
+              instance
+                // Text selection should start from the position of the first pointer
+                // down event.
+                ..dragStartBehavior = DragStartBehavior.down
+                ..onTapTrackStart = _handleTapTrackStart
+                ..onTapTrackReset = _handleTapTrackReset
+                ..onTapDown = _handleTapDown
+                ..onDragStart = _handleDragStart
+                ..onDragUpdate = _handleDragUpdate
+                ..onDragEnd = _handleDragEnd
+                ..onTapUp = _handleTapUp
+                ..onCancel = _handleTapCancel;
+            },
+          );
+      }
+    }
+
+    if (widget.onForcePressStart != null || widget.onForcePressEnd != null) {
+      gestures[ForcePressGestureRecognizer] =
+          GestureRecognizerFactoryWithHandlers<ForcePressGestureRecognizer>(
+        () => ForcePressGestureRecognizer(debugOwner: this),
+        (ForcePressGestureRecognizer instance) {
+          instance
+            ..onStart =
+                widget.onForcePressStart != null ? _forcePressStarted : null
+            ..onEnd = widget.onForcePressEnd != null ? _forcePressEnded : null;
+        },
+      );
+    }
+
+    return RawGestureDetector(
+      gestures: gestures,
+      excludeFromSemantics: true,
+      behavior: widget.behavior,
+      child: widget.child,
     );
   }
 }

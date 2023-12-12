@@ -19,13 +19,22 @@ import 'package:flutter/material.dart'
         FloatingLabelBehavior,
         MaterialStateProperty,
         MaterialState,
+        MaterialStateTextStyle,
+        MaterialStateColor,
+        MaterialStateBorderSide,
         InputDecoration,
+        InputDecorationTheme,
         FloatingLabelAlignment,
+        IconButtonTheme,
+        IconButtonThemeData,
+        IconButton,
         Theme,
+        ColorScheme,
         ThemeData,
+        TextTheme,
         Brightness;
 import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/widgets.dart' hide Text;
 
 import '../base/mongol_text_align.dart';
 import '../text/mongol_text.dart';
@@ -35,6 +44,13 @@ import 'input_border.dart';
 const Duration _kTransitionDuration = Duration(milliseconds: 200);
 const Curve _kTransitionCurve = Curves.fastOutSlowIn;
 const double _kFinalLabelScale = 0.75;
+
+// The default duration for hint fade in/out transitions.
+//
+// Animating hint is not mentioned in the Material specification.
+// The animation is kept for backward compatibility and a short duration
+// is used to mitigate the UX impact.
+const Duration _kHintFadeTransitionDuration = Duration(milliseconds: 20);
 
 // Defines the gap in the MongolInputDecorator's outline border where the
 // floating label will appear.
@@ -304,20 +320,21 @@ class _Shaker extends AnimatedWidget {
 // slides leftwards a little when it first appears.
 class _HelperError extends StatefulWidget {
   const _HelperError({
-    Key? key,
     this.textAlign,
     this.helperText,
     this.helperStyle,
     this.helperMaxLines,
+    this.error,
     this.errorText,
     this.errorStyle,
     this.errorMaxLines,
-  }) : super(key: key);
+  });
 
   final MongolTextAlign? textAlign;
   final String? helperText;
   final TextStyle? helperStyle;
   final int? helperMaxLines;
+  final Widget? error;
   final String? errorText;
   final TextStyle? errorStyle;
   final int? errorMaxLines;
@@ -1531,12 +1548,16 @@ class _AffixText extends StatelessWidget {
     this.text,
     this.style,
     this.child,
+    this.semanticsSortKey,
+    required this.semanticsTag,
   });
 
   final bool labelIsFloating;
   final String? text;
   final TextStyle? style;
   final Widget? child;
+  final SemanticsSortKey? semanticsSortKey;
+  final SemanticsTag semanticsTag;
 
   @override
   Widget build(BuildContext context) {
@@ -1546,13 +1567,12 @@ class _AffixText extends StatelessWidget {
         duration: _kTransitionDuration,
         curve: _kTransitionCurve,
         opacity: labelIsFloating ? 1.0 : 0.0,
-        child: child ??
-            (text == null
-                ? null
-                : MongolText(
-                    text!,
-                    style: style,
-                  )),
+        child: Semantics(
+          sortKey: semanticsSortKey,
+          tagForChildren: semanticsTag,
+          child:
+              child ?? (text == null ? null : MongolText(text!, style: style)),
+        ),
       ),
     );
   }
@@ -1717,9 +1737,17 @@ class MongolInputDecorator extends StatefulWidget {
 
 class _InputDecoratorState extends State<MongolInputDecorator>
     with TickerProviderStateMixin {
-  late AnimationController _floatingLabelController;
-  late AnimationController _shakingLabelController;
+  late final AnimationController _floatingLabelController;
+  late final Animation<double> _floatingLabelAnimation;
+  late final AnimationController _shakingLabelController;
   final _InputBorderGap _borderGap = _InputBorderGap();
+  static const OrdinalSortKey _kPrefixSemanticsSortOrder = OrdinalSortKey(0);
+  static const OrdinalSortKey _kInputSemanticsSortOrder = OrdinalSortKey(1);
+  static const OrdinalSortKey _kSuffixSemanticsSortOrder = OrdinalSortKey(2);
+  static const SemanticsTag _kPrefixSemanticsTag =
+      SemanticsTag('_InputDecoratorState.prefix');
+  static const SemanticsTag _kSuffixSemanticsTag =
+      SemanticsTag('_InputDecoratorState.suffix');
 
   @override
   void initState() {
@@ -1763,19 +1791,17 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   }
 
   InputDecoration? _effectiveDecoration;
-  InputDecoration? get decoration {
-    _effectiveDecoration ??= widget.decoration.applyDefaults(
-      Theme.of(context).inputDecorationTheme,
-    );
-    return _effectiveDecoration;
-  }
+  InputDecoration get decoration => _effectiveDecoration ??=
+      widget.decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
   MongolTextAlign? get textAlign => widget.textAlign;
   bool get isFocused => widget.isFocused;
-  bool get isHovering => widget.isHovering && decoration!.enabled;
+  bool get _hasError =>
+      decoration.errorText != null || decoration.error != null;
+  bool get isHovering => widget.isHovering && decoration.enabled;
   bool get isEmpty => widget.isEmpty;
   bool get _floatingLabelEnabled {
-    return decoration!.floatingLabelBehavior != FloatingLabelBehavior.never;
+    return decoration.floatingLabelBehavior != FloatingLabelBehavior.never;
   }
 
   @override
@@ -1800,7 +1826,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
       }
     }
 
-    final String? errorText = decoration!.errorText;
+    final String? errorText = decoration.errorText;
     final String? oldErrorText = old.decoration.errorText;
 
     if (_floatingLabelController.isCompleted &&
@@ -1812,24 +1838,26 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     }
   }
 
-  Color _getActiveColor(ThemeData themeData) {
+  Color _getDefaultM2BorderColor(ThemeData themeData) {
+    if (!decoration.enabled && !isFocused) {
+      return ((decoration.filled ?? false) &&
+              !(decoration.border?.isOutline ?? false))
+          ? Colors.transparent
+          : themeData.disabledColor;
+    }
+    if (_hasError) {
+      return themeData.colorScheme.error;
+    }
     if (isFocused) {
       return themeData.colorScheme.primary;
     }
-    return themeData.hintColor;
-  }
-
-  Color _getDefaultBorderColor(ThemeData themeData) {
-    if (isFocused) {
-      return themeData.colorScheme.primary;
-    }
-    if (decoration!.filled!) {
+    if (decoration.filled!) {
       return themeData.hintColor;
     }
     final Color enabledColor =
         themeData.colorScheme.onSurface.withOpacity(0.38);
     if (isHovering) {
-      final Color hoverColor = decoration!.hoverColor ??
+      final Color hoverColor = decoration.hoverColor ??
           themeData.inputDecorationTheme.hoverColor ??
           themeData.hoverColor;
       return Color.alphaBlend(hoverColor.withOpacity(0.12), enabledColor);
@@ -1837,78 +1865,56 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     return enabledColor;
   }
 
-  Color _getFillColor(ThemeData themeData) {
-    if (decoration!.filled != true) {
+  Color _getFillColor(ThemeData themeData, InputDecorationTheme defaults) {
+    if (decoration.filled != true) {
       // filled == null same as filled == false
       return Colors.transparent;
     }
-    if (decoration!.fillColor != null) {
+    if (decoration.fillColor != null) {
       return MaterialStateProperty.resolveAs(
-          decoration!.fillColor!, materialState);
+          decoration.fillColor!, materialState);
     }
-
-    // dark theme: 10% white (enabled), 5% white (disabled)
-    // light theme: 4% black (enabled), 2% black (disabled)
-    const Color darkEnabled = Color(0x1AFFFFFF);
-    const Color darkDisabled = Color(0x0DFFFFFF);
-    const Color lightEnabled = Color(0x0A000000);
-    const Color lightDisabled = Color(0x05000000);
-
-    switch (themeData.brightness) {
-      case Brightness.dark:
-        return decoration!.enabled ? darkEnabled : darkDisabled;
-      case Brightness.light:
-        return decoration!.enabled ? lightEnabled : lightDisabled;
-    }
+    return MaterialStateProperty.resolveAs(defaults.fillColor!, materialState);
   }
 
   Color _getHoverColor(ThemeData themeData) {
-    if (decoration!.filled == null ||
-        !decoration!.filled! ||
+    if (decoration.filled == null ||
+        !decoration.filled! ||
         isFocused ||
-        !decoration!.enabled) {
+        !decoration.enabled) {
       return Colors.transparent;
     }
-    return decoration!.hoverColor ??
+    return decoration.hoverColor ??
         themeData.inputDecorationTheme.hoverColor ??
         themeData.hoverColor;
   }
 
-  Color _getIconColor(ThemeData themeData) {
-    Color resolveIconColor(Set<MaterialState> states) {
-      if (states.contains(MaterialState.disabled) &&
-          !states.contains(MaterialState.focused)) {
-        return themeData.disabledColor;
-      }
-
-      if (states.contains(MaterialState.focused)) {
-        return themeData.colorScheme.primary;
-      }
-
-      switch (themeData.brightness) {
-        case Brightness.dark:
-          return Colors.white70;
-        case Brightness.light:
-          return Colors.black45;
-      }
-    }
-
+  Color _getIconColor(ThemeData themeData, InputDecorationTheme defaults) {
     return MaterialStateProperty.resolveAs(
+            decoration.iconColor, materialState) ??
+        MaterialStateProperty.resolveAs(
             themeData.inputDecorationTheme.iconColor, materialState) ??
-        MaterialStateProperty.resolveWith(resolveIconColor)
-            .resolve(materialState);
+        MaterialStateProperty.resolveAs(defaults.iconColor!, materialState);
   }
 
-  Color _getPrefixIconColor(ThemeData themeData) {
+  Color _getPrefixIconColor(
+      ThemeData themeData, InputDecorationTheme defaults) {
     return MaterialStateProperty.resolveAs(
+            decoration.prefixIconColor, materialState) ??
+        MaterialStateProperty.resolveAs(
             themeData.inputDecorationTheme.prefixIconColor, materialState) ??
-        _getIconColor(themeData);
+        MaterialStateProperty.resolveAs(
+            defaults.prefixIconColor!, materialState);
   }
 
-  Color _getSuffixIconColor(ThemeData themeData) {
+  Color _getSuffixIconColor(
+      ThemeData themeData, InputDecorationTheme defaults) {
     return MaterialStateProperty.resolveAs(
+            decoration.suffixIconColor, materialState) ??
+        MaterialStateProperty.resolveAs(
             themeData.inputDecorationTheme.suffixIconColor, materialState) ??
-        _getIconColor(themeData);
+        MaterialStateProperty.resolveAs(
+            defaults.suffixIconColor!, materialState);
   }
 
   // True if the label will be shown and the hint will not.
@@ -1917,8 +1923,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   // hint would.
   bool get _hasInlineLabel {
     return !widget._labelShouldWithdraw &&
-        (decoration!.labelText != null || decoration!.label != null) &&
-        decoration!.floatingLabelBehavior != FloatingLabelBehavior.always;
+        (decoration.labelText != null || decoration.label != null) &&
+        decoration.floatingLabelBehavior != FloatingLabelBehavior.always;
   }
 
   // If the label is a floating placeholder, it's always shown.
@@ -1926,16 +1932,15 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
   // The base style for the inline label when they're displayed "inline",
   // i.e. when they appear in place of the empty text field.
-  TextStyle _getInlineLabelStyle(ThemeData themeData) {
-    final TextStyle defaultStyle = TextStyle(
-      color:
-          decoration!.enabled ? themeData.hintColor : themeData.disabledColor,
-    );
+  TextStyle _getInlineLabelStyle(
+      ThemeData themeData, InputDecorationTheme defaults) {
+    final TextStyle defaultStyle =
+        MaterialStateProperty.resolveAs(defaults.labelStyle!, materialState);
 
-    final TextStyle? style = MaterialStateProperty.resolveAs(
-            decoration!.labelStyle, materialState) ??
-        MaterialStateProperty.resolveAs(
-            themeData.inputDecorationTheme.labelStyle, materialState);
+    final TextStyle? style =
+        MaterialStateProperty.resolveAs(decoration.labelStyle, materialState) ??
+            MaterialStateProperty.resolveAs(
+                themeData.inputDecorationTheme.labelStyle, materialState);
 
     return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
@@ -1946,14 +1951,13 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
   // The base style for the inline hint when they're displayed "inline",
   // i.e. when they appear in place of the empty text field.
-  TextStyle _getInlineHintStyle(ThemeData themeData) {
-    final TextStyle defaultStyle = TextStyle(
-      color:
-          decoration!.enabled ? themeData.hintColor : themeData.disabledColor,
-    );
+  TextStyle _getInlineHintStyle(
+      ThemeData themeData, InputDecorationTheme defaults) {
+    final TextStyle defaultStyle =
+        MaterialStateProperty.resolveAs(defaults.hintStyle!, materialState);
 
     final TextStyle? style =
-        MaterialStateProperty.resolveAs(decoration!.hintStyle, materialState) ??
+        MaterialStateProperty.resolveAs(decoration.hintStyle, materialState) ??
             MaterialStateProperty.resolveAs(
                 themeData.inputDecorationTheme.hintStyle, materialState);
 
@@ -1963,60 +1967,57 @@ class _InputDecoratorState extends State<MongolInputDecorator>
         .merge(style);
   }
 
-  TextStyle _getFloatingLabelStyle(ThemeData themeData) {
-    TextStyle getFallbackTextStyle() {
-      final Color color = decoration!.errorText != null
-          ? decoration!.errorStyle?.color ?? themeData.colorScheme.error
-          : _getActiveColor(themeData);
-
-      return TextStyle(
-              color: decoration!.enabled ? color : themeData.disabledColor)
-          .merge(decoration!.floatingLabelStyle ?? decoration!.labelStyle);
+  TextStyle _getFloatingLabelStyle(
+      ThemeData themeData, InputDecorationTheme defaults) {
+    TextStyle defaultTextStyle = MaterialStateProperty.resolveAs(
+        defaults.floatingLabelStyle!, materialState);
+    if (_hasError && decoration.errorStyle?.color != null) {
+      defaultTextStyle =
+          defaultTextStyle.copyWith(color: decoration.errorStyle?.color);
     }
+    defaultTextStyle = defaultTextStyle
+        .merge(decoration.floatingLabelStyle ?? decoration.labelStyle);
 
     final TextStyle? style = MaterialStateProperty.resolveAs(
-            decoration!.floatingLabelStyle, materialState) ??
+            decoration.floatingLabelStyle, materialState) ??
         MaterialStateProperty.resolveAs(
             themeData.inputDecorationTheme.floatingLabelStyle, materialState);
 
     return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
         .copyWith(height: 1)
-        .merge(getFallbackTextStyle())
+        .merge(defaultTextStyle)
         .merge(style);
   }
 
-  TextStyle _getHelperStyle(ThemeData themeData) {
-    final Color color =
-        decoration!.enabled ? themeData.hintColor : Colors.transparent;
-    return themeData.textTheme.bodySmall!.copyWith(color: color).merge(
-        MaterialStateProperty.resolveAs(
-            decoration!.helperStyle, materialState));
+  TextStyle _getHelperStyle(
+      ThemeData themeData, InputDecorationTheme defaults) {
+    return MaterialStateProperty.resolveAs(defaults.helperStyle!, materialState)
+        .merge(MaterialStateProperty.resolveAs(
+            decoration.helperStyle, materialState));
   }
 
-  TextStyle _getErrorStyle(ThemeData themeData) {
-    final Color color =
-        decoration!.enabled ? themeData.colorScheme.error : Colors.transparent;
-    return themeData.textTheme.bodySmall!
-        .copyWith(color: color)
-        .merge(decoration!.errorStyle);
+  TextStyle _getErrorStyle(ThemeData themeData, InputDecorationTheme defaults) {
+    return MaterialStateProperty.resolveAs(defaults.errorStyle!, materialState)
+        .merge(decoration.errorStyle);
   }
 
   Set<MaterialState> get materialState {
     return <MaterialState>{
-      if (!decoration!.enabled) MaterialState.disabled,
+      if (!decoration.enabled) MaterialState.disabled,
       if (isFocused) MaterialState.focused,
       if (isHovering) MaterialState.hovered,
-      if (decoration!.errorText != null) MaterialState.error,
+      if (_hasError) MaterialState.error,
     };
   }
 
-  InputBorder _getDefaultBorder(ThemeData themeData) {
+  InputBorder _getDefaultBorder(
+      ThemeData themeData, InputDecorationTheme defaults) {
     final InputBorder border =
-        MaterialStateProperty.resolveAs(decoration!.border, materialState) ??
+        MaterialStateProperty.resolveAs(decoration.border, materialState) ??
             const SidelineInputBorder();
 
-    if (decoration!.border is MaterialStateProperty<InputBorder>) {
+    if (decoration.border is MaterialStateProperty<InputBorder>) {
       return border;
     }
 
@@ -2024,77 +2025,85 @@ class _InputDecoratorState extends State<MongolInputDecorator>
       return border;
     }
 
-    final Color borderColor;
-    if (decoration!.enabled || isFocused) {
-      borderColor = decoration!.errorText == null
-          ? _getDefaultBorderColor(themeData)
-          : themeData.colorScheme.error;
+    if (themeData.useMaterial3) {
+      if (decoration.filled!) {
+        return border.copyWith(
+          borderSide: MaterialStateProperty.resolveAs(
+              defaults.activeIndicatorBorder, materialState),
+        );
+      } else {
+        return border.copyWith(
+          borderSide: MaterialStateProperty.resolveAs(
+              defaults.outlineBorder, materialState),
+        );
+      }
     } else {
-      borderColor = ((decoration!.filled ?? false) &&
-              !(decoration!.border?.isOutline ?? false))
-          ? Colors.transparent
-          : themeData.disabledColor;
+      return border.copyWith(
+        borderSide: BorderSide(
+          color: _getDefaultM2BorderColor(themeData),
+          width: ((decoration.isCollapsed ??
+                      themeData.inputDecorationTheme.isCollapsed) ||
+                  decoration.border == InputBorder.none ||
+                  !decoration.enabled)
+              ? 0.0
+              : isFocused
+                  ? 2.0
+                  : 1.0,
+        ),
+      );
     }
-
-    final double borderWeight;
-    if (decoration!.isCollapsed ||
-        decoration?.border == InputBorder.none ||
-        !decoration!.enabled) {
-      borderWeight = 0.0;
-    } else {
-      borderWeight = isFocused ? 2.0 : 1.0;
-    }
-
-    return border.copyWith(
-        borderSide: BorderSide(color: borderColor, width: borderWeight));
   }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    final TextStyle labelStyle = _getInlineLabelStyle(themeData);
+    final InputDecorationTheme defaults = Theme.of(context).useMaterial3
+        ? _InputDecoratorDefaultsM3(context)
+        : _InputDecoratorDefaultsM2(context);
+
+    final TextStyle labelStyle = _getInlineLabelStyle(themeData, defaults);
     final TextBaseline textBaseline = labelStyle.textBaseline!;
 
-    final TextStyle hintStyle = _getInlineHintStyle(themeData);
-    final Widget? hint = decoration!.hintText == null
+    final TextStyle hintStyle = _getInlineHintStyle(themeData, defaults);
+    final String? hintText = decoration.hintText;
+    final Widget? hint = hintText == null
         ? null
         : AnimatedOpacity(
             opacity: (isEmpty && !_hasInlineLabel) ? 1.0 : 0.0,
-            duration: _kTransitionDuration,
+            duration:
+                decoration.hintFadeDuration ?? _kHintFadeTransitionDuration,
             curve: _kTransitionCurve,
-            alwaysIncludeSemantics: true,
             child: MongolText(
-              decoration!.hintText!,
+              hintText,
               style: hintStyle,
-              overflow: TextOverflow.ellipsis,
+              overflow: hintStyle.overflow ?? TextOverflow.ellipsis,
               textAlign: textAlign,
-              maxLines: decoration!.hintMaxLines,
+              maxLines: decoration.hintMaxLines,
             ),
           );
 
-    final bool isError = decoration!.errorText != null;
     InputBorder? border;
-    if (!decoration!.enabled) {
-      border = isError ? decoration!.errorBorder : decoration!.disabledBorder;
+    if (!decoration.enabled) {
+      border = _hasError ? decoration.errorBorder : decoration.disabledBorder;
     } else if (isFocused) {
       border =
-          isError ? decoration!.focusedErrorBorder : decoration!.focusedBorder;
+          _hasError ? decoration.focusedErrorBorder : decoration.focusedBorder;
     } else {
-      border = isError ? decoration!.errorBorder : decoration!.enabledBorder;
+      border = _hasError ? decoration.errorBorder : decoration.enabledBorder;
     }
-    border ??= _getDefaultBorder(themeData);
+    border ??= _getDefaultBorder(themeData, defaults);
 
     final Widget container = _BorderContainer(
       border: border,
       gap: _borderGap,
-      gapAnimation: _floatingLabelController.view,
-      fillColor: _getFillColor(themeData),
+      gapAnimation: _floatingLabelAnimation,
+      fillColor: _getFillColor(themeData, defaults),
       hoverColor: _getHoverColor(themeData),
       isHovering: isHovering,
     );
 
     final Widget? label =
-        decoration!.labelText == null && decoration!.label == null
+        decoration.labelText == null && decoration.label == null
             ? null
             : _Shaker(
                 animation: _shakingLabelController.view,
@@ -2106,11 +2115,11 @@ class _InputDecoratorState extends State<MongolInputDecorator>
                     duration: _kTransitionDuration,
                     curve: _kTransitionCurve,
                     style: widget._labelShouldWithdraw
-                        ? _getFloatingLabelStyle(themeData)
+                        ? _getFloatingLabelStyle(themeData, defaults)
                         : labelStyle,
-                    child: decoration!.label ??
+                    child: decoration.label ??
                         MongolText(
-                          decoration!.labelText!,
+                          decoration.labelText!,
                           overflow: TextOverflow.ellipsis,
                           textAlign: textAlign,
                         ),
@@ -2118,117 +2127,170 @@ class _InputDecoratorState extends State<MongolInputDecorator>
                 ),
               );
 
-    final Widget? prefix =
-        decoration!.prefix == null && decoration!.prefixText == null
-            ? null
-            : _AffixText(
-                labelIsFloating: widget._labelShouldWithdraw,
-                text: decoration!.prefixText,
-                style: MaterialStateProperty.resolveAs(
-                        decoration!.prefixStyle, materialState) ??
-                    hintStyle,
-                child: decoration!.prefix,
-              );
+    final bool hasPrefix =
+        decoration.prefix != null || decoration.prefixText != null;
+    final bool hasSuffix =
+        decoration.suffix != null || decoration.suffixText != null;
 
-    final Widget? suffix =
-        decoration!.suffix == null && decoration!.suffixText == null
-            ? null
-            : _AffixText(
-                labelIsFloating: widget._labelShouldWithdraw,
-                text: decoration!.suffixText,
-                style: MaterialStateProperty.resolveAs(
-                        decoration!.suffixStyle, materialState) ??
-                    hintStyle,
-                child: decoration!.suffix,
-              );
+    Widget? input = widget.child;
+    // If at least two out of the three are visible, it needs semantics sort
+    // order.
+    final bool needsSemanticsSortOrder = widget._labelShouldWithdraw &&
+        (input != null ? (hasPrefix || hasSuffix) : (hasPrefix && hasSuffix));
 
-    final bool decorationIsDense = decoration!.isDense ?? false;
+    final Widget? prefix = hasPrefix
+        ? _AffixText(
+            labelIsFloating: widget._labelShouldWithdraw,
+            text: decoration.prefixText,
+            style: MaterialStateProperty.resolveAs(
+                    decoration.prefixStyle, materialState) ??
+                hintStyle,
+            semanticsSortKey:
+                needsSemanticsSortOrder ? _kPrefixSemanticsSortOrder : null,
+            semanticsTag: _kPrefixSemanticsTag,
+            child: decoration.prefix,
+          )
+        : null;
+
+    final Widget? suffix = hasSuffix
+        ? _AffixText(
+            labelIsFloating: widget._labelShouldWithdraw,
+            text: decoration.suffixText,
+            style: MaterialStateProperty.resolveAs(
+                    decoration.suffixStyle, materialState) ??
+                hintStyle,
+            semanticsSortKey:
+                needsSemanticsSortOrder ? _kSuffixSemanticsSortOrder : null,
+            semanticsTag: _kSuffixSemanticsTag,
+            child: decoration.suffix,
+          )
+        : null;
+
+    if (input != null && needsSemanticsSortOrder) {
+      input = Semantics(
+        sortKey: _kInputSemanticsSortOrder,
+        child: input,
+      );
+    }
+
+    final bool decorationIsDense = decoration.isDense ?? false;
     final double iconSize = decorationIsDense ? 18.0 : 24.0;
 
-    final Widget? icon = decoration!.icon == null
+    final Widget? icon = decoration.icon == null
         ? null
-        : Padding(
-            padding: const EdgeInsetsDirectional.only(end: 16.0),
-            child: IconTheme.merge(
-              data: IconThemeData(
-                color: _getIconColor(themeData),
-                size: iconSize,
-              ),
-              child: decoration!.icon!,
-            ),
-          );
-
-    final Widget? prefixIcon = decoration!.prefixIcon == null
-        ? null
-        : Center(
-            widthFactor: 1.0,
-            heightFactor: 1.0,
-            child: ConstrainedBox(
-              constraints: decoration!.prefixIconConstraints ??
-                  themeData.visualDensity.effectiveConstraints(
-                    const BoxConstraints(
-                      minWidth: kMinInteractiveDimension,
-                      minHeight: kMinInteractiveDimension,
-                    ),
-                  ),
+        : MouseRegion(
+            cursor: SystemMouseCursors.basic,
+            child: Padding(
+              padding: const EdgeInsetsDirectional.only(bottom: 16.0),
               child: IconTheme.merge(
                 data: IconThemeData(
-                  color: _getPrefixIconColor(themeData),
+                  color: _getIconColor(themeData, defaults),
                   size: iconSize,
                 ),
-                child: decoration!.prefixIcon!,
+                child: decoration.icon!,
               ),
             ),
           );
 
-    final Widget? suffixIcon = decoration!.suffixIcon == null
+    final Widget? prefixIcon = decoration.prefixIcon == null
         ? null
         : Center(
             widthFactor: 1.0,
             heightFactor: 1.0,
-            child: ConstrainedBox(
-              constraints: decoration!.suffixIconConstraints ??
-                  themeData.visualDensity.effectiveConstraints(
-                    const BoxConstraints(
-                      minWidth: kMinInteractiveDimension,
-                      minHeight: kMinInteractiveDimension,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.basic,
+              child: ConstrainedBox(
+                constraints: decoration.prefixIconConstraints ??
+                    themeData.visualDensity.effectiveConstraints(
+                      const BoxConstraints(
+                        minWidth: kMinInteractiveDimension,
+                        minHeight: kMinInteractiveDimension,
+                      ),
+                    ),
+                child: IconTheme.merge(
+                  data: IconThemeData(
+                    color: _getPrefixIconColor(themeData, defaults),
+                    size: iconSize,
+                  ),
+                  child: IconButtonTheme(
+                    data: IconButtonThemeData(
+                      style: IconButton.styleFrom(
+                        foregroundColor:
+                            _getPrefixIconColor(themeData, defaults),
+                        iconSize: iconSize,
+                      ),
+                    ),
+                    child: Semantics(
+                      child: decoration.prefixIcon,
                     ),
                   ),
-              child: IconTheme.merge(
-                data: IconThemeData(
-                  color: _getSuffixIconColor(themeData),
-                  size: iconSize,
                 ),
-                child: decoration!.suffixIcon!,
+              ),
+            ),
+          );
+
+    final Widget? suffixIcon = decoration.suffixIcon == null
+        ? null
+        : Center(
+            widthFactor: 1.0,
+            heightFactor: 1.0,
+            child: MouseRegion(
+              cursor: SystemMouseCursors.basic,
+              child: ConstrainedBox(
+                constraints: decoration.suffixIconConstraints ??
+                    themeData.visualDensity.effectiveConstraints(
+                      const BoxConstraints(
+                        minWidth: kMinInteractiveDimension,
+                        minHeight: kMinInteractiveDimension,
+                      ),
+                    ),
+                child: IconTheme.merge(
+                  data: IconThemeData(
+                    color: _getSuffixIconColor(themeData, defaults),
+                    size: iconSize,
+                  ),
+                  child: IconButtonTheme(
+                    data: IconButtonThemeData(
+                      style: IconButton.styleFrom(
+                        foregroundColor:
+                            _getSuffixIconColor(themeData, defaults),
+                        iconSize: iconSize,
+                      ),
+                    ),
+                    child: Semantics(
+                      child: decoration.suffixIcon,
+                    ),
+                  ),
+                ),
               ),
             ),
           );
 
     final Widget helperError = _HelperError(
       textAlign: textAlign,
-      helperText: decoration!.helperText,
-      helperStyle: _getHelperStyle(themeData),
-      helperMaxLines: decoration!.helperMaxLines,
-      errorText: decoration!.errorText,
-      errorStyle: _getErrorStyle(themeData),
-      errorMaxLines: decoration!.errorMaxLines,
+      helperText: decoration.helperText,
+      helperStyle: _getHelperStyle(themeData, defaults),
+      helperMaxLines: decoration.helperMaxLines,
+      error: decoration.error,
+      errorText: decoration.errorText,
+      errorStyle: _getErrorStyle(themeData, defaults),
+      errorMaxLines: decoration.errorMaxLines,
     );
 
     Widget? counter;
-    if (decoration!.counter != null) {
-      counter = decoration!.counter;
-    } else if (decoration!.counterText != null &&
-        decoration!.counterText != '') {
+    if (decoration.counter != null) {
+      counter = decoration.counter;
+    } else if (decoration.counterText != null && decoration.counterText != '') {
       counter = Semantics(
         container: true,
         liveRegion: isFocused,
         child: MongolText(
-          decoration!.counterText!,
-          style: _getHelperStyle(themeData).merge(
+          decoration.counterText!,
+          style: _getHelperStyle(themeData, defaults).merge(
               MaterialStateProperty.resolveAs(
-                  decoration!.counterStyle, materialState)),
+                  decoration.counterStyle, materialState)),
           overflow: TextOverflow.ellipsis,
-          semanticsLabel: decoration!.semanticCounterText,
+          semanticsLabel: decoration.semanticCounterText,
         ),
       );
     }
@@ -2237,53 +2299,54 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     // has been resolved to EdgeInsets.
     const textDirection = TextDirection.ltr;
     final EdgeInsets? decorationContentPadding =
-        decoration!.contentPadding?.resolve(textDirection);
+        decoration.contentPadding?.resolve(textDirection);
 
     final EdgeInsets contentPadding;
     final double floatingLabelWidth;
-    if (decoration!.isCollapsed) {
+    if (decoration.isCollapsed ?? themeData.inputDecorationTheme.isCollapsed) {
       floatingLabelWidth = 0.0;
       contentPadding = decorationContentPadding ?? EdgeInsets.zero;
     } else if (!border.isOutline) {
       // 4.0: the horizontal gap between the inline elements and the floating label.
       floatingLabelWidth = (4.0 + 0.75 * labelStyle.fontSize!) *
-          MediaQuery.textScaleFactorOf(context);
-      if (decoration!.filled ?? false) {
+          MediaQuery.textScalerOf(context).textScaleFactor;
+      if (decoration.filled ?? false) {
         contentPadding = decorationContentPadding ??
             (decorationIsDense
-                ? const EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 12.0)
+                ? const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0)
                 : const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0));
       } else {
-        // Not top or bottom padding for sideline borders that aren't filled
+        // Not left or right padding for underline borders that aren't filled
         // is a small concession to backwards compatibility. This eliminates
         // the most noticeable layout change introduced by #13734.
         contentPadding = decorationContentPadding ??
             (decorationIsDense
-                ? const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0)
-                : const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0));
+                ? const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0)
+                : const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 12.0));
       }
     } else {
       floatingLabelWidth = 0.0;
       contentPadding = decorationContentPadding ??
           (decorationIsDense
-              ? const EdgeInsets.fromLTRB(20.0, 12.0, 12.0, 12.0)
-              : const EdgeInsets.fromLTRB(24.0, 12.0, 16.0, 12.0));
+              ? const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0)
+              : const EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0));
     }
 
     final _Decorator decorator = _Decorator(
       decoration: _Decoration(
           contentPadding: contentPadding,
-          isCollapsed: decoration!.isCollapsed,
+          isCollapsed: decoration.isCollapsed ??
+              themeData.inputDecorationTheme.isCollapsed,
           floatingLabelWidth: floatingLabelWidth,
-          floatingLabelAlignment: decoration!.floatingLabelAlignment!,
-          floatingLabelProgress: _floatingLabelController.value,
+          floatingLabelAlignment: decoration.floatingLabelAlignment!,
+          floatingLabelProgress: _floatingLabelAnimation.value,
           border: border,
           borderGap: _borderGap,
-          alignLabelWithHint: decoration!.alignLabelWithHint ?? false,
-          isDense: decoration!.isDense,
+          alignLabelWithHint: decoration.alignLabelWithHint ?? false,
+          isDense: decoration.isDense,
           visualDensity: themeData.visualDensity,
           icon: icon,
-          input: widget.child,
+          input: input,
           label: label,
           hint: hint,
           prefix: prefix,
@@ -2300,7 +2363,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     );
 
     final BoxConstraints? constraints =
-        decoration!.constraints ?? themeData.inputDecorationTheme.constraints;
+        decoration.constraints ?? themeData.inputDecorationTheme.constraints;
     if (constraints != null) {
       return ConstrainedBox(
         constraints: constraints,
@@ -2309,4 +2372,308 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     }
     return decorator;
   }
+}
+
+class _InputDecoratorDefaultsM2 extends InputDecorationTheme {
+  const _InputDecoratorDefaultsM2(this.context) : super();
+
+  final BuildContext context;
+
+  @override
+  TextStyle? get hintStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return TextStyle(color: Theme.of(context).disabledColor);
+        }
+        return TextStyle(color: Theme.of(context).hintColor);
+      });
+
+  @override
+  TextStyle? get labelStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return TextStyle(color: Theme.of(context).disabledColor);
+        }
+        return TextStyle(color: Theme.of(context).hintColor);
+      });
+
+  @override
+  TextStyle? get floatingLabelStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return TextStyle(color: Theme.of(context).disabledColor);
+        }
+        if (states.contains(MaterialState.error)) {
+          return TextStyle(color: Theme.of(context).colorScheme.error);
+        }
+        if (states.contains(MaterialState.focused)) {
+          return TextStyle(color: Theme.of(context).colorScheme.primary);
+        }
+        return TextStyle(color: Theme.of(context).hintColor);
+      });
+
+  @override
+  TextStyle? get helperStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        final ThemeData themeData = Theme.of(context);
+        if (states.contains(MaterialState.disabled)) {
+          return themeData.textTheme.bodySmall!
+              .copyWith(color: Colors.transparent);
+        }
+
+        return themeData.textTheme.bodySmall!
+            .copyWith(color: themeData.hintColor);
+      });
+
+  @override
+  TextStyle? get errorStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        final ThemeData themeData = Theme.of(context);
+        if (states.contains(MaterialState.disabled)) {
+          return themeData.textTheme.bodySmall!
+              .copyWith(color: Colors.transparent);
+        }
+        return themeData.textTheme.bodySmall!
+            .copyWith(color: themeData.colorScheme.error);
+      });
+
+  @override
+  Color? get fillColor =>
+      MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          // dark theme: 5% white
+          // light theme: 2% black
+          switch (Theme.of(context).brightness) {
+            case Brightness.dark:
+              return const Color(0x0DFFFFFF);
+            case Brightness.light:
+              return const Color(0x05000000);
+          }
+        }
+        // dark theme: 10% white
+        // light theme: 4% black
+        switch (Theme.of(context).brightness) {
+          case Brightness.dark:
+            return const Color(0x1AFFFFFF);
+          case Brightness.light:
+            return const Color(0x0A000000);
+        }
+      });
+
+  @override
+  Color? get iconColor =>
+      MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled) &&
+            !states.contains(MaterialState.focused)) {
+          return Theme.of(context).disabledColor;
+        }
+        if (states.contains(MaterialState.focused)) {
+          return Theme.of(context).colorScheme.primary;
+        }
+        switch (Theme.of(context).brightness) {
+          case Brightness.dark:
+            return Colors.white70;
+          case Brightness.light:
+            return Colors.black45;
+        }
+      });
+
+  @override
+  Color? get prefixIconColor =>
+      MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled) &&
+            !states.contains(MaterialState.focused)) {
+          return Theme.of(context).disabledColor;
+        }
+        if (states.contains(MaterialState.focused)) {
+          return Theme.of(context).colorScheme.primary;
+        }
+        switch (Theme.of(context).brightness) {
+          case Brightness.dark:
+            return Colors.white70;
+          case Brightness.light:
+            return Colors.black45;
+        }
+      });
+
+  @override
+  Color? get suffixIconColor =>
+      MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled) &&
+            !states.contains(MaterialState.focused)) {
+          return Theme.of(context).disabledColor;
+        }
+        if (states.contains(MaterialState.focused)) {
+          return Theme.of(context).colorScheme.primary;
+        }
+        switch (Theme.of(context).brightness) {
+          case Brightness.dark:
+            return Colors.white70;
+          case Brightness.light:
+            return Colors.black45;
+        }
+      });
+}
+
+class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
+  _InputDecoratorDefaultsM3(this.context) : super();
+
+  final BuildContext context;
+
+  late final ColorScheme _colors = Theme.of(context).colorScheme;
+  late final TextTheme _textTheme = Theme.of(context).textTheme;
+
+  @override
+  TextStyle? get hintStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return TextStyle(color: Theme.of(context).disabledColor);
+        }
+        return TextStyle(color: Theme.of(context).hintColor);
+      });
+
+  @override
+  Color? get fillColor =>
+      MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return _colors.onSurface.withOpacity(0.04);
+        }
+        return _colors.surfaceVariant;
+      });
+
+  @override
+  BorderSide? get activeIndicatorBorder =>
+      MaterialStateBorderSide.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return BorderSide(color: _colors.onSurface.withOpacity(0.38));
+        }
+        if (states.contains(MaterialState.error)) {
+          if (states.contains(MaterialState.hovered)) {
+            return BorderSide(color: _colors.onErrorContainer);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return BorderSide(color: _colors.error, width: 2.0);
+          }
+          return BorderSide(color: _colors.error);
+        }
+        if (states.contains(MaterialState.hovered)) {
+          return BorderSide(color: _colors.onSurface);
+        }
+        if (states.contains(MaterialState.focused)) {
+          return BorderSide(color: _colors.primary, width: 2.0);
+        }
+        return BorderSide(color: _colors.onSurfaceVariant);
+      });
+
+  @override
+  BorderSide? get outlineBorder =>
+      MaterialStateBorderSide.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return BorderSide(color: _colors.onSurface.withOpacity(0.12));
+        }
+        if (states.contains(MaterialState.error)) {
+          if (states.contains(MaterialState.hovered)) {
+            return BorderSide(color: _colors.onErrorContainer);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return BorderSide(color: _colors.error, width: 2.0);
+          }
+          return BorderSide(color: _colors.error);
+        }
+        if (states.contains(MaterialState.hovered)) {
+          return BorderSide(color: _colors.onSurface);
+        }
+        if (states.contains(MaterialState.focused)) {
+          return BorderSide(color: _colors.primary, width: 2.0);
+        }
+        return BorderSide(color: _colors.outline);
+      });
+
+  @override
+  Color? get iconColor => _colors.onSurfaceVariant;
+
+  @override
+  Color? get prefixIconColor =>
+      MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        return _colors.onSurfaceVariant;
+      });
+
+  @override
+  Color? get suffixIconColor =>
+      MaterialStateColor.resolveWith((Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return _colors.onSurface.withOpacity(0.38);
+        }
+        if (states.contains(MaterialState.error)) {
+          return _colors.error;
+        }
+        return _colors.onSurfaceVariant;
+      });
+
+  @override
+  TextStyle? get labelStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        final TextStyle textStyle = _textTheme.bodyLarge ?? const TextStyle();
+        if (states.contains(MaterialState.disabled)) {
+          return textStyle.copyWith(color: _colors.onSurface.withOpacity(0.38));
+        }
+        if (states.contains(MaterialState.error)) {
+          if (states.contains(MaterialState.hovered)) {
+            return textStyle.copyWith(color: _colors.onErrorContainer);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return textStyle.copyWith(color: _colors.error);
+          }
+          return textStyle.copyWith(color: _colors.error);
+        }
+        if (states.contains(MaterialState.hovered)) {
+          return textStyle.copyWith(color: _colors.onSurfaceVariant);
+        }
+        if (states.contains(MaterialState.focused)) {
+          return textStyle.copyWith(color: _colors.primary);
+        }
+        return textStyle.copyWith(color: _colors.onSurfaceVariant);
+      });
+
+  @override
+  TextStyle? get floatingLabelStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        final TextStyle textStyle = _textTheme.bodyLarge ?? const TextStyle();
+        if (states.contains(MaterialState.disabled)) {
+          return textStyle.copyWith(color: _colors.onSurface.withOpacity(0.38));
+        }
+        if (states.contains(MaterialState.error)) {
+          if (states.contains(MaterialState.hovered)) {
+            return textStyle.copyWith(color: _colors.onErrorContainer);
+          }
+          if (states.contains(MaterialState.focused)) {
+            return textStyle.copyWith(color: _colors.error);
+          }
+          return textStyle.copyWith(color: _colors.error);
+        }
+        if (states.contains(MaterialState.hovered)) {
+          return textStyle.copyWith(color: _colors.onSurfaceVariant);
+        }
+        if (states.contains(MaterialState.focused)) {
+          return textStyle.copyWith(color: _colors.primary);
+        }
+        return textStyle.copyWith(color: _colors.onSurfaceVariant);
+      });
+
+  @override
+  TextStyle? get helperStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        final TextStyle textStyle = _textTheme.bodySmall ?? const TextStyle();
+        if (states.contains(MaterialState.disabled)) {
+          return textStyle.copyWith(color: _colors.onSurface.withOpacity(0.38));
+        }
+        return textStyle.copyWith(color: _colors.onSurfaceVariant);
+      });
+
+  @override
+  TextStyle? get errorStyle =>
+      MaterialStateTextStyle.resolveWith((Set<MaterialState> states) {
+        final TextStyle textStyle = _textTheme.bodySmall ?? const TextStyle();
+        return textStyle.copyWith(color: _colors.error);
+      });
 }

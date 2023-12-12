@@ -169,6 +169,7 @@ class MongolParagraph {
 
   double? _width;
   double? _height;
+  double? _longestLine;
   double? _minIntrinsicHeight;
   double? _maxIntrinsicHeight;
 
@@ -181,6 +182,12 @@ class MongolParagraph {
   ///
   /// Valid only after [layout] has been called.
   double get height => _height ?? 0;
+
+  /// The distance from the top edge of the topmost glyph to the bottom edge of
+  /// the bottommost glyph in the paragraph.
+  ///
+  /// Valid only after [layout] has been called.
+  double get longestLine => _longestLine ?? 0;
 
   /// The minimum height that this paragraph could be without failing to paint
   /// its contents within itself.
@@ -313,6 +320,7 @@ class MongolParagraph {
     final bounds = Rect.fromLTRB(0, 0, width, height);
     final lineInfo = _LineInfo(start, end, bounds);
     _lines.add(lineInfo);
+    _longestLine = math.max(longestLine, lineInfo.bounds.width);
   }
 
   void _calculateWidth() {
@@ -889,18 +897,26 @@ class MongolParagraphBuilder {
   MongolParagraphBuilder(
     ui.ParagraphStyle style, {
     MongolTextAlign textAlign = MongolTextAlign.top,
+    @Deprecated(
+      'Use textScaler instead. '
+      'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+      'This feature was deprecated after v3.12.0-2.0.pre.',
+    )
     double textScaleFactor = 1.0,
+    TextScaler textScaler = TextScaler.noScaling,
     int? maxLines,
     String? ellipsis,
   })  : _paragraphStyle = style,
         _textAlign = textAlign,
-        _textScaleFactor = textScaleFactor,
+        _textScaler = textScaler == TextScaler.noScaling
+            ? TextScaler.linear(textScaleFactor)
+            : textScaler,
         _maxLines = maxLines,
         _ellipsis = ellipsis;
 
   ui.ParagraphStyle? _paragraphStyle;
   final MongolTextAlign _textAlign;
-  final double _textScaleFactor;
+  final TextScaler _textScaler;
   final int? _maxLines;
   final String? _ellipsis;
 
@@ -1024,8 +1040,7 @@ class MongolParagraphBuilder {
 
   ui.TextStyle _uiStyleForRun(int index) {
     final style = _rawStyledTextRuns[index].style;
-    return style?.getTextStyle(textScaleFactor: _textScaleFactor) ??
-        _defaultTextStyle;
+    return style?.getTextStyle(textScaler: _textScaler) ?? _defaultTextStyle;
   }
 
   String _stripNewLineChar(String text) {
