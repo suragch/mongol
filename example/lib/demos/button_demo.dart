@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class ButtonDemo extends StatelessWidget {
-  const ButtonDemo({Key? key}) : super(key: key);
+  const ButtonDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -3,7 +3,7 @@ import 'package:mongol/mongol.dart';
 
 //const text = 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ';
 class ListTileDemo extends StatelessWidget {
-  const ListTileDemo({Key? key}) : super(key: key);
+  const ListTileDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

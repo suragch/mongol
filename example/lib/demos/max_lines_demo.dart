@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class MaxLinesDemo extends StatelessWidget {
-  const MaxLinesDemo({Key? key}) : super(key: key);
+  const MaxLinesDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

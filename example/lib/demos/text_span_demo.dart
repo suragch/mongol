@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class RichTextDemo extends StatelessWidget {
-  const RichTextDemo({Key? key}) : super(key: key);
+  const RichTextDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,7 +15,7 @@ class RichTextDemo extends StatelessWidget {
 }
 
 class ExampleWidget extends StatelessWidget {
-  const ExampleWidget({Key? key}) : super(key: key);
+  const ExampleWidget({super.key});
   @override
   Widget build(BuildContext context) {
     return Container(

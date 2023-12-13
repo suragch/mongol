@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class TextDemo extends StatefulWidget {
-  const TextDemo({Key? key}) : super(key: key);
+  const TextDemo({super.key});
   @override
   State<TextDemo> createState() => _TextDemoState();
 }
@@ -63,10 +63,10 @@ class _TextDemoState extends State<TextDemo> {
 
 class Button extends StatelessWidget {
   const Button({
-    Key? key,
+    super.key,
     required this.title,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   final String title;
   final VoidCallback onPressed;

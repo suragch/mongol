@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class ResizableTextDemo extends StatefulWidget {
-  const ResizableTextDemo({Key? key}) : super(key: key);
+  const ResizableTextDemo({super.key});
   @override
   State<ResizableTextDemo> createState() => _ResizableTextDemoState();
 }

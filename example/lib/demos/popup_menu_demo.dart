@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class PopupMenuDemo extends StatelessWidget {
-  const PopupMenuDemo({Key? key}) : super(key: key);
+  const PopupMenuDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class AlertDialogDemo extends StatelessWidget {
-  const AlertDialogDemo({Key? key}) : super(key: key);
+  const AlertDialogDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

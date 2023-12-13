@@ -1108,7 +1108,7 @@ class MongolTextPainter {
     final int prevCodeUnit = plainText.codeUnitAt(max(0, offset - 1));
 
     // If the upstream character is a newline, cursor is at start of next line
-    const int NEWLINE_CODE_UNIT = 10;
+    const int newlineCodeUnit = 10;
 
     // Check for multi-code-unit glyphs such as emojis or zero width joiner.
     final bool needsSearch = isHighSurrogate(prevCodeUnit) ||
@@ -1125,7 +1125,7 @@ class MongolTextPainter {
       if (boxes.isEmpty) {
         // When we are at the beginning of the line, a non-surrogate position will
         // return empty boxes. We break and try from downstream instead.
-        if (!needsSearch && prevCodeUnit == NEWLINE_CODE_UNIT) {
+        if (!needsSearch && prevCodeUnit == newlineCodeUnit) {
           break; // Only perform one iteration if no search is required.
         }
         if (prevRuneOffset < -plainTextLength) {
@@ -1142,7 +1142,7 @@ class MongolTextPainter {
       // Try to identify the box nearest the offset.  This logic works when
       // there's just one box, and when all boxes have the same direction.
       final box = boxes.last;
-      return prevCodeUnit == NEWLINE_CODE_UNIT
+      return prevCodeUnit == newlineCodeUnit
           ? _EmptyLineCaretMetrics(lineHorizontalOffset: box.right)
           : _LineCaretMetrics(
               offset: Offset(box.right, box.top),

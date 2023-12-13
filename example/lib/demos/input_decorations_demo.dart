@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class InputDecorationsDemo extends StatelessWidget {
-  const InputDecorationsDemo({Key? key}) : super(key: key);
+  const InputDecorationsDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +13,7 @@ class InputDecorationsDemo extends StatelessWidget {
 }
 
 class InputDecorationsBody extends StatefulWidget {
-  const InputDecorationsBody({Key? key}) : super(key: key);
+  const InputDecorationsBody({super.key});
   @override
   State<InputDecorationsBody> createState() => _InputDecorationsBodyState();
 }

@@ -25,7 +25,7 @@ void main() {
 }
 
 class DemoApp extends StatelessWidget {
-  const DemoApp({Key? key}) : super(key: key);
+  const DemoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class DemoApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +122,10 @@ class HomeScreen extends StatelessWidget {
 
 class DemoTile extends StatelessWidget {
   const DemoTile({
-    Key? key,
+    super.key,
     required this.title,
     required this.destination,
-  }) : super(key: key);
+  });
 
   final String title;
   final Widget destination;

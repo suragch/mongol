@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class HorizontalListviewDemo extends StatelessWidget {
-  const HorizontalListviewDemo({Key? key}) : super(key: key);
+  const HorizontalListviewDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +13,7 @@ class HorizontalListviewDemo extends StatelessWidget {
 }
 
 class SearchBody extends StatelessWidget {
-  const SearchBody({Key? key}) : super(key: key);
+  const SearchBody({super.key});
   @override
   Widget build(BuildContext context) {
     return SafeArea(

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class EmojiCjkDemo extends StatelessWidget {
-  const EmojiCjkDemo({Key? key}) : super(key: key);
+  const EmojiCjkDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

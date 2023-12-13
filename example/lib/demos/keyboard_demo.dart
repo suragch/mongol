@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class KeyboardDemo extends StatelessWidget {
-  const KeyboardDemo({Key? key}) : super(key: key);
+  const KeyboardDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +13,7 @@ class KeyboardDemo extends StatelessWidget {
 }
 
 class BodyWidget extends StatefulWidget {
-  const BodyWidget({Key? key}) : super(key: key);
+  const BodyWidget({super.key});
   @override
   State<BodyWidget> createState() => _BodyWidgetState();
 }
@@ -114,10 +114,10 @@ class _BodyWidgetState extends State<BodyWidget> {
 
 class MongolKeyboard extends StatelessWidget {
   const MongolKeyboard({
-    Key? key,
+    super.key,
     this.onTextInput,
     this.onBackspace,
-  }) : super(key: key);
+  });
 
   final ValueSetter<String>? onTextInput;
   final VoidCallback? onBackspace;
@@ -337,11 +337,11 @@ class MongolKeyboard extends StatelessWidget {
 
 class MongolKeyboardKey extends StatelessWidget {
   const MongolKeyboardKey({
-    Key? key,
+    super.key,
     required this.text,
     this.onTextInput,
     this.flex = 1,
-  }) : super(key: key);
+  });
 
   final String text;
   final ValueSetter<String>? onTextInput;
@@ -369,10 +369,10 @@ class MongolKeyboardKey extends StatelessWidget {
 
 class BackspaceKey extends StatelessWidget {
   const BackspaceKey({
-    Key? key,
+    super.key,
     this.onBackspace,
     this.flex = 1,
-  }) : super(key: key);
+  });
 
   final VoidCallback? onBackspace;
   final int flex;

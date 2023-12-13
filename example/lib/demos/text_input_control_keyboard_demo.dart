@@ -6,7 +6,7 @@ import 'package:mongol/mongol.dart';
 import 'keyboard_demo.dart';
 
 class TextInputControlKeyboardDemo extends StatelessWidget {
-  const TextInputControlKeyboardDemo({Key? key}) : super(key: key);
+  const TextInputControlKeyboardDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class TextInputControlKeyboardDemo extends StatelessWidget {
 }
 
 class BodyWidget extends StatefulWidget {
-  const BodyWidget({Key? key}) : super(key: key);
+  const BodyWidget({super.key});
 
   @override
   State<BodyWidget> createState() => MyStatefulWidgetState();
@@ -140,7 +140,7 @@ class MyTextInputControl with TextInputControl {
     final text = _editingState.text;
     final textSelection = _editingState.selection;
     final newText =
-    text.replaceRange(textSelection.start, textSelection.end, myText);
+        text.replaceRange(textSelection.start, textSelection.end, myText);
     final myTextLength = myText.length;
     _editingState = _editingState.copyWith(
       text: newText,
@@ -161,7 +161,7 @@ class MyTextInputControl with TextInputControl {
     // There is a selection.
     if (selectionLength > 0) {
       final newText =
-      text.replaceRange(textSelection.start, textSelection.end, '');
+          text.replaceRange(textSelection.start, textSelection.end, '');
       _editingState = _editingState.copyWith(
           text: newText,
           selection: textSelection.copyWith(

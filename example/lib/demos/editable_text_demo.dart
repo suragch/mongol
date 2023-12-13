@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
 class MongolEditableTextDemo extends StatelessWidget {
-  const MongolEditableTextDemo({Key? key}) : super(key: key);
+  const MongolEditableTextDemo({super.key});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -13,7 +13,7 @@ class MongolEditableTextDemo extends StatelessWidget {
 }
 
 class SearchBody extends StatefulWidget {
-  const SearchBody({Key? key}) : super(key: key);
+  const SearchBody({super.key});
   @override
   State<SearchBody> createState() => _SearchBodyState();
 }
