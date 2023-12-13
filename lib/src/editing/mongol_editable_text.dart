@@ -1656,6 +1656,18 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
   }
 
+  /// This method is not yet implemented and always returns null.
+  SuggestionSpan? findSuggestionSpanAtCursorIndex(int cursorIndex) {
+    // Spellcheck is not implemented yet.
+    return null;
+  }
+
+  /// This method is not yet implemented and always returns false.
+  bool showSpellCheckSuggestionsToolbar() {
+    // Spellcheck is not implemented yet.
+    return false;
+  }
+
   /// Returns the [ContextMenuButtonItem]s for the given [ToolbarOptions].
   @Deprecated(
     'Use `contextMenuBuilder` instead of `toolbarOptions`. '

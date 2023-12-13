@@ -1061,27 +1061,24 @@ class MongolTextSelectionGestureDetectorBuilder {
   @protected
   void onSingleTapUp(TapDragUpDetails details) {
     if (delegate.selectionEnabled) {
-      // Handle shift + click selection if needed.
-      final bool isShiftPressed = _containsShift(details.keysPressedOnDown);
       // It is impossible to extend the selection when the shift key is pressed, if the
       // renderEditable.selection is invalid.
       final bool isShiftPressedValid =
-          isShiftPressed && renderEditable.selection?.baseOffset != null;
+          _isShiftPressed && renderEditable.selection?.baseOffset != null;
       switch (defaultTargetPlatform) {
         case TargetPlatform.linux:
         case TargetPlatform.macOS:
         case TargetPlatform.windows:
-          editableText.hideToolbar();
+          break;
         // On desktop platforms the selection is set on tap down.
         case TargetPlatform.android:
-          editableText.hideToolbar();
           if (isShiftPressedValid) {
             _extendSelection(details.globalPosition, SelectionChangedCause.tap);
             return;
           }
           renderEditable.selectPosition(cause: SelectionChangedCause.tap);
+          editableText.showSpellCheckSuggestionsToolbar();
         case TargetPlatform.fuchsia:
-          editableText.hideToolbar();
           if (isShiftPressedValid) {
             _extendSelection(details.globalPosition, SelectionChangedCause.tap);
             return;
@@ -1106,9 +1103,15 @@ class MongolTextSelectionGestureDetectorBuilder {
             case PointerDeviceKind.trackpad:
             case PointerDeviceKind.stylus:
             case PointerDeviceKind.invertedStylus:
+              // Precise devices should place the cursor at a precise position if the
+              // word at the text position is not misspelled.
               renderEditable.selectPosition(cause: SelectionChangedCause.tap);
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
+              // If the word that was tapped is misspelled, select the word and show the spell check suggestions
+              // toolbar once. If additional taps are made on a misspelled word, toggle the toolbar. If the word
+              // is not misspelled, default to the following behavior:
+              //
               // Toggle the toolbar if the `previousSelection` is collapsed, the tap is on the selection, the
               // TextAffinity remains the same, and the editable is focused. The TextAffinity is important when the
               // cursor is on the boundary of a line wrap, if the affinity is different (i.e. it is downstream), the
@@ -1127,8 +1130,19 @@ class MongolTextSelectionGestureDetectorBuilder {
                   renderEditable.getPositionForPoint(details.globalPosition);
               final bool isAffinityTheSame =
                   textPosition.affinity == previousSelection.affinity;
+              final bool wordAtCursorIndexIsMisspelled = editableText
+                      .findSuggestionSpanAtCursorIndex(textPosition.offset) !=
+                  null;
 
-              if (((_positionWasOnSelectionExclusive(textPosition) &&
+              if (wordAtCursorIndexIsMisspelled) {
+                renderEditable.selectWord(cause: SelectionChangedCause.tap);
+                if (previousSelection !=
+                    editableText.textEditingValue.selection) {
+                  editableText.showSpellCheckSuggestionsToolbar();
+                } else {
+                  editableText.toggleToolbar(false);
+                }
+              } else if (((_positionWasOnSelectionExclusive(textPosition) &&
                           !previousSelection.isCollapsed) ||
                       (_positionWasOnSelectionInclusive(textPosition) &&
                           previousSelection.isCollapsed &&
@@ -1269,16 +1283,7 @@ class MongolTextSelectionGestureDetectorBuilder {
   ///    callback.
   @protected
   void onSingleLongTapEnd(LongPressEndDetails details) {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.android:
-      case TargetPlatform.iOS:
-        editableText.hideMagnifier();
-      case TargetPlatform.fuchsia:
-      case TargetPlatform.linux:
-      case TargetPlatform.macOS:
-      case TargetPlatform.windows:
-        break;
-    }
+    _hideMagnifierIfSupportedByPlatform();
     if (shouldShowSelectionToolbar) {
       editableText.showToolbar();
     }
@@ -1571,9 +1576,7 @@ class MongolTextSelectionGestureDetectorBuilder {
       return;
     }
 
-    final bool isShiftPressed = _containsShift(details.keysPressedOnDown);
-
-    if (!isShiftPressed) {
+    if (!_isShiftPressed) {
       // Adjust the drag start offset for possible viewport offset changes.
       final Offset editableOffset = renderEditable.maxLines == 1
           ? Offset(renderEditable.offset.pixels - _dragStartViewportOffset, 0.0)
@@ -1587,16 +1590,32 @@ class MongolTextSelectionGestureDetectorBuilder {
           details.globalPosition - details.offsetFromOrigin;
 
       // Select word by word.
-      if (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount) == 2) {
-        return renderEditable.selectWordsInRange(
+      if (_TextSelectionGestureDetectorState._getEffectiveConsecutiveTapCount(
+              details.consecutiveTapCount) ==
+          2) {
+        renderEditable.selectWordsInRange(
           from: dragStartGlobalPosition - editableOffset - scrollableOffset,
           to: details.globalPosition,
           cause: SelectionChangedCause.drag,
         );
+
+        switch (details.kind) {
+          case PointerDeviceKind.stylus:
+          case PointerDeviceKind.invertedStylus:
+          case PointerDeviceKind.touch:
+          case PointerDeviceKind.unknown:
+            return _showMagnifierIfSupportedByPlatform(details.globalPosition);
+          case PointerDeviceKind.mouse:
+          case PointerDeviceKind.trackpad:
+          case null:
+            return;
+        }
       }
 
       // Select paragraph-by-paragraph.
-      if (_getEffectiveConsecutiveTapCount(details.consecutiveTapCount) == 3) {
+      if (_TextSelectionGestureDetectorState._getEffectiveConsecutiveTapCount(
+              details.consecutiveTapCount) ==
+          3) {
         switch (defaultTargetPlatform) {
           case TargetPlatform.android:
           case TargetPlatform.fuchsia:
@@ -1658,16 +1677,16 @@ class MongolTextSelectionGestureDetectorBuilder {
             case PointerDeviceKind.invertedStylus:
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
-              _dragBeganOnPreviousSelection ??= _positionOnSelection(
-                  dragStartGlobalPosition, _dragStartSelection);
               assert(_dragBeganOnPreviousSelection != null);
               if (renderEditable.hasFocus &&
                   _dragStartSelection!.isCollapsed &&
                   _dragBeganOnPreviousSelection!) {
-                return renderEditable.selectPositionAt(
+                renderEditable.selectPositionAt(
                   from: details.globalPosition,
                   cause: SelectionChangedCause.drag,
                 );
+                return _showMagnifierIfSupportedByPlatform(
+                    details.globalPosition);
               }
             case null:
               break;
@@ -1692,10 +1711,12 @@ class MongolTextSelectionGestureDetectorBuilder {
             case PointerDeviceKind.touch:
             case PointerDeviceKind.unknown:
               if (renderEditable.hasFocus) {
-                return renderEditable.selectPositionAt(
+                renderEditable.selectPositionAt(
                   from: details.globalPosition,
                   cause: SelectionChangedCause.drag,
                 );
+                return _showMagnifierIfSupportedByPlatform(
+                    details.globalPosition);
               }
             case null:
               break;
@@ -1767,12 +1788,20 @@ class MongolTextSelectionGestureDetectorBuilder {
   ///    callback.
   @protected
   void onDragSelectionEnd(TapDragEndDetails details) {
-    final bool isShiftPressed = _containsShift(details.keysPressedOnDown);
     _dragBeganOnPreviousSelection = null;
 
-    if (isShiftPressed) {
+    if (_shouldShowSelectionToolbar &&
+        _TextSelectionGestureDetectorState._getEffectiveConsecutiveTapCount(
+                details.consecutiveTapCount) ==
+            2) {
+      editableText.showToolbar();
+    }
+
+    if (_isShiftPressed) {
       _dragStartSelection = null;
     }
+
+    _hideMagnifierIfSupportedByPlatform();
   }
 
   /// Returns a [TextSelectionGestureDetector] configured with the handlers

@@ -10,7 +10,6 @@ class InputDecorationsDemo extends StatelessWidget {
       body: const InputDecorationsBody(),
     );
   }
-  TextSelectionGestureDetectorBuilder s
 }
 
 class InputDecorationsBody extends StatefulWidget {
