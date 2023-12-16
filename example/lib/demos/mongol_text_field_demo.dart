@@ -41,17 +41,33 @@ class _SearchBodyState extends State<SearchBody> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              width: 200,
-              height: 200,
-              child: MongolTextField(
-                style: const TextStyle(fontSize: 24),
-                controller: controller1,
-                maxLines: null,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: MongolTextField(
+                    style: const TextStyle(fontSize: 24),
+                    controller: controller1,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                 ),
-              ),
+                SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: TextField(
+                    style: const TextStyle(fontSize: 24),
+                    controller: controller1,
+                    maxLines: null,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(
@@ -64,7 +80,7 @@ class _SearchBodyState extends State<SearchBody> {
                 maxLines: null,
                 expands: true,
                 decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: MongolOutlineInputBorder(),
                 ),
               ),
             ),

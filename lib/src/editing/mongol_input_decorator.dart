@@ -56,7 +56,9 @@ const Duration _kHintFadeTransitionDuration = Duration(milliseconds: 20);
 // floating label will appear.
 class _InputBorderGap extends ChangeNotifier {
   double? _start;
+
   double? get start => _start;
+
   set start(double? value) {
     if (value != _start) {
       _start = value;
@@ -65,7 +67,9 @@ class _InputBorderGap extends ChangeNotifier {
   }
 
   double _extent = 0.0;
+
   double get extent => _extent;
+
   set extent(double value) {
     if (value != _extent) {
       _extent = value;
@@ -668,15 +672,25 @@ class _RenderDecoration extends RenderBox
   static const double subtextGap = 8.0;
 
   RenderBox? get icon => childForSlot(_DecorationSlot.icon);
+
   RenderBox? get input => childForSlot(_DecorationSlot.input);
+
   RenderBox? get label => childForSlot(_DecorationSlot.label);
+
   RenderBox? get hint => childForSlot(_DecorationSlot.hint);
+
   RenderBox? get prefix => childForSlot(_DecorationSlot.prefix);
+
   RenderBox? get suffix => childForSlot(_DecorationSlot.suffix);
+
   RenderBox? get prefixIcon => childForSlot(_DecorationSlot.prefixIcon);
+
   RenderBox? get suffixIcon => childForSlot(_DecorationSlot.suffixIcon);
+
   RenderBox? get helperError => childForSlot(_DecorationSlot.helperError);
+
   RenderBox? get counter => childForSlot(_DecorationSlot.counter);
+
   RenderBox? get container => childForSlot(_DecorationSlot.container);
 
   // The returned list is ordered for hit testing.
@@ -699,6 +713,7 @@ class _RenderDecoration extends RenderBox
 
   _Decoration get decoration => _decoration;
   _Decoration _decoration;
+
   set decoration(_Decoration value) {
     if (_decoration == value) {
       return;
@@ -709,6 +724,7 @@ class _RenderDecoration extends RenderBox
 
   TextBaseline get textBaseline => _textBaseline;
   TextBaseline _textBaseline;
+
   set textBaseline(TextBaseline value) {
     if (_textBaseline == value) {
       return;
@@ -719,9 +735,11 @@ class _RenderDecoration extends RenderBox
 
   TextAlignHorizontal get _defaultTextAlignHorizontal =>
       _isOutlineAligned ? TextAlignHorizontal.center : TextAlignHorizontal.left;
+
   TextAlignHorizontal? get textAlignHorizontal =>
       _textAlignHorizontal ?? _defaultTextAlignHorizontal;
   TextAlignHorizontal? _textAlignHorizontal;
+
   set textAlignHorizontal(TextAlignHorizontal? value) {
     if (_textAlignHorizontal == value) {
       return;
@@ -737,6 +755,7 @@ class _RenderDecoration extends RenderBox
 
   bool get isFocused => _isFocused;
   bool _isFocused;
+
   set isFocused(bool value) {
     if (_isFocused == value) {
       return;
@@ -747,6 +766,7 @@ class _RenderDecoration extends RenderBox
 
   bool get expands => _expands;
   bool _expands = false;
+
   set expands(bool value) {
     if (_expands == value) {
       return;
@@ -1796,15 +1816,21 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   }
 
   InputDecoration? _effectiveDecoration;
+
   InputDecoration get decoration => _effectiveDecoration ??=
       widget.decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
 
   MongolTextAlign? get textAlign => widget.textAlign;
+
   bool get isFocused => widget.isFocused;
+
   bool get _hasError =>
       decoration.errorText != null || decoration.error != null;
+
   bool get isHovering => widget.isHovering && decoration.enabled;
+
   bool get isEmpty => widget.isEmpty;
+
   bool get _floatingLabelEnabled {
     return decoration.floatingLabelBehavior != FloatingLabelBehavior.never;
   }
@@ -2318,23 +2344,23 @@ class _InputDecoratorState extends State<MongolInputDecorator>
       if (decoration.filled ?? false) {
         contentPadding = decorationContentPadding ??
             (decorationIsDense
-                ? const EdgeInsets.fromLTRB(12.0, 8.0, 12.0, 8.0)
+                ? const EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 12.0)
                 : const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0));
       } else {
-        // Not left or right padding for underline borders that aren't filled
+        // Not top or bottom padding for underline borders that aren't filled
         // is a small concession to backwards compatibility. This eliminates
         // the most noticeable layout change introduced by #13734.
         contentPadding = decorationContentPadding ??
             (decorationIsDense
-                ? const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0)
-                : const EdgeInsets.fromLTRB(0.0, 12.0, 0.0, 12.0));
+                ? const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0)
+                : const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0));
       }
     } else {
       floatingLabelWidth = 0.0;
       contentPadding = decorationContentPadding ??
           (decorationIsDense
-              ? const EdgeInsets.fromLTRB(12.0, 20.0, 12.0, 12.0)
-              : const EdgeInsets.fromLTRB(12.0, 24.0, 12.0, 16.0));
+              ? const EdgeInsets.fromLTRB(20.0, 12.0, 12.0, 12.0)
+              : const EdgeInsets.fromLTRB(24.0, 12.0, 16.0, 12.0));
     }
 
     final _Decorator decorator = _Decorator(
