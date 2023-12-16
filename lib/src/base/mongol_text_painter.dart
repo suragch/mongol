@@ -1145,7 +1145,7 @@ class MongolTextPainter {
       return prevCodeUnit == newlineCodeUnit
           ? _EmptyLineCaretMetrics(lineHorizontalOffset: box.right)
           : _LineCaretMetrics(
-              offset: Offset(box.right, box.top),
+              offset: Offset(box.left, box.bottom),
               fullWidth: box.right - box.left,
             );
     }

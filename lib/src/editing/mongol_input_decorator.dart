@@ -1764,6 +1764,11 @@ class _InputDecoratorState extends State<MongolInputDecorator>
         vsync: this,
         value: labelIsInitiallyFloating ? 1.0 : 0.0);
     _floatingLabelController.addListener(_handleChange);
+    _floatingLabelAnimation = CurvedAnimation(
+      parent: _floatingLabelController,
+      curve: _kTransitionCurve,
+      reverseCurve: _kTransitionCurve.flipped,
+    );
 
     _shakingLabelController = AnimationController(
       duration: _kTransitionDuration,
