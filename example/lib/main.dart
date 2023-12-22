@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
+import 'package:mongol_demo_app/demos/base_demo.dart';
 
 import 'demos/alert_dialog_demo.dart';
 import 'demos/button_demo.dart';
@@ -114,6 +115,10 @@ class HomeScreen extends StatelessWidget {
         DemoTile(
           title: 'Buttons',
           destination: ButtonDemo(),
+        ),
+        DemoTile(
+          title: 'MongolTextPainter',
+          destination: TextPainterDemo(),
         ),
       ],
     );
