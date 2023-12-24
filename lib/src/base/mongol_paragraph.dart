@@ -336,18 +336,39 @@ class MongolParagraph {
   void _calculateIntrinsicHeight() {
     var sum = 0.0;
     var maxRunWidth = 0.0;
-    var maxLineLength = 0.0;
-    for (final line in _lines) {
+    var maxLineEndsWithNewLine = 0.0;
+    var minLineEndsWithoutNewLine = double.infinity;
+    for (var index = 0; index < _lines.length; index++) {
+      final line = _lines[index];
+      _TextRun? lastRun;
       for (var i = line.textRunStart; i < line.textRunEnd; i++) {
-        final width = _runs[i].width;
+        lastRun = _runs[i];
+        final width = lastRun.width;
         maxRunWidth = math.max(width, maxRunWidth);
         sum += width;
       }
-      maxLineLength = math.max(maxLineLength, sum);
+      final bool endsWithNewLine;
+      if (lastRun != null) {
+        endsWithNewLine = _runEndsWithNewLine(lastRun);
+      } else {
+        endsWithNewLine = false;
+      }
+      final hasNextLine = index < _lines.length - 1;
+      if (hasNextLine && !endsWithNewLine) {
+        final nextLine = _lines[index + 1];
+        sum += _runs[nextLine.textRunStart].width;
+        minLineEndsWithoutNewLine = math.min(minLineEndsWithoutNewLine, sum);
+      } else {
+        maxLineEndsWithNewLine = math.max(maxLineEndsWithNewLine, sum);
+      }
       sum = 0;
     }
+    if (minLineEndsWithoutNewLine == double.infinity) {
+      minLineEndsWithoutNewLine = 0;
+    }
     _minIntrinsicHeight = maxRunWidth;
-    _maxIntrinsicHeight = maxLineLength;
+    _maxIntrinsicHeight =
+        math.max(minLineEndsWithoutNewLine, maxLineEndsWithNewLine);
   }
 
   /// Returns the text position closest to the given offset.
