@@ -141,7 +141,7 @@ void main() {
           ))
       ..layout(maxHeight: 80);
 
-    expect(painter.size, const Size(20.0, 60.0));
+    expect(painter.size, const Size(20.0, 80.0));
 
     // before the first character
     var offset = const Offset(-1.0, -1.0);

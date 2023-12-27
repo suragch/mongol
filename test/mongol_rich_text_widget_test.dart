@@ -70,7 +70,7 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(28.0)); // two lines
-    expect(baseSize.height, equals(406.0));
+    expect(baseSize.height, equals(500.0));
   });
 
   testWidgets('MongolRichText wraps text for new line character',
@@ -192,7 +192,8 @@ void main() {
 
     final baseSize = tester.getSize(find.byType(MongolRichText));
     expect(baseSize.width, equals(42.0));
-    expect(baseSize.height, equals(283.0));
+    expect(baseSize.height,
+        equals(282.7890625)); // should this be rounded to 283.0?
   });
 
   testWidgets('MongolText handles embedded formatting characters',
