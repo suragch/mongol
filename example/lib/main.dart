@@ -19,7 +19,7 @@ import 'demos/resizable_text_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/text_span_demo.dart';
 
-const versionTitle = 'Flutter mongol package 6.0.0';
+const versionTitle = 'Flutter mongol package 7.0.0';
 
 void main() {
   runApp(const DemoApp());
