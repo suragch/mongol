@@ -784,14 +784,6 @@ class MongolTextSelectionGestureDetectorBuilder {
         targetSelection.end >= textPosition.offset;
   }
 
-  /// Returns true if shift left or right is contained in the given set.
-  static bool _containsShift(Set<LogicalKeyboardKey> keysPressed) {
-    return keysPressed.any(<LogicalKeyboardKey>{
-      LogicalKeyboardKey.shiftLeft,
-      LogicalKeyboardKey.shiftRight
-    }.contains);
-  }
-
   // Expand the selection to the given global position.
   //
   // Either base or extent will be moved to the last tapped position, whichever
