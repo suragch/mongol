@@ -11,6 +11,11 @@
 // If it is resolved then you can directly extend ButtonStyleButton for all of
 // the buttons.
 
+// NOTE: This file is a copy of the original file from the Flutter SDK and only deviates
+// in the VisualDensity adjustment from the _MongolButtonStyleState.build method.
+// In this file, the VisualDensity adjustment only reduces the vertical size of the button.
+// This is opposite to the original file.
+
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -265,7 +270,8 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
     T? resolve<T>(
         MaterialStateProperty<T>? Function(ButtonStyle? style) getProperty) {
       return effectiveValue(
-        (ButtonStyle? style) => getProperty(style)?.resolve(statesController.value),
+        (ButtonStyle? style) =>
+            getProperty(style)?.resolve(statesController.value),
       );
     }
 
@@ -348,19 +354,17 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
       }
     }
 
+    // This is the only deviation from [_ButtonStyleState] in the original.
+    //
     // Per the Material Design team: don't allow the VisualDensity
-    // adjustment to reduce the width of the left/right padding. If we
+    // adjustment to reduce the height of the top/bottom padding. If we
     // did, VisualDensity.compact, the default for desktop/web, would
-    // reduce the horizontal padding to zero.
-    
-    // todo material3 add comment.
-    final double dx = densityAdjustment.dy;
-    final double dy = math.max(0, densityAdjustment.dx);
-    print('dx: $dx, dy: $dy');
+    // reduce the vertical padding to zero.
+    final double dy = math.max(0, densityAdjustment.dy);
+    final double dx = densityAdjustment.dx;
     final EdgeInsetsGeometry padding = resolvedPadding!
         .add(EdgeInsets.fromLTRB(dx, dy, dx, dy))
         .clamp(EdgeInsets.zero, EdgeInsetsGeometry.infinity);
-    print('padding1: $padding');
 
     // If an opaque button's background is becoming translucent while its
     // elevation is changing, change the elevation first. Material implicitly

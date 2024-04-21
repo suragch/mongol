@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol.dart';
 
 class ButtonDemo extends StatelessWidget {
@@ -46,14 +45,11 @@ class ButtonDemo extends StatelessWidget {
                   child: const MongolText('ᠳᠦᠷᠪᠡ'),
                 ),
                 const SizedBox(width: 16),
-                RotatedBox(
-                  quarterTurns: 1,
-                  child: FilledButton(
-                    onPressed: () {
-                      _showStackBar(context, 'MongolFilledButton');
-                    },
-                    child: const Text('ᠳᠦᠷᠪᠡ'),
-                  ),
+                MongolFilledButton.tonal(
+                  onPressed: () {
+                    _showStackBar(context, 'MongolFilledButton.tonal');
+                  },
+                  child: const MongolText('ᠲᠠᠪᠤ'),
                 ),
               ],
             ),
@@ -95,21 +91,18 @@ class ButtonDemo extends StatelessWidget {
                 const SizedBox(width: 16),
                 MongolFilledButton.icon(
                   onPressed: () {
-                    _showStackBar(context, 'MongolFilledButton');
+                    _showStackBar(context, 'MongolFilledButton.icon');
                   },
                   label: const MongolText('ᠳᠦᠷᠪᠡ'),
                   icon: const Icon(Icons.local_florist),
                 ),
                 const SizedBox(width: 16),
-                RotatedBox(
-                  quarterTurns: 1,
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      _showStackBar(context, 'MongolFilledButton');
-                    },
-                     label: const Text('ᠳᠦᠷᠪᠡ'),
+                MongolFilledButton.tonalIcon(
+                  onPressed: () {
+                    _showStackBar(context, 'MongolFilledButton.tonalIcon');
+                  },
+                  label: const MongolText('ᠲᠠᠪᠤ'),
                   icon: const Icon(Icons.local_florist),
-                  ),
                 ),
               ],
             ),
