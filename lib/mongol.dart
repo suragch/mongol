@@ -3,6 +3,7 @@ library mongol;
 export 'package:mongol/src/base/mongol_text_align.dart';
 export 'package:mongol/src/base/mongol_text_painter.dart';
 export 'package:mongol/src/button/mongol_elevated_button.dart';
+export 'package:mongol/src/button/mongol_filled_button.dart';
 export 'package:mongol/src/button/mongol_icon_button.dart';
 export 'package:mongol/src/button/mongol_outlined_button.dart';
 export 'package:mongol/src/button/mongol_text_button.dart';

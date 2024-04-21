@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol.dart';
 
 class ButtonDemo extends StatelessWidget {
@@ -37,6 +38,23 @@ class ButtonDemo extends StatelessWidget {
                   },
                   child: const MongolText('ᠭᠤᠷᠪᠠ'),
                 ),
+                const SizedBox(width: 16),
+                MongolFilledButton(
+                  onPressed: () {
+                    _showStackBar(context, 'MongolFilledButton');
+                  },
+                  child: const MongolText('ᠳᠦᠷᠪᠡ'),
+                ),
+                const SizedBox(width: 16),
+                RotatedBox(
+                  quarterTurns: 1,
+                  child: FilledButton(
+                    onPressed: () {
+                      _showStackBar(context, 'MongolFilledButton');
+                    },
+                    child: const Text('ᠳᠦᠷᠪᠡ'),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 32),
@@ -73,6 +91,25 @@ class ButtonDemo extends StatelessWidget {
                   },
                   icon: const Icon(Icons.local_florist),
                   mongolTooltip: 'ᠳᠦᠷᠪᠡ',
+                ),
+                const SizedBox(width: 16),
+                MongolFilledButton.icon(
+                  onPressed: () {
+                    _showStackBar(context, 'MongolFilledButton');
+                  },
+                  label: const MongolText('ᠳᠦᠷᠪᠡ'),
+                  icon: const Icon(Icons.local_florist),
+                ),
+                const SizedBox(width: 16),
+                RotatedBox(
+                  quarterTurns: 1,
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      _showStackBar(context, 'MongolFilledButton');
+                    },
+                     label: const Text('ᠳᠦᠷᠪᠡ'),
+                  icon: const Icon(Icons.local_florist),
+                  ),
                 ),
               ],
             ),

@@ -352,11 +352,15 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
     // adjustment to reduce the width of the left/right padding. If we
     // did, VisualDensity.compact, the default for desktop/web, would
     // reduce the horizontal padding to zero.
-    final double dy = densityAdjustment.dy;
-    final double dx = math.max(0, densityAdjustment.dx);
+    
+    // todo material3 add comment.
+    final double dx = densityAdjustment.dy;
+    final double dy = math.max(0, densityAdjustment.dx);
+    print('dx: $dx, dy: $dy');
     final EdgeInsetsGeometry padding = resolvedPadding!
         .add(EdgeInsets.fromLTRB(dx, dy, dx, dy))
         .clamp(EdgeInsets.zero, EdgeInsetsGeometry.infinity);
+    print('padding1: $padding');
 
     // If an opaque button's background is becoming translucent while its
     // elevation is changing, change the elevation first. Material implicitly
