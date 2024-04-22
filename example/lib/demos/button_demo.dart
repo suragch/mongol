@@ -86,14 +86,6 @@ class _ButtonDemoState extends State<ButtonDemo> {
                     label: const MongolText('ᠨᠢᠭᠡ'),
                   ),
                   const SizedBox(width: 16),
-                  TextButton.icon(
-                    onPressed: () {
-                      _showStackBar(context, 'MongolTextButton.icon');
-                    },
-                    icon: const Icon(Icons.local_florist),
-                    label: const Text('ᠨᠢᠭᠡ'),
-                  ),
-                  const SizedBox(width: 16),
                   MongolOutlinedButton.icon(
                     onPressed: () {
                       _showStackBar(context, 'MongolOutlinedButton.icon');
@@ -110,14 +102,6 @@ class _ButtonDemoState extends State<ButtonDemo> {
                     label: const MongolText('ᠭᠤᠷᠪᠠ'),
                   ),
                   const SizedBox(width: 16),
-                  MongolIconButton(
-                    onPressed: () {
-                      _showStackBar(context, 'MongolIconButton');
-                    },
-                    icon: const Icon(Icons.local_florist),
-                    mongolTooltip: 'ᠳᠦᠷᠪᠡ',
-                  ),
-                  const SizedBox(width: 16),
                   MongolFilledButton.icon(
                     onPressed: () {
                       _showStackBar(context, 'MongolFilledButton.icon');
@@ -132,6 +116,43 @@ class _ButtonDemoState extends State<ButtonDemo> {
                     },
                     label: const MongolText('ᠲᠠᠪᠤ'),
                     icon: const Icon(Icons.local_florist),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  MongolIconButton(
+                    onPressed: () {
+                      _showStackBar(context, 'MongolIconButton');
+                    },
+                    icon: const Icon(Icons.local_florist),
+                    tooltip: 'ᠨᠢᠭᠡ',
+                  ),
+                  const SizedBox(width: 16),
+                  MongolIconButton.filled(
+                    onPressed: () {
+                      _showStackBar(context, 'MongolIconButton.filled');
+                    },
+                    icon: const Icon(Icons.local_florist),
+                    tooltip: 'ᠬᠣᠶᠠᠷ',
+                  ),
+                  const SizedBox(width: 16),
+                  MongolIconButton.filledTonal(
+                    onPressed: () {
+                      _showStackBar(context, 'MongolIconButton.filledTonal');
+                    },
+                    icon: const Icon(Icons.local_florist),
+                    tooltip: 'ᠭᠤᠷᠪᠠ',
+                  ),
+                  const SizedBox(width: 16),
+                  MongolIconButton.outlined(
+                    onPressed: () {
+                      _showStackBar(context, 'MongolIconButton.outlined');
+                    },
+                    icon: const Icon(Icons.local_florist),
+                    tooltip: 'ᠳᠦᠷᠪᠡ',
                   ),
                 ],
               ),
