@@ -57,9 +57,9 @@ class _PopupMenuDemoState extends State<PopupMenuDemo> {
               PopupMenuButton(
                 icon: const Icon(Icons.other_houses),
                 itemBuilder: (context) => const [
-                  PopupMenuItem(value: 1, child: Text('ᠨᠢᠭᠡ')),
-                  PopupMenuItem(value: 2, child: Text('ᠬᠤᠶᠠᠷ')),
-                  PopupMenuItem(value: 3, child: Text('ᠭᠤᠷᠪᠠ')),
+                  CheckedPopupMenuItem(value: 1, child: Text('ᠨᠢᠭᠡ')),
+                  CheckedPopupMenuItem(value: 2, child: Text('ᠬᠤᠶᠠᠷ')),
+                  CheckedPopupMenuItem(value: 3, child: Text('ᠭᠤᠷᠪᠠ')),
                 ],
                 tooltip: 'Popup Menu Button',
                 onSelected: (value) => _showStackBar(context, value),
@@ -68,9 +68,9 @@ class _PopupMenuDemoState extends State<PopupMenuDemo> {
               MongolPopupMenuButton(
                 icon: const Icon(Icons.other_houses),
                 itemBuilder: (context) => const [
-                  MongolPopupMenuItem(value: 1, child: MongolText('ᠨᠢᠭᠡ')),
-                  MongolPopupMenuItem(value: 2, child: MongolText('ᠬᠤᠶᠠᠷ')),
-                  MongolPopupMenuItem(value: 3, child: MongolText('ᠭᠤᠷᠪᠠ')),
+                  MongolCheckedPopupMenuItem(value: 1, child: MongolText('ᠨᠢᠭᠡ')),
+                  MongolCheckedPopupMenuItem(value: 2, child: MongolText('ᠬᠤᠶᠠᠷ')),
+                  MongolCheckedPopupMenuItem(value: 3, child: MongolText('ᠭᠤᠷᠪᠠ')),
                 ],
                 tooltip: 'Mongol Popup Menu Button',
                 onSelected: (value) => _showStackBar(context, value),
