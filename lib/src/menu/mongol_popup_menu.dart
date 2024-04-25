@@ -68,6 +68,7 @@ const double _kMenuScreenPadding = 8.0;
 ///
 ///  * [MongolPopupMenuItem], a popup menu entry for a single value.
 ///  * [MongolPopupMenuDivider], a popup menu entry that is just a vertical line.
+///  * [MongolCheckedPopupMenuItem], a popup menu item with a checkmark.
 ///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.
 ///  * [MongolPopupMenuButton], an [IconButton] that automatically shows a menu
 ///    when it is tapped.
@@ -190,6 +191,9 @@ class _RenderMenuItem extends RenderShiftedBox {
 /// To show a popup menu, use the [showMongolMenu] function. To create a button that
 /// shows a popup menu, consider using [MongolPopupMenuButton].
 ///
+/// To show a checkmark next to a popup menu item, consider using
+/// [MongolCheckedPopupMenuItem].
+///
 /// Typically the [child] of a [MongolPopupMenuItem] is a [MongolText] widget.
 /// More elaborate menus with icons can use a [MongolListTile]. By default, a
 /// [MongolPopupMenuItem] is [kMinInteractiveDimension] pixels
@@ -210,11 +214,15 @@ class _RenderMenuItem extends RenderShiftedBox {
 /// {@end-tool}
 ///
 /// See the example at [MongolPopupMenuButton] for how this example could be
-/// used in a complete menu.
+/// used in a complete menu, and see the example at [MongolCheckedPopupMenuItem] for one way to
+/// keep the text of [MongolPopupMenuItem]s that use [MongolText] widgets in their [child]
+/// slot aligned with the text of [MongolCheckedPopupMenuItem]s or of [MongolPopupMenuItem]
+/// that use a [MongolListTile] in their [child] slot.
 ///
 /// See also:
 ///
 ///  * [MongolPopupMenuDivider], which can be used to divide items from each other.
+///  * [MongolCheckedPopupMenuItem], a variant of [MongolPopupMenuItem] with a checkmark.
 ///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.
 ///  * [MongolPopupMenuButton], an [IconButton] that automatically shows a menu when
 ///    it is tapped.
@@ -421,15 +429,15 @@ class MongolPopupMenuItemState<T, W extends MongolPopupMenuItem<T>>
   }
 }
 
-/// An item with a checkmark in a Material Design popup menu.
+/// An item with a checkmark in a Mongol Material Design popup menu.
 ///
-/// To show a popup menu, use the [showMenu] function. To create a button that
-/// shows a popup menu, consider using [PopupMenuButton].
+/// To show a popup menu, use the [showMongolMenu] function. To create a button that
+/// shows a popup menu, consider using [MongolPopupMenuButton].
 ///
-/// A [CheckedPopupMenuItem] is kMinInteractiveDimension pixels high, which
-/// matches the default minimum height of a [PopupMenuItem]. The horizontal
-/// layout uses [ListTile]; the checkmark is an [Icons.done] icon, shown in the
-/// [ListTile.leading] position.
+/// A [MongolCheckedPopupMenuItem] is kMinInteractiveDimension pixels high, which
+/// matches the default minimum height of a [MongolPopupMenuItem]. The horizontal
+/// layout uses [MongolListTile]; the checkmark is an [Icons.done] icon, shown in the
+/// [MongolListTile.leading] position.
 ///
 /// {@tool snippet}
 ///
@@ -442,7 +450,7 @@ class MongolPopupMenuItemState<T, W extends MongolPopupMenuItem<T>>
 /// shows a divider placed between the two menu items.)
 ///
 /// ```dart
-/// PopupMenuButton<Commands>(
+/// MongolPopupMenuButton<Commands>(
 ///   onSelected: (Commands result) {
 ///     switch (result) {
 ///       case Commands.heroAndScholar:
@@ -453,16 +461,16 @@ class MongolPopupMenuItemState<T, W extends MongolPopupMenuItem<T>>
 ///       // ...other items handled here
 ///     }
 ///   },
-///   itemBuilder: (BuildContext context) => <PopupMenuEntry<Commands>>[
+///   itemBuilder: (BuildContext context) => <MongolPopupMenuEntry<Commands>>[
 ///     CheckedPopupMenuItem<Commands>(
 ///       checked: _heroAndScholar,
 ///       value: Commands.heroAndScholar,
 ///       child: const Text('Hero and scholar'),
 ///     ),
-///     const PopupMenuDivider(),
-///     const PopupMenuItem<Commands>(
+///     const MongolPopupMenuDivider(),
+///     const MongolPopupMenuItem<Commands>(
 ///       value: Commands.hurricaneCame,
-///       child: ListTile(leading: Icon(null), title: Text('Bring hurricane')),
+///       child: MongolListTile(leading: Icon(null), title: Text('Bring hurricane')),
 ///     ),
 ///     // ...other items listed here
 ///   ],
@@ -470,17 +478,17 @@ class MongolPopupMenuItemState<T, W extends MongolPopupMenuItem<T>>
 /// ```
 /// {@end-tool}
 ///
-/// In particular, observe how the second menu item uses a [ListTile] with a
-/// blank [Icon] in the [ListTile.leading] position to get the same alignment as
+/// In particular, observe how the second menu item uses a [MongolListTile] with a
+/// blank [Icon] in the [MongolListTile.leading] position to get the same alignment as
 /// the item with the checkmark.
 ///
 /// See also:
 ///
-///  * [PopupMenuItem], a popup menu entry for picking a command (as opposed to
+///  * [MongolPopupMenuItem], a popup menu entry for picking a command (as opposed to
 ///    toggling a value).
-///  * [PopupMenuDivider], a popup menu entry that is just a horizontal line.
-///  * [showMenu], a method to dynamically show a popup menu at a given location.
-///  * [PopupMenuButton], an [IconButton] that automatically shows a menu when
+///  * [MongolPopupMenuDivider], a popup menu entry that is just a horizontal line.
+///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.
+///  * [MongolPopupMenuButton], an [MongolIconButton] that automatically shows a menu when
 ///    it is tapped.
 class MongolCheckedPopupMenuItem<T> extends MongolPopupMenuItem<T> {
   /// Creates a popup menu item with a checkmark.
@@ -1009,6 +1017,7 @@ class _PopupMenuRoute<T> extends PopupRoute<T> {
 ///
 ///  * [MongolPopupMenuItem], a popup menu entry for a single value.
 ///  * [MongolPopupMenuDivider], a popup menu entry that is just a vertical line.
+///  * [MongolCheckedPopupMenuItem], a popup menu item with a checkmark.
 ///  * [MongolPopupMenuButton], which provides an [IconButton] that shows a menu by
 ///    calling this method automatically.
 ///  * [SemanticsConfiguration.namesRoute], for a description of edge triggered
@@ -1136,6 +1145,7 @@ typedef MongolPopupMenuItemBuilder<T> = List<MongolPopupMenuEntry<T>> Function(
 ///
 ///  * [MongolPopupMenuItem], a popup menu entry for a single value.
 ///  * [MongolPopupMenuDivider], a popup menu entry that is just a vertical line.
+///  * [MongolCheckedPopupMenuItem], a popup menu item with a checkmark.
 ///  * [showMongolMenu], a method to dynamically show a popup menu at a given location.
 class MongolPopupMenuButton<T> extends StatefulWidget {
   /// Creates a button that shows a popup menu.
