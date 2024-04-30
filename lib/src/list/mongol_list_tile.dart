@@ -537,14 +537,6 @@ class MongolListTileTheme extends InheritedTheme {
     return result?.data ?? const MongolListTileThemeData();
   }
 
-  static MongolListTileTheme ofTheme(BuildContext context) {
-    final MongolListTileTheme? result =
-        context.dependOnInheritedWidgetOfExactType<MongolListTileTheme>();
-    return result ??
-        MongolListTileTheme(
-            data: const MongolListTileThemeData(), child: SizedBox());
-  }
-
   /// Creates a list tile theme that controls the color and style parameters for
   /// [ListTile]s, and merges in the current list tile theme, if any.
   static Widget merge({
