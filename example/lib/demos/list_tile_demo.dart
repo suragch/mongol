@@ -28,28 +28,36 @@ class _ListTileDemoState extends State<ListTileDemo> {
         ),
         body: ListView(
           scrollDirection: Axis.horizontal,
-          children: const [
-            Card(child: MongolListTile(title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'))),
+          children: [
+            const Card(
+                child: MongolListTile(
+                    title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'))),
             Card(
               child: MongolListTile(
-                leading: FlutterLogo(),
-                title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
+                leading: Container(
+                  color: Colors.red,
+                  child: const FlutterLogo(),
+                ),
+                title: const MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
               ),
             ),
-            Card(
+            const Card(
               child: MongolListTile(
-                title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
-                trailing: Icon(Icons.more_vert),
-              ),
-            ),
-            Card(
-              child: MongolListTile(
-                leading: FlutterLogo(),
                 title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
                 trailing: Icon(Icons.more_vert),
               ),
             ),
             Card(
+              child: MongolListTile(
+                leading: Container(
+                  color: Colors.red,
+                  child: const FlutterLogo(),
+                ),
+                title: const MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
+                trailing: const Icon(Icons.more_vert),
+              ),
+            ),
+            const Card(
               child: MongolListTile(
                 title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
                 dense: true,
@@ -57,21 +65,27 @@ class _ListTileDemoState extends State<ListTileDemo> {
             ),
             Card(
               child: MongolListTile(
-                leading: FlutterLogo(size: 56.0),
-                title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
-                subtitle: MongolText('ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ'),
-                trailing: Icon(Icons.more_vert),
+                leading: Container(
+                  color: Colors.red,
+                  child: const FlutterLogo(size: 56.0),
+                ),
+                title: const MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
+                subtitle: const MongolText('ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ'),
+                trailing: const Icon(Icons.more_vert),
               ),
             ),
             Card(
               child: MongolListTile(
-                leading: FlutterLogo(size: 72.0),
-                title: MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
-                subtitle: MongolText(
-                  'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ',
+                leading: Container(
+                  color: Colors.red,
+                  child: const FlutterLogo(size: 72.0),
+                ),
+                title: const MongolText('ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ'),
+                subtitle: const MongolText(
+                  'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ ᠭᠤᠷᠪᠠ ᠳᠦᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ',
                   maxLines: 2,
                 ),
-                trailing: Icon(Icons.more_vert),
+                trailing: const Icon(Icons.more_vert),
                 isThreeLine: true,
               ),
             ),
