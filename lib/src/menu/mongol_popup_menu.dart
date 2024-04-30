@@ -578,8 +578,7 @@ class _MongolCheckedPopupMenuItemState<T> extends MongolPopupMenuItemState<T, Mo
         contentPadding: EdgeInsets.zero,
         child: MongolListTile(
           enabled: widget.enabled,
-          // todo material3
-          // titleTextStyle: effectiveLabelTextStyle?.resolve(states),
+          titleTextStyle: effectiveLabelTextStyle?.resolve(states),
           leading: FadeTransition(
             opacity: _opacity,
             child: Icon(_controller.isDismissed ? null : Icons.done),
