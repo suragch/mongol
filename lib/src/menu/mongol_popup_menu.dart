@@ -529,10 +529,13 @@ class MongolCheckedPopupMenuItem<T> extends MongolPopupMenuItem<T> {
   Widget? get child => super.child;
 
   @override
-  MongolPopupMenuItemState<T, MongolCheckedPopupMenuItem<T>> createState() => _MongolCheckedPopupMenuItemState<T>();
+  MongolPopupMenuItemState<T, MongolCheckedPopupMenuItem<T>> createState() =>
+      _MongolCheckedPopupMenuItemState<T>();
 }
 
-class _MongolCheckedPopupMenuItemState<T> extends MongolPopupMenuItemState<T, MongolCheckedPopupMenuItem<T>> with SingleTickerProviderStateMixin {
+class _MongolCheckedPopupMenuItemState<T>
+    extends MongolPopupMenuItemState<T, MongolCheckedPopupMenuItem<T>>
+    with SingleTickerProviderStateMixin {
   static const Duration _fadeDuration = Duration(milliseconds: 150);
   late AnimationController _controller;
   Animation<double> get _opacity => _controller.view;
@@ -542,7 +545,7 @@ class _MongolCheckedPopupMenuItemState<T> extends MongolPopupMenuItemState<T, Mo
     super.initState();
     _controller = AnimationController(duration: _fadeDuration, vsync: this)
       ..value = widget.checked ? 1.0 : 0.0
-      ..addListener(() => setState(() { /* animation changed */ }));
+      ..addListener(() => setState(() {/* animation changed */}));
   }
 
   @override
@@ -566,13 +569,16 @@ class _MongolCheckedPopupMenuItemState<T> extends MongolPopupMenuItemState<T, Mo
   Widget buildChild() {
     final ThemeData theme = Theme.of(context);
     final PopupMenuThemeData popupMenuTheme = PopupMenuTheme.of(context);
-    final PopupMenuThemeData defaults = theme.useMaterial3 ? _PopupMenuDefaultsM3(context) : _PopupMenuDefaultsM2(context);
+    final PopupMenuThemeData defaults = theme.useMaterial3
+        ? _PopupMenuDefaultsM3(context)
+        : _PopupMenuDefaultsM2(context);
     final Set<MaterialState> states = <MaterialState>{
       if (widget.checked) MaterialState.selected,
     };
-    final MaterialStateProperty<TextStyle?>? effectiveLabelTextStyle = widget.labelTextStyle
-      ?? popupMenuTheme.labelTextStyle
-      ?? defaults.labelTextStyle;
+    final MaterialStateProperty<TextStyle?>? effectiveLabelTextStyle =
+        widget.labelTextStyle ??
+            popupMenuTheme.labelTextStyle ??
+            defaults.labelTextStyle;
     return IgnorePointer(
       child: MongolListTileTheme.merge(
         contentPadding: EdgeInsets.zero,
@@ -667,8 +673,10 @@ class _PopupMenu<T> extends StatelessWidget {
             padding: const EdgeInsets.symmetric(
               horizontal: _kMenuHorizontalPadding,
             ),
-            child: ListBody(
-              mainAxis: Axis.horizontal,
+            // In flutter, there is using ListBody here. But we use Column instead.
+            // I try to use ListBody, but it doesn't work well. the height of menu is too big.
+            // I don't know why. So I use Column instead.
+            child: Row(
               children: children,
             ),
           ),
