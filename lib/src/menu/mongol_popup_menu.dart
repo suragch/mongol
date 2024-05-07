@@ -417,8 +417,7 @@ class MongolPopupMenuItemState<T, W extends MongolPopupMenuItem<T>>
           canRequestFocus: widget.enabled,
           mouseCursor: _EffectiveMouseCursor(
               widget.mouseCursor, popupMenuTheme.mouseCursor),
-          // todo material3: there should use ListTileTheme instead of MongolListTileTheme
-          child: ListTileTheme.merge(
+          child: MongolListTileTheme.merge(
             contentPadding: EdgeInsets.zero,
             titleTextStyle: style,
             child: item,
@@ -792,24 +791,6 @@ class _PopupMenuRouteLayout extends SingleChildLayoutDelegate {
             Offset.zero & size, avoidBounds);
     final Rect subScreen = _closestScreen(subScreens, originCenter);
     return _fitInsideScreen(subScreen, childSize, wantedPosition);
-
-    // Avoid going outside an area defined as the rectangle 8.0 pixels from the
-    // edge of the screen in every direction.
-    // todo material3: this should be removed
-    // if (y < _kMenuScreenPadding + padding.top) {
-    //   y = _kMenuScreenPadding + padding.top;
-    // } else if (y + childSize.height >
-    //     size.height - _kMenuScreenPadding - padding.bottom) {
-    //   y = size.height - childSize.height - _kMenuScreenPadding - padding.bottom;
-    // }
-    // if (x < _kMenuScreenPadding + padding.left) {
-    //   x = _kMenuScreenPadding + padding.left;
-    // } else if (x + childSize.width >
-    //     size.width - _kMenuScreenPadding - padding.right) {
-    //   x = size.width - padding.right - _kMenuScreenPadding - childSize.width;
-    // }
-
-    // return Offset(x, y);
   }
 
   Rect _closestScreen(Iterable<Rect> screens, Offset point) {
