@@ -69,8 +69,8 @@ import 'package:flutter/rendering.dart';
 /// default based on the overall [Theme]'s textTheme and
 /// colorScheme. See the individual [MongolListTile] properties for details.
 ///
-/// todo material3 The [MongolDrawer] widget specifies a list tile theme for its children that
-/// todo material3 defines [style] to be [ListTileStyle.drawer].
+/// The [Drawer] widget specifies a list tile theme for its children that
+/// defines [style] to be [ListTileStyle.drawer].
 @immutable
 class MongolListTileThemeData with Diagnosticable {
   /// Creates a [MongolListTileThemeData].
@@ -342,8 +342,8 @@ class MongolListTileThemeData with Diagnosticable {
 /// Values specified here are used for [MongolListTile] properties that are not given
 /// an explicit non-null value.
 ///
-/// todo material3 The [MongolDrawer] widget specifies a tile theme for its children which sets
-/// todo material3 [style] to [ListTileStyle.drawer].
+/// The [MongolDrawer] widget specifies a tile theme for its children which sets
+/// [style] to [ListTileStyle.drawer].
 class MongolListTileTheme extends InheritedTheme {
   /// Creates a list tile theme that defines the color and style parameters for
   /// descendant [MongolListTile]s.
