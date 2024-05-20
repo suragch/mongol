@@ -126,12 +126,12 @@ import 'package:flutter/widgets.dart'
         WidgetsBinding,
         WidgetsBindingObserver,
         debugCheckHasMediaQuery;
-//import 'package:flutter/widgets.dart' hide EditableText, EditableTextState;
 
 import 'package:mongol/src/base/mongol_text_align.dart';
 import 'package:mongol/src/editing/mongol_render_editable.dart';
 import 'package:mongol/src/editing/text_selection/mongol_text_selection.dart';
 
+import 'text_editing_controller_extension.dart';
 import 'mongol_text_editing_intents.dart';
 
 export 'package:flutter/services.dart'
