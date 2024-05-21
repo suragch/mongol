@@ -11,6 +11,11 @@
 // If it is resolved then you can directly extend ButtonStyleButton for all of
 // the buttons.
 
+// NOTE: This file is a copy of the original file from the Flutter SDK and only deviates
+// in the VisualDensity adjustment from the _MongolButtonStyleState.build method.
+// In this file, the VisualDensity adjustment only reduces the vertical size of the button.
+// This is opposite to the original file.
+
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -19,7 +24,6 @@ import 'package:flutter/material.dart'
         ButtonStyle,
         Colors,
         MaterialStateProperty,
-        MaterialStateMixin,
         VisualDensity,
         InkWell,
         MaterialPropertyResolver,
@@ -29,6 +33,7 @@ import 'package:flutter/material.dart'
         kMinInteractiveDimension,
         MaterialStateMouseCursor,
         InteractiveInkFeatureFactory,
+        MaterialStatesController,
         MaterialState;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -39,9 +44,11 @@ import 'package:flutter/widgets.dart';
 ///
 /// See also:
 ///
-///  * [MongolTextButton], a simple MongolButtonStyleButton without a shadow.
+///  * [MongolTextButton], a simple MongolButtonStyleButton without no outline or fill color.
+///  * [MongolFilledButton], a filled MongolButtonStyleButton button that doesn't elevate when pressed.
+///  * [MongolFilledButton.tonal], a filled MongolButtonStyleButton button variant that uses a secondary fill color.
 ///  * [MongolElevatedButton], a filled MongolButtonStyleButton whose material elevates when pressed.
-///  * [MongolOutlinedButton], similar to [MongolTextButton], but with an outline.
+///  * [MongolOutlinedButton], similar to [MongolTextButton], but with an outline and no fill color.
 abstract class MongolButtonStyleButton extends StatefulWidget {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
@@ -49,10 +56,14 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
     Key? key,
     required this.onPressed,
     required this.onLongPress,
+    required this.onHover,
+    required this.onFocusChange,
     required this.style,
     required this.focusNode,
     required this.autofocus,
     required this.clipBehavior,
+    this.statesController,
+    this.isSemanticButton = true,
     required this.child,
   }) : super(key: key);
 
@@ -74,6 +85,19 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
   ///  * [enabled], which is true if the button is enabled.
   final VoidCallback? onLongPress;
 
+  /// Called when a pointer enters or exits the button response area.
+  ///
+  /// The value passed to the callback is true if a pointer has entered this
+  /// part of the material and false if a pointer has exited this part of the
+  /// material.
+  final ValueChanged<bool>? onHover;
+
+  /// Handler called when the focus changes.
+  ///
+  /// Called with true if this widget's node gains focus, and false if it loses
+  /// focus.
+  final ValueChanged<bool>? onFocusChange;
+
   /// Customizes this button's appearance.
   ///
   /// Non-null properties of this style override the corresponding
@@ -94,6 +118,18 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
 
   /// {@macro flutter.widgets.Focus.autofocus}
   final bool autofocus;
+
+  /// {@macro flutter.material.inkwell.statesController}
+  final MaterialStatesController? statesController;
+
+  /// Determine whether this subtree represents a button.
+  ///
+  /// If this is null, the screen reader will not announce "button" when this
+  /// is focused. This is useful for [MenuItemButton] and [SubmenuButton] when we
+  /// traverse the menu system.
+  ///
+  /// Defaults to true.
+  final bool? isSemanticButton;
 
   /// Typically the button's label.
   final Widget? child;
@@ -150,38 +186,6 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
     properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode,
         defaultValue: null));
   }
-
-  /// Returns null if [value] is null, otherwise `MaterialStateProperty.all<T>(value)`.
-  ///
-  /// A convenience method for subclasses.
-  static MaterialStateProperty<T>? allOrNull<T>(T? value) =>
-      value == null ? null : MaterialStateProperty.all<T>(value);
-
-  /// Returns an interpolated value based on the [textScaleFactor] parameter:
-  ///
-  ///  * 0 - 1 [geometry1x]
-  ///  * 1 - 2 lerp([geometry1x], [geometry2x], [textScaleFactor] - 1)
-  ///  * 2 - 3 lerp([geometry2x], [geometry3x], [textScaleFactor] - 2)
-  ///  * otherwise [geometry3x]
-  ///
-  /// A convenience method for subclasses.
-  static EdgeInsetsGeometry scaledPadding(
-    EdgeInsetsGeometry geometry1x,
-    EdgeInsetsGeometry geometry2x,
-    EdgeInsetsGeometry geometry3x,
-    double textScaleFactor,
-  ) {
-    if (textScaleFactor <= 1) {
-      return geometry1x;
-    } else if (textScaleFactor >= 3) {
-      return geometry3x;
-    } else if (textScaleFactor <= 2) {
-      return EdgeInsetsGeometry.lerp(
-          geometry1x, geometry2x, textScaleFactor - 1)!;
-    }
-    return EdgeInsetsGeometry.lerp(
-        geometry2x, geometry3x, textScaleFactor - 2)!;
-  }
 }
 
 /// The base [State] class for buttons whose style is defined by a [ButtonStyle] object.
@@ -191,21 +195,41 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
 ///  * [MongolButtonStyleButton], the [StatefulWidget] subclass for which this class is the [State].
 ///  * [MongolTextButton], a simple button without a shadow.
 ///  * [MongolElevatedButton], a filled button whose material elevates when pressed.
+///  * [MongolFilledButton], a filled ButtonStyleButton that doesn't elevate when pressed.
 ///  * [MongolOutlinedButton], similar to [MongolTextButton], but with an outline.
 class _MongolButtonStyleState extends State<MongolButtonStyleButton>
-    with MaterialStateMixin, TickerProviderStateMixin {
+    with TickerProviderStateMixin {
   AnimationController? _controller;
   double? _elevation;
   Color? _backgroundColor;
+  MaterialStatesController? internalStatesController;
+
+  void handleStatesControllerChange() {
+    // Force a rebuild to resolve MaterialStateProperty properties
+    setState(() {});
+  }
+
+  MaterialStatesController get statesController =>
+      widget.statesController ?? internalStatesController!;
+
+  void initStatesController() {
+    if (widget.statesController == null) {
+      internalStatesController = MaterialStatesController();
+    }
+    statesController.update(MaterialState.disabled, !widget.enabled);
+    statesController.addListener(handleStatesControllerChange);
+  }
 
   @override
   void initState() {
     super.initState();
-    setMaterialState(MaterialState.disabled, !widget.enabled);
+    initStatesController();
   }
 
   @override
   void dispose() {
+    statesController.removeListener(handleStatesControllerChange);
+    internalStatesController?.dispose();
     _controller?.dispose();
     super.dispose();
   }
@@ -213,13 +237,20 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
   @override
   void didUpdateWidget(MongolButtonStyleButton oldWidget) {
     super.didUpdateWidget(oldWidget);
-    setMaterialState(MaterialState.disabled, !widget.enabled);
-    // If the button is disabled while a press gesture is currently ongoing,
-    // InkWell makes a call to handleHighlightChanged. This causes an exception
-    // because it calls setState in the middle of a build. To preempt this, we
-    // manually update pressed to false when this situation occurs.
-    if (isDisabled && isPressed) {
-      removeMaterialState(MaterialState.pressed);
+    if (widget.statesController != oldWidget.statesController) {
+      oldWidget.statesController?.removeListener(handleStatesControllerChange);
+      if (widget.statesController != null) {
+        internalStatesController?.dispose();
+        internalStatesController = null;
+      }
+      initStatesController();
+    }
+    if (widget.enabled != oldWidget.enabled) {
+      statesController.update(MaterialState.disabled, !widget.enabled);
+      if (!widget.enabled) {
+        // The button may have been disabled while a press gesture is currently underway.
+        statesController.update(MaterialState.pressed, false);
+      }
     }
   }
 
@@ -239,7 +270,8 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
     T? resolve<T>(
         MaterialStateProperty<T>? Function(ButtonStyle? style) getProperty) {
       return effectiveValue(
-        (ButtonStyle? style) => getProperty(style)?.resolve(materialStates),
+        (ButtonStyle? style) =>
+            getProperty(style)?.resolve(statesController.value),
       );
     }
 
@@ -253,6 +285,8 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
         resolve<Color?>((ButtonStyle? style) => style?.foregroundColor);
     final Color? resolvedShadowColor =
         resolve<Color?>((ButtonStyle? style) => style?.shadowColor);
+    final Color? resolvedSurfaceTintColor =
+        resolve<Color?>((ButtonStyle? style) => style?.surfaceTintColor);
     final EdgeInsetsGeometry? resolvedPadding =
         resolve<EdgeInsetsGeometry?>((ButtonStyle? style) => style?.padding);
     final Size? resolvedMinimumSize =
@@ -261,6 +295,10 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
         resolve<Size?>((ButtonStyle? style) => style?.fixedSize);
     final Size? resolvedMaximumSize =
         resolve<Size?>((ButtonStyle? style) => style?.maximumSize);
+    final Color? resolvedIconColor =
+        resolve<Color?>((ButtonStyle? style) => style?.iconColor);
+    final double? resolvedIconSize =
+        resolve<double?>((ButtonStyle? style) => style?.iconSize);
     final BorderSide? resolvedSide =
         resolve<BorderSide?>((ButtonStyle? style) => style?.side);
     final OutlinedBorder? resolvedShape =
@@ -294,10 +332,10 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
     BoxConstraints effectiveConstraints =
         resolvedVisualDensity.effectiveConstraints(
       BoxConstraints(
-        minWidth: resolvedMinimumSize?.width ?? 0.0,
-        minHeight: resolvedMinimumSize?.height ?? 0.0,
-        maxWidth: resolvedMaximumSize?.width ?? double.infinity,
-        maxHeight: resolvedMaximumSize?.height ?? double.infinity,
+        minWidth: resolvedMinimumSize!.width,
+        minHeight: resolvedMinimumSize.height,
+        maxWidth: resolvedMaximumSize!.width,
+        maxHeight: resolvedMaximumSize.height,
       ),
     );
     if (resolvedFixedSize != null) {
@@ -316,12 +354,14 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
       }
     }
 
+    // This is the only deviation from [_ButtonStyleState] in the original.
+    //
     // Per the Material Design team: don't allow the VisualDensity
-    // adjustment to reduce the width of the left/right padding. If we
+    // adjustment to reduce the height of the top/bottom padding. If we
     // did, VisualDensity.compact, the default for desktop/web, would
-    // reduce the horizontal padding to zero.
-    final double dy = densityAdjustment.dy;
-    final double dx = math.max(0, densityAdjustment.dx);
+    // reduce the vertical padding to zero.
+    final double dy = math.max(0, densityAdjustment.dy);
+    final double dx = densityAdjustment.dx;
     final EdgeInsetsGeometry padding = resolvedPadding!
         .add(EdgeInsets.fromLTRB(dx, dy, dx, dy))
         .clamp(EdgeInsets.zero, EdgeInsetsGeometry.infinity);
@@ -349,8 +389,8 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
             }
           });
       }
-      resolvedBackgroundColor =
-          _backgroundColor; // Defer changing the background color.
+      // Defer changing the background color.
+      resolvedBackgroundColor = _backgroundColor;
       _controller!.value = 0;
       _controller!.forward();
     }
@@ -365,6 +405,7 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
         shape: resolvedShape!.copyWith(side: resolvedSide),
         color: resolvedBackgroundColor,
         shadowColor: resolvedShadowColor,
+        surfaceTintColor: resolvedSurfaceTintColor,
         type: resolvedBackgroundColor == null
             ? MaterialType.transparency
             : MaterialType.button,
@@ -373,20 +414,22 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
         child: InkWell(
           onTap: widget.onPressed,
           onLongPress: widget.onLongPress,
-          onHighlightChanged: updateMaterialState(MaterialState.pressed),
-          onHover: updateMaterialState(MaterialState.hovered),
+          onHover: widget.onHover,
           mouseCursor: resolvedMouseCursor,
           enableFeedback: resolvedEnableFeedback,
           focusNode: widget.focusNode,
           canRequestFocus: widget.enabled,
-          onFocusChange: updateMaterialState(MaterialState.focused),
+          onFocusChange: widget.onFocusChange,
           autofocus: widget.autofocus,
           splashFactory: resolvedSplashFactory,
           overlayColor: overlayColor,
           highlightColor: Colors.transparent,
-          customBorder: resolvedShape,
+          customBorder: resolvedShape.copyWith(side: resolvedSide),
+          statesController: statesController,
           child: IconTheme.merge(
-            data: IconThemeData(color: resolvedForegroundColor),
+            data: IconThemeData(
+                color: resolvedIconColor ?? resolvedForegroundColor,
+                size: resolvedIconSize),
             child: Padding(
               padding: padding,
               child: Align(
@@ -447,10 +490,9 @@ class _MouseCursor extends MaterialStateMouseCursor {
 /// "tap target", but not its material or its ink splashes.
 class _InputPadding extends SingleChildRenderObjectWidget {
   const _InputPadding({
-    Key? key,
-    Widget? child,
+    super.child,
     required this.minSize,
-  }) : super(key: key, child: child);
+  });
 
   final Size minSize;
 
