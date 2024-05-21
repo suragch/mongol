@@ -12,10 +12,451 @@ import 'package:flutter/gestures.dart' show DragStartBehavior;
 import 'package:flutter/material.dart';
 
 import 'mongol_list_tile.dart';
+import 'mongol_checkbox_list_tile.dart';
+import 'mongol_radio_list_tile.dart';
+import '../text/mongol_text.dart';
+import '../text/mongol_rich_text.dart';
 
 enum _SwitchListTileType { material, adaptive }
 
-/// todo material3 comments
+/// A [MongolListTile] with a Rotated [Switch]. In other words, a switch with a label.
+///
+/// {@youtube 560 315 https://www.youtube.com/watch?v=0igIjvtEWNU}
+///
+/// The entire list tile is interactive: tapping anywhere in the tile toggles
+/// the switch. Tapping and dragging the [Switch] also triggers the [onChanged]
+/// callback.
+///
+/// To ensure that [onChanged] correctly triggers, the state passed
+/// into [value] must be properly managed. This is typically done by invoking
+/// [State.setState] in [onChanged] to toggle the state value.
+///
+/// The [value], [onChanged], [activeColor], [activeThumbImage], and
+/// [inactiveThumbImage] properties of this widget are identical to the
+/// similarly-named properties on the [Switch] widget.
+///
+/// The [title], [subtitle], [isThreeLine], and [dense] properties are like
+/// those of the same name on [MongolListTile].
+///
+/// The [selected] property on this widget is similar to the [MongolListTile.selected]
+/// property. This tile's [activeColor] is used for the selected item's text color, or
+/// the theme's [SwitchThemeData.overlayColor] if [activeColor] is null.
+///
+/// This widget does not coordinate the [selected] state and the
+/// [value]; to have the list tile appear selected when the
+/// switch button is on, use the same value for both.
+///
+/// The switch is shown on the bottom by default (i.e.
+/// in the [MongolListTile.trailing] slot) which can be changed using [controlAffinity].
+/// The [secondary] widget is placed in the [MongolListTile.leading] slot.
+///
+/// This widget requires a [Material] widget ancestor in the tree to paint
+/// itself on, which is typically provided by the app's [Scaffold].
+/// The [tileColor], and [selectedTileColor] are not painted by the
+/// [MongolSwitchListTile] itself but by the [Material] widget ancestor. In this
+/// case, one can wrap a [Material] widget around the [MongolSwitchListTile], e.g.:
+///
+/// {@tool snippet}
+/// ```dart
+/// ColoredBox(
+///   color: Colors.green,
+///   child: Material(
+///     child: MongolSwitchListTilev(
+///       tileColor: Colors.red,
+///       title: const MongolText('MongolSwitchListTile with red background'),
+///       value: true,
+///       onChanged:(bool? value) { },
+///     ),
+///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// ## Performance considerations when wrapping [MongolSwitchListTile] with [Material]
+///
+/// Wrapping a large number of [MongolSwitchListTile]s individually with [Material]s
+/// is expensive. Consider only wrapping the [MongolSwitchListTile]s that require it
+/// or include a common [Material] ancestor where possible.
+///
+/// To show the [MongolSwitchListTile] as disabled, pass null as the [onChanged]
+/// callback.
+///
+/// {@tool dartpad}
+///
+/// This widget shows a switch that, when toggled, changes the state of a [bool]
+/// member field called `_lights`.
+///
+/// import 'package:flutter/material.dart';
+///
+/// /// Flutter code sample for [SwitchListTile].
+///
+/// void main() => runApp(const SwitchListTileApp());
+///
+/// class SwitchListTileApp extends StatelessWidget {
+///   const SwitchListTileApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: Scaffold(
+///         appBar: AppBar(title: const Text('SwitchListTile Sample')),
+///         body: const Center(
+///           child: SwitchListTileExample(),
+///         ),
+///       ),
+///     );
+///   }
+/// }
+///
+/// class SwitchListTileExample extends StatefulWidget {
+///   const SwitchListTileExample({super.key});
+///
+///   @override
+///   State<SwitchListTileExample> createState() => _SwitchListTileExampleState();
+/// }
+///
+/// class _SwitchListTileExampleState extends State<SwitchListTileExample> {
+///   bool _lights = false;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MongolSwitchListTile(
+///       title: const MongolText('Lights'),
+///       value: _lights,
+///       onChanged: (bool value) {
+///         setState(() {
+///           _lights = value;
+///         });
+///       },
+///       secondary: const Icon(Icons.lightbulb_outline),
+///     );
+///   }
+/// }
+/// {@end-tool}
+///
+/// {@tool dartpad}
+/// This sample demonstrates how [MongolSwitchListTile] positions the switch widget
+/// relative to the text in different configurations.
+/// 
+/// ```dart
+/// import 'package:flutter/material.dart';
+///
+/// Flutter code sample for [SwitchListTile].
+///
+/// void main() => runApp(const SwitchListTileApp());
+///
+/// class SwitchListTileApp extends StatelessWidget {
+///   const SwitchListTileApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: Scaffold(
+///           appBar: AppBar(title: const Text('SwitchListTile Sample')),
+///           body: const SwitchListTileExample()),
+///     );
+///   }
+/// }
+///
+/// class SwitchListTileExample extends StatefulWidget {
+///   const SwitchListTileExample({super.key});
+///
+///   @override
+///   State<SwitchListTileExample> createState() => _SwitchListTileExampleState();
+/// }
+///
+/// class _SwitchListTileExampleState extends State<SwitchListTileExample> {
+///   bool switchValue1 = true;
+///   bool switchValue2 = true;
+///   bool switchValue3 = true;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Scaffold(
+///       body: Row(
+///         children: <Widget>[
+///           MongolSwitchListTile(
+///             value: switchValue1,
+///             onChanged: (bool? value) {
+///               setState(() {
+///                 switchValue1 = value!;
+///               });
+///             },
+///             title: const MongolText('Headline'),
+///             subtitle: const MongolText('Supporting text'),
+///           ),
+///           const Divider(height: 0),
+///           MongolSwitchListTile(
+///             value: switchValue2,
+///             onChanged: (bool? value) {
+///               setState(() {
+///                 switchValue2 = value!;
+///               });
+///             },
+///             title: const MongolText('Headline'),
+///             subtitle: const MongolText(
+///                 'Longer supporting text to demonstrate how the text wraps and the switch is centered vertically with the text.'),
+///           ),
+///           const Divider(height: 0),
+///           MongolSwitchListTile(
+///             value: switchValue3,
+///             onChanged: (bool? value) {
+///               setState(() {
+///                 switchValue3 = value!;
+///               });
+///             },
+///             title: const MongolText('Headline'),
+///             subtitle: const MongolText(
+///                 "Longer supporting text to demonstrate how the text wraps and how setting 'SwitchListTile.isThreeLine = true' aligns the switch to the top vertically with the text."),
+///             isThreeLine: true,
+///           ),
+///           const Divider(height: 0),
+///         ],
+///       ),
+///     );
+///   }
+/// }
+/// ```
+/// {@end-tool}
+///
+/// ## Semantics in MongolSwitchListTile
+///
+/// Since the entirety of the MongolSwitchListTile is interactive, it should represent
+/// itself as a single interactive entity.
+///
+/// To do so, a MongolSwitchListTile widget wraps its children with a [MergeSemantics]
+/// widget. [MergeSemantics] will attempt to merge its descendant [Semantics]
+/// nodes into one node in the semantics tree. Therefore, MongolSwitchListTile will
+/// throw an error if any of its children requires its own [Semantics] node.
+///
+/// For example, you cannot nest a [MongolRichText] widget as a descendant of
+/// MongolSwitchListTile. [MongolRichText] has an embedded gesture recognizer that
+/// requires its own [Semantics] node, which directly conflicts with
+/// MongolSwitchListTile's desire to merge all its descendants' semantic nodes
+/// into one. Therefore, it may be necessary to create a custom radio tile
+/// widget to accommodate similar use cases.
+///
+/// {@tool dartpad}
+///
+/// Here is an example of a custom labeled radio widget, called
+/// LinkedLabelRadio, that includes an interactive [MongolRichText] widget that
+/// handles tap gestures.
+///
+/// ```dart
+/// import 'package:flutter/gestures.dart';
+/// import 'package:flutter/material.dart';
+///
+/// /// Flutter code sample for custom labeled switch.
+///
+/// void main() => runApp(const LabeledSwitchApp());
+///
+/// class LabeledSwitchApp extends StatelessWidget {
+///   const LabeledSwitchApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: Scaffold(
+///         appBar: AppBar(title: const Text('Custom Labeled Switch Sample')),
+///         body: const Center(
+///           child: LabeledSwitchExample(),
+///         ),
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LinkedLabelSwitch extends StatelessWidget {
+///   const LinkedLabelSwitch({
+///     super.key,
+///     required this.label,
+///     required this.padding,
+///     required this.value,
+///     required this.onChanged,
+///   });
+///
+///   final String label;
+///   final EdgeInsets padding;
+///   final bool value;
+///   final ValueChanged<bool> onChanged;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Padding(
+///       padding: padding,
+///       child: Column(
+///         children: <Widget>[
+///           Expanded(
+///             child: MongolRichText(
+///               text: TextSpan(
+///                 text: label,
+///                 style: TextStyle(
+///                   color: Theme.of(context).colorScheme.primary,
+///                   decoration: TextDecoration.underline,
+///                 ),
+///                 recognizer: TapGestureRecognizer()
+///                   ..onTap = () {
+///                     debugPrint('Label has been tapped.');
+///                   },
+///               ),
+///             ),
+///           ),
+///           RotatedBox(
+///             quarterTurns: 1, 
+///             child: Switch(
+///               value: value,
+///               onChanged: (bool newValue) {
+///                 onChanged(newValue);
+///               },
+///             ),
+///           ),
+///         ],
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LabeledSwitchExample extends StatefulWidget {
+///   const LabeledSwitchExample({super.key});
+///
+///   @override
+///   State<LabeledSwitchExample> createState() => _LabeledSwitchExampleState();
+/// }
+///
+/// class _LabeledSwitchExampleState extends State<LabeledSwitchExample> {
+///   bool _isSelected = false;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return LinkedLabelSwitch(
+///       label: 'Linked, tappable label text',
+///       padding: const EdgeInsets.symmetric(horizontal: 20.0),
+///       value: _isSelected,
+///       onChanged: (bool newValue) {
+///         setState(() {
+///           _isSelected = newValue;
+///         });
+///       },
+///     );
+///   }
+/// }
+/// ```
+/// {@end-tool}
+///
+/// ## MongolSwitchListTile isn't exactly what I want
+///
+/// If the way MongolSwitchListTile pads and positions its elements isn't 
+/// quite what you're looking for, you can create custom labeled switch 
+/// widgets by combining [Switch] with other widgets, such as [MongolText], [Padding]
+/// and [InkWell].
+///
+/// {@tool dartpad}
+///
+/// Here is an example of a custom LabeledSwitch widget, but you can easily
+/// make your own configurable widget.
+///
+/// ```dart
+/// import 'package:flutter/material.dart';
+///
+/// Flutter code sample for custom labeled switch.
+///
+/// void main() => runApp(const LabeledSwitchApp());
+///
+/// class LabeledSwitchApp extends StatelessWidget {
+///   const LabeledSwitchApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: Scaffold(
+///         appBar: AppBar(title: const Text('Custom Labeled Switch Sample')),
+///         body: const Center(
+///           child: LabeledSwitchExample(),
+///         ),
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LabeledSwitch extends StatelessWidget {
+///   const LabeledSwitch({
+///     super.key,
+///     required this.label,
+///     required this.padding,
+///     required this.value,
+///     required this.onChanged,
+///   });
+///
+///   final String label;
+///   final EdgeInsets padding;
+///   final bool value;
+///   final ValueChanged<bool> onChanged;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return InkWell(
+///       onTap: () {
+///         onChanged(!value);
+///       },
+///       child: Padding(
+///         padding: padding,
+///         child: Column(
+///           children: <Widget>[
+///             Expanded(child: MongolText(label)),
+///             RotatedBox(
+///               quarterTurns: 1, 
+///               child: Switch(
+///                 value: value,
+///                 onChanged: (bool newValue) {
+///                   onChanged(newValue);
+///                 },
+///               ),
+///             ),
+///           ],
+///         ),
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LabeledSwitchExample extends StatefulWidget {
+///   const LabeledSwitchExample({super.key});
+///
+///   @override
+///   State<LabeledSwitchExample> createState() => _LabeledSwitchExampleState();
+/// }
+///
+/// class _LabeledSwitchExampleState extends State<LabeledSwitchExample> {
+///   bool _isSelected = false;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return LabeledSwitch(
+///       label: 'This is the label text',
+///       padding: const EdgeInsets.symmetric(horizontal: 20.0),
+///       value: _isSelected,
+///       onChanged: (bool newValue) {
+///         setState(() {
+///           _isSelected = newValue;
+///         });
+///       },
+///     );
+///   }
+/// }
+/// ```
+/// {@end-tool}
+///
+/// See also:
+///
+///  * [MongolListTileTheme], which can be used to affect the style of list tiles,
+///    including switch list tiles.
+///  * [MongolCheckboxListTile], a similar widget for checkboxes.
+///  * [MongolRadioListTile], a similar widget for radio buttons.
+///  * [MongolListTile] and [Switch], the widgets from which this widget is made.
 class MongolSwitchListTile extends StatelessWidget {
   /// Creates a combination of a list tile and a switch.
   ///

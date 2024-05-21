@@ -13,10 +13,499 @@
 import 'package:flutter/material.dart';
 
 import 'mongol_list_tile.dart';
+import 'mongol_checkbox_list_tile.dart';
+import 'mongol_switch_list_tile.dart';
+import '../text/mongol_text.dart';
+import '../text/mongol_rich_text.dart';
+
 
 enum _RadioType { material, adaptive }
 
-/// todo material3 comments
+/// A [MongolListTile] with a [Radio]. In other words, a radio button with a label.
+///
+/// The entire list tile is interactive: tapping anywhere in the tile selects
+/// the radio button.
+///
+/// The [value], [groupValue], [onChanged], and [activeColor] properties of this
+/// widget are identical to the similarly-named properties on the [Radio]
+/// widget. The type parameter `T` serves the same purpose as that of the
+/// [Radio] class' type parameter.
+///
+/// The [title], [subtitle], [isThreeLine], and [dense] properties are like
+/// those of the same name on [MongolListTile].
+///
+/// The [selected] property on this widget is similar to the [MongolListTile.selected]
+/// property. This tile's [activeColor] is used for the selected item's text color, or
+/// the theme's [ThemeData.toggleableActiveColor] if [activeColor] is null.
+///
+/// This widget does not coordinate the [selected] state and the
+/// [checked] state; to have the list tile appear selected when the
+/// radio button is the selected radio button, set [selected] to true
+/// when [value] matches [groupValue].
+///
+/// The radio button is shown on the left by default in left-to-right languages
+/// (i.e. the leading edge). This can be changed using [controlAffinity]. The
+/// [secondary] widget is placed on the opposite side. This maps to the
+/// [MongolListTile.leading] and [MongolListTile.trailing] properties of [MongolListTile].
+///
+/// This widget requires a [Material] widget ancestor in the tree to paint
+/// itself on, which is typically provided by the app's [Scaffold].
+/// The [tileColor], and [selectedTileColor] are not painted by the
+/// [MongolRadioListTile] itself but by the [Material] widget ancestor. In this
+/// case, one can wrap a [Material] widget around the [MongolRadioListTile], e.g.:
+///
+/// {@tool snippet}
+/// ```dart
+/// ColoredBox(
+///   color: Colors.green,
+///   child: Material(
+///     child: MongolRadioListTile<Meridiem>(
+///       tileColor: Colors.red,
+///       title: const MongolText('AM'),
+///       groupValue: Meridiem.am,
+///       value: Meridiem.am,
+///       onChanged:(Meridiem? value) { },
+///     ),
+///   ),
+/// )
+/// ```
+/// {@end-tool}
+///
+/// ## Performance considerations when wrapping [MongolRadioListTile] with [Material]
+///
+/// Wrapping a large number of [MongolRadioListTile]s individually with [Material]s
+/// is expensive. Consider only wrapping the [MongolRadioListTile]s that require it
+/// or include a common [Material] ancestor where possible.
+///
+/// To show the [MongolRadioListTile] as disabled, pass null as the [onChanged]
+/// callback.
+///
+/// {@tool dartpad}
+/// ![MongolRadioListTile sample](https://flutter.github.io/assets-for-api-docs/assets/material/radio_list_tile.png)
+///
+/// This widget shows a pair of radio buttons that control the `_character`
+/// field. The field is of the type `SingingCharacter`, an enum.
+///
+/// ```dart
+/// import 'package:flutter/material.dart';
+///
+/// /// Flutter code sample for [MongolRadioListTile].
+///
+/// void main() => runApp(const RadioListTileApp());
+///
+/// class RadioListTileApp extends StatelessWidget {
+///   const RadioListTileApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: Scaffold(
+///         appBar: AppBar(title: const Text('RadioListTile Sample')),
+///         body: const RadioListTileExample(),
+///       ),
+///     );
+///   }
+/// }
+///
+/// enum SingingCharacter { lafayette, jefferson }
+///
+/// class RadioListTileExample extends StatefulWidget {
+///   const RadioListTileExample({super.key});
+///
+///   @override
+///   State<RadioListTileExample> createState() => _RadioListTileExampleState();
+/// }
+///
+/// class _RadioListTileExampleState extends State<RadioListTileExample> {
+///   SingingCharacter? _character = SingingCharacter.lafayette;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Column(
+///       children: <Widget>[
+///         MongolRadioListTile<SingingCharacter>(
+///           title: const MongolText('Lafayette'),
+///           value: SingingCharacter.lafayette,
+///           groupValue: _character,
+///           onChanged: (SingingCharacter? value) {
+///             setState(() {
+///               _character = value;
+///             });
+///           },
+///         ),
+///         MongolRadioListTile<SingingCharacter>(
+///           title: const MongolText('Thomas Jefferson'),
+///           value: SingingCharacter.jefferson,
+///           groupValue: _character,
+///           onChanged: (SingingCharacter? value) {
+///             setState(() {
+///               _character = value;
+///             });
+///           },
+///         ),
+///       ],
+///     );
+///   }
+/// }
+///```
+/// {@end-tool}
+///
+/// {@tool dartpad}
+/// This sample demonstrates how [MongolRadioListTile] positions the radio widget
+/// relative to the text in different configurations.
+///
+/// ```dart
+/// import 'package:flutter/material.dart';
+///
+/// Flutter code sample for [MongolRadioListTile].
+///
+/// void main() => runApp(const RadioListTileApp());
+///
+/// class RadioListTileApp extends StatelessWidget {
+///   const RadioListTileApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: const RadioListTileExample(),
+///     );
+///   }
+/// }
+///
+/// enum Groceries { pickles, tomato, lettuce }
+///
+/// class RadioListTileExample extends StatefulWidget {
+///   const RadioListTileExample({super.key});
+///
+///   @override
+///   State<RadioListTileExample> createState() => _RadioListTileExampleState();
+/// }
+///
+/// class _RadioListTileExampleState extends State<RadioListTileExample> {
+///   Groceries? _groceryItem = Groceries.pickles;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Scaffold(
+///       appBar: AppBar(title: const Text('RadioListTile Sample')),
+///       body: Column(
+///         children: <Widget>[
+///           MongolRadioListTile<Groceries>(
+///             value: Groceries.pickles,
+///             groupValue: _groceryItem,
+///             onChanged: (Groceries? value) {
+///               setState(() {
+///                 _groceryItem = value;
+///               });
+///             },
+///             title: const MongolText('Pickles'),
+///             subtitle: const MongolText('Supporting text'),
+///           ),
+///           MongolRadioListTile<Groceries>(
+///             value: Groceries.tomato,
+///             groupValue: _groceryItem,
+///             onChanged: (Groceries? value) {
+///               setState(() {
+///                 _groceryItem = value;
+///               });
+///             },
+///             title: const MongolText('Tomato'),
+///             subtitle: const MongolText(
+///                 'Longer supporting text to demonstrate how the text wraps and the radio is centered vertically with the text.'),
+///           ),
+///           MongolRadioListTile<Groceries>(
+///             value: Groceries.lettuce,
+///             groupValue: _groceryItem,
+///             onChanged: (Groceries? value) {
+///               setState(() {
+///                 _groceryItem = value;
+///               });
+///             },
+///             title: const MongolText('Lettuce'),
+///             subtitle: const MongolText(
+///                 "Longer supporting text to demonstrate how the text wraps and how setting 'RadioListTile.isThreeLine = true' aligns the radio to the top vertically with the text."),
+///             isThreeLine: true,
+///           ),
+///         ],
+///       ),
+///     );
+///   }
+/// }
+/// ```
+/// {@end-tool}
+///
+/// ## Semantics in MongolRadioListTile
+///
+/// Since the entirety of the MongolRadioListTile is interactive, it should represent
+/// itself as a single interactive entity.
+///
+/// To do so, a MongolRadioListTile widget wraps its children with a [MergeSemantics]
+/// widget. [MergeSemantics] will attempt to merge its descendant [Semantics]
+/// nodes into one node in the semantics tree. Therefore, MongolRadioListTile will
+/// throw an error if any of its children requires its own [Semantics] node.
+///
+/// For example, you cannot nest a [MongolRichText] widget as a descendant of
+/// MongolRadioListTile. [MongolRichText] has an embedded gesture recognizer that
+/// requires its own [Semantics] node, which directly conflicts with
+/// MongolRadioListTile's desire to merge all its descendants' semantic nodes
+/// into one. Therefore, it may be necessary to create a custom radio tile
+/// widget to accommodate similar use cases.
+///
+/// {@tool dartpad}
+///
+/// Here is an example of a custom labeled radio widget, called
+/// LinkedLabelRadio, that includes an interactive [MongolRichText] widget that
+/// handles tap gestures.
+///
+/// ```dart
+/// import 'package:flutter/gestures.dart';
+/// import 'package:flutter/material.dart';
+///
+/// Flutter code sample for custom labeled radio.
+///
+/// void main() => runApp(const LabeledRadioApp());
+///
+/// class LabeledRadioApp extends StatelessWidget {
+///   const LabeledRadioApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: Scaffold(
+///         appBar: AppBar(title: const Text('Custom Labeled Radio Sample')),
+///         body: const LabeledRadioExample(),
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LinkedLabelRadio extends StatelessWidget {
+///   const LinkedLabelRadio({
+///     super.key,
+///     required this.label,
+///     required this.padding,
+///     required this.groupValue,
+///     required this.value,
+///     required this.onChanged,
+///   });
+///
+///   final String label;
+///   final EdgeInsets padding;
+///   final bool groupValue;
+///   final bool value;
+///   final ValueChanged<bool> onChanged;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Padding(
+///       padding: padding,
+///       child: Column(
+///         children: <Widget>[
+///           Radio<bool>(
+///             groupValue: groupValue,
+///             value: value,
+///             onChanged: (bool? newValue) {
+///               onChanged(newValue!);
+///             },
+///           ),
+///           MongolRichText(
+///             text: TextSpan(
+///               text: label,
+///               style: TextStyle(
+///                 color: Theme.of(context).colorScheme.primary,
+///                 decoration: TextDecoration.underline,
+///               ),
+///               recognizer: TapGestureRecognizer()
+///                 ..onTap = () {
+///                   debugPrint('Label has been tapped.');
+///                 },
+///             ),
+///           ),
+///         ],
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LabeledRadioExample extends StatefulWidget {
+///   const LabeledRadioExample({super.key});
+///
+///   @override
+///   State<LabeledRadioExample> createState() => _LabeledRadioExampleState();
+/// }
+///
+/// class _LabeledRadioExampleState extends State<LabeledRadioExample> {
+///   bool _isRadioSelected = false;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Scaffold(
+///       body: Row(
+///         mainAxisAlignment: MainAxisAlignment.center,
+///         children: <Widget>[
+///           LinkedLabelRadio(
+///             label: 'First tappable label text',
+///             padding: const EdgeInsets.symmetric(horizontal: 5.0),
+///             value: true,
+///             groupValue: _isRadioSelected,
+///             onChanged: (bool newValue) {
+///               setState(() {
+///                 _isRadioSelected = newValue;
+///               });
+///             },
+///           ),
+///           LinkedLabelRadio(
+///             label: 'Second tappable label text',
+///             padding: const EdgeInsets.symmetric(horizontal: 5.0),
+///             value: false,
+///             groupValue: _isRadioSelected,
+///             onChanged: (bool newValue) {
+///               setState(() {
+///                 _isRadioSelected = newValue;
+///               });
+///             },
+///           ),
+///         ],
+///       ),
+///     );
+///   }
+/// }
+/// ```
+/// {@end-tool}
+///
+/// ## MongolRadioListTile isn't exactly what I want
+///
+/// If the way MongolRadioListTile pads and positions its elements isn't quite what
+/// you're looking for, you can create custom labeled radio widgets by
+/// combining [Radio] with other widgets, such as [MongolText], [Padding] and
+/// [InkWell].
+///
+/// {@tool dartpad}
+///
+/// Here is an example of a custom LabeledRadio widget, but you can easily
+/// make your own configurable widget.
+///
+/// ```dart
+/// import 'package:flutter/material.dart';
+///
+/// /// Flutter code sample for custom labeled radio.
+///
+/// void main() => runApp(const LabeledRadioApp());
+///
+/// class LabeledRadioApp extends StatelessWidget {
+//   const LabeledRadioApp({super.key});
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return MaterialApp(
+///       theme: ThemeData(useMaterial3: true),
+///       home: Scaffold(
+///         appBar: AppBar(title: const Text('Custom Labeled Radio Sample')),
+///         body: const LabeledRadioExample(),
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LabeledRadio extends StatelessWidget {
+///   const LabeledRadio({
+///     super.key,
+///     required this.label,
+///     required this.padding,
+///     required this.groupValue,
+///     required this.value,
+///     required this.onChanged,
+///   });
+///
+///   final String label;
+///   final EdgeInsets padding;
+///   final bool groupValue;
+///   final bool value;
+///   final ValueChanged<bool> onChanged;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return InkWell(
+///       onTap: () {
+///         if (value != groupValue) {
+///           onChanged(value);
+///         }
+///       },
+///       child: Padding(
+///         padding: padding,
+///         child: Column(
+///           children: <Widget>[
+///             Radio<bool>(
+///               groupValue: groupValue,
+///               value: value,
+///               onChanged: (bool? newValue) {
+///                 onChanged(newValue!);
+///               },
+///             ),
+///             MongolText(label),
+///           ],
+///         ),
+///       ),
+///     );
+///   }
+/// }
+///
+/// class LabeledRadioExample extends StatefulWidget {
+///   const LabeledRadioExample({super.key});
+///
+///   @override
+///   State<LabeledRadioExample> createState() => _LabeledRadioExampleState();
+/// }
+///
+/// class _LabeledRadioExampleState extends State<LabeledRadioExample> {
+///   bool _isRadioSelected = false;
+///
+///   @override
+///   Widget build(BuildContext context) {
+///     return Scaffold(
+///       body: Row(
+///         mainAxisAlignment: MainAxisAlignment.center,
+///         children: <LabeledRadio>[
+///           LabeledRadio(
+///             label: 'This is the first label text',
+///             padding: const EdgeInsets.symmetric(horizontal: 5.0),
+///             value: true,
+///             groupValue: _isRadioSelected,
+///             onChanged: (bool newValue) {
+///               setState(() {
+///                 _isRadioSelected = newValue;
+///               });
+///             },
+///           ),
+///           LabeledRadio(
+///             label: 'This is the second label text',
+///             padding: const EdgeInsets.symmetric(horizontal: 5.0),
+///             value: false,
+///             groupValue: _isRadioSelected,
+///             onChanged: (bool newValue) {
+///               setState(() {
+///                 _isRadioSelected = newValue;
+///               });
+///             },
+///           ),
+///         ],
+///       ),
+///     );
+///   }
+/// }
+/// ```
+/// {@end-tool}
+///
+/// See also:
+///
+///  * [MongolListTileTheme], which can be used to affect the style of list tiles,
+///    including radio list tiles.
+///  * [MongolCheckboxListTile], a similar widget for checkboxes.
+///  * [MongolSwitchListTile], a similar widget for switches.
+///  * [MongolListTile] and [Radio], the widgets from which this widget is made.
 class MongolRadioListTile<T> extends StatelessWidget {
   /// Creates a combination of a list tile and a radio button.
   ///
