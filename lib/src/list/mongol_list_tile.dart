@@ -31,13 +31,16 @@ import 'package:flutter/material.dart'
         kThemeChangeDuration;
 import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
+import 'mongol_checkbox_list_tile.dart';
+import 'mongol_radio_list_tile.dart';
+import 'mongol_switch_list_tile.dart';
 
 /// Used with [MongolListTileTheme] to define default property values for
 /// descendant [MongolListTile] widgets.
 ///
-/// todo material3 as well as classes that build
-/// todo material3 [MongolListTile]s, like [MongolCheckboxListTile], [MongolRadioListTile], and
-/// todo material3 [MongolSwitchListTile].
+/// as well as classes that build
+/// [MongolListTile]s, like [MongolCheckboxListTile], [MongolRadioListTile], and
+/// [MongolSwitchListTile].
 ///
 /// Descendant widgets obtain the current [MongolListTileThemeData] object
 /// using `MongolListTileTheme.of(context)`. Instances of
