@@ -134,6 +134,8 @@ If you want to use an outlined text field with a label, use `MongolOutlineInputB
 
 ![](./example/supplemental/mongol_outline_input_border.png)
 
+> **Note**: There is currently a [bug](https://github.com/suragch/mongol/issues/39) in the `MongolTextField` for `maxLines: null`. PRs are welcome!
+
 ```dart
 MongolTextField(
   decoration: InputDecoration(
@@ -180,7 +182,7 @@ Card(
 ),
 ```
 
-![](./example/supplemental/mongol_list_tile.png)
+![](./example/supplemental/mongol_list_tile.gif)
 
 ## Menus
 
@@ -215,10 +217,17 @@ There are Mongol equivalents to all of the Flutter buttons:
 - `MongolTextButton`
 - `MongolOutlinedButton`
 - `MongolElevatedButton`
+- `MongolFilledButton`
+- `MongolFilledButton.tonal`
 - `MongolTextButton.icon`
 - `MongolOutlinedButton.icon`
 - `MongolElevatedButton.icon`
+- `MongolFilledButton.icon`
+- `MongolFilledButton.tonalIcon`
 - `MongolIconButton`
+- `MongolIconButton.filled`
+- `MongolIconButton.filledTonal`
+- `MongolIconButton.outlined`
 
 ![](./example/supplemental/buttons.png)
 

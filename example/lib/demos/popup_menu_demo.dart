@@ -68,9 +68,18 @@ class _PopupMenuDemoState extends State<PopupMenuDemo> {
               MongolPopupMenuButton(
                 icon: const Icon(Icons.other_houses),
                 itemBuilder: (context) => const [
-                  MongolCheckedPopupMenuItem(value: 1, child: MongolText('ᠨᠢᠭᠡ')),
-                  MongolCheckedPopupMenuItem(value: 2, child: MongolText('ᠬᠤᠶᠠᠷ')),
-                  MongolCheckedPopupMenuItem(value: 3, child: MongolText('ᠭᠤᠷᠪᠠ')),
+                  MongolCheckedPopupMenuItem(
+                    value: 1,
+                    child: MongolText('ᠨᠢᠭᠡ'),
+                  ),
+                  MongolCheckedPopupMenuItem(
+                    value: 2,
+                    child: MongolText('ᠬᠤᠶᠠᠷ'),
+                  ),
+                  MongolCheckedPopupMenuItem(
+                    value: 3,
+                    child: MongolText('ᠭᠤᠷᠪᠠ'),
+                  ),
                 ],
                 tooltip: 'Mongol Popup Menu Button',
                 onSelected: (value) => _showStackBar(context, value),
