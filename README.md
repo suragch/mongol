@@ -184,6 +184,12 @@ Card(
 
 ![](./example/supplemental/mongol_list_tile.gif)
 
+As visible in the image above, in addition to `MongolListTile`, there is also:
+
+- `MongolCheckboxListTile`
+- `MongolRadioListTile`
+- `MongolSwitchListTile`
+
 ## Menus
 
 To add a popup menu with horizontal items, you can use `MongolPopupMenuButton`. It is customizable in all the ways that the standard `PopupMenuButton` is.
