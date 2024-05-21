@@ -1,3 +1,14 @@
+## [8.0.0] - 2024.05.13
+
+- Update widgets for Material 3 (#50) (@Satsrag)
+- New tonal buttons (@Satsrag)
+- New `MongolFilledButton` widget (@Satsrag)
+- New `MongolCheckboxListTile` widget (@Satsrag)
+- New `MongolRadioListTile` widget (@Satsrag)
+- New `MongolSwitchListTile` widget (@Satsrag)
+- New `MongolCheckedPopupMenuItem` (@Satsrag)
+- Update for breaking change in Flutter 3.22
+
 ## [7.0.0] - 2023.12.27
 
 - Update APIs to match the Flutter 3.16 release. (#47) (with lots of help from @Satsrag)
