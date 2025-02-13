@@ -1,8 +1,8 @@
 ## [9.0.0] - 2025.02.13
 
-- Updated for Flutter 3.29
-- Migrated some properties
-- Fixed type issue that was preventing runs/builds on Flutter 3.29.0
+- Updated for Flutter 3.29 (@sadespresso)
+- Migrated some properties (@sadespresso)
+- Fixed type issue that was preventing runs/builds on Flutter 3.29.0 (@sadespresso)
 
 ## [8.0.0] - 2024.05.13
 
