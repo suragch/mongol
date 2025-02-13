@@ -14,7 +14,7 @@ import 'package:mongol/mongol.dart';
 void main() {
   testWidgets('MongolText respects media query', (WidgetTester tester) async {
     await tester.pumpWidget(const MediaQuery(
-      data: MediaQueryData(textScaleFactor: 1.3),
+      data: MediaQueryData(textScaler: TextScaler.linear(1.3)),
       child: Center(
         child: MongolText('Hello'),
       ),

@@ -1932,7 +1932,9 @@ class MongolRenderEditable extends RenderBox
   void _layoutText(
       {double minHeight = 0.0, double maxHeight = double.infinity}) {
     if (_textLayoutLastMaxHeight == maxHeight &&
-        _textLayoutLastMinHeight == minHeight) return;
+        _textLayoutLastMinHeight == minHeight) {
+      return;
+    }
     final availableMaxHeight = math.max(0.0, maxHeight - _caretMargin);
     final availableMinHeight = math.min(minHeight, availableMaxHeight);
     final textMaxHeight = _isMultiline ? availableMaxHeight : double.infinity;
@@ -2504,7 +2506,9 @@ class _CompositeRenderEditablePainter extends MongolRenderEditablePainter {
   bool shouldRepaint(MongolRenderEditablePainter? oldDelegate) {
     if (identical(oldDelegate, this)) return false;
     if (oldDelegate is! _CompositeRenderEditablePainter ||
-        oldDelegate.painters.length != painters.length) return true;
+        oldDelegate.painters.length != painters.length) {
+      return true;
+    }
 
     final oldPainters = oldDelegate.painters.iterator;
     final newPainters = painters.iterator;

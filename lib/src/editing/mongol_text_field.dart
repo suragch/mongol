@@ -1187,7 +1187,9 @@ class _TextFieldState extends State<MongolTextField>
 
     // No need to build anything if counter or counterText were given directly.
     if (effectiveDecoration.counter != null ||
-        effectiveDecoration.counterText != null) return effectiveDecoration;
+        effectiveDecoration.counterText != null) {
+      return effectiveDecoration;
+    }
 
     // If buildCounter was provided, use it to generate a counter widget.
     Widget? counter;

@@ -52,7 +52,7 @@ class MongolDialog extends StatelessWidget {
             child: Material(
               color: backgroundColor ??
                   dialogTheme.backgroundColor ??
-                  Theme.of(context).dialogBackgroundColor,
+                  Theme.of(context).dialogTheme.backgroundColor,
               elevation:
                   elevation ?? dialogTheme.elevation ?? _defaultElevation,
               shape: shape ?? dialogTheme.shape ?? _defaultDialogShape,

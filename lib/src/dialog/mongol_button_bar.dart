@@ -7,7 +7,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-/// These classes were adapted from Flutter [ButtonBar]
+/// These classes were adapted from Flutter [OverflowBar]
 
 class MongolButtonBar extends StatelessWidget {
   const MongolButtonBar({

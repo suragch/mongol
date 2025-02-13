@@ -1209,7 +1209,9 @@ class LineBreaker implements Iterator<RotatableString> {
         codePoint <= _cjkUnifiedIdeographsEnd) {
       // exceptions for font handled punctuation
       if (codePoint >= _cjkSymbolsAndPunctuationStart &&
-          codePoint <= _cjkSymbolsAndPunctuationMenksoftEnd) return false;
+          codePoint <= _cjkSymbolsAndPunctuationMenksoftEnd) {
+        return false;
+      }
       if (codePoint >= _circleNumber21 && codePoint <= _circleNumber35) {
         return false;
       }
@@ -1222,11 +1224,15 @@ class LineBreaker implements Iterator<RotatableString> {
 
     // Korean Hangul
     if (codePoint >= _hangulSyllablesStart &&
-        codePoint <= _hangulJamoExtendedBEnd) return true;
+        codePoint <= _hangulJamoExtendedBEnd) {
+      return true;
+    }
 
     // More Chinese
     if (codePoint >= _cjkCompatibilityIdeographsStart &&
-        codePoint <= _cjkCompatibilityIdeographsEnd) return true;
+        codePoint <= _cjkCompatibilityIdeographsEnd) {
+      return true;
+    }
 
     // Emoji
     if (_isEmoji(codePoint)) return true;
