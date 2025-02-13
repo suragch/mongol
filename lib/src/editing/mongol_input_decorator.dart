@@ -176,6 +176,8 @@ class _BorderContainer extends StatefulWidget {
     required this.fillColor,
     required this.hoverColor,
     required this.isHovering,
+    // ignore: unused_element_parameter
+    this.child,
   }) : super(key: key);
 
   final InputBorder border;
