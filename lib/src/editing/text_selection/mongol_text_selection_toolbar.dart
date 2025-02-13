@@ -642,8 +642,6 @@ class _TextSelectionToolbarOverflowButton extends StatelessWidget {
     Key? key,
     required this.icon,
     this.onPressed,
-    // ignore: unused_element
-    this.tooltip,
   }) : super(key: key);
 
   final Icon icon;

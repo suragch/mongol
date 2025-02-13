@@ -19,10 +19,10 @@ import 'package:flutter/material.dart'
         Ink,
         InkWell,
         ListTileStyle,
-        MaterialState,
-        MaterialStateColor,
-        MaterialStateMouseCursor,
-        MaterialStateProperty,
+        WidgetState,
+        WidgetStateColor,
+        WidgetStateMouseCursor,
+        WidgetStateProperty,
         TextTheme,
         Theme,
         ThemeData,
@@ -148,7 +148,7 @@ class MongolListTileThemeData with Diagnosticable {
   final bool? enableFeedback;
 
   /// If specified, overrides the default value of [MongolListTile.mouseCursor].
-  final MaterialStateProperty<MouseCursor?>? mouseCursor;
+  final WidgetStateProperty<MouseCursor?>? mouseCursor;
 
   /// If specified, overrides the default value of [MongolListTile.visualDensity].
   final VisualDensity? visualDensity;
@@ -175,7 +175,7 @@ class MongolListTileThemeData with Diagnosticable {
     double? minHorizontalPadding,
     double? minLeadingHeight,
     bool? enableFeedback,
-    MaterialStateProperty<MouseCursor?>? mouseCursor,
+    WidgetStateProperty<MouseCursor?>? mouseCursor,
     bool? isThreeLine,
     VisualDensity? visualDensity,
     MongolListTileTitleAlignment? titleAlignment,
@@ -327,7 +327,7 @@ class MongolListTileThemeData with Diagnosticable {
         defaultValue: null));
     properties.add(DiagnosticsProperty<bool>('enableFeedback', enableFeedback,
         defaultValue: null));
-    properties.add(DiagnosticsProperty<MaterialStateProperty<MouseCursor?>>(
+    properties.add(DiagnosticsProperty<WidgetStateProperty<MouseCursor?>>(
         'mouseCursor', mouseCursor,
         defaultValue: null));
     properties.add(DiagnosticsProperty<VisualDensity>(
@@ -366,7 +366,7 @@ class MongolListTileTheme extends InheritedTheme {
     Color? tileColor,
     Color? selectedTileColor,
     bool? enableFeedback,
-    MaterialStateProperty<MouseCursor?>? mouseCursor,
+    WidgetStateProperty<MouseCursor?>? mouseCursor,
     double? verticalTitleGap,
     double? minHorizontalPadding,
     double? minLeadingHeight,
@@ -415,7 +415,7 @@ class MongolListTileTheme extends InheritedTheme {
   final double? _minHorizontalPadding;
   final double? _minLeadingHeight;
   final bool? _enableFeedback;
-  final MaterialStateProperty<MouseCursor?>? _mouseCursor;
+  final WidgetStateProperty<MouseCursor?>? _mouseCursor;
 
   /// The configuration of this theme.
   MongolListTileThemeData get data {
@@ -561,7 +561,7 @@ class MongolListTileTheme extends InheritedTheme {
     double? minHorizontalPadding,
     double? minLeadingHeight,
     MongolListTileTitleAlignment? titleAlignment,
-    MaterialStateProperty<MouseCursor?>? mouseCursor,
+    WidgetStateProperty<MouseCursor?>? mouseCursor,
     VisualDensity? visualDensity,
     required Widget child,
   }) {
@@ -995,8 +995,8 @@ class MongolListTile extends StatelessWidget {
   /// If this property is null and [selected] is true then [ListTileThemeData.selectedColor]
   /// is used. If that is also null then [ColorScheme.primary] is used.
   ///
-  /// If this color is a [MaterialStateColor] it will be resolved against
-  /// [MaterialState.selected] and [MaterialState.disabled] states.
+  /// If this color is a [WidgetStateColor] it will be resolved against
+  /// [WidgetState.selected] and [WidgetState.disabled] states.
   ///
   /// See also:
   ///
@@ -1014,8 +1014,8 @@ class MongolListTile extends StatelessWidget {
   /// If this property is null and [selected] is true then [ListTileThemeData.selectedColor]
   /// is used. If that is also null then [ColorScheme.primary] is used.
   ///
-  /// If this color is a [MaterialStateColor] it will be resolved against
-  /// [MaterialState.selected] and [MaterialState.disabled] states.
+  /// If this color is a [WidgetStateColor] it will be resolved against
+  /// [WidgetState.selected] and [WidgetState.disabled] states.
   ///
   /// See also:
   ///
@@ -1091,12 +1091,12 @@ class MongolListTile extends StatelessWidget {
   /// widget.
   ///
   /// If [mouseCursor] is a [MaterialStateProperty<MouseCursor>],
-  /// [MaterialStateProperty.resolve] is used for the following [MaterialState]s:
+  /// [WidgetStateProperty.resolve] is used for the following [WidgetState]s:
   ///
-  ///  * [MaterialState.selected].
-  ///  * [MaterialState.disabled].
+  ///  * [WidgetState.selected].
+  ///  * [WidgetState.disabled].
   ///
-  /// If this property is null, [MaterialStateMouseCursor.clickable] will be used.
+  /// If this property is null, [WidgetStateMouseCursor.clickable] will be used.
   final MouseCursor? mouseCursor;
 
   /// If this tile is also [enabled] then icons and text are rendered with the same color.
@@ -1236,9 +1236,9 @@ class MongolListTile extends StatelessWidget {
     final MongolListTileThemeData defaults = theme.useMaterial3
         ? _LisTileDefaultsM3(context)
         : _LisTileDefaultsM2(context, listTileStyle);
-    final Set<MaterialState> states = <MaterialState>{
-      if (!enabled) MaterialState.disabled,
-      if (selected) MaterialState.selected,
+    final Set<WidgetState> states = <WidgetState>{
+      if (!enabled) WidgetState.disabled,
+      if (selected) WidgetState.selected,
     };
 
     Color? resolveColor(
@@ -1346,15 +1346,15 @@ class MongolListTile extends StatelessWidget {
             defaultContentPadding;
 
     // Show basic cursor when MongolListTile isn't enabled or gesture callbacks are null.
-    final Set<MaterialState> mouseStates = <MaterialState>{
+    final Set<WidgetState> mouseStates = <WidgetState>{
       if (!enabled || (onTap == null && onLongPress == null))
-        MaterialState.disabled,
+        WidgetState.disabled,
     };
     final MouseCursor effectiveMouseCursor =
-        MaterialStateProperty.resolveAs<MouseCursor?>(
+        WidgetStateProperty.resolveAs<MouseCursor?>(
                 mouseCursor, mouseStates) ??
             tileTheme.mouseCursor?.resolve(mouseStates) ??
-            MaterialStateMouseCursor.clickable.resolve(mouseStates);
+            WidgetStateMouseCursor.clickable.resolve(mouseStates);
 
     final MongolListTileTitleAlignment effectiveTitleAlignment =
         titleAlignment ??
@@ -1514,7 +1514,7 @@ class MongolListTile extends StatelessWidget {
   }
 }
 
-class _IndividualOverrides extends MaterialStateProperty<Color?> {
+class _IndividualOverrides extends WidgetStateProperty<Color?> {
   _IndividualOverrides({
     this.explicitColor,
     this.enabledColor,
@@ -1528,14 +1528,14 @@ class _IndividualOverrides extends MaterialStateProperty<Color?> {
   final Color? disabledColor;
 
   @override
-  Color? resolve(Set<MaterialState> states) {
-    if (explicitColor is MaterialStateColor) {
-      return MaterialStateProperty.resolveAs<Color?>(explicitColor, states);
+  Color? resolve(Set<WidgetState> states) {
+    if (explicitColor is WidgetStateColor) {
+      return WidgetStateProperty.resolveAs<Color?>(explicitColor, states);
     }
-    if (states.contains(MaterialState.disabled)) {
+    if (states.contains(WidgetState.disabled)) {
       return disabledColor;
     }
-    if (states.contains(MaterialState.selected)) {
+    if (states.contains(WidgetState.selected)) {
       return selectedColor;
     }
     return enabledColor;

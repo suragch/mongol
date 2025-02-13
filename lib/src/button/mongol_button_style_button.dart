@@ -23,18 +23,18 @@ import 'package:flutter/material.dart'
     show
         ButtonStyle,
         Colors,
-        MaterialStateProperty,
+        WidgetStateProperty,
         VisualDensity,
         InkWell,
-        MaterialPropertyResolver,
+        WidgetPropertyResolver,
         MaterialType,
         MaterialTapTargetSize,
         Material,
         kMinInteractiveDimension,
-        MaterialStateMouseCursor,
+        WidgetStateMouseCursor,
         InteractiveInkFeatureFactory,
-        MaterialStatesController,
-        MaterialState;
+        WidgetStatesController,
+        WidgetState;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -101,9 +101,9 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
   /// Customizes this button's appearance.
   ///
   /// Non-null properties of this style override the corresponding
-  /// properties in [themeStyleOf] and [defaultStyleOf]. [MaterialStateProperty]s
+  /// properties in [themeStyleOf] and [defaultStyleOf]. [WidgetStateProperty]s
   /// that resolve to non-null values will similarly override the corresponding
-  /// [MaterialStateProperty]s in [themeStyleOf] and [defaultStyleOf].
+  /// [WidgetStateProperty]s in [themeStyleOf] and [defaultStyleOf].
   ///
   /// Null by default.
   final ButtonStyle? style;
@@ -120,7 +120,7 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
   final bool autofocus;
 
   /// {@macro flutter.material.inkwell.statesController}
-  final MaterialStatesController? statesController;
+  final WidgetStatesController? statesController;
 
   /// Determine whether this subtree represents a button.
   ///
@@ -144,7 +144,7 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
   /// [TextButtonTheme].
   ///
   /// Concrete button subclasses should return a ButtonStyle that
-  /// has no null properties, and where all of the [MaterialStateProperty]
+  /// has no null properties, and where all of the [WidgetStateProperty]
   /// properties resolve to non-null values.
   ///
   /// See also:
@@ -202,21 +202,21 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
   AnimationController? _controller;
   double? _elevation;
   Color? _backgroundColor;
-  MaterialStatesController? internalStatesController;
+  WidgetStatesController? internalStatesController;
 
   void handleStatesControllerChange() {
     // Force a rebuild to resolve MaterialStateProperty properties
     setState(() {});
   }
 
-  MaterialStatesController get statesController =>
+  WidgetStatesController get statesController =>
       widget.statesController ?? internalStatesController!;
 
   void initStatesController() {
     if (widget.statesController == null) {
-      internalStatesController = MaterialStatesController();
+      internalStatesController = WidgetStatesController();
     }
-    statesController.update(MaterialState.disabled, !widget.enabled);
+    statesController.update(WidgetState.disabled, !widget.enabled);
     statesController.addListener(handleStatesControllerChange);
   }
 
@@ -246,10 +246,10 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
       initStatesController();
     }
     if (widget.enabled != oldWidget.enabled) {
-      statesController.update(MaterialState.disabled, !widget.enabled);
+      statesController.update(WidgetState.disabled, !widget.enabled);
       if (!widget.enabled) {
         // The button may have been disabled while a press gesture is currently underway.
-        statesController.update(MaterialState.pressed, false);
+        statesController.update(WidgetState.pressed, false);
       }
     }
   }
@@ -268,7 +268,7 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
     }
 
     T? resolve<T>(
-        MaterialStateProperty<T>? Function(ButtonStyle? style) getProperty) {
+        WidgetStateProperty<T>? Function(ButtonStyle? style) getProperty) {
       return effectiveValue(
         (ButtonStyle? style) =>
             getProperty(style)?.resolve(statesController.value),
@@ -304,14 +304,14 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
     final OutlinedBorder? resolvedShape =
         resolve<OutlinedBorder?>((ButtonStyle? style) => style?.shape);
 
-    final MaterialStateMouseCursor resolvedMouseCursor = _MouseCursor(
-      (Set<MaterialState> states) => effectiveValue(
+    final WidgetStateMouseCursor resolvedMouseCursor = _MouseCursor(
+      (Set<WidgetState> states) => effectiveValue(
           (ButtonStyle? style) => style?.mouseCursor?.resolve(states)),
     );
 
-    final MaterialStateProperty<Color?> overlayColor =
-        MaterialStateProperty.resolveWith<Color?>(
-      (Set<MaterialState> states) => effectiveValue(
+    final WidgetStateProperty<Color?> overlayColor =
+        WidgetStateProperty.resolveWith<Color?>(
+      (Set<WidgetState> states) => effectiveValue(
           (ButtonStyle? style) => style?.overlayColor?.resolve(states)),
     );
 
@@ -374,9 +374,11 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
         _elevation != null &&
         _backgroundColor != null &&
         _elevation != resolvedElevation &&
-        _backgroundColor!.value != resolvedBackgroundColor!.value &&
-        _backgroundColor!.opacity == 1 &&
-        resolvedBackgroundColor.opacity < 1 &&
+        _backgroundColor!.r != resolvedBackgroundColor!.r &&
+        _backgroundColor!.g != resolvedBackgroundColor.g &&
+        _backgroundColor!.b != resolvedBackgroundColor.b &&
+        _backgroundColor!.a == 1.0 &&
+        resolvedBackgroundColor.a < 1.0 &&
         resolvedElevation == 0) {
       if (_controller?.duration != resolvedAnimationDuration) {
         _controller?.dispose();
@@ -416,7 +418,7 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
           onLongPress: widget.onLongPress,
           onHover: widget.onHover,
           mouseCursor: resolvedMouseCursor,
-          enableFeedback: resolvedEnableFeedback,
+          enableFeedback: resolvedEnableFeedback ?? true,
           focusNode: widget.focusNode,
           canRequestFocus: widget.enabled,
           onFocusChange: widget.onFocusChange,
@@ -471,13 +473,13 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
   }
 }
 
-class _MouseCursor extends MaterialStateMouseCursor {
+class _MouseCursor extends WidgetStateMouseCursor {
   const _MouseCursor(this.resolveCallback);
 
-  final MaterialPropertyResolver<MouseCursor?> resolveCallback;
+  final WidgetPropertyResolver<MouseCursor?> resolveCallback;
 
   @override
-  MouseCursor resolve(Set<MaterialState> states) => resolveCallback(states)!;
+  MouseCursor resolve(Set<WidgetState> states) => resolveCallback(states)!;
 
   @override
   String get debugDescription => 'ButtonStyleButton_MouseCursor';

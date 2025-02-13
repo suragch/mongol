@@ -16,9 +16,9 @@ import 'package:flutter/material.dart'
         InkWell,
         Material,
         MaterialLocalizations,
-        MaterialState,
-        MaterialStateMouseCursor,
-        MaterialStateProperty,
+        WidgetState,
+        WidgetStateMouseCursor,
+        WidgetStateProperty,
         MaterialType,
         PopupMenuTheme,
         PopupMenuThemeData,
@@ -294,20 +294,20 @@ class MongolPopupMenuItem<T> extends MongolPopupMenuEntry<T> {
   /// If [PopupMenuThemeData.labelTextStyle] is also null, then [TextTheme.labelLarge]
   /// is used with the [ColorScheme.onSurface] color when popup menu item is enabled and
   /// the [ColorScheme.onSurface] color with 0.38 opacity when the popup menu item is disabled.
-  final MaterialStateProperty<TextStyle?>? labelTextStyle;
+  final WidgetStateProperty<TextStyle?>? labelTextStyle;
 
   /// The cursor for a mouse pointer when it enters or is hovering over the
   /// widget.
   ///
   /// If [mouseCursor] is a [MaterialStateProperty<MouseCursor>],
-  /// [MaterialStateProperty.resolve] is used for the following [MaterialState]:
+  /// [WidgetStateProperty.resolve] is used for the following [WidgetState]:
   ///
-  ///  * [MaterialState.hovered].
-  ///  * [MaterialState.focused].
-  ///  * [MaterialState.disabled].
+  ///  * [WidgetState.hovered].
+  ///  * [WidgetState.focused].
+  ///  * [WidgetState.disabled].
   ///
   /// If null, then the value of [PopupMenuThemeData.mouseCursor] is used. If
-  /// that is also null, then [MaterialStateMouseCursor.clickable] is used.
+  /// that is also null, then [WidgetStateMouseCursor.clickable] is used.
   final MouseCursor? mouseCursor;
 
   /// The widget below this widget in the tree.
@@ -373,8 +373,8 @@ class MongolPopupMenuItemState<T, W extends MongolPopupMenuItem<T>>
     final PopupMenuThemeData defaults = theme.useMaterial3
         ? _PopupMenuDefaultsM3(context)
         : _PopupMenuDefaultsM2(context);
-    final Set<MaterialState> states = <MaterialState>{
-      if (!widget.enabled) MaterialState.disabled,
+    final Set<WidgetState> states = <WidgetState>{
+      if (!widget.enabled) WidgetState.disabled,
     };
 
     TextStyle style = theme.useMaterial3
@@ -572,10 +572,10 @@ class _MongolCheckedPopupMenuItemState<T>
     final PopupMenuThemeData defaults = theme.useMaterial3
         ? _PopupMenuDefaultsM3(context)
         : _PopupMenuDefaultsM2(context);
-    final Set<MaterialState> states = <MaterialState>{
-      if (widget.checked) MaterialState.selected,
+    final Set<WidgetState> states = <WidgetState>{
+      if (widget.checked) WidgetState.selected,
     };
-    final MaterialStateProperty<TextStyle?>? effectiveLabelTextStyle =
+    final WidgetStateProperty<TextStyle?>? effectiveLabelTextStyle =
         widget.labelTextStyle ??
             popupMenuTheme.labelTextStyle ??
             defaults.labelTextStyle;
@@ -1453,18 +1453,18 @@ class MongolPopupMenuButtonState<T> extends State<MongolPopupMenuButton<T>> {
 // This MaterialStateProperty is passed along to the menu item's InkWell which
 // resolves the property against MaterialState.disabled, MaterialState.hovered,
 // MaterialState.focused.
-class _EffectiveMouseCursor extends MaterialStateMouseCursor {
+class _EffectiveMouseCursor extends WidgetStateMouseCursor {
   const _EffectiveMouseCursor(this.widgetCursor, this.themeCursor);
 
   final MouseCursor? widgetCursor;
-  final MaterialStateProperty<MouseCursor?>? themeCursor;
+  final WidgetStateProperty<MouseCursor?>? themeCursor;
 
   @override
-  MouseCursor resolve(Set<MaterialState> states) {
-    return MaterialStateProperty.resolveAs<MouseCursor?>(
+  MouseCursor resolve(Set<WidgetState> states) {
+    return WidgetStateProperty.resolveAs<MouseCursor?>(
             widgetCursor, states) ??
         themeCursor?.resolve(states) ??
-        MaterialStateMouseCursor.clickable.resolve(states);
+        WidgetStateMouseCursor.clickable.resolve(states);
   }
 
   @override
@@ -1501,10 +1501,10 @@ class _PopupMenuDefaultsM3 extends PopupMenuThemeData {
   late final TextTheme _textTheme = _theme.textTheme;
 
   @override
-  MaterialStateProperty<TextStyle?>? get labelTextStyle {
-    return MaterialStateProperty.resolveWith((Set<MaterialState> states) {
+  WidgetStateProperty<TextStyle?>? get labelTextStyle {
+    return WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       final TextStyle style = _textTheme.labelLarge!;
-      if (states.contains(MaterialState.disabled)) {
+      if (states.contains(WidgetState.disabled)) {
         return style.apply(color: _colors.onSurface.withOpacity(0.38));
       }
       return style.apply(color: _colors.onSurface);

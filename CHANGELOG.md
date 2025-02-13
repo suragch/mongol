@@ -1,3 +1,8 @@
+## [8.1.0] - 2025.02.13
+
+- Migrated some properties
+- Fixed type issue that was preventing runs/builds on Flutter 3.29.0
+
 ## [8.0.0] - 2024.05.13
 
 - Update widgets for Material 3 (#50) (@Satsrag)
