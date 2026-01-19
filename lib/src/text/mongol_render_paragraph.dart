@@ -33,6 +33,7 @@ class MongolRenderParagraph extends RenderBox
     TextOverflow overflow = TextOverflow.clip,
     double textScaleFactor = 1.0,
     int? maxLines,
+    bool rotateCJK = true,
   })  : assert(maxLines == null || maxLines > 0),
         _softWrap = softWrap,
         _overflow = overflow,
@@ -135,6 +136,15 @@ class MongolRenderParagraph extends RenderBox
     }
     _textPainter.maxLines = value;
     _overflowShader = null;
+    markNeedsLayout();
+  }
+
+  /// Whether CJK characters should be rotated 90 degrees to appear upright in
+  /// a vertical column.
+  bool get rotateCJK => _textPainter.rotateCJK;
+  set rotateCJK(bool value) {
+    if (_textPainter.rotateCJK == value) return;
+    _textPainter.rotateCJK = value;
     markNeedsLayout();
   }
 

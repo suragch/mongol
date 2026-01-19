@@ -76,6 +76,7 @@ class MongolRichText extends LeafRenderObjectWidget {
     this.overflow = TextOverflow.clip,
     this.textScaleFactor = 1.0,
     this.maxLines,
+    this.rotateCJK = true,
   })  : assert(maxLines == null || maxLines > 0),
         super(key: key);
 
@@ -87,7 +88,7 @@ class MongolRichText extends LeafRenderObjectWidget {
 
   /// Whether the text should break at soft line breaks.
   ///
-  /// If false, the glyphs in the text will be positioned as if there was 
+  /// If false, the glyphs in the text will be positioned as if there was
   /// unlimited vertical space.
   final bool softWrap;
 
@@ -108,6 +109,12 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// edge of the box.
   final int? maxLines;
 
+  /// Whether Chinese, Japanese, and Korean characters should be rotated 90
+  /// degrees so that they are in correct orientation for a vertical column.
+  ///
+  /// Defaults to `true`.
+  final bool rotateCJK;
+
   @override
   MongolRenderParagraph createRenderObject(BuildContext context) {
     return MongolRenderParagraph(
@@ -117,6 +124,7 @@ class MongolRichText extends LeafRenderObjectWidget {
       overflow: overflow,
       textScaleFactor: textScaleFactor,
       maxLines: maxLines,
+      rotateCJK: rotateCJK,
     );
   }
 
@@ -129,7 +137,8 @@ class MongolRichText extends LeafRenderObjectWidget {
       ..softWrap = softWrap
       ..overflow = overflow
       ..textScaleFactor = textScaleFactor
-      ..maxLines = maxLines;
+      ..maxLines = maxLines
+      ..rotateCJK = rotateCJK;
   }
 
   @override
@@ -138,13 +147,20 @@ class MongolRichText extends LeafRenderObjectWidget {
     properties.add(StringProperty('text', text.toPlainText()));
     properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
         defaultValue: MongolTextAlign.top));
-    properties.add(FlagProperty('softWrap', value: softWrap, ifTrue: 'wrapping at box height', ifFalse: 'no wrapping except at line break characters', showName: true));
+    properties.add(FlagProperty('softWrap',
+        value: softWrap,
+        ifTrue: 'wrapping at box height',
+        ifFalse: 'no wrapping except at line break characters',
+        showName: true));
     properties.add(EnumProperty<TextOverflow>('overflow', overflow,
         defaultValue: TextOverflow.clip));
     properties.add(
         DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
+    properties.add(FlagProperty('rotateCJK',
+        value: rotateCJK,
+        ifTrue: 'rotate CJK characters',
+        ifFalse: 'do not rotate CJK characters',
+        showName: true));
   }
 }
-
-

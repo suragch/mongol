@@ -1,18 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:mongol/mongol.dart';
 
-class EmojiCjkDemo extends StatelessWidget {
+class EmojiCjkDemo extends StatefulWidget {
   const EmojiCjkDemo({super.key});
+
+  @override
+  State<EmojiCjkDemo> createState() => _EmojiCjkDemoState();
+}
+
+class _EmojiCjkDemoState extends State<EmojiCjkDemo> {
+  bool _rotateCJK = true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('MongolText with emoji and CJK')),
+      appBar: AppBar(
+        title: const Text('MongolText with emoji and CJK'),
+        actions: [
+          IconButton(
+            icon: Icon(_rotateCJK ? Icons.crop_rotate : Icons.crop_portrait),
+            tooltip: 'Toggle CJK Rotation',
+            onPressed: () {
+              setState(() {
+                _rotateCJK = !_rotateCJK;
+              });
+            },
+          ),
+        ],
+      ),
       body: Center(
         child: Container(
           color: Colors.blue[100],
-          child: const MongolText.rich(
+          child: MongolText.rich(
             text,
-            style: TextStyle(fontSize: 30),
+            style: const TextStyle(fontSize: 30),
+            rotateCJK: _rotateCJK,
           ),
         ),
       ),

@@ -1,3 +1,7 @@
+## [9.1.0] = 2026.01.19
+
+- Add `rotateCJK` parameter to allow disabling CJK rotation.
+
 ## [9.0.0] - 2025.02.13
 
 - Updated for Flutter 3.29 (@sadespresso)

@@ -927,19 +927,22 @@ class MongolParagraphBuilder {
     TextScaler textScaler = TextScaler.noScaling,
     int? maxLines,
     String? ellipsis,
+    bool rotateCJK = true,
   })  : _paragraphStyle = style,
         _textAlign = textAlign,
         _textScaler = textScaler == TextScaler.noScaling
             ? TextScaler.linear(textScaleFactor)
             : textScaler,
         _maxLines = maxLines,
-        _ellipsis = ellipsis;
+        _ellipsis = ellipsis,
+        _rotateCJK = rotateCJK;
 
   ui.ParagraphStyle? _paragraphStyle;
   final MongolTextAlign _textAlign;
   final TextScaler _textScaler;
   final int? _maxLines;
   final String? _ellipsis;
+  final bool _rotateCJK;
 
   //_TextRun? _ellipsisRun;
   final _styleStack = _Stack<TextStyle>();
@@ -985,7 +988,7 @@ class MongolParagraphBuilder {
   void addText(String text) {
     _plainText.write(text);
     final style = _styleStack.isEmpty ? null : _styleStack.top;
-    final breakSegments = BreakSegments(text);
+    final breakSegments = BreakSegments(text, rotateCJK: _rotateCJK);
     for (final segment in breakSegments) {
       _rawStyledTextRuns.add(_RawStyledTextRun(style, segment));
     }
@@ -1087,12 +1090,14 @@ class MongolParagraphBuilder {
 /// An iterable that iterates over the substrings of [text] between locations
 /// that line breaks are allowed.
 class BreakSegments extends Iterable<RotatableString> {
-  BreakSegments(this.text);
+  BreakSegments(this.text, {this.rotateCJK = true});
 
   final String text;
+  final bool rotateCJK;
 
   @override
-  Iterator<RotatableString> get iterator => LineBreaker(text);
+  Iterator<RotatableString> get iterator =>
+      LineBreaker(text, rotateCJK: rotateCJK);
 }
 
 class RotatableString {
@@ -1106,11 +1111,12 @@ class RotatableString {
 ///
 /// LineBreaker gives the strings between the breaks upon iteration.
 class LineBreaker implements Iterator<RotatableString> {
-  LineBreaker(this.text) {
+  LineBreaker(this.text, {this.rotateCJK = true}) {
     _characterIterator = text.characters.iterator;
   }
 
   final String text;
+  final bool rotateCJK;
 
   late CharacterRange _characterIterator;
 
@@ -1190,8 +1196,6 @@ class LineBreaker implements Iterator<RotatableString> {
   static const _unicodeEmojiStart = 0x1F000;
 
   bool _isRotatable(String character) {
-    //if (character.runes.length > 1) return true;
-
     final codePoint = character.runes.first;
 
     // Quick return: most Mongol chars should be in this range
@@ -1199,6 +1203,12 @@ class LineBreaker implements Iterator<RotatableString> {
         codePoint < _mongolQuickCheckEnd) {
       return false;
     }
+
+    // Emoji - ALWAYS rotate emojis regardless of rotateCJK setting
+    if (_isEmoji(codePoint)) return true;
+
+    // If CJK rotation is disabled, we stop here (since it wasn't an emoji)
+    if (!rotateCJK) return false;
 
     // Korean Jamo
     if (codePoint < _koreanJamoStart) return false; // latin, etc

@@ -422,6 +422,7 @@ class MongolTextPainter {
     int? maxLines,
     String? ellipsis,
     TextHeightBasis textHeightBasis = TextHeightBasis.parent,
+    bool rotateCJK = true,
   })  : assert(text == null || text.debugAssertIsValid()),
         assert(maxLines == null || maxLines > 0),
         assert(
@@ -435,7 +436,8 @@ class MongolTextPainter {
             : textScaler,
         _maxLines = maxLines,
         _ellipsis = ellipsis,
-        _textHeightBasis = textHeightBasis;
+        _textHeightBasis = textHeightBasis,
+        _rotateCJK = rotateCJK;
 
   /// Computes the height of a configured [MongolTextPainter].
   ///
@@ -750,6 +752,18 @@ class MongolTextPainter {
     _textHeightBasis = value;
   }
 
+  /// Whether CJK characters should be rotated 90 degrees to appear upright in
+  /// a vertical column.
+  bool get rotateCJK => _rotateCJK;
+  bool _rotateCJK;
+  set rotateCJK(bool value) {
+    if (_rotateCJK == value) {
+      return;
+    }
+    _rotateCJK = value;
+    markNeedsLayout();
+  }
+
   ui.ParagraphStyle _createParagraphStyle() {
     // textAlign should always be `left` because this is the style for
     // a single text run. MongolTextAlign is handled elsewhere.
@@ -885,6 +899,7 @@ class MongolTextPainter {
       textScaler: _textScaler,
       maxLines: _maxLines,
       ellipsis: _ellipsis,
+      rotateCJK: _rotateCJK,
     );
     _addStyleToText(builder, text);
     assert(() {

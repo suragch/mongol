@@ -86,6 +86,7 @@ class MongolText extends StatelessWidget {
     this.textScaleFactor,
     this.maxLines,
     this.semanticsLabel,
+    this.rotateCJK = true,
   })  : assert(
           data != null,
           'A non-null String must be provided to a MongolText widget.',
@@ -108,6 +109,7 @@ class MongolText extends StatelessWidget {
     this.textScaleFactor,
     this.maxLines,
     this.semanticsLabel,
+    this.rotateCJK = true,
   })  : assert(
           textSpan != null,
           'A non-null TextSpan must be provided to a Text.rich widget.',
@@ -172,6 +174,12 @@ class MongolText extends StatelessWidget {
   /// ```
   final String? semanticsLabel;
 
+  /// Whether Chinese, Japanese, and Korean characters should be rotated 90
+  /// degrees so that they are in correct orientation for a vertical column.
+  ///
+  /// Defaults to `true`.
+  final bool rotateCJK;
+
   @override
   Widget build(BuildContext context) {
     final defaultTextStyle = DefaultTextStyle.of(context);
@@ -191,6 +199,7 @@ class MongolText extends StatelessWidget {
       overflow: overflow ?? defaultTextStyle.overflow,
       textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
+      rotateCJK: rotateCJK,
       text: TextSpan(
         style: effectiveTextStyle,
         text: data,
@@ -233,5 +242,10 @@ class MongolText extends StatelessWidget {
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));
     }
+    properties.add(FlagProperty('rotateCJK',
+        value: rotateCJK,
+        ifTrue: 'rotate CJK characters',
+        ifFalse: 'do not rotate CJK characters',
+        showName: true));
   }
 }
