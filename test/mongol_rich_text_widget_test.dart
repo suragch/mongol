@@ -147,8 +147,8 @@ void main() {
     expect(text, isNotNull);
 
     final baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(28.0));
-    expect(baseSize.height, equals(14.0));
+    expect(baseSize.width, equals(14.0));
+    expect(baseSize.height, equals(28.0));
   });
 
   testWidgets('MongolText rotates and stacks two CJK character',
@@ -191,9 +191,9 @@ void main() {
     expect(text, isNotNull);
 
     final baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(42.0));
+    expect(baseSize.width, equals(14.0));
     expect(baseSize.height,
-        equals(282.7890625)); // should this be rounded to 283.0?
+        equals(324.7890625)); // should this be rounded to 283.0?
   });
 
   testWidgets('MongolText handles embedded formatting characters',

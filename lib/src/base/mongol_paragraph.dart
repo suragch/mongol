@@ -654,18 +654,9 @@ class MongolParagraph {
 
       // handle orientation differences for emoji and CJK characters
       final box = textBoxes.first;
-      double verticalWidth;
-      double verticalHeight;
-      if (run.isRotated) {
-        verticalWidth = box.right;
-        verticalHeight = box.bottom;
-      } else {
-        dy += box.left;
-        verticalWidth = box.bottom;
-        verticalHeight = box.right - box.left;
-      }
-
-      // update the rect size
+      dy += box.left;
+      double verticalWidth = box.bottom;
+      double verticalHeight = box.right - box.left;
       boxWidth = math.max(boxWidth, verticalWidth);
       boxHeight += verticalHeight;
 
