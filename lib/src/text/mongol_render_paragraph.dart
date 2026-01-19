@@ -43,6 +43,7 @@ class MongolRenderParagraph extends RenderBox
           textScaleFactor: textScaleFactor,
           maxLines: maxLines,
           ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,
+          rotateCJK: rotateCJK,
         );
 
   @override

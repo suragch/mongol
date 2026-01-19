@@ -1,3 +1,7 @@
+## [9.1.1] = 2026.01.19
+
+- Fix `rotateCJK: false` initialization bug.
+
 ## [9.1.0] = 2026.01.19
 
 - Add `rotateCJK` parameter to allow disabling CJK rotation.
