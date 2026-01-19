@@ -231,13 +231,13 @@ class MongolTextButton extends MongolButtonStyleButton {
         (foreground == null && disabledForeground == null)
             ? null
             : _TextButtonDefaultColor(foreground, disabledForeground);
-    final WidgetStateProperty<Color?>? backgroundColorProp =
-        (backgroundColor == null && disabledBackgroundColor == null)
-            ? null
-            : disabledBackgroundColor == null
-                ? ButtonStyleButton.allOrNull<Color?>(backgroundColor)
-                : _TextButtonDefaultColor(
-                    backgroundColor, disabledBackgroundColor);
+    final WidgetStateProperty<Color?>? backgroundColorProp = (backgroundColor ==
+                null &&
+            disabledBackgroundColor == null)
+        ? null
+        : disabledBackgroundColor == null
+            ? ButtonStyleButton.allOrNull<Color?>(backgroundColor)
+            : _TextButtonDefaultColor(backgroundColor, disabledBackgroundColor);
     final WidgetStateProperty<Color?>? overlayColor =
         (foreground == null) ? null : _TextButtonDefaultOverlay(foreground);
     final WidgetStateProperty<Color?>? iconColorProp =
@@ -287,7 +287,7 @@ class MongolTextButton extends MongolButtonStyleButton {
   /// In this list "Theme.foo" is shorthand for
   /// `Theme.of(context).foo`. Color scheme values like
   /// "onSurface(0.38)" are shorthand for
-  /// `onSurface.withOpacity(0.38)`. [WidgetStateProperty] valued
+  /// `onSurface.withValues(alpha: 0.38)`. [WidgetStateProperty] valued
   /// properties that are not followed by a sublist have the same
   /// value for all states, otherwise the values are as specified for
   /// each state and "others" means all other states.
@@ -393,7 +393,8 @@ class MongolTextButton extends MongolButtonStyleButton {
         ? _MongolTextButtonDefaultsM3(context)
         : styleFrom(
             foregroundColor: colorScheme.primary,
-            disabledForegroundColor: colorScheme.onSurface.withOpacity(0.38),
+            disabledForegroundColor:
+                colorScheme.onSurface.withValues(alpha: 0.38),
             backgroundColor: Colors.transparent,
             disabledBackgroundColor: Colors.transparent,
             shadowColor: theme.shadowColor,
@@ -468,20 +469,20 @@ class _TextButtonDefaultOverlay extends WidgetStateProperty<Color?> {
   @override
   Color? resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.pressed)) {
-      return primary.withOpacity(0.12);
+      return primary.withValues(alpha: 0.12);
     }
     if (states.contains(WidgetState.hovered)) {
-      return primary.withOpacity(0.04);
+      return primary.withValues(alpha: 0.04);
     }
     if (states.contains(WidgetState.focused)) {
-      return primary.withOpacity(0.12);
+      return primary.withValues(alpha: 0.12);
     }
     return null;
   }
 
   @override
   String toString() {
-    return '{hovered: ${primary.withOpacity(0.04)}, focused,pressed: ${primary.withOpacity(0.12)}, otherwise: null}';
+    return '{hovered: ${primary.withValues(alpha: 0.04)}, focused,pressed: ${primary.withValues(alpha: 0.12)}, otherwise: null}';
   }
 }
 
@@ -548,8 +549,7 @@ class _MongolTextButtonWithIcon extends MongolTextButton {
     final bool useMaterial3 = Theme.of(context).useMaterial3;
     final ButtonStyle buttonStyle = super.defaultStyleOf(context);
     final double defaultFontSize =
-        buttonStyle.textStyle?.resolve(const <WidgetState>{})?.fontSize ??
-            14.0;
+        buttonStyle.textStyle?.resolve(const <WidgetState>{})?.fontSize ?? 14.0;
     final double effectiveTextScale =
         MediaQuery.textScalerOf(context).scale(defaultFontSize) / 14.0;
     final EdgeInsetsGeometry scaledPadding = ButtonStyleButton.scaledPadding(
@@ -618,7 +618,7 @@ class _MongolTextButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<Color?>? get foregroundColor =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return _colors.onSurface.withOpacity(0.38);
+          return _colors.onSurface.withValues(alpha: 0.38);
         }
         return _colors.primary;
       });
@@ -627,13 +627,13 @@ class _MongolTextButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<Color?>? get overlayColor =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.pressed)) {
-          return _colors.primary.withOpacity(0.12);
+          return _colors.primary.withValues(alpha: 0.12);
         }
         if (states.contains(WidgetState.hovered)) {
-          return _colors.primary.withOpacity(0.08);
+          return _colors.primary.withValues(alpha: 0.08);
         }
         if (states.contains(WidgetState.focused)) {
-          return _colors.primary.withOpacity(0.12);
+          return _colors.primary.withValues(alpha: 0.12);
         }
         return null;
       });

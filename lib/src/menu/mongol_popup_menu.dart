@@ -1461,8 +1461,7 @@ class _EffectiveMouseCursor extends WidgetStateMouseCursor {
 
   @override
   MouseCursor resolve(Set<WidgetState> states) {
-    return WidgetStateProperty.resolveAs<MouseCursor?>(
-            widgetCursor, states) ??
+    return WidgetStateProperty.resolveAs<MouseCursor?>(widgetCursor, states) ??
         themeCursor?.resolve(states) ??
         WidgetStateMouseCursor.clickable.resolve(states);
   }
@@ -1505,7 +1504,7 @@ class _PopupMenuDefaultsM3 extends PopupMenuThemeData {
     return WidgetStateProperty.resolveWith((Set<WidgetState> states) {
       final TextStyle style = _textTheme.labelLarge!;
       if (states.contains(WidgetState.disabled)) {
-        return style.apply(color: _colors.onSurface.withOpacity(0.38));
+        return style.apply(color: _colors.onSurface.withValues(alpha: 0.38));
       }
       return style.apply(color: _colors.onSurface);
     });

@@ -143,7 +143,7 @@ class MongolElevatedButton extends MongolButtonStyleButton {
   /// The [foregroundColor] and [disabledForegroundColor] colors are used
   /// to create a [MaterialStateProperty] [ButtonStyle.foregroundColor], and
   /// a derived [ButtonStyle.overlayColor].
-  /// 
+  ///
   /// The [backgroundColor] and [disabledBackgroundColor] colors are
   /// used to create a [MaterialStateProperty] [ButtonStyle.backgroundColor].
   ///
@@ -282,7 +282,7 @@ class MongolElevatedButton extends MongolButtonStyleButton {
   /// [ButtonStyle.foregroundColor] color is used instead.
   ///
   /// ## Material 2 defaults
-  /// 
+  ///
   /// * `textStyle` - Theme.textTheme.button
   /// * `backgroundColor`
   ///   * disabled - Theme.colorScheme.onSurface(0.12)
@@ -331,7 +331,7 @@ class MongolElevatedButton extends MongolButtonStyleButton {
   /// outline, is null. That means that the outline is defined by the button
   /// shape's [OutlinedBorder.side]. Typically the default value of an
   /// [OutlinedBorder]'s side is [BorderSide.none], so an outline is not drawn.
-  /// 
+  ///
   /// ## Material 3 defaults
   ///
   /// If [ThemeData.useMaterial3] is set to true the following defaults will
@@ -386,8 +386,10 @@ class MongolElevatedButton extends MongolButtonStyleButton {
         : styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: colorScheme.onPrimary,
-            disabledBackgroundColor: colorScheme.onSurface.withOpacity(0.12),
-            disabledForegroundColor: colorScheme.onSurface.withOpacity(0.38),
+            disabledBackgroundColor:
+                colorScheme.onSurface.withValues(alpha: 0.12),
+            disabledForegroundColor:
+                colorScheme.onSurface.withValues(alpha: 0.38),
             shadowColor: theme.shadowColor,
             elevation: 2,
             textStyle: theme.textTheme.labelLarge,
@@ -458,13 +460,13 @@ class _ElevatedButtonDefaultOverlay extends WidgetStateProperty<Color?>
   @override
   Color? resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.pressed)) {
-      return overlay.withOpacity(0.24);
+      return overlay.withValues(alpha: 0.24);
     }
     if (states.contains(WidgetState.hovered)) {
-      return overlay.withOpacity(0.08);
+      return overlay.withValues(alpha: 0.08);
     }
     if (states.contains(WidgetState.focused)) {
-      return overlay.withOpacity(0.24);
+      return overlay.withValues(alpha: 0.24);
     }
     return null;
   }
@@ -537,8 +539,7 @@ class _MongolElevatedButtonWithIcon extends MongolElevatedButton {
     final bool useMaterial3 = Theme.of(context).useMaterial3;
     final ButtonStyle buttonStyle = super.defaultStyleOf(context);
     final double defaultFontSize =
-        buttonStyle.textStyle?.resolve(const <WidgetState>{})?.fontSize ??
-            14.0;
+        buttonStyle.textStyle?.resolve(const <WidgetState>{})?.fontSize ?? 14.0;
     final double effectiveTextScale =
         MediaQuery.textScalerOf(context).scale(defaultFontSize) / 14.0;
 
@@ -608,7 +609,7 @@ class _ElevatedButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<Color?>? get backgroundColor =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return _colors.onSurface.withOpacity(0.12);
+          return _colors.onSurface.withValues(alpha: 0.12);
         }
         return _colors.surface;
       });
@@ -617,7 +618,7 @@ class _ElevatedButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<Color?>? get foregroundColor =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return _colors.onSurface.withOpacity(0.38);
+          return _colors.onSurface.withValues(alpha: 0.38);
         }
         return _colors.primary;
       });
@@ -626,13 +627,13 @@ class _ElevatedButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<Color?>? get overlayColor =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.pressed)) {
-          return _colors.primary.withOpacity(0.12);
+          return _colors.primary.withValues(alpha: 0.12);
         }
         if (states.contains(WidgetState.hovered)) {
-          return _colors.primary.withOpacity(0.08);
+          return _colors.primary.withValues(alpha: 0.08);
         }
         if (states.contains(WidgetState.focused)) {
-          return _colors.primary.withOpacity(0.12);
+          return _colors.primary.withValues(alpha: 0.12);
         }
         return null;
       });
@@ -705,4 +706,3 @@ class _ElevatedButtonDefaultsM3 extends ButtonStyle {
 }
 
 // END GENERATED TOKEN PROPERTIES - ElevatedButton
-

@@ -2572,7 +2572,7 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
   BorderSide? get activeIndicatorBorder =>
       WidgetStateBorderSide.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return BorderSide(color: _colors.onSurface.withOpacity(0.38));
+          return BorderSide(color: _colors.onSurface.withValues(alpha: 0.38));
         }
         if (states.contains(WidgetState.error)) {
           if (states.contains(WidgetState.hovered)) {
@@ -2596,7 +2596,7 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
   BorderSide? get outlineBorder =>
       WidgetStateBorderSide.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return BorderSide(color: _colors.onSurface.withOpacity(0.12));
+          return BorderSide(color: _colors.onSurface.withValues(alpha: 0.12));
         }
         if (states.contains(WidgetState.error)) {
           if (states.contains(WidgetState.hovered)) {
@@ -2629,7 +2629,7 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
   Color? get suffixIconColor =>
       WidgetStateColor.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return _colors.onSurface.withOpacity(0.38);
+          return _colors.onSurface.withValues(alpha: 0.38);
         }
         if (states.contains(WidgetState.error)) {
           return _colors.error;
@@ -2642,7 +2642,8 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
       WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
         final TextStyle textStyle = _textTheme.bodyLarge ?? const TextStyle();
         if (states.contains(WidgetState.disabled)) {
-          return textStyle.copyWith(color: _colors.onSurface.withOpacity(0.38));
+          return textStyle.copyWith(
+              color: _colors.onSurface.withValues(alpha: 0.38));
         }
         if (states.contains(WidgetState.error)) {
           if (states.contains(WidgetState.hovered)) {
@@ -2667,7 +2668,8 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
       WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
         final TextStyle textStyle = _textTheme.bodyLarge ?? const TextStyle();
         if (states.contains(WidgetState.disabled)) {
-          return textStyle.copyWith(color: _colors.onSurface.withOpacity(0.38));
+          return textStyle.copyWith(
+              color: _colors.onSurface.withValues(alpha: 0.38));
         }
         if (states.contains(WidgetState.error)) {
           if (states.contains(WidgetState.hovered)) {
@@ -2692,7 +2694,8 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
       WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
         final TextStyle textStyle = _textTheme.bodySmall ?? const TextStyle();
         if (states.contains(WidgetState.disabled)) {
-          return textStyle.copyWith(color: _colors.onSurface.withOpacity(0.38));
+          return textStyle.copyWith(
+              color: _colors.onSurface.withValues(alpha: 0.38));
         }
         return textStyle.copyWith(color: _colors.onSurfaceVariant);
       });

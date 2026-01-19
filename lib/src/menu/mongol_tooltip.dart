@@ -494,7 +494,7 @@ class _MongolTooltipState extends State<MongolTooltip>
         fontSize: _getDefaultFontSize(),
       );
       defaultDecoration = BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: const BorderRadius.all(Radius.circular(4)),
       );
     } else {
@@ -503,7 +503,7 @@ class _MongolTooltipState extends State<MongolTooltip>
         fontSize: _getDefaultFontSize(),
       );
       defaultDecoration = BoxDecoration(
-        color: Colors.grey[700]!.withOpacity(0.9),
+        color: Colors.grey[700]!.withValues(alpha: 0.9),
         borderRadius: const BorderRadius.all(Radius.circular(4)),
       );
     }

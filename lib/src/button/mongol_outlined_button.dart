@@ -238,7 +238,7 @@ class MongolOutlinedButton extends MongolButtonStyleButton {
   /// All of the ButtonStyle's defaults appear below. In this list
   /// "Theme.foo" is shorthand for `Theme.of(context).foo`. Color
   /// scheme values like "onSurface(0.38)" are shorthand for
-  /// `onSurface.withOpacity(0.38)`. [WidgetStateProperty] valued
+  /// `onSurface.withValues(alpha: 0.38)`. [WidgetStateProperty] valued
   /// properties that are not followed by a sublist have the same
   /// value for all states, otherwise the values are as specified for
   /// each state and "others" means all other states.
@@ -328,7 +328,8 @@ class MongolOutlinedButton extends MongolButtonStyleButton {
         ? _MongolOutlinedButtonDefaultsM3(context)
         : styleFrom(
             foregroundColor: colorScheme.primary,
-            disabledForegroundColor: colorScheme.onSurface.withOpacity(0.38),
+            disabledForegroundColor:
+                colorScheme.onSurface.withValues(alpha: 0.38),
             backgroundColor: Colors.transparent,
             disabledBackgroundColor: Colors.transparent,
             shadowColor: theme.shadowColor,
@@ -338,7 +339,10 @@ class MongolOutlinedButton extends MongolButtonStyleButton {
             minimumSize: const Size(36, 64),
             maximumSize: Size.infinite,
             side: BorderSide(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.12),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.12),
             ),
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(4))),
@@ -400,13 +404,13 @@ class _OutlinedButtonDefaultOverlay extends WidgetStateProperty<Color?>
   @override
   Color? resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.pressed)) {
-      return foreground.withOpacity(0.12);
+      return foreground.withValues(alpha: 0.12);
     }
     if (states.contains(WidgetState.hovered)) {
-      return foreground.withOpacity(0.04);
+      return foreground.withValues(alpha: 0.04);
     }
     if (states.contains(WidgetState.focused)) {
-      return foreground.withOpacity(0.12);
+      return foreground.withValues(alpha: 0.12);
     }
     return null;
   }
@@ -455,8 +459,7 @@ class _MongolOutlinedButtonWithIcon extends MongolOutlinedButton {
     }
     final ButtonStyle buttonStyle = super.defaultStyleOf(context);
     final double defaultFontSize =
-        buttonStyle.textStyle?.resolve(const <WidgetState>{})?.fontSize ??
-            14.0;
+        buttonStyle.textStyle?.resolve(const <WidgetState>{})?.fontSize ?? 14.0;
     final double effectiveTextScale =
         MediaQuery.textScalerOf(context).scale(defaultFontSize) / 14.0;
     final EdgeInsetsGeometry scaledPadding = ButtonStyleButton.scaledPadding(
@@ -523,7 +526,7 @@ class _MongolOutlinedButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<Color?>? get foregroundColor =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return _colors.onSurface.withOpacity(0.38);
+          return _colors.onSurface.withValues(alpha: 0.38);
         }
         return _colors.primary;
       });
@@ -532,13 +535,13 @@ class _MongolOutlinedButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<Color?>? get overlayColor =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.pressed)) {
-          return _colors.primary.withOpacity(0.12);
+          return _colors.primary.withValues(alpha: 0.12);
         }
         if (states.contains(WidgetState.hovered)) {
-          return _colors.primary.withOpacity(0.08);
+          return _colors.primary.withValues(alpha: 0.08);
         }
         if (states.contains(WidgetState.focused)) {
-          return _colors.primary.withOpacity(0.12);
+          return _colors.primary.withValues(alpha: 0.12);
         }
         return null;
       });
@@ -573,7 +576,7 @@ class _MongolOutlinedButtonDefaultsM3 extends ButtonStyle {
   WidgetStateProperty<BorderSide>? get side =>
       WidgetStateProperty.resolveWith((Set<WidgetState> states) {
         if (states.contains(WidgetState.disabled)) {
-          return BorderSide(color: _colors.onSurface.withOpacity(0.12));
+          return BorderSide(color: _colors.onSurface.withValues(alpha: 0.12));
         }
         if (states.contains(WidgetState.focused)) {
           return BorderSide(color: _colors.primary);

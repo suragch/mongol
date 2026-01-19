@@ -1,6 +1,8 @@
 ## [9.1.0] = 2026.01.19
 
 - Add `rotateCJK` parameter to allow disabling CJK rotation.
+- Fix alignment and spacing with rotated characters (#10, #48).
+- Fix `withOpacity` deprecation warnings.
 
 ## [9.0.0] - 2025.02.13
 
