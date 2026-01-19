@@ -496,16 +496,27 @@ class MongolParagraph {
     final startIndex = line.textRunStart;
     final endIndex = line.textRunEnd - 1;
     for (var j = startIndex; j <= endIndex; j++) {
+      final run = _runs[j];
+
+      var alignmentOffset = 0.0;
+      if (run.isRotated) {
+        alignmentOffset = (line.bounds.height - run.width) / 2;
+      }
+      var verticalShift = 0.0;
+      if (run.isRotated) {
+        final descent = run.paragraph.height - run.paragraph.alphabeticBaseline;
+        verticalShift = -descent / 2;
+      }
+      final offset = Offset(verticalShift, alignmentOffset);
+
       if (shouldDrawEllipsis && isLastLine && j == endIndex) {
         if (maxIntrinsicHeight + _ellipsis!.height < height) {
-          final run = _runs[j];
-          run.draw(canvas, const Offset(0, 0));
+          run.draw(canvas, offset);
           canvas.translate(run.width, 0);
         }
         _ellipsis!.draw(canvas, const Offset(0, 0));
       } else {
-        final run = _runs[j];
-        run.draw(canvas, const Offset(0, 0));
+        run.draw(canvas, offset);
         canvas.translate(run.width, 0);
       }
       canvas.translate(runSpacing, 0);
@@ -1295,30 +1306,23 @@ class _TextRun {
   /// It includes the size but should never be more than one line.
   final ui.Paragraph paragraph;
 
-  /// Returns the width of the run (in horizontal orientation) taking into account
-  /// whether it [isRotated].
+  /// Returns the width of the run (in horizontal orientation).
   double get width {
-    if (isRotated) {
-      return paragraph.height;
-    }
     return paragraph.maxIntrinsicWidth;
   }
 
-  /// Returns the height of the run (in horizontal orientation) taking into account
-  /// whether it [isRotated].
+  /// Returns the height of the run (in horizontal orientation).
   double get height {
-    if (isRotated) {
-      return paragraph.maxIntrinsicWidth;
-    }
     return paragraph.height;
   }
 
   void draw(ui.Canvas canvas, ui.Offset offset) {
     if (isRotated) {
       canvas.save();
+      canvas.translate(offset.dx, offset.dy);
       canvas.rotate(-math.pi / 2);
-      canvas.translate(-height, 0);
-      canvas.drawParagraph(paragraph, offset);
+      canvas.translate(-paragraph.maxIntrinsicWidth, 0);
+      canvas.drawParagraph(paragraph, const ui.Offset(0, 0));
       canvas.restore();
     } else {
       canvas.drawParagraph(paragraph, offset);
