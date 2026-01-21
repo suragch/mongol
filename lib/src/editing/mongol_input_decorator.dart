@@ -662,12 +662,14 @@ class _RenderDecoration extends RenderBox
     required TextBaseline textBaseline,
     required bool isFocused,
     required bool expands,
+    required bool isEmpty,
     TextAlignHorizontal? textAlignHorizontal,
   })  : _decoration = decoration,
         _textBaseline = textBaseline,
         _textAlignHorizontal = textAlignHorizontal,
         _isFocused = isFocused,
-        _expands = expands;
+        _expands = expands,
+        _isEmpty = isEmpty;
 
   static const double subtextGap = 8.0;
 
@@ -772,6 +774,17 @@ class _RenderDecoration extends RenderBox
       return;
     }
     _expands = value;
+    markNeedsLayout();
+  }
+
+  bool get isEmpty => _isEmpty;
+  bool _isEmpty = false;
+
+  set isEmpty(bool value) {
+    if (_isEmpty == value) {
+      return;
+    }
+    _isEmpty = value;
     markNeedsLayout();
   }
 
@@ -942,10 +955,6 @@ class _RenderDecoration extends RenderBox
       label,
       boxConstraints.copyWith(maxHeight: labelHeight * invertedLabelScale),
     );
-    boxToBaseline[hint] = _layoutLineBox(
-      hint,
-      boxConstraints.copyWith(minHeight: inputHeight, maxHeight: inputHeight),
-    );
     boxToBaseline[counter] = _layoutLineBox(counter, contentConstraints);
 
     // The helper or error text can occupy the full height less the space
@@ -975,6 +984,20 @@ class _RenderDecoration extends RenderBox
       helperErrorWidth,
     );
     final Offset densityOffset = decoration.visualDensity!.baseSizeAdjustment;
+
+    boxToBaseline[hint] = _layoutLineBox(
+      hint,
+      boxConstraints
+          .deflate(EdgeInsets.only(
+            left: contentPadding.left + leftWidth + densityOffset.dx / 2,
+            right: contentPadding.right + rightWidth + densityOffset.dx / 2,
+          ))
+          .copyWith(
+            minHeight: inputHeight,
+            maxHeight: inputHeight,
+          ),
+    );
+
     boxToBaseline[input] = _layoutLineBox(
       input,
       boxConstraints
@@ -1342,11 +1365,23 @@ class _RenderDecoration extends RenderBox
     if (prefix != null) {
       start += baselineLayout(prefix!, start);
     }
-    if (input != null) {
-      baselineLayout(input!, start);
-    }
-    if (hint != null) {
-      baselineLayout(hint!, start);
+    // When hint text is shown (field is empty), position input to match hint's position
+    // so the cursor aligns correctly with the hint text
+    if (input != null && hint != null && isEmpty) {
+      // Position hint first to get its horizontal offset
+      final double hintHorizontalOffset =
+          baseline! - layout.boxToBaseline[hint]!;
+      _boxParentData(hint!).offset = Offset(hintHorizontalOffset, start);
+      // Position input at the same horizontal offset as hint
+      _boxParentData(input!).offset = Offset(hintHorizontalOffset, start);
+      // Don't advance start since both are at the same position
+    } else {
+      if (input != null) {
+        baselineLayout(input!, start);
+      }
+      if (hint != null) {
+        baselineLayout(hint!, start);
+      }
     }
     if (suffixIcon != null) {
       end += contentPadding.bottom;
@@ -1500,6 +1535,7 @@ class _Decorator
     required this.textBaseline,
     required this.isFocused,
     required this.expands,
+    required this.isEmpty,
   });
 
   final _Decoration decoration;
@@ -1507,6 +1543,7 @@ class _Decorator
   final TextAlignHorizontal? textAlignHorizontal;
   final bool isFocused;
   final bool expands;
+  final bool isEmpty;
 
   @override
   Iterable<_DecorationSlot> get slots => _DecorationSlot.values;
@@ -1547,6 +1584,7 @@ class _Decorator
       textAlignHorizontal: textAlignHorizontal,
       isFocused: isFocused,
       expands: expands,
+      isEmpty: isEmpty,
     );
   }
 
@@ -1557,6 +1595,7 @@ class _Decorator
       ..decoration = decoration
       ..expands = expands
       ..isFocused = isFocused
+      ..isEmpty = isEmpty
       ..textAlignHorizontal = textAlignHorizontal
       ..textBaseline = textBaseline;
   }
@@ -2387,6 +2426,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
       textAlignHorizontal: widget.textAlignHorizontal,
       isFocused: isFocused,
       expands: widget.expands,
+      isEmpty: isEmpty,
     );
 
     final BoxConstraints? constraints =
