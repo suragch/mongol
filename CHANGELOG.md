@@ -1,3 +1,7 @@
+## [9.1.2] = 2026.01.22
+
+- Fixed cursor issue when hint text present (@hubcin)
+
 ## [9.1.1] = 2026.01.19
 
 - Fix `rotateCJK: false` initialization bug.

@@ -1,7 +1,7 @@
 name: mongol
 description: Flutter widget package for displaying and editing vertical Mongolian text.
 # When updating version, also update CHANGELOG.md and example/lib/main.dart
-version: 9.1.1
+version: 9.1.2
 homepage: https://github.com/suragch/mongol
 topics:
   - text
