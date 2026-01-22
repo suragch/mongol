@@ -1370,7 +1370,7 @@ class _RenderDecoration extends RenderBox
     if (input != null && hint != null && isEmpty) {
       // Position hint first to get its horizontal offset
       final double hintHorizontalOffset =
-          baseline! - layout.boxToBaseline[hint]!;
+          baseline - layout.boxToBaseline[hint]!;
       _boxParentData(hint!).offset = Offset(hintHorizontalOffset, start);
       // Position input at the same horizontal offset as hint
       _boxParentData(input!).offset = Offset(hintHorizontalOffset, start);
