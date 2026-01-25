@@ -889,6 +889,11 @@ class _RenderDecoration extends RenderBox
     return baseline;
   }
 
+  double _emptyColumnWidth(RenderBox input) {
+    // This equals one vertical column advance
+    return input.getMaxIntrinsicHeight(double.infinity);
+  }
+
   // Returns a value used by performLayout to position all of the renderers.
   // This method applies layout to all of the renderers except the container.
   // For convenience, the container is laid out in performLayout().
@@ -1014,7 +1019,13 @@ class _RenderDecoration extends RenderBox
     // The field can be occupied by a hint or by the input itself
     final double hintWidth = hint == null ? 0 : hint!.size.width;
     final double inputDirectWidth = input == null ? 0 : input!.size.width;
-    final double inputWidth = math.max(hintWidth, inputDirectWidth);
+
+    final bool isFullyEmpty = inputDirectWidth == 0 && hintWidth == 0;
+
+    final double inputWidth = isFullyEmpty && input != null
+        ? _emptyColumnWidth(input!)
+        : math.max(hintWidth, inputDirectWidth);
+
     final double inputInternalBaseline = math.max(
       boxToBaseline[input]!,
       boxToBaseline[hint]!,
@@ -1370,7 +1381,7 @@ class _RenderDecoration extends RenderBox
     if (input != null && hint != null && isEmpty) {
       // Position hint first to get its horizontal offset
       final double hintHorizontalOffset =
-          baseline! - layout.boxToBaseline[hint]!;
+          baseline - layout.boxToBaseline[hint]!;
       _boxParentData(hint!).offset = Offset(hintHorizontalOffset, start);
       // Position input at the same horizontal offset as hint
       _boxParentData(input!).offset = Offset(hintHorizontalOffset, start);
