@@ -1619,7 +1619,7 @@ class MongolRenderEditable extends RenderBox
   double _preferredWidth(double height) {
     final String plain = plainText;
 
-    // ✅ FIX: empty paragraph must reserve one column
+    // FIX: empty paragraph must reserve one column
     if (plain.isEmpty) {
       return preferredLineWidth;
     }
