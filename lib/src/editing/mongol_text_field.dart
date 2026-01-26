@@ -251,6 +251,7 @@ class MongolTextField extends StatefulWidget {
     ToolbarOptions? toolbarOptions,
     this.showCursor,
     this.autofocus = false,
+    this.onTapOutside,
     this.obscuringCharacter = '•',
     this.obscureText = false,
     this.autocorrect = true,
@@ -410,6 +411,8 @@ class MongolTextField extends StatefulWidget {
   ///
   /// Defaults to false.
   final bool autofocus;
+
+  final TapRegionCallback? onTapOutside;
 
   /// Character used for obscuring text if [obscureText] is true.
   ///
@@ -1504,6 +1507,7 @@ class _TextFieldState extends State<MongolTextField>
           style: style,
           textAlign: widget.textAlign,
           autofocus: widget.autofocus,
+          onTapOutside: widget.onTapOutside,
           obscuringCharacter: widget.obscuringCharacter,
           obscureText: widget.obscureText,
           autocorrect: widget.autocorrect,
