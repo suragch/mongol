@@ -1,3 +1,8 @@
+## [9.2.0] = 2026.01.26
+
+- Fixed MongolTextField's width problem when text and hint are empty (#39) (@hubcin)
+- Added onTapOutside feature for MongolTextField (@hubcin)
+
 ## [9.1.2] = 2026.01.22
 
 - Fixed cursor issue when hint text present (@hubcin)

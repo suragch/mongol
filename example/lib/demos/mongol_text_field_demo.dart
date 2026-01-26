@@ -53,6 +53,9 @@ class _SearchBodyState extends State<SearchBody> {
                     decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                     ),
+                    onTapOutside: (event) {
+                      print('onTapOutside: $event');
+                    },
                   ),
                 ),
                 SizedBox(
