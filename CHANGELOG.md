@@ -1,3 +1,21 @@
+## [9.3.0] - 2026.08.25
+
+PR from @Satsrag:
+
+- Remove references to `ExtendSelectionByPageIntent`, which is no longer
+  available in Flutter 3.44.
+- Add an internal horizontal adjacent-page intent and action for Mongol text
+  editing.
+- Support horizontal Page Up and Page Down behavior using Flutter's
+  `Shortcuts`, `Intent`, and `Action` architecture.
+- Follow Flutter's platform conventions:
+  - On macOS and iOS, Page Up and Page Down scroll one horizontal page without
+    moving the caret.
+  - On Android, Fuchsia, Linux, and Windows, Page Up and Page Down move the
+    caret one horizontal page.
+  - Shift + Page Up and Shift + Page Down extend the selection by one
+    horizontal page on all platforms.
+
 ## [9.2.1] - 2026.02.07
 
 - fixed: onTapOutside triggers when empty area tapped (@hubcin)

@@ -297,6 +297,9 @@ class FakeTicker implements Ticker {
     return DiagnosticsProperty<Ticker>(name, this,
         style: DiagnosticsTreeStyle.errorProperty);
   }
+
+  @override
+  bool forceFrames = throw UnimplementedError();
 }
 
 class TestClipPaintingContext extends PaintingContext {
