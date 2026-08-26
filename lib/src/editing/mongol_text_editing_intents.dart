@@ -26,6 +26,18 @@ class MongolExtendSelectionHorizontallyToAdjacentLineIntent
       {required super.forward, required super.collapseSelection});
 }
 
+/// Extends, or moves the current selection from the current
+/// [TextSelection.extent] position to the closest position on the adjacent
+/// horizontal page.
+class MongolExtendSelectionHorizontallyToAdjacentPageIntent
+    extends ExtendSelectionVerticallyToAdjacentPageIntent {
+  /// Creates a [MongolExtendSelectionHorizontallyToAdjacentPageIntent].
+  const MongolExtendSelectionHorizontallyToAdjacentPageIntent({
+    required super.forward,
+    required super.collapseSelection,
+  });
+}
+
 /// Expands the current selection to the closest line break in the direction
 /// given by [forward].
 ///

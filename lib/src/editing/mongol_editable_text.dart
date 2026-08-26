@@ -64,7 +64,6 @@ import 'package:flutter/widgets.dart'
         EdgeInsets,
         ExpandSelectionToLineBreakIntent,
         ExtendSelectionByCharacterIntent,
-        ExtendSelectionByPageIntent,
         ExtendSelectionToDocumentBoundaryIntent,
         ExtendSelectionToLineBreakIntent,
         ExtendSelectionToNextWordBoundaryIntent,
@@ -3306,14 +3305,13 @@ class MongolEditableTextState extends State<MongolEditableText>
     _scrollController.jumpTo(destination);
   }
 
-  /// Extend the selection down by page if the `forward` parameter is true, or
-  /// up by page otherwise.
-  void _extendSelectionByPage(ExtendSelectionByPageIntent intent) {
+  /// Extends the selection horizontally by one page.
+  void _extendSelectionHorizontallyByPage(
+      MongolExtendSelectionHorizontallyToAdjacentPageIntent intent) {
     if (widget.maxLines == 1) {
       return;
     }
 
-    final TextSelection nextSelection;
     final Rect extentRect = renderEditable.getLocalRectForCaret(
       _value.selection.extent,
     );
@@ -3327,6 +3325,8 @@ class MongolEditableTextState extends State<MongolEditableText>
       ),
     );
     final ScrollPosition position = _scrollController.position;
+
+    final TextPosition nextExtent;
     if (intent.forward) {
       if (_value.selection.extentOffset >= _value.text.length) {
         return;
@@ -3334,31 +3334,32 @@ class MongolEditableTextState extends State<MongolEditableText>
       final Offset nextExtentOffset =
           Offset(extentRect.left + increment, extentRect.top);
       final double width = position.maxScrollExtent + renderEditable.size.width;
-      final TextPosition nextExtent =
-          nextExtentOffset.dx + position.pixels >= width
-              ? TextPosition(offset: _value.text.length)
-              : renderEditable.getPositionForPoint(
-                  renderEditable.localToGlobal(nextExtentOffset),
-                );
-      nextSelection = _value.selection.copyWith(
-        extentOffset: nextExtent.offset,
-      );
+      nextExtent = nextExtentOffset.dx + position.pixels >= width
+          ? TextPosition(offset: _value.text.length)
+          : renderEditable.getPositionForPoint(
+              renderEditable.localToGlobal(nextExtentOffset),
+            );
     } else {
       if (_value.selection.extentOffset <= 0) {
         return;
       }
       final Offset nextExtentOffset =
           Offset(extentRect.left + increment, extentRect.top);
-      final TextPosition nextExtent = nextExtentOffset.dx + position.pixels <= 0
+      nextExtent = nextExtentOffset.dx + position.pixels <= 0
           ? const TextPosition(offset: 0)
           : renderEditable.getPositionForPoint(
               renderEditable.localToGlobal(nextExtentOffset),
             );
-      nextSelection = _value.selection.copyWith(
-        extentOffset: nextExtent.offset,
-      );
     }
 
+    final bool collapseSelection =
+        intent.collapseSelection || !widget.selectionEnabled;
+    final TextSelection nextSelection = collapseSelection
+        ? TextSelection.fromPosition(nextExtent)
+        : _value.selection.copyWith(
+            extentOffset: nextExtent.offset,
+            affinity: nextExtent.affinity,
+          );
     bringIntoView(nextSelection.extent);
     userUpdateTextEditingValue(
       _value.copyWith(selection: nextSelection),
@@ -3474,9 +3475,6 @@ class MongolEditableTextState extends State<MongolEditableText>
       false,
       _characterBoundary,
     )),
-    ExtendSelectionByPageIntent: _makeOverridable(
-        CallbackAction<ExtendSelectionByPageIntent>(
-            onInvoke: _extendSelectionByPage)),
     MongolExtendSelectionByCharacterIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionByCharacterIntent>(
       this,
@@ -3508,6 +3506,11 @@ class MongolEditableTextState extends State<MongolEditableText>
         _makeOverridable(_adjacentLineAction),
     MongolExtendSelectionHorizontallyToAdjacentLineIntent:
         _makeOverridable(_adjacentLineAction),
+    MongolExtendSelectionHorizontallyToAdjacentPageIntent: _makeOverridable(
+      CallbackAction<MongolExtendSelectionHorizontallyToAdjacentPageIntent>(
+        onInvoke: _extendSelectionHorizontallyByPage,
+      ),
+    ),
     ExtendSelectionToDocumentBoundaryIntent: _makeOverridable(
         _UpdateTextSelectionAction<ExtendSelectionToDocumentBoundaryIntent>(
             this, true, _documentBoundary)),

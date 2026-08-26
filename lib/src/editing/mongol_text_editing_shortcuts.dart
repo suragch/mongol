@@ -26,10 +26,53 @@ class MongolTextEditingShortcuts extends StatelessWidget {
 
   final Widget? child;
 
+  static final Map<ShortcutActivator, Intent> _selectionPageShortcuts =
+      <ShortcutActivator, Intent>{
+    const SingleActivator(LogicalKeyboardKey.pageUp, shift: true):
+        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+      forward: false,
+      collapseSelection: false,
+    ),
+    const SingleActivator(LogicalKeyboardKey.pageDown, shift: true):
+        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+      forward: true,
+      collapseSelection: false,
+    ),
+  };
+
+  static final Map<ShortcutActivator, Intent> _commonPageShortcuts =
+      <ShortcutActivator, Intent>{
+    const SingleActivator(LogicalKeyboardKey.pageUp):
+        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+      forward: false,
+      collapseSelection: true,
+    ),
+    const SingleActivator(LogicalKeyboardKey.pageDown):
+        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+      forward: true,
+      collapseSelection: true,
+    ),
+    ..._selectionPageShortcuts,
+  };
+
+  static final Map<ShortcutActivator, Intent> _macPageShortcuts =
+      <ShortcutActivator, Intent>{
+    const SingleActivator(LogicalKeyboardKey.pageUp): const ScrollIntent(
+      direction: AxisDirection.left,
+      type: ScrollIncrementType.page,
+    ),
+    const SingleActivator(LogicalKeyboardKey.pageDown): const ScrollIntent(
+      direction: AxisDirection.right,
+      type: ScrollIncrementType.page,
+    ),
+    ..._selectionPageShortcuts,
+  };
+
   // These shortcuts are shared between most platforms except macOS, which
   // uses different modifier keys for the line/word modifier.
   static final Map<ShortcutActivator, Intent> _commonShortcuts =
       <ShortcutActivator, Intent>{
+    ..._commonPageShortcuts,
     // Arrow: Move Selection.
     const SingleActivator(LogicalKeyboardKey.arrowUp):
         const MongolExtendSelectionByCharacterIntent(
@@ -133,6 +176,7 @@ class MongolTextEditingShortcuts extends StatelessWidget {
   // platforms.
   static final Map<ShortcutActivator, Intent> _macShortcuts =
       <ShortcutActivator, Intent>{
+    ..._macPageShortcuts,
     const SingleActivator(LogicalKeyboardKey.arrowUp):
         const MongolExtendSelectionByCharacterIntent(
             forward: false, collapseSelection: true),
