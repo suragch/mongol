@@ -73,4 +73,41 @@ void main() {
     final breakSegments = BreakSegments(text);
     expect(breakSegments.length, equals(2));
   });
+
+  // Fullwidth forms should be upright in a vertical line, like other CJK text.
+  // See https://github.com/suragch/mongol/issues/43
+
+  test('BreakSegments rotates fullwidth question and exclamation marks', () {
+    for (final text in ['？', '！']) {
+      final segments = BreakSegments(text);
+      expect(segments.length, equals(1));
+      expect(segments.first.isRotatable, isTrue, reason: 'U+${text.runes.first.toRadixString(16).toUpperCase()}');
+    }
+  });
+
+  test('BreakSegments rotates fullwidth numerals', () {
+    const text = '１２３';
+    final segments = BreakSegments(text);
+    for (final segment in segments) {
+      expect(segment.isRotatable, isTrue);
+    }
+  });
+
+  test('BreakSegments still does not rotate ASCII digits', () {
+    const text = '123';
+    final segments = BreakSegments(text);
+    expect(segments.first.isRotatable, isFalse);
+  });
+
+  test('BreakSegments still does not rotate Mongolian text', () {
+    const text = 'ᠠᠡ';
+    final segments = BreakSegments(text);
+    expect(segments.first.isRotatable, isFalse);
+  });
+
+  test('BreakSegments still rotates CJK ideographs', () {
+    const text = '漢';
+    final segments = BreakSegments(text);
+    expect(segments.first.isRotatable, isTrue);
+  });
 }

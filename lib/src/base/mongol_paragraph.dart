@@ -1202,6 +1202,8 @@ class LineBreaker implements Iterator<RotatableString> {
   static const _hangulJamoExtendedBEnd = 0xD7FF;
   static const _cjkCompatibilityIdeographsStart = 0xF900;
   static const _cjkCompatibilityIdeographsEnd = 0xFAFF;
+  static const _fullwidthFormsStart = 0xFF01;
+  static const _fullwidthFormsEnd = 0xFF60;
   static const _unicodeEmojiStart = 0x1F000;
 
   bool _isRotatable(String character) {
@@ -1244,6 +1246,12 @@ class LineBreaker implements Iterator<RotatableString> {
     // More Chinese
     if (codePoint >= _cjkCompatibilityIdeographsStart &&
         codePoint <= _cjkCompatibilityIdeographsEnd) {
+      return true;
+    }
+
+    // Fullwidth forms, ex: ？ ！ １２３. These are the CJK-width variants of
+    // ASCII characters and are set upright, like the ideographs they accompany.
+    if (codePoint >= _fullwidthFormsStart && codePoint <= _fullwidthFormsEnd) {
       return true;
     }
 
