@@ -2409,7 +2409,7 @@ class _CaretPainter extends MongolRenderEditablePainter {
   Color? _caretColor;
 
   set caretColor(Color? value) {
-    if (caretColor?.value == value?.value) return;
+    if (caretColor?.toARGB32() == value?.toARGB32()) return;
 
     _caretColor = value;
     notifyListeners();

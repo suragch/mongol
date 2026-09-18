@@ -54,7 +54,7 @@ class _SearchBodyState extends State<SearchBody> {
                       border: OutlineInputBorder(),
                     ),
                     onTapOutside: (event) {
-                      print('onTapOutside: $event');
+                      debugPrint('onTapOutside: $event');
                     },
                   ),
                 ),
