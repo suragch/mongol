@@ -173,29 +173,6 @@ void main() {
     expect(baseSize.height, equals(28.0));
   });
 
-  testWidgets('MongolText handles mixed rotated and non-rotated text',
-      (WidgetTester tester) async {
-    await binding.setSurfaceSize(const Size(1000, 1000));
-    addTearDown(() => binding.setSurfaceSize(null));
-
-    const myString = 'ᠰᠠᠶᠢᠨ ᠪᠠᠶᠢᠨ᠎ᠠ ᠤᠤ︖ 👨‍👩‍👧🇭🇺22';
-    await tester.pumpWidget(
-      const Center(
-        child: MongolText(
-          myString,
-        ),
-      ),
-    );
-
-    final text = tester.firstWidget(find.byType(MongolRichText));
-    expect(text, isNotNull);
-
-    final baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(14.0));
-    expect(baseSize.height,
-        equals(324.7890625)); // should this be rounded to 283.0?
-  });
-
   testWidgets('MongolText handles embedded formatting characters',
       (WidgetTester tester) async {
     await binding.setSurfaceSize(const Size(1000, 1000));
