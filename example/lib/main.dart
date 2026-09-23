@@ -18,7 +18,7 @@ import 'demos/resizable_text_demo.dart';
 import 'demos/text_demo.dart';
 import 'demos/text_span_demo.dart';
 
-const versionTitle = 'Flutter mongol package 9.2.1';
+const versionTitle = 'Flutter mongol package 9.4.0';
 
 void main() {
   runApp(const DemoApp());

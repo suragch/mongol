@@ -1,3 +1,9 @@
+## [9.4.0] - 2026.09.23
+
+- Resolve the analyzer issues that have a mechanical fix (#62) (@AltangerelG)
+- Set fullwidth forms upright, like the ideographs they accompany (#64) (@AltangerelG)
+- Add widget tests for MongolInputDecorator (#65) (@AltangerelG)
+
 ## [9.3.0] - 2026.08.25
 
 PR from @Satsrag:
