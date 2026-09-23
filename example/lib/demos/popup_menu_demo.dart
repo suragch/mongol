@@ -91,7 +91,7 @@ class _PopupMenuDemoState extends State<PopupMenuDemo> {
     );
   }
 
-  _showStackBar(BuildContext context, Object? value) {
+  void _showStackBar(BuildContext context, Object? value) {
     final snackBar = SnackBar(
       content: Text('$value'),
       duration: const Duration(milliseconds: 500),
