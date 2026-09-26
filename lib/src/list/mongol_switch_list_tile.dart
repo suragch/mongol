@@ -474,7 +474,12 @@ class MongolSwitchListTile extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    @Deprecated(
+      'Use activeThumbColor instead. '
+      'This feature was deprecated after v3.31.0-2.0.pre.',
+    )
     this.activeColor,
+    this.activeThumbColor,
     this.activeTrackColor,
     this.inactiveThumbColor,
     this.inactiveTrackColor,
@@ -530,7 +535,12 @@ class MongolSwitchListTile extends StatelessWidget {
     super.key,
     required this.value,
     required this.onChanged,
+    @Deprecated(
+      'Use activeThumbColor instead. '
+      'This feature was deprecated after v3.31.0-2.0.pre.',
+    )
     this.activeColor,
+    this.activeThumbColor,
     this.activeTrackColor,
     this.inactiveThumbColor,
     this.inactiveTrackColor,
@@ -603,7 +613,14 @@ class MongolSwitchListTile extends StatelessWidget {
   /// {@macro flutter.material.switch.activeColor}
   ///
   /// Defaults to [ColorScheme.secondary] of the current [Theme].
+  @Deprecated(
+    'Use activeThumbColor instead. '
+    'This feature was deprecated after v3.31.0-2.0.pre.',
+  )
   final Color? activeColor;
+
+  /// The color to use when this switch's thumb is on.
+  final Color? activeThumbColor;
 
   /// {@macro flutter.material.switch.activeTrackColor}
   ///
@@ -824,7 +841,7 @@ class MongolSwitchListTile extends StatelessWidget {
         control = Switch.adaptive(
           value: value,
           onChanged: onChanged,
-          activeColor: activeColor,
+          activeThumbColor: activeThumbColor ?? activeColor,
           activeThumbImage: activeThumbImage,
           inactiveThumbImage: inactiveThumbImage,
           materialTapTargetSize:
@@ -851,7 +868,7 @@ class MongolSwitchListTile extends StatelessWidget {
         control = Switch(
           value: value,
           onChanged: onChanged,
-          activeColor: activeColor,
+          activeThumbColor: activeThumbColor ?? activeColor,
           activeThumbImage: activeThumbImage,
           inactiveThumbImage: inactiveThumbImage,
           materialTapTargetSize:
