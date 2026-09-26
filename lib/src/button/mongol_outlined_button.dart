@@ -485,7 +485,9 @@ class _MongolOutlinedButtonWithIconChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double scale = MediaQuery.textScalerOf(context).textScaleFactor;
+    // Mirrors Flutter's own icon-button gap calculation: scale a reference font
+    // size rather than reading the deprecated linear factor off the scaler.
+    final double scale = MediaQuery.textScalerOf(context).scale(14.0) / 14.0;
     final double gap =
         scale <= 1 ? 8 : lerpDouble(8, 4, math.min(scale - 1, 1))!;
     return Column(
