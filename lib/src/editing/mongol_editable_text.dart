@@ -24,6 +24,7 @@ import 'package:flutter/material.dart'
         ReplaceTextIntent,
         ScrollToDocumentBoundaryIntent,
         Size,
+        TextScaler,
         kMinInteractiveDimension;
 import 'package:flutter/rendering.dart' show RevealedOffset, ViewportOffset;
 import 'package:flutter/scheduler.dart';
@@ -341,7 +342,13 @@ class MongolEditableText extends StatefulWidget {
     required this.style,
     required this.cursorColor,
     this.textAlign = MongolTextAlign.top,
+    @Deprecated(
+      'Use textScaler instead. '
+      'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+      'This feature was deprecated after v3.12.0-2.0.pre.',
+    )
     this.textScaleFactor,
+    this.textScaler,
     this.maxLines = 1,
     this.minLines,
     this.expands = false,
@@ -547,7 +554,18 @@ class MongolEditableText extends StatefulWidget {
   ///
   /// Defaults to the [MediaQueryData.textScaleFactor] obtained from the ambient
   /// [MediaQuery], or 1.0 if there is no [MediaQuery] in scope.
+  @Deprecated(
+    'Use textScaler instead. '
+    'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+    'This feature was deprecated after v3.12.0-2.0.pre.',
+  )
   final double? textScaleFactor;
+
+  /// {@macro flutter.painting.textPainter.textScaler}
+  ///
+  /// Defaults to the [MediaQueryData.textScaler] obtained from the ambient
+  /// [MediaQuery], or [TextScaler.noScaling] if there is no [MediaQuery].
+  final TextScaler? textScaler;
 
   /// The color to use when painting the cursor.
   final Color cursorColor;
@@ -1334,7 +1352,8 @@ class MongolEditableText extends StatefulWidget {
     properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
         defaultValue: null));
     properties.add(
-        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: null));
+        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+            defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: 1));
     properties.add(IntProperty('minLines', minLines, defaultValue: null));
     properties.add(
@@ -3597,8 +3616,10 @@ class MongolEditableTextState extends State<MongolEditableText>
                         minLines: widget.minLines,
                         expands: widget.expands,
                         selectionColor: widget.selectionColor,
-                        textScaleFactor: widget.textScaleFactor ??
-                            MediaQuery.textScaleFactorOf(context),
+                        textScaler: widget.textScaler ??
+                            (widget.textScaleFactor != null
+                                ? TextScaler.linear(widget.textScaleFactor!)
+                                : MediaQuery.textScalerOf(context)),
                         textAlign: widget.textAlign,
                         obscuringCharacter: widget.obscuringCharacter,
                         obscureText: widget.obscureText,
@@ -3672,7 +3693,7 @@ class _MongolEditable extends LeafRenderObjectWidget {
     this.minLines,
     required this.expands,
     this.selectionColor,
-    required this.textScaleFactor,
+    required this.textScaler,
     required this.textAlign,
     required this.obscuringCharacter,
     required this.obscureText,
@@ -3703,7 +3724,7 @@ class _MongolEditable extends LeafRenderObjectWidget {
   final int? minLines;
   final bool expands;
   final Color? selectionColor;
-  final double textScaleFactor;
+  final TextScaler textScaler;
   final MongolTextAlign textAlign;
   final String obscuringCharacter;
   final bool obscureText;
@@ -3735,7 +3756,7 @@ class _MongolEditable extends LeafRenderObjectWidget {
       minLines: minLines,
       expands: expands,
       selectionColor: selectionColor,
-      textScaleFactor: textScaleFactor,
+      textScaler: textScaler,
       textAlign: textAlign,
       selection: value.selection,
       offset: offset,
@@ -3769,7 +3790,7 @@ class _MongolEditable extends LeafRenderObjectWidget {
       ..minLines = minLines
       ..expands = expands
       ..selectionColor = selectionColor
-      ..textScaleFactor = textScaleFactor
+      ..textScaler = textScaler
       ..textAlign = textAlign
       ..selection = value.selection
       ..offset = offset

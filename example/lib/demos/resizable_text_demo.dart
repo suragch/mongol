@@ -27,7 +27,7 @@ class _ResizableTextDemoState extends State<ResizableTextDemo> {
               child: MongolText(
                 text,
                 style: const TextStyle(fontSize: 30),
-                textScaleFactor: scale,
+                textScaler: TextScaler.linear(scale),
               ),
             ),
             _scaleBoxRed(),

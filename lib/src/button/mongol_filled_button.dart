@@ -537,7 +537,9 @@ class _MongolFilledButtonWithIconChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double scale = MediaQuery.textScalerOf(context).textScaleFactor;
+    // Mirrors Flutter's own icon-button gap calculation: scale a reference font
+    // size rather than reading the deprecated linear factor off the scaler.
+    final double scale = MediaQuery.textScalerOf(context).scale(14.0) / 14.0;
     // Adjust the gap based on the text scale factor. Start at 8, and lerp
     // to 4 based on how large the text is.
     final double gap =

@@ -68,17 +68,37 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// it is not null, it must be greater than zero.
   ///
   /// The [text] argument must not be null.
-  const MongolRichText({
+  MongolRichText({
     Key? key,
     required this.text,
     this.textAlign = MongolTextAlign.top,
     this.softWrap = true,
     this.overflow = TextOverflow.clip,
-    this.textScaleFactor = 1.0,
+    @Deprecated(
+      'Use textScaler instead. '
+      'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+      'This feature was deprecated after v3.12.0-2.0.pre.',
+    )
+    double textScaleFactor = 1.0,
+    TextScaler textScaler = TextScaler.noScaling,
     this.maxLines,
     this.rotateCJK = true,
   })  : assert(maxLines == null || maxLines > 0),
+        assert(
+          textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
+          'Use textScaler instead.',
+        ),
+        textScaler = _effectiveTextScalerFrom(textScaler, textScaleFactor),
         super(key: key);
+
+  static TextScaler _effectiveTextScalerFrom(
+      TextScaler textScaler, double textScaleFactor) {
+    if (textScaleFactor == 1.0) return textScaler;
+    if (identical(textScaler, TextScaler.noScaling)) {
+      return TextScaler.linear(textScaleFactor);
+    }
+    return textScaler;
+  }
 
   /// The text to display in this widget.
   final TextSpan text;
@@ -95,11 +115,22 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// How visual overflow should be handled.
   final TextOverflow overflow;
 
+  /// Deprecated. Will be removed in a future version of this package. Use
+  /// [textScaler] instead.
+  ///
   /// The number of font pixels for each logical pixel.
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
-  final double textScaleFactor;
+  @Deprecated(
+    'Use textScaler instead. '
+    'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+    'This feature was deprecated after v3.12.0-2.0.pre.',
+  )
+  double get textScaleFactor => textScaler.textScaleFactor;
+
+  /// {@macro flutter.painting.textPainter.textScaler}
+  final TextScaler textScaler;
 
   /// An optional maximum number of lines for the text to span, wrapping if
   /// necessary. If the text exceeds the given number of lines, it will be
@@ -122,7 +153,7 @@ class MongolRichText extends LeafRenderObjectWidget {
       textAlign: textAlign,
       softWrap: softWrap,
       overflow: overflow,
-      textScaleFactor: textScaleFactor,
+      textScaler: textScaler,
       maxLines: maxLines,
       rotateCJK: rotateCJK,
     );
@@ -136,7 +167,7 @@ class MongolRichText extends LeafRenderObjectWidget {
       ..textAlign = textAlign
       ..softWrap = softWrap
       ..overflow = overflow
-      ..textScaleFactor = textScaleFactor
+      ..textScaler = textScaler
       ..maxLines = maxLines
       ..rotateCJK = rotateCJK;
   }
@@ -155,7 +186,8 @@ class MongolRichText extends LeafRenderObjectWidget {
     properties.add(EnumProperty<TextOverflow>('overflow', overflow,
         defaultValue: TextOverflow.clip));
     properties.add(
-        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
+        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+            defaultValue: TextScaler.noScaling));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
     properties.add(FlagProperty('rotateCJK',
         value: rotateCJK,
