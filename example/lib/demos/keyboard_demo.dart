@@ -195,17 +195,21 @@ class MongolKeyboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 160,
-      color: Colors.blue,
-      child: Column(
-        children: [
-          buildRowOne(),
-          buildRowTwo(),
-          buildRowThree(),
-          buildRowFour(),
-          buildRowFive(),
-        ],
+    return SafeArea(
+      top: false,
+      child: Container(
+        height: 190,
+        color: Colors.blue,
+        child: Column(
+          children: [
+            buildRowOne(),
+            buildRowTwo(),
+            buildRowThree(),
+            buildRowFour(),
+            buildRowFive(),
+            buildRowSix(),
+          ],
+        ),
       ),
     );
   }
@@ -400,17 +404,57 @@ class MongolKeyboard extends StatelessWidget {
       ),
     );
   }
+  /// The vowel separator and the free variation selectors. These have no glyph
+  /// of their own, so the keys are labelled rather than showing their text.
+  Expanded buildRowSix() {
+    return Expanded(
+      child: Row(
+        children: [
+          MongolKeyboardKey(
+            text: '\u180E', // MONGOLIAN VOWEL SEPARATOR
+            label: 'MVS',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: '\u180B', // MONGOLIAN FREE VARIATION SELECTOR ONE
+            label: 'FVS1',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: '\u180C', // MONGOLIAN FREE VARIATION SELECTOR TWO
+            label: 'FVS2',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: '\u180D', // MONGOLIAN FREE VARIATION SELECTOR THREE
+            label: 'FVS3',
+            onTextInput: textInputHandler,
+          ),
+          MongolKeyboardKey(
+            text: '\u180F', // MONGOLIAN FREE VARIATION SELECTOR FOUR
+            label: 'FVS4',
+            onTextInput: textInputHandler,
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class MongolKeyboardKey extends StatelessWidget {
   const MongolKeyboardKey({
     super.key,
     required this.text,
+    this.label,
     this.onTextInput,
     this.flex = 1,
   });
 
   final String text;
+
+  /// What to draw on the key, when [text] itself has no visible glyph.
+  final String? label;
+
   final ValueSetter<String>? onTextInput;
   final int flex;
 
@@ -426,7 +470,11 @@ class MongolKeyboardKey extends StatelessWidget {
             onTap: () {
               onTextInput?.call(text);
             },
-            child: Center(child: MongolText(text)),
+            child: Center(
+              child: label == null
+                  ? MongolText(text)
+                  : Text(label!, style: const TextStyle(fontSize: 12)),
+            ),
           ),
         ),
       ),
