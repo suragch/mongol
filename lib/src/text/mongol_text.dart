@@ -83,7 +83,13 @@ class MongolText extends StatelessWidget {
     this.textAlign,
     this.softWrap,
     this.overflow,
+    @Deprecated(
+      'Use textScaler instead. '
+      'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+      'This feature was deprecated after v3.12.0-2.0.pre.',
+    )
     this.textScaleFactor,
+    this.textScaler,
     this.maxLines,
     this.semanticsLabel,
     this.rotateCJK = true,
@@ -106,7 +112,13 @@ class MongolText extends StatelessWidget {
     this.textAlign,
     this.softWrap,
     this.overflow,
+    @Deprecated(
+      'Use textScaler instead. '
+      'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+      'This feature was deprecated after v3.12.0-2.0.pre.',
+    )
     this.textScaleFactor,
+    this.textScaler,
     this.maxLines,
     this.semanticsLabel,
     this.rotateCJK = true,
@@ -143,8 +155,19 @@ class MongolText extends StatelessWidget {
   /// Defaults to retrieving the value from the nearest [DefaultTextStyle] ancestor.
   final TextOverflow? overflow;
 
-  /// Font pixels per logical pixel
+  /// Deprecated. Will be removed in a future version of this package. Use
+  /// [textScaler] instead.
+  ///
+  /// Font pixels per logical pixel.
+  @Deprecated(
+    'Use textScaler instead. '
+    'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+    'This feature was deprecated after v3.12.0-2.0.pre.',
+  )
   final double? textScaleFactor;
+
+  /// {@macro flutter.painting.textPainter.textScaler}
+  final TextScaler? textScaler;
 
   /// An optional maximum number of lines for the text to span, wrapping if
   /// necessary. If the text exceeds the given number of lines, it will be
@@ -197,7 +220,10 @@ class MongolText extends StatelessWidget {
       textAlign: textAlign ?? defaultTextAlign ?? MongolTextAlign.top,
       softWrap: softWrap ?? defaultTextStyle.softWrap,
       overflow: overflow ?? defaultTextStyle.overflow,
-      textScaleFactor: textScaleFactor ?? MediaQuery.textScaleFactorOf(context),
+      textScaler: textScaler ??
+          (textScaleFactor != null
+              ? TextScaler.linear(textScaleFactor!)
+              : MediaQuery.textScalerOf(context)),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
       rotateCJK: rotateCJK,
       text: TextSpan(
@@ -237,7 +263,8 @@ class MongolText extends StatelessWidget {
     properties.add(
         EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
     properties.add(
-        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
+        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+            defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));

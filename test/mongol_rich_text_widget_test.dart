@@ -14,7 +14,7 @@ void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('MongolRichText has text', (WidgetTester tester) async {
-    await tester.pumpWidget(const MongolRichText(
+    await tester.pumpWidget(MongolRichText(
       text: TextSpan(text: 'T'),
     ));
 

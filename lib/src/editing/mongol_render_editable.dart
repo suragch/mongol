@@ -209,7 +209,13 @@ class MongolRenderEditable extends RenderBox
     int? minLines,
     bool expands = false,
     Color? selectionColor,
+    @Deprecated(
+      'Use textScaler instead. '
+      'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+      'This feature was deprecated after v3.12.0-2.0.pre.',
+    )
     double textScaleFactor = 1.0,
+    TextScaler textScaler = TextScaler.noScaling,
     TextSelection? selection,
     required ViewportOffset offset,
     this.ignorePointer = false,
@@ -243,7 +249,9 @@ class MongolRenderEditable extends RenderBox
         _textPainter = MongolTextPainter(
           text: text,
           textAlign: textAlign,
-          textScaleFactor: textScaleFactor,
+          textScaler: textScaler == TextScaler.noScaling && textScaleFactor != 1.0
+              ? TextScaler.linear(textScaleFactor)
+              : textScaler,
           maxLines: maxLines == 1 ? 1 : null,
         ),
         _showCursor = showCursor ?? ValueNotifier<bool>(false),
@@ -904,11 +912,28 @@ class MongolRenderEditable extends RenderBox
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
-  double get textScaleFactor => _textPainter.textScaleFactor;
+  @Deprecated(
+    'Use textScaler instead. '
+    'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+    'This feature was deprecated after v3.12.0-2.0.pre.',
+  )
+  double get textScaleFactor => textScaler.textScaleFactor;
 
+  @Deprecated(
+    'Use textScaler instead. '
+    'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+    'This feature was deprecated after v3.12.0-2.0.pre.',
+  )
   set textScaleFactor(double value) {
-    if (_textPainter.textScaleFactor == value) return;
-    _textPainter.textScaleFactor = value;
+    textScaler = TextScaler.linear(value);
+  }
+
+  /// {@macro flutter.painting.textPainter.textScaler}
+  TextScaler get textScaler => _textPainter.textScaler;
+
+  set textScaler(TextScaler value) {
+    if (_textPainter.textScaler == value) return;
+    _textPainter.textScaler = value;
     markNeedsTextLayout();
   }
 
@@ -2202,7 +2227,7 @@ class MongolRenderEditable extends RenderBox
     properties.add(
         DiagnosticsProperty<bool>('expands', expands, defaultValue: false));
     properties.add(ColorProperty('selectionColor', selectionColor));
-    properties.add(DoubleProperty('textScaleFactor', textScaleFactor));
+    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler));
     properties.add(DiagnosticsProperty<TextSelection>('selection', selection));
     properties.add(DiagnosticsProperty<ViewportOffset>('offset', offset));
   }

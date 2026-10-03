@@ -26,7 +26,7 @@ class ExampleWidget extends StatelessWidget {
       ),
       child: const MongolText.rich(
         text,
-        textScaleFactor: 2.5,
+        textScaler: TextScaler.linear(2.5),
       ),
     );
   }

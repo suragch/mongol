@@ -31,16 +31,28 @@ class MongolRenderParagraph extends RenderBox
     MongolTextAlign textAlign = MongolTextAlign.top,
     bool softWrap = true,
     TextOverflow overflow = TextOverflow.clip,
+    @Deprecated(
+      'Use textScaler instead. '
+      'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+      'This feature was deprecated after v3.12.0-2.0.pre.',
+    )
     double textScaleFactor = 1.0,
+    TextScaler textScaler = TextScaler.noScaling,
     int? maxLines,
     bool rotateCJK = true,
   })  : assert(maxLines == null || maxLines > 0),
+        assert(
+          textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
+          'Use textScaler instead.',
+        ),
         _softWrap = softWrap,
         _overflow = overflow,
         _textPainter = MongolTextPainter(
           text: text,
           textAlign: textAlign,
-          textScaleFactor: textScaleFactor,
+          textScaler: textScaler == TextScaler.noScaling && textScaleFactor != 1.0
+              ? TextScaler.linear(textScaleFactor)
+              : textScaler,
           maxLines: maxLines,
           ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,
           rotateCJK: rotateCJK,
@@ -116,10 +128,27 @@ class MongolRenderParagraph extends RenderBox
   ///
   /// For example, if the text scale factor is 1.5, text will be 50% larger than
   /// the specified font size.
-  double get textScaleFactor => _textPainter.textScaleFactor;
+  @Deprecated(
+    'Use textScaler instead. '
+    'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+    'This feature was deprecated after v3.12.0-2.0.pre.',
+  )
+  double get textScaleFactor => textScaler.textScaleFactor;
+
+  @Deprecated(
+    'Use textScaler instead. '
+    'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
+    'This feature was deprecated after v3.12.0-2.0.pre.',
+  )
   set textScaleFactor(double value) {
-    if (_textPainter.textScaleFactor == value) return;
-    _textPainter.textScaleFactor = value;
+    textScaler = TextScaler.linear(value);
+  }
+
+  /// {@macro flutter.painting.textPainter.textScaler}
+  TextScaler get textScaler => _textPainter.textScaler;
+  set textScaler(TextScaler value) {
+    if (_textPainter.textScaler == value) return;
+    _textPainter.textScaler = value;
     markNeedsLayout();
   }
 
@@ -266,7 +295,7 @@ class MongolRenderParagraph extends RenderBox
           _needsClipping = true;
           final fadeSizePainter = MongolTextPainter(
             text: TextSpan(style: _textPainter.text!.style, text: '\u2026'),
-            textScaleFactor: textScaleFactor,
+            textScaler: textScaler,
           )..layout();
           if (didOverflowWidth) {
             double fadeEnd, fadeStart;
@@ -352,7 +381,8 @@ class MongolRenderParagraph extends RenderBox
     ));
     properties.add(EnumProperty<TextOverflow>('overflow', overflow));
     properties.add(
-        DoubleProperty('textScaleFactor', textScaleFactor, defaultValue: 1.0));
+        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+            defaultValue: TextScaler.noScaling));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
   }
 }
