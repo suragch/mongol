@@ -4,6 +4,7 @@
 - Fix cursor misalignment on prefix text and prefix icons for input decorator (#67) (@AltangerelG)
 - Deprecate `textScaleFactor` in favor of `textScalar` to match Flutter (#68) (@AltangerelG)
 - Deprecate `Matrix4.translate` and `Matrix4.scale` to match Flutter (#69) (@AltangerelG)
+- Build the toolbar midpoint with its axes the right way round (#70) (@AltangerelG)
 
 ## [9.4.0] - 2026.09.23
 
