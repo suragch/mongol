@@ -171,4 +171,61 @@ void main() {
       expect(icon.dy, lessThan(input.dy));
     });
   });
+
+  // Regression tests for #29. An affix whose column is wider than the input's
+  // used to drag the input sideways, because the boxes were aligned on a
+  // rotated alphabetic baseline rather than on the column centre. The caret
+  // rides with the input, which is what made it visible.
+  //
+  // The test font gives every glyph the same width, so the affix is given a
+  // larger style to make its column wider than the input's.
+  const TextStyle wideAffix = TextStyle(fontSize: 28.0);
+
+  double inputOffsetFromCentre(WidgetTester tester) {
+    final decorator = tester.getRect(find.byType(MongolInputDecorator));
+    final input = tester.getRect(findMongolText(inputText));
+    return input.center.dx - decorator.center.dx;
+  }
+
+  testWidgets('input is centred with no affix', (tester) async {
+    await tester.pumpWidget(buildInputDecorator());
+    expect(inputOffsetFromCentre(tester), moreOrLessEquals(0.0, epsilon: 0.5));
+  });
+
+  testWidgets('a wider prefixText does not push the input off centre',
+      (tester) async {
+    await tester.pumpWidget(buildInputDecorator(
+      decoration: const InputDecoration(
+        prefixText: 'pre',
+        prefixStyle: wideAffix,
+      ),
+    ));
+    expect(inputOffsetFromCentre(tester), moreOrLessEquals(0.0, epsilon: 0.5));
+  });
+
+  testWidgets('a wider suffixText does not push the input off centre',
+      (tester) async {
+    await tester.pumpWidget(buildInputDecorator(
+      decoration: const InputDecoration(
+        suffixText: 'suf',
+        suffixStyle: wideAffix,
+      ),
+    ));
+    expect(inputOffsetFromCentre(tester), moreOrLessEquals(0.0, epsilon: 0.5));
+  });
+
+  testWidgets('a wider affix still widens the decorator', (tester) async {
+    await tester.pumpWidget(buildInputDecorator());
+    final double plain = decoratorSize(tester).width;
+
+    await tester.pumpWidget(buildInputDecorator(
+      decoration: const InputDecoration(
+        suffixText: 'suf',
+        suffixStyle: wideAffix,
+      ),
+    ));
+
+    expect(decoratorSize(tester).width, greaterThan(plain),
+        reason: 'the affix still has to fit');
+  });
 }

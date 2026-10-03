@@ -865,13 +865,18 @@ class _RenderDecoration extends RenderBox
       return 0.0;
     }
     box.layout(constraints, parentUsesSize: true);
-    // Since internally, all layout is performed against the alphabetic baseline,
-    // (eg, ascents/descents are all relative to alphabetic, even if the font is
-    // an ideographic or hanging font), we should always obtain the reference
-    // baseline from the alphabetic baseline. The ideographic baseline is for
-    // use post-layout and is derived from the alphabetic baseline combined with
-    // the font metrics.
-    final double baseline = box.getDistanceToBaseline(TextBaseline.alphabetic)!;
+    // Everything here is laid out in columns, and the axis the boxes align on
+    // is horizontal: the column's own centre line, the spine the script hangs
+    // from.
+    //
+    // Flutter's InputDecorator uses the alphabetic baseline for this, because
+    // for horizontal text that is the line prefix, input and suffix sit on. The
+    // vertical equivalent is not a rotated alphabetic baseline: that is derived
+    // from ascent and descent, so it lands off centre by an amount that depends
+    // on the font and the size. A Mongolian input and a Latin affix use
+    // different fonts, so aligning on it puts the input - and the caret with it
+    // - visibly off centre. The column centre does not have that problem.
+    final double baseline = box.size.width / 2.0;
 
     assert(() {
       if (baseline >= 0) {
