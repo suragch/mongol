@@ -1,3 +1,8 @@
+## [9.5.0] - 2026.10.03
+
+- Fix cursor misalignment on prefix text and prefix icons for input decorator (#67) (@AltangerelG)
+
+
 ## [9.4.0] - 2026.09.23
 
 - Resolve the analyzer issues that have a mechanical fix (#62) (@AltangerelG)
