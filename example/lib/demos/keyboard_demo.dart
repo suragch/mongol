@@ -386,27 +386,9 @@ class MongolKeyboard extends StatelessWidget {
     );
   }
 
-  Expanded buildRowFive() {
-    return Expanded(
-      child: Row(
-        children: [
-          MongolKeyboardKey(
-            text: ' ',
-            flex: 4,
-            onTextInput: textInputHandler,
-          ),
-          BackspaceKey(
-            onBackspace: () {
-              onBackspace?.call();
-            },
-          ),
-        ],
-      ),
-    );
-  }
   /// The vowel separator and the free variation selectors. These have no glyph
   /// of their own, so the keys are labelled rather than showing their text.
-  Expanded buildRowSix() {
+  Expanded buildRowFive() {
     return Expanded(
       child: Row(
         children: [
@@ -434,6 +416,25 @@ class MongolKeyboard extends StatelessWidget {
             text: '\u180F', // MONGOLIAN FREE VARIATION SELECTOR FOUR
             label: 'FVS4',
             onTextInput: textInputHandler,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Expanded buildRowSix() {
+    return Expanded(
+      child: Row(
+        children: [
+          MongolKeyboardKey(
+            text: ' ',
+            flex: 4,
+            onTextInput: textInputHandler,
+          ),
+          BackspaceKey(
+            onBackspace: () {
+              onBackspace?.call();
+            },
           ),
         ],
       ),
