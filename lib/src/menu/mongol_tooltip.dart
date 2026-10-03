@@ -508,7 +508,15 @@ class _MongolTooltipState extends State<MongolTooltip>
       );
     }
 
-    width = widget.width ?? tooltipTheme.height ?? _getDefaultTooltipWidth();
+    // TooltipThemeData.height is deprecated in favour of constraints, but it is
+    // still honoured by Flutter's own Tooltip, so a theme that sets it has to go
+    // on working here too. This tooltip runs vertically, so the theme's
+    // cross-axis minimum becomes this one's width.
+    width = widget.width ??
+        tooltipTheme.constraints?.minHeight ??
+        // ignore: deprecated_member_use
+        tooltipTheme.height ??
+        _getDefaultTooltipWidth();
     padding = widget.padding ?? tooltipTheme.padding ?? _getDefaultPadding();
     margin = widget.margin ?? tooltipTheme.margin ?? _defaultMargin;
     horizontalOffset = widget.horizontalOffset ??
