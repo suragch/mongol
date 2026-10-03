@@ -2408,9 +2408,9 @@ class MongolSelectionOverlay {
             2;
 
     final Offset midpoint = Offset(
-      midY,
       // The x-coordinate won't be made use of most likely.
       selectionEndpoints.first.point.dx - lineWidthAtStart,
+      midY,
     );
 
     return _SelectionToolbarWrapper(
