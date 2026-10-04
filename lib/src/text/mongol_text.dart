@@ -90,6 +90,7 @@ class MongolText extends StatelessWidget {
     )
     this.textScaleFactor,
     this.textScaler,
+    this.textHeightBasis,
     this.maxLines,
     this.semanticsLabel,
     this.rotateCJK = true,
@@ -119,6 +120,7 @@ class MongolText extends StatelessWidget {
     )
     this.textScaleFactor,
     this.textScaler,
+    this.textHeightBasis,
     this.maxLines,
     this.semanticsLabel,
     this.rotateCJK = true,
@@ -168,6 +170,13 @@ class MongolText extends StatelessWidget {
 
   /// {@macro flutter.painting.textPainter.textScaler}
   final TextScaler? textScaler;
+
+  /// Defines how to measure the height of the rendered text.
+  ///
+  /// Falls back to the ambient [DefaultTextStyle]'s [TextWidthBasis], which
+  /// means the same thing on the horizontal axis, and then to
+  /// [TextHeightBasis.parent].
+  final TextHeightBasis? textHeightBasis;
 
   /// An optional maximum number of lines for the text to span, wrapping if
   /// necessary. If the text exceeds the given number of lines, it will be
@@ -225,6 +234,9 @@ class MongolText extends StatelessWidget {
               ? TextScaler.linear(textScaleFactor!)
               : MediaQuery.textScalerOf(context)),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
+      textHeightBasis: textHeightBasis ??
+          mapHorizontalToMongolTextHeightBasis(defaultTextStyle.textWidthBasis) ??
+          TextHeightBasis.parent,
       rotateCJK: rotateCJK,
       text: TextSpan(
         style: effectiveTextStyle,

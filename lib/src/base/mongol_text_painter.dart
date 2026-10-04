@@ -29,6 +29,7 @@ import 'package:flutter/widgets.dart'
         TextDirection,
         TextBaseline,
         TextScaler,
+        TextWidthBasis,
         TextAffinity;
 import 'package:mongol/src/base/mongol_paragraph.dart';
 
@@ -362,6 +363,19 @@ final class _EmptyLineCaretMetrics implements _CaretMetrics {
 }
 
 /// A convenience method for converting MongolTextAlign to TextAlign
+/// Maps the horizontal [TextWidthBasis] of a [DefaultTextStyle] onto the
+/// vertical equivalent, so that an ambient default still applies to Mongolian
+/// text. The two enums mean the same thing on their own axis.
+TextHeightBasis? mapHorizontalToMongolTextHeightBasis(TextWidthBasis? basis) {
+  if (basis == null) return null;
+  switch (basis) {
+    case TextWidthBasis.parent:
+      return TextHeightBasis.parent;
+    case TextWidthBasis.longestLine:
+      return TextHeightBasis.longestLine;
+  }
+}
+
 MongolTextAlign? mapHorizontalToMongolTextAlign(TextAlign? textAlign) {
   if (textAlign == null) return null;
   switch (textAlign) {

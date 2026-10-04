@@ -9,6 +9,7 @@ import 'package:flutter/widgets.dart';
 
 import 'mongol_render_paragraph.dart';
 import '../base/mongol_text_align.dart';
+import '../base/mongol_text_painter.dart';
 
 /// A string of rich text in vertical Mongolian layout.
 ///
@@ -83,6 +84,7 @@ class MongolRichText extends LeafRenderObjectWidget {
     TextScaler textScaler = TextScaler.noScaling,
     this.maxLines,
     this.rotateCJK = true,
+    this.textHeightBasis = TextHeightBasis.parent,
   })  : assert(maxLines == null || maxLines > 0),
         assert(
           textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
@@ -140,6 +142,13 @@ class MongolRichText extends LeafRenderObjectWidget {
   /// edge of the box.
   final int? maxLines;
 
+  /// Defines how to measure the height of the rendered text.
+  ///
+  /// Defaults to [TextHeightBasis.parent], which gives multiline text the full
+  /// height the parent allows. [TextHeightBasis.longestLine] takes only the
+  /// height the longest line needs.
+  final TextHeightBasis textHeightBasis;
+
   /// Whether Chinese, Japanese, and Korean characters should be rotated 90
   /// degrees so that they are in correct orientation for a vertical column.
   ///
@@ -156,6 +165,7 @@ class MongolRichText extends LeafRenderObjectWidget {
       textScaler: textScaler,
       maxLines: maxLines,
       rotateCJK: rotateCJK,
+      textHeightBasis: textHeightBasis,
     );
   }
 
@@ -169,7 +179,8 @@ class MongolRichText extends LeafRenderObjectWidget {
       ..overflow = overflow
       ..textScaler = textScaler
       ..maxLines = maxLines
-      ..rotateCJK = rotateCJK;
+      ..rotateCJK = rotateCJK
+      ..textHeightBasis = textHeightBasis;
   }
 
   @override
