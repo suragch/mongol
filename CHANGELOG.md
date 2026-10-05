@@ -4,6 +4,7 @@
 longer `required`.
 - Carry TextHeightBasis up to MongolText and MongolRichText (#71) (@AltangerelG)
 - Migrate MongolRadioListTile to RadioGroup (#73) (@AltangerelG)
+- Add widget tests for MongolTextField (#74) (@AltangerelG)
 
 ## [10.0.0] - 2026.10.03
 
