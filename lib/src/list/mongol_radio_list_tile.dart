@@ -506,7 +506,7 @@ enum _RadioType { material, adaptive }
 ///  * [MongolCheckboxListTile], a similar widget for checkboxes.
 ///  * [MongolSwitchListTile], a similar widget for switches.
 ///  * [MongolListTile] and [Radio], the widgets from which this widget is made.
-class MongolRadioListTile<T> extends StatelessWidget {
+class MongolRadioListTile<T> extends StatefulWidget {
   /// Creates a combination of a list tile and a radio button.
   ///
   /// The radio tile itself does not maintain any state. Instead, when the radio
@@ -523,8 +523,17 @@ class MongolRadioListTile<T> extends StatelessWidget {
   const MongolRadioListTile({
     super.key,
     required this.value,
-    required this.groupValue,
-    required this.onChanged,
+    @Deprecated(
+      'Use a RadioGroup ancestor to manage group value instead. '
+      'This feature was deprecated after v3.32.0-0.0.pre.',
+    )
+    this.groupValue,
+    @Deprecated(
+      'Use RadioGroup to handle value change instead. '
+      'This feature was deprecated after v3.32.0-0.0.pre.',
+    )
+    this.onChanged,
+    this.enabled,
     this.mouseCursor,
     this.toggleable = false,
     this.activeColor,
@@ -562,8 +571,17 @@ class MongolRadioListTile<T> extends StatelessWidget {
   const MongolRadioListTile.adaptive({
     super.key,
     required this.value,
-    required this.groupValue,
-    required this.onChanged,
+    @Deprecated(
+      'Use a RadioGroup ancestor to manage group value instead. '
+      'This feature was deprecated after v3.32.0-0.0.pre.',
+    )
+    this.groupValue,
+    @Deprecated(
+      'Use RadioGroup to handle value change instead. '
+      'This feature was deprecated after v3.32.0-0.0.pre.',
+    )
+    this.onChanged,
+    this.enabled,
     this.mouseCursor,
     this.toggleable = false,
     this.activeColor,
@@ -599,6 +617,10 @@ class MongolRadioListTile<T> extends StatelessWidget {
   ///
   /// This radio button is considered selected if its [value] matches the
   /// [groupValue].
+  @Deprecated(
+    'Use a RadioGroup ancestor to manage group value instead. '
+    'This feature was deprecated after v3.32.0-0.0.pre.',
+  )
   final T? groupValue;
 
   /// Called when the user selects this radio button.
@@ -628,7 +650,17 @@ class MongolRadioListTile<T> extends StatelessWidget {
   ///   },
   /// )
   /// ```
+  @Deprecated(
+    'Use RadioGroup to handle value change instead. '
+    'This feature was deprecated after v3.32.0-0.0.pre.',
+  )
   final ValueChanged<T?>? onChanged;
+
+  /// Whether this radio button is interactive.
+  ///
+  /// Defaults to true when [onChanged] is non-null or a [RadioGroup] ancestor
+  /// supplies the group value.
+  final bool? enabled;
 
   /// The cursor for a mouse pointer when it enters or is hovering over the
   /// widget.
@@ -766,7 +798,6 @@ class MongolRadioListTile<T> extends StatelessWidget {
   /// Whether this radio button is checked.
   ///
   /// To control this value, set [value] and [groupValue] appropriately.
-  bool get checked => value == groupValue;
 
   /// If specified, [shape] defines the shape of the [RadioListTile]'s [InkWell] border.
   final ShapeBorder? shape;
@@ -809,90 +840,161 @@ class MongolRadioListTile<T> extends StatelessWidget {
   final bool useCupertinoCheckmarkStyle;
 
   @override
+  State<MongolRadioListTile<T>> createState() =>
+      _MongolRadioListTileState<T>();
+}
+
+class _MongolRadioListTileState<T> extends State<MongolRadioListTile<T>>
+    with RadioClient<T> {
+  FocusNode? _internalFocusNode;
+
+  @override
+  FocusNode get focusNode =>
+      widget.focusNode ?? (_internalFocusNode ??= FocusNode());
+
+  @override
+  T get radioValue => widget.value;
+
+  @override
+  bool get tristate => widget.toggleable;
+
+  @override
+  bool get enabled => _enabled;
+
+  bool get checked => radioValue == effectiveGroupValue;
+
+  late final _MongolRadioRegistry<T> _radioRegistry =
+      _MongolRadioRegistry<T>(this);
+
+  /// A [RadioGroup] ancestor takes precedence over the deprecated groupValue.
+  T? get effectiveGroupValue => registry?.groupValue ?? widget.groupValue;
+
+  bool get _enabled =>
+      widget.enabled ?? (widget.onChanged != null || registry != null);
+
+  void _handleTap() {
+    if (!widget.toggleable && checked) {
+      return;
+    }
+    handleChange(checked ? null : radioValue);
+  }
+
+  void handleChange(T? value) {
+    registry?.onChanged(value);
+    widget.onChanged?.call(value);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    registry = RadioGroup.maybeOf(context);
+  }
+
+  @override
+  void dispose() {
+    registry = null;
+    _internalFocusNode?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Widget control;
-    switch (_radioType) {
+    switch (widget._radioType) {
       case _RadioType.material:
-        control = Radio<T>(
-          value: value,
-          groupValue: groupValue,
-          onChanged: onChanged,
-          toggleable: toggleable,
-          activeColor: activeColor,
-          materialTapTargetSize: materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
-          autofocus: autofocus,
-          fillColor: fillColor,
-          mouseCursor: mouseCursor,
-          hoverColor: hoverColor,
-          overlayColor: overlayColor,
-          splashRadius: splashRadius,
-        );
+        control = ExcludeFocus(
+            child: Radio<T>(
+          value: widget.value,
+          groupRegistry: _radioRegistry,
+          enabled: _enabled,
+          toggleable: widget.toggleable,
+          activeColor: widget.activeColor,
+          materialTapTargetSize: widget.materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
+          autofocus: widget.autofocus,
+          fillColor: widget.fillColor,
+          mouseCursor: widget.mouseCursor,
+          hoverColor: widget.hoverColor,
+          overlayColor: widget.overlayColor,
+          splashRadius: widget.splashRadius,
+        ));
       case _RadioType.adaptive:
-        control = Radio<T>.adaptive(
-          value: value,
-          groupValue: groupValue,
-          onChanged: onChanged,
-          toggleable: toggleable,
-          activeColor: activeColor,
-          materialTapTargetSize: materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
-          autofocus: autofocus,
-          fillColor: fillColor,
-          mouseCursor: mouseCursor,
-          hoverColor: hoverColor,
-          overlayColor: overlayColor,
-          splashRadius: splashRadius,
-          useCupertinoCheckmarkStyle: useCupertinoCheckmarkStyle,
-        );
+        control = ExcludeFocus(
+            child: Radio<T>.adaptive(
+          value: widget.value,
+          groupRegistry: _radioRegistry,
+          enabled: _enabled,
+          toggleable: widget.toggleable,
+          activeColor: widget.activeColor,
+          materialTapTargetSize: widget.materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
+          autofocus: widget.autofocus,
+          fillColor: widget.fillColor,
+          mouseCursor: widget.mouseCursor,
+          hoverColor: widget.hoverColor,
+          overlayColor: widget.overlayColor,
+          splashRadius: widget.splashRadius,
+          useCupertinoCheckmarkStyle: widget.useCupertinoCheckmarkStyle,
+        ));
     }
 
     Widget? leading, trailing;
-    switch (controlAffinity) {
+    switch (widget.controlAffinity) {
       case ListTileControlAffinity.leading:
       case ListTileControlAffinity.platform:
         leading = control;
-        trailing = secondary;
+        trailing = widget.secondary;
       case ListTileControlAffinity.trailing:
-        leading = secondary;
+        leading = widget.secondary;
         trailing = control;
     }
     final ThemeData theme = Theme.of(context);
     final RadioThemeData radioThemeData = RadioTheme.of(context);
     final Set<WidgetState> states = <WidgetState>{
-      if (selected) WidgetState.selected,
+      if (widget.selected) WidgetState.selected,
     };
-    final Color effectiveActiveColor = activeColor
+    final Color effectiveActiveColor = widget.activeColor
       ?? radioThemeData.fillColor?.resolve(states)
       ?? theme.colorScheme.secondary;
     return MergeSemantics(
       child: MongolListTile(
         selectedColor: effectiveActiveColor,
         leading: leading,
-        title: title,
-        subtitle: subtitle,
+        title: widget.title,
+        subtitle: widget.subtitle,
         trailing: trailing,
-        isThreeLine: isThreeLine,
-        dense: dense,
-        enabled: onChanged != null,
-        shape: shape,
-        tileColor: tileColor,
-        selectedTileColor: selectedTileColor,
-        onTap: onChanged != null ? () {
-          if (toggleable && checked) {
-            onChanged!(null);
-            return;
-          }
-          if (!checked) {
-            onChanged!(value);
-          }
-        } : null,
-        selected: selected,
-        autofocus: autofocus,
-        contentPadding: contentPadding,
-        visualDensity: visualDensity,
-        focusNode: focusNode,
-        onFocusChange: onFocusChange,
-        enableFeedback: enableFeedback,
+        isThreeLine: widget.isThreeLine,
+        dense: widget.dense,
+        enabled: _enabled,
+        shape: widget.shape,
+        tileColor: widget.tileColor,
+        selectedTileColor: widget.selectedTileColor,
+        onTap: _enabled ? _handleTap : null,
+        selected: widget.selected,
+        autofocus: widget.autofocus,
+        contentPadding: widget.contentPadding,
+        visualDensity: widget.visualDensity,
+        focusNode: widget.focusNode,
+        onFocusChange: widget.onFocusChange,
+        enableFeedback: widget.enableFeedback,
       ),
     );
   }
+}
+
+
+class _MongolRadioRegistry<T> extends RadioGroupRegistry<T> {
+  _MongolRadioRegistry(this.state);
+
+  final _MongolRadioListTileState<T> state;
+
+  @override
+  T? get groupValue => state.effectiveGroupValue;
+
+  @override
+  ValueChanged<T?> get onChanged => state.handleChange;
+
+  @override
+  void registerClient(RadioClient<T> radio) {}
+
+  @override
+  void unregisterClient(RadioClient<T> radio) {}
 }
