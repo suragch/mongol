@@ -296,13 +296,6 @@ class _TextPainterLayoutCacheWithOffset {
     // of double.infinity, and to make the text visible the paintOffset.dy is
     // bound to be double.negativeInfinity, which invalidates all arithmetic
     // operations.
-    // When maxLines truncated the text, the cached layout cannot be reused by
-    // adjusting the paint offset: maxIntrinsicHeight only describes the lines
-    // that were kept, so it no longer tells us whether a different input height
-    // would change the line breaks. A taller box fits more of the text.
-    if (paragraph.didExceedMaxLines) {
-      return false;
-    }
     final double newContentHeight =
         _contentHeightFor(minHeight, maxHeight, heightBasis, layout);
     if (newContentHeight == contentHeight) {
