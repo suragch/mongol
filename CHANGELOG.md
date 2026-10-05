@@ -1,3 +1,7 @@
+## [10.1.0] 
+
+- Carry TextHeightBasis up to MongolText and MongolRichText (#71) (@AltangerelG)
+
 ## [10.0.0] - 2026.10.03
 
 - BREAKING CHANGE: `MongolRichText` can no longer be `const`.
