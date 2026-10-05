@@ -40,6 +40,7 @@ class MongolRenderParagraph extends RenderBox
     TextScaler textScaler = TextScaler.noScaling,
     int? maxLines,
     bool rotateCJK = true,
+    TextHeightBasis textHeightBasis = TextHeightBasis.parent,
   })  : assert(maxLines == null || maxLines > 0),
         assert(
           textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
@@ -56,6 +57,7 @@ class MongolRenderParagraph extends RenderBox
           maxLines: maxLines,
           ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,
           rotateCJK: rotateCJK,
+          textHeightBasis: textHeightBasis,
         );
 
   @override
@@ -142,6 +144,14 @@ class MongolRenderParagraph extends RenderBox
   )
   set textScaleFactor(double value) {
     textScaler = TextScaler.linear(value);
+  }
+
+  /// Defines how to measure the height of the rendered text.
+  TextHeightBasis get textHeightBasis => _textPainter.textHeightBasis;
+  set textHeightBasis(TextHeightBasis value) {
+    if (_textPainter.textHeightBasis == value) return;
+    _textPainter.textHeightBasis = value;
+    markNeedsLayout();
   }
 
   /// {@macro flutter.painting.textPainter.textScaler}
