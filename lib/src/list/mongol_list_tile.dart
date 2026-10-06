@@ -1351,8 +1351,7 @@ class MongolListTile extends StatelessWidget {
         WidgetState.disabled,
     };
     final MouseCursor effectiveMouseCursor =
-        WidgetStateProperty.resolveAs<MouseCursor?>(
-                mouseCursor, mouseStates) ??
+        WidgetStateProperty.resolveAs<MouseCursor?>(mouseCursor, mouseStates) ??
             tileTheme.mouseCursor?.resolve(mouseStates) ??
             WidgetStateMouseCursor.clickable.resolve(mouseStates);
 
@@ -1553,7 +1552,6 @@ enum _ListTileSlot {
 class _MongolListTile
     extends SlottedMultiChildRenderObjectWidget<_ListTileSlot, RenderBox> {
   const _MongolListTile({
-    Key? key,
     this.leading,
     required this.title,
     this.subtitle,
@@ -1567,7 +1565,7 @@ class _MongolListTile
     required this.minLeadingHeight,
     this.subtitleBaselineType,
     required this.titleAlignment,
-  }) : super(key: key);
+  });
 
   final Widget? leading;
   final Widget title;

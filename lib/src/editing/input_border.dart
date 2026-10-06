@@ -42,12 +42,12 @@ class SidelineInputBorder extends InputBorder {
   /// bottom left corners have a circular radius of 4.0. The [borderRadius]
   /// parameter must not be null.
   const SidelineInputBorder({
-    BorderSide borderSide = const BorderSide(),
+    super.borderSide = const BorderSide(),
     this.borderRadius = const BorderRadius.only(
       topLeft: Radius.circular(4.0),
       bottomLeft: Radius.circular(4.0),
     ),
-  }) : super(borderSide: borderSide);
+  });
 
   /// The radii of the border's rounded rectangle corners.
   ///

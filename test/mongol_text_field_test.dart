@@ -4,7 +4,6 @@
 // found in the LICENSE file.
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/mongol.dart';
 
@@ -20,8 +19,8 @@ Widget boxed(Widget child, {double height = 300.0}) => MaterialApp(
     );
 
 /// find.text matches nothing here: these widgets render MongolText.
-Finder findMongolText(String text) => find.byWidgetPredicate(
-    (widget) => widget is MongolText && widget.data == text);
+Finder findMongolText(String text) => find
+    .byWidgetPredicate((widget) => widget is MongolText && widget.data == text);
 
 /// tester.enterText looks for Flutter's EditableText, which this package does
 /// not use, so focus the field first and drive the input connection directly.

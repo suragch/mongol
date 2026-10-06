@@ -564,8 +564,7 @@ class _MongolElevatedButtonWithIcon extends MongolElevatedButton {
 
 class _MongolElevatedButtonWithIconChild extends StatelessWidget {
   const _MongolElevatedButtonWithIconChild(
-      {Key? key, required this.label, required this.icon})
-      : super(key: key);
+      {required this.label, required this.icon});
 
   final Widget label;
   final Widget icon;

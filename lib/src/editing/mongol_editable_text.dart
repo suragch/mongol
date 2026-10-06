@@ -331,7 +331,7 @@ class MongolEditableText extends StatefulWidget {
   /// The text cursor is not shown if [showCursor] is false or if [showCursor]
   /// is null (the default) and [readOnly] is true.
   MongolEditableText({
-    Key? key,
+    super.key,
     required this.controller,
     required this.focusNode,
     this.readOnly = false,
@@ -450,8 +450,7 @@ class MongolEditableText extends StatefulWidget {
                     const Iterable<TextInputFormatter>.empty(),
               ]
             : inputFormatters,
-        showCursor = showCursor ?? !readOnly,
-        super(key: key);
+        showCursor = showCursor ?? !readOnly;
 
   /// Controls the text being edited.
   final TextEditingController controller;
@@ -1351,9 +1350,8 @@ class MongolEditableText extends StatefulWidget {
     style.debugFillProperties(properties);
     properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
         defaultValue: null));
-    properties.add(
-        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
-            defaultValue: null));
+    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+        defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: 1));
     properties.add(IntProperty('minLines', minLines, defaultValue: null));
     properties.add(
@@ -3679,7 +3677,7 @@ class MongolEditableTextState extends State<MongolEditableText>
 
 class _MongolEditable extends LeafRenderObjectWidget {
   const _MongolEditable({
-    Key? key,
+    super.key,
     required this.textSpan,
     required this.value,
     required this.startHandleLayerLink,
@@ -3709,7 +3707,7 @@ class _MongolEditable extends LeafRenderObjectWidget {
     required this.textSelectionDelegate,
     required this.devicePixelRatio,
     required this.clipBehavior,
-  }) : super(key: key);
+  });
 
   final TextSpan textSpan;
   final TextEditingValue value;

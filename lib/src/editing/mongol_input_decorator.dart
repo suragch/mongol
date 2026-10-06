@@ -98,8 +98,7 @@ class _InputBorderGap extends ChangeNotifier {
 
 // Used to interpolate between two InputBorders.
 class _InputBorderTween extends Tween<InputBorder> {
-  _InputBorderTween({InputBorder? begin, InputBorder? end})
-      : super(begin: begin, end: end);
+  _InputBorderTween({super.begin, super.end});
 
   @override
   InputBorder lerp(double t) => ShapeBorder.lerp(begin, end, t)! as InputBorder;
@@ -169,7 +168,6 @@ class _InputBorderPainter extends CustomPainter {
 // _InputBorder's paint method.
 class _BorderContainer extends StatefulWidget {
   const _BorderContainer({
-    Key? key,
     required this.border,
     required this.gap,
     required this.gapAnimation,
@@ -178,7 +176,7 @@ class _BorderContainer extends StatefulWidget {
     required this.isHovering,
     // ignore: unused_element_parameter
     this.child,
-  }) : super(key: key);
+  });
 
   final InputBorder border;
   final _InputBorderGap gap;
@@ -289,10 +287,9 @@ class _BorderContainerState extends State<_BorderContainer>
 // when the errorText first appears.
 class _Shaker extends AnimatedWidget {
   const _Shaker({
-    Key? key,
     required Animation<double> animation,
     this.child,
-  }) : super(key: key, listenable: animation);
+  }) : super(listenable: animation);
 
   final Widget? child;
 

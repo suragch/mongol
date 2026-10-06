@@ -44,10 +44,9 @@ class MongolIntrinsicHeight extends SingleChildRenderObjectWidget {
   ///
   /// This class is relatively expensive. Avoid using it where possible.
   const MongolIntrinsicHeight(
-      {Key? key, this.stepHeight, this.stepWidth, Widget? child})
+      {super.key, this.stepHeight, this.stepWidth, super.child})
       : assert(stepHeight == null || stepHeight >= 0.0),
-        assert(stepWidth == null || stepWidth >= 0.0),
-        super(key: key, child: child);
+        assert(stepWidth == null || stepWidth >= 0.0);
 
   /// If non-null, force the child's height to be a multiple of this value.
   ///

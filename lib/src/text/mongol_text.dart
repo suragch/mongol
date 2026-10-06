@@ -78,7 +78,7 @@ class MongolText extends StatelessWidget {
   /// given overflow option.
   const MongolText(
     this.data, {
-    Key? key,
+    super.key,
     this.style,
     this.textAlign,
     this.softWrap,
@@ -98,8 +98,7 @@ class MongolText extends StatelessWidget {
           data != null,
           'A non-null String must be provided to a MongolText widget.',
         ),
-        textSpan = null,
-        super(key: key);
+        textSpan = null;
 
   /// Creates a vertical Mongolian text widget with a [TextSpan].
   ///
@@ -108,7 +107,7 @@ class MongolText extends StatelessWidget {
   /// See [MongolRichText] which provides a lower-level way to draw text.
   const MongolText.rich(
     this.textSpan, {
-    Key? key,
+    super.key,
     this.style,
     this.textAlign,
     this.softWrap,
@@ -128,8 +127,7 @@ class MongolText extends StatelessWidget {
           textSpan != null,
           'A non-null TextSpan must be provided to a Text.rich widget.',
         ),
-        data = null,
-        super(key: key);
+        data = null;
 
   /// This is the text that the MongolText widget will display.
   final String? data;
@@ -235,7 +233,8 @@ class MongolText extends StatelessWidget {
               : MediaQuery.textScalerOf(context)),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
       textHeightBasis: textHeightBasis ??
-          mapHorizontalToMongolTextHeightBasis(defaultTextStyle.textWidthBasis) ??
+          mapHorizontalToMongolTextHeightBasis(
+              defaultTextStyle.textWidthBasis) ??
           TextHeightBasis.parent,
       rotateCJK: rotateCJK,
       text: TextSpan(
@@ -274,9 +273,8 @@ class MongolText extends StatelessWidget {
         showName: true));
     properties.add(
         EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
-    properties.add(
-        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
-            defaultValue: null));
+    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+        defaultValue: null));
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));

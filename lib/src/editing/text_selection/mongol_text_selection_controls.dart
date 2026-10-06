@@ -147,7 +147,6 @@ class _TextSelectionToolbarItemData {
 // The highest level toolbar widget, built directly by buildToolbar.
 class _TextSelectionControlsToolbar extends StatefulWidget {
   const _TextSelectionControlsToolbar({
-    Key? key,
     required this.clipboardStatus,
     required this.delegate,
     required this.endpoints,
@@ -158,7 +157,7 @@ class _TextSelectionControlsToolbar extends StatefulWidget {
     required this.handleSelectAll,
     required this.selectionMidpoint,
     required this.textLineWidth,
-  }) : super(key: key);
+  });
 
   final ValueListenable<ClipboardStatus>? clipboardStatus;
   final TextSelectionDelegate delegate;

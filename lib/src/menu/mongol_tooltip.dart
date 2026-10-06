@@ -110,7 +110,7 @@ class MongolTooltip extends StatefulWidget {
   /// All parameters that are defined in the constructor will
   /// override the default values _and_ the values in [TooltipTheme.of].
   const MongolTooltip({
-    Key? key,
+    super.key,
     required this.message,
     this.width,
     this.padding,
@@ -123,7 +123,7 @@ class MongolTooltip extends StatefulWidget {
     this.waitDuration,
     this.showDuration,
     this.child,
-  }) : super(key: key);
+  });
 
   /// The text to display in the tooltip.
   final String message;
@@ -611,7 +611,6 @@ class _MongolTooltipPositionDelegate extends SingleChildLayoutDelegate {
 
 class _MongolTooltipOverlay extends StatelessWidget {
   const _MongolTooltipOverlay({
-    Key? key,
     required this.message,
     required this.width,
     this.padding,
@@ -622,7 +621,7 @@ class _MongolTooltipOverlay extends StatelessWidget {
     required this.target,
     required this.horizontalOffset,
     required this.preferRight,
-  }) : super(key: key);
+  });
 
   final String message;
   final double width;

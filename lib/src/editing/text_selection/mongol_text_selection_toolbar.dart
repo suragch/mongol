@@ -34,13 +34,12 @@ const double _kToolbarWidth = 44.0;
 class MongolTextSelectionToolbar extends StatelessWidget {
   /// Creates an instance of MongolTextSelectionToolbar.
   const MongolTextSelectionToolbar({
-    Key? key,
+    super.key,
     required this.anchorLeft,
     required this.anchorRight,
     this.toolbarBuilder = _defaultToolbarBuilder,
     required this.children,
-  })  : assert(children.length > 0),
-        super(key: key);
+  }) : assert(children.length > 0);
 
   /// The focal point to the left of which the toolbar attempts to position
   /// itself.
@@ -117,12 +116,10 @@ class MongolTextSelectionToolbar extends StatelessWidget {
 // menu.
 class _TextSelectionToolbarOverflowable extends StatefulWidget {
   const _TextSelectionToolbarOverflowable({
-    Key? key,
     required this.isLeft,
     required this.toolbarBuilder,
     required this.children,
-  })  : assert(children.length > 0),
-        super(key: key);
+  }) : assert(children.length > 0);
 
   final List<Widget> children;
 
@@ -213,10 +210,10 @@ class _TextSelectionToolbarOverflowableState
 class _TextSelectionToolbarTrailingEdgeAlign
     extends SingleChildRenderObjectWidget {
   const _TextSelectionToolbarTrailingEdgeAlign({
-    Key? key,
-    required Widget child,
+    super.key,
+    required Widget super.child,
     required this.overflowOpen,
-  }) : super(key: key, child: child);
+  });
 
   final bool overflowOpen;
 
@@ -330,11 +327,10 @@ class _TextSelectionToolbarTrailingEdgeAlignRenderBox extends RenderProxyBox {
 // submenu based on calculating which item would first overflow.
 class _TextSelectionToolbarItemsLayout extends MultiChildRenderObjectWidget {
   const _TextSelectionToolbarItemsLayout({
-    Key? key,
     required this.isLeft,
     required this.overflowOpen,
-    required List<Widget> children,
-  }) : super(key: key, children: children);
+    required super.children,
+  });
 
   final bool isLeft;
   final bool overflowOpen;
@@ -364,8 +360,8 @@ class _TextSelectionToolbarItemsLayout extends MultiChildRenderObjectWidget {
 class _TextSelectionToolbarItemsLayoutElement
     extends MultiChildRenderObjectElement {
   _TextSelectionToolbarItemsLayoutElement(
-    MultiChildRenderObjectWidget widget,
-  ) : super(widget);
+    super.widget,
+  );
 
   static bool _shouldPaint(Element child) {
     return (child.renderObject!.parentData! as ToolbarItemsParentData)
@@ -616,9 +612,8 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
 // overflow ability.
 class _TextSelectionToolbarContainer extends StatelessWidget {
   const _TextSelectionToolbarContainer({
-    Key? key,
     required this.child,
-  }) : super(key: key);
+  });
 
   final Widget child;
 
@@ -640,12 +635,11 @@ class _TextSelectionToolbarContainer extends StatelessWidget {
 // forward and back controls.
 class _TextSelectionToolbarOverflowButton extends StatelessWidget {
   const _TextSelectionToolbarOverflowButton({
-    Key? key,
     required this.icon,
     this.onPressed,
     // ignore: unused_element_parameter
     this.tooltip,
-  }) : super(key: key);
+  });
 
   final Icon icon;
   final VoidCallback? onPressed;

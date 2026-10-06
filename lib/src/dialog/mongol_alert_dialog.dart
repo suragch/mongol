@@ -11,14 +11,14 @@ import 'mongol_button_bar.dart';
 /// This class was adapted from Flutter [Dialog]
 class MongolDialog extends StatelessWidget {
   const MongolDialog({
-    Key? key,
+    super.key,
     this.backgroundColor,
     this.elevation,
     this.insetAnimationDuration = const Duration(milliseconds: 100),
     this.insetAnimationCurve = Curves.decelerate,
     this.shape,
     this.child,
-  }) : super(key: key);
+  });
 
   final Color? backgroundColor;
   final double? elevation;
@@ -69,7 +69,7 @@ class MongolDialog extends StatelessWidget {
 /// This class was adapted from the Flutter [AlertDialog] class
 class MongolAlertDialog extends StatelessWidget {
   const MongolAlertDialog({
-    Key? key,
+    super.key,
     this.title,
     this.titlePadding,
     this.titleTextStyle,
@@ -83,7 +83,7 @@ class MongolAlertDialog extends StatelessWidget {
     this.backgroundColor,
     this.elevation,
     this.shape,
-  }) : super(key: key);
+  });
 
   final Widget? title;
   final EdgeInsetsGeometry? titlePadding;

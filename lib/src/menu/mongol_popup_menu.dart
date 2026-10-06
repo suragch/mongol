@@ -4,8 +4,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-/// TODO: MongolMenuAnchor is not implemented yet.
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart'
     show
@@ -76,7 +74,7 @@ const double _kMenuScreenPadding = 8.0;
 abstract class MongolPopupMenuEntry<T> extends StatefulWidget {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
-  const MongolPopupMenuEntry({Key? key}) : super(key: key);
+  const MongolPopupMenuEntry({super.key});
 
   /// The amount of horizontal space occupied by this entry.
   ///
@@ -115,8 +113,7 @@ class MongolPopupMenuDivider extends MongolPopupMenuEntry<Never> {
   /// Creates a vertical divider for a popup menu.
   ///
   /// By default, the divider has a width of 16 logical pixels.
-  const MongolPopupMenuDivider({Key? key, this.width = _kMenuDividerWidth})
-      : super(key: key);
+  const MongolPopupMenuDivider({super.key, this.width = _kMenuDividerWidth});
 
   /// The width of the divider entry.
   ///
@@ -598,12 +595,12 @@ class _MongolCheckedPopupMenuItemState<T>
 
 class _PopupMenu<T> extends StatelessWidget {
   const _PopupMenu({
-    Key? key,
+    super.key,
     required this.route,
     required this.semanticLabel,
     this.constraints,
     required this.clipBehavior,
-  }) : super(key: key);
+  });
 
   final _PopupMenuRoute<T> route;
   final String? semanticLabel;

@@ -6,6 +6,7 @@ longer `required`.
 - Migrate MongolRadioListTile to RadioGroup (#73) (@AltangerelG)
 - Add widget tests for MongolTextField (#74) (@AltangerelG)
 - Relayout maxLines text when the box grows (#72) (@AltangerelG)
+- Update linter version and handle warnings.
 
 ## [10.0.0] - 2026.10.03
 

@@ -113,10 +113,10 @@ enum _SwitchListTileType { material, adaptive }
 ///   const SwitchListTileExample({super.key});
 ///
 ///   @override
-///   State<SwitchListTileExample> createState() => _SwitchListTileExampleState();
+///   `State<SwitchListTileExample>` createState() => _SwitchListTileExampleState();
 /// }
 ///
-/// class _SwitchListTileExampleState extends State<SwitchListTileExample> {
+/// class _SwitchListTileExampleState extends `State<SwitchListTileExample>` {
 ///   bool _lights = false;
 ///
 ///   @override
@@ -138,7 +138,7 @@ enum _SwitchListTileType { material, adaptive }
 /// {@tool dartpad}
 /// This sample demonstrates how [MongolSwitchListTile] positions the switch widget
 /// relative to the text in different configurations.
-/// 
+///
 /// ```dart
 /// import 'package:flutter/material.dart';
 ///
@@ -305,7 +305,7 @@ enum _SwitchListTileType { material, adaptive }
 ///             ),
 ///           ),
 ///           RotatedBox(
-///             quarterTurns: 1, 
+///             quarterTurns: 1,
 ///             child: Switch(
 ///               value: value,
 ///               onChanged: (bool newValue) {
@@ -348,8 +348,8 @@ enum _SwitchListTileType { material, adaptive }
 ///
 /// ## MongolSwitchListTile isn't exactly what I want
 ///
-/// If the way MongolSwitchListTile pads and positions its elements isn't 
-/// quite what you're looking for, you can create custom labeled switch 
+/// If the way MongolSwitchListTile pads and positions its elements isn't
+/// quite what you're looking for, you can create custom labeled switch
 /// widgets by combining [Switch] with other widgets, such as [MongolText], [Padding]
 /// and [InkWell].
 ///
@@ -408,7 +408,7 @@ enum _SwitchListTileType { material, adaptive }
 ///           children: <Widget>[
 ///             Expanded(child: MongolText(label)),
 ///             RotatedBox(
-///               quarterTurns: 1, 
+///               quarterTurns: 1,
 ///               child: Switch(
 ///                 value: value,
 ///                 onChanged: (bool newValue) {

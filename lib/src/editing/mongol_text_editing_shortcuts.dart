@@ -21,8 +21,7 @@ import 'mongol_text_editing_intents.dart';
 ///   builder: (context, child) => MongolTextEditingShortcuts(child: child),
 /// ```
 class MongolTextEditingShortcuts extends StatelessWidget {
-  const MongolTextEditingShortcuts({Key? key, required this.child})
-      : super(key: key);
+  const MongolTextEditingShortcuts({super.key, required this.child});
 
   final Widget? child;
 

@@ -53,7 +53,7 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
   /// Abstract const constructor. This constructor enables subclasses to provide
   /// const constructors so that they can be used in const expressions.
   const MongolButtonStyleButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     required this.onLongPress,
     required this.onHover,
@@ -65,7 +65,7 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
     this.statesController,
     this.isSemanticButton = true,
     required this.child,
-  }) : super(key: key);
+  });
 
   /// Called when the button is tapped or otherwise activated.
   ///

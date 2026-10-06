@@ -11,7 +11,7 @@ import 'package:flutter/rendering.dart';
 
 class MongolButtonBar extends StatelessWidget {
   const MongolButtonBar({
-    Key? key,
+    super.key,
     this.alignment,
     this.mainAxisSize,
     this.buttonTextTheme,
@@ -21,8 +21,7 @@ class MongolButtonBar extends StatelessWidget {
     this.layoutBehavior,
     this.children = const <Widget>[],
   })  : assert(buttonMinWidth == null || buttonMinWidth >= 0.0),
-        assert(buttonHeight == null || buttonHeight >= 0.0),
-        super(key: key);
+        assert(buttonHeight == null || buttonHeight >= 0.0);
 
   /// How the children should be placed along the vertical axis.
   ///
@@ -110,18 +109,11 @@ class _ButtonBarColumn extends Flex {
   /// Creates a button bar that attempts to display in a column, but displays in
   /// a row if there is insufficient vertical space.
   const _ButtonBarColumn({
-    required List<Widget> children,
-    Axis direction = Axis.vertical,
-    MainAxisSize mainAxisSize = MainAxisSize.max,
-    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
-    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
-  }) : super(
-          children: children,
-          direction: direction,
-          mainAxisSize: mainAxisSize,
-          mainAxisAlignment: mainAxisAlignment,
-          crossAxisAlignment: crossAxisAlignment,
-        );
+    required super.children,
+    super.direction = Axis.vertical,
+    super.mainAxisSize,
+    super.mainAxisAlignment,
+  });
 
   @override
   _RenderButtonBarColumn createRenderObject(BuildContext context) {
@@ -146,18 +138,11 @@ class _ButtonBarColumn extends Flex {
 
 class _RenderButtonBarColumn extends RenderFlex {
   _RenderButtonBarColumn({
-    List<RenderBox>? children,
-    Axis direction = Axis.vertical,
-    MainAxisSize mainAxisSize = MainAxisSize.max,
-    MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
-    CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
-  }) : super(
-          children: children,
-          direction: direction,
-          mainAxisSize: mainAxisSize,
-          mainAxisAlignment: mainAxisAlignment,
-          crossAxisAlignment: crossAxisAlignment,
-        );
+    super.direction = Axis.vertical,
+    super.mainAxisSize,
+    super.mainAxisAlignment,
+    super.crossAxisAlignment,
+  });
 
   bool _hasCheckedLayoutHeight = false;
 

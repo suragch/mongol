@@ -1,4 +1,4 @@
-library mongol;
+library;
 
 export 'package:mongol/src/base/mongol_text_align.dart';
 export 'package:mongol/src/base/mongol_text_painter.dart';

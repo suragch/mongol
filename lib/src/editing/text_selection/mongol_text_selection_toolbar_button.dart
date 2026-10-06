@@ -4,7 +4,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart' show Theme, Brightness, Colors, IconButton;
+import 'package:flutter/material.dart'
+    show Theme, Brightness, Colors, IconButton;
 import 'package:flutter/widgets.dart';
 
 enum _TextSelectionToolbarItemPosition {
@@ -25,11 +26,11 @@ enum _TextSelectionToolbarItemPosition {
 class MongolTextSelectionToolbarButton extends StatelessWidget {
   /// Creates an instance of MongolTextSelectionToolbarButton.
   const MongolTextSelectionToolbarButton({
-    Key? key,
+    super.key,
     required this.child,
     required this.padding,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   // These values were eyeballed to match the native text selection menu on a
   // Pixel 2 running Android 10.
@@ -65,16 +66,16 @@ class MongolTextSelectionToolbarButton extends StatelessWidget {
   }
 
   static double _getTopPadding(_TextSelectionToolbarItemPosition position) {
-    if (position == _TextSelectionToolbarItemPosition.first
-        || position == _TextSelectionToolbarItemPosition.only) {
+    if (position == _TextSelectionToolbarItemPosition.first ||
+        position == _TextSelectionToolbarItemPosition.only) {
       return _kEndPadding;
     }
     return _kMiddlePadding;
   }
 
   static double _getBottomPadding(_TextSelectionToolbarItemPosition position) {
-    if (position == _TextSelectionToolbarItemPosition.last
-        || position == _TextSelectionToolbarItemPosition.only) {
+    if (position == _TextSelectionToolbarItemPosition.last ||
+        position == _TextSelectionToolbarItemPosition.only) {
       return _kEndPadding;
     }
     return _kMiddlePadding;

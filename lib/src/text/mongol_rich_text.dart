@@ -70,7 +70,7 @@ class MongolRichText extends LeafRenderObjectWidget {
   ///
   /// The [text] argument must not be null.
   MongolRichText({
-    Key? key,
+    super.key,
     required this.text,
     this.textAlign = MongolTextAlign.top,
     this.softWrap = true,
@@ -90,8 +90,7 @@ class MongolRichText extends LeafRenderObjectWidget {
           textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
           'Use textScaler instead.',
         ),
-        textScaler = _effectiveTextScalerFrom(textScaler, textScaleFactor),
-        super(key: key);
+        textScaler = _effectiveTextScalerFrom(textScaler, textScaleFactor);
 
   static TextScaler _effectiveTextScalerFrom(
       TextScaler textScaler, double textScaleFactor) {
@@ -196,9 +195,8 @@ class MongolRichText extends LeafRenderObjectWidget {
         showName: true));
     properties.add(EnumProperty<TextOverflow>('overflow', overflow,
         defaultValue: TextOverflow.clip));
-    properties.add(
-        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
-            defaultValue: TextScaler.noScaling));
+    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler,
+        defaultValue: TextScaler.noScaling));
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
     properties.add(FlagProperty('rotateCJK',
         value: rotateCJK,

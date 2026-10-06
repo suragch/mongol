@@ -516,13 +516,13 @@ class MongolParagraph {
 
   /// Returns a list of rects that enclose the given text range.
   ///
-  /// Coordinates of the Rect are relative to the upper-left corner of the
+  /// Coordinates of the `Rect` are relative to the upper-left corner of the
   /// paragraph, where positive y values indicate down. Orientation is as
   /// vertical Mongolian text with left to right line wrapping.
   ///
   /// Note that this method behaves slightly differently than
-  /// Paragraph.getBoxesForRange. The Paragraph version returns List<TextBox>,
-  /// but TextBox doesn't accurately describe vertical text so Rect is used.
+  /// `Paragraph.getBoxesForRange`. The Paragraph version returns `List<TextBox>`,
+  /// but `TextBox` doesn't accurately describe vertical text so `Rect` is used.
   List<Rect> getBoxesForRange(int start, int end) {
     final boxes = <Rect>[];
 
