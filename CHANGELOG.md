@@ -1,10 +1,11 @@
-## [11.0.0] 
+## [11.0.0] - 2026.10.06
 
 - BREAKING CHANGE: `MongolRadioListTile` is no longer a `StatelessWidget`, and `groupValue`/`onChanged` are no
 longer `required`.
 - Carry TextHeightBasis up to MongolText and MongolRichText (#71) (@AltangerelG)
 - Migrate MongolRadioListTile to RadioGroup (#73) (@AltangerelG)
 - Add widget tests for MongolTextField (#74) (@AltangerelG)
+- Relayout maxLines text when the box grows (#72) (@AltangerelG)
 
 ## [10.0.0] - 2026.10.03
 
