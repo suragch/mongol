@@ -7,6 +7,8 @@ longer `required`.
 - Add widget tests for MongolTextField (#74) (@AltangerelG)
 - Relayout maxLines text when the box grows (#72) (@AltangerelG)
 - Update linter version and handle warnings.
+- Migrate to material_ui package.
+- Require Flutter 3.47 to remove old deprecations.
 
 ## [10.0.0] - 2026.10.03
 

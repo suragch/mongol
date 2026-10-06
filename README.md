@@ -252,6 +252,5 @@ This alert dialog works mostly the same as the Flutter `AlertDialog`.
 - Improve keyboard (this may be better as a separate package)
 - Various other text based widgets
 - Support `WidgetSpan`.
-- Add more tests
 - For `MongolTextAlign.bottom` don't count final space in line height
 - Add `MongolSelectableText` widget
