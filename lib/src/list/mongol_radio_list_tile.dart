@@ -10,7 +10,7 @@
 // enum SingingCharacter { lafayette }
 // late SingingCharacter? _character;
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'mongol_list_tile.dart';
 import 'mongol_checkbox_list_tile.dart';

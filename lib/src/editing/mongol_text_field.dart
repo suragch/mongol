@@ -4,15 +4,17 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+//
+
 // ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
-import 'package:flutter/cupertino.dart' show CupertinoTheme;
+import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoTheme;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide EditableTextState;
-import 'package:flutter/material.dart'
+import 'package:material_ui/material_ui.dart'
     show
         InputCounterWidgetBuilder,
         Theme,
@@ -24,9 +26,9 @@ import 'package:flutter/material.dart'
         debugCheckHasMaterialLocalizations,
         TextSelectionThemeData,
         iOSHorizontalOffset,
-        MaterialStateProperty,
-        MaterialStateMouseCursor,
-        MaterialState;
+        WidgetStateProperty,
+        WidgetStateMouseCursor,
+        WidgetState;
 import 'package:mongol/src/base/mongol_text_align.dart';
 
 import 'alignment.dart';
@@ -854,14 +856,14 @@ class MongolTextField extends StatefulWidget {
   /// widget.
   ///
   /// If [mouseCursor] is a [MaterialStateProperty<MouseCursor>],
-  /// [MaterialStateProperty.resolve] is used for the following [MaterialState]s:
+  /// [WidgetStateProperty.resolve] is used for the following [WidgetState]s:
   ///
-  ///  * [MaterialState.error].
-  ///  * [MaterialState.hovered].
-  ///  * [MaterialState.focused].
-  ///  * [MaterialState.disabled].
+  ///  * [WidgetState.error].
+  ///  * [WidgetState.hovered].
+  ///  * [WidgetState.focused].
+  ///  * [WidgetState.disabled].
   ///
-  /// If this property is null, [MaterialStateMouseCursor.textable] will be used.
+  /// If this property is null, [WidgetStateMouseCursor.textable] will be used.
   ///
   /// The [mouseCursor] is the only property of [MongolTextField] that controls the
   /// appearance of the mouse pointer. All other properties related to "cursor"
@@ -1444,7 +1446,7 @@ class _TextFieldState extends State<MongolTextField>
             selectionStyle.cursorColor ??
             cupertinoTheme.primaryColor;
         selectionColor = selectionStyle.selectionColor ??
-            cupertinoTheme.primaryColor.withOpacity(0.40);
+            cupertinoTheme.primaryColor.withValues(alpha: 0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
@@ -1459,7 +1461,7 @@ class _TextFieldState extends State<MongolTextField>
             selectionStyle.cursorColor ??
             cupertinoTheme.primaryColor;
         selectionColor = selectionStyle.selectionColor ??
-            cupertinoTheme.primaryColor.withOpacity(0.40);
+            cupertinoTheme.primaryColor.withValues(alpha: 0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
             iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
@@ -1474,7 +1476,7 @@ class _TextFieldState extends State<MongolTextField>
             selectionStyle.cursorColor ??
             theme.colorScheme.primary;
         selectionColor = selectionStyle.selectionColor ??
-            theme.colorScheme.primary.withOpacity(0.40);
+            theme.colorScheme.primary.withValues(alpha: 0.40);
         break;
 
       case TargetPlatform.linux:
@@ -1486,7 +1488,7 @@ class _TextFieldState extends State<MongolTextField>
             selectionStyle.cursorColor ??
             theme.colorScheme.primary;
         selectionColor = selectionStyle.selectionColor ??
-            theme.colorScheme.primary.withOpacity(0.40);
+            theme.colorScheme.primary.withValues(alpha: 0.40);
         break;
     }
 
@@ -1565,13 +1567,13 @@ class _TextFieldState extends State<MongolTextField>
         child: child,
       );
     }
-    final effectiveMouseCursor = MaterialStateProperty.resolveAs<MouseCursor>(
-      widget.mouseCursor ?? MaterialStateMouseCursor.textable,
-      <MaterialState>{
-        if (!_isEnabled) MaterialState.disabled,
-        if (_isHovering) MaterialState.hovered,
-        if (focusNode.hasFocus) MaterialState.focused,
-        if (_hasError) MaterialState.error,
+    final effectiveMouseCursor = WidgetStateProperty.resolveAs<MouseCursor>(
+      widget.mouseCursor ?? WidgetStateMouseCursor.textable,
+      <WidgetState>{
+        if (!_isEnabled) WidgetState.disabled,
+        if (_isHovering) WidgetState.hovered,
+        if (focusNode.hasFocus) WidgetState.focused,
+        if (_hasError) WidgetState.error,
       },
     );
 

@@ -312,7 +312,7 @@ class MongolParagraph {
   }
 
   void _addLine(int start, int end, double width, double height) {
-    if (_maxLines != null && _maxLines! <= _lines.length) {
+    if (_maxLines != null && _maxLines <= _lines.length) {
       _didExceedMaxLines = true;
       return;
     }
@@ -503,7 +503,7 @@ class MongolParagraph {
           run.draw(canvas, offset);
           canvas.translate(run.width, 0);
         }
-        _ellipsis!.draw(canvas, const Offset(0, 0));
+        _ellipsis.draw(canvas, const Offset(0, 0));
       } else {
         run.draw(canvas, offset);
         canvas.translate(run.width, 0);
@@ -908,7 +908,7 @@ class MongolParagraphConstraints {
 class MongolParagraphBuilder {
   MongolParagraphBuilder(
     ui.ParagraphStyle style, {
-    MongolTextAlign textAlign = MongolTextAlign.top,
+    this._textAlign = MongolTextAlign.top,
     @Deprecated(
       'Use textScaler instead. '
       'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
@@ -916,17 +916,13 @@ class MongolParagraphBuilder {
     )
     double textScaleFactor = 1.0,
     TextScaler textScaler = TextScaler.noScaling,
-    int? maxLines,
-    String? ellipsis,
-    bool rotateCJK = true,
+    this._maxLines,
+    this._ellipsis,
+    this._rotateCJK = true,
   })  : _paragraphStyle = style,
-        _textAlign = textAlign,
         _textScaler = textScaler == TextScaler.noScaling
             ? TextScaler.linear(textScaleFactor)
-            : textScaler,
-        _maxLines = maxLines,
-        _ellipsis = ellipsis,
-        _rotateCJK = rotateCJK;
+            : textScaler;
 
   ui.ParagraphStyle? _paragraphStyle;
   final MongolTextAlign _textAlign;
@@ -1081,7 +1077,7 @@ class MongolParagraphBuilder {
     if (style != null) {
       builder.pushStyle(style);
     }
-    builder.addText(_ellipsis!);
+    builder.addText(_ellipsis);
     final paragraph = builder.build();
     paragraph.layout(const ui.ParagraphConstraints(width: double.infinity));
     return _TextRun(-1, -1, false, paragraph);

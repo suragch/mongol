@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:mongol/mongol.dart';
 import 'package:mongol_demo_app/demos/text_painter_demo.dart';
 

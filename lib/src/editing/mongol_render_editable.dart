@@ -9,7 +9,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:mongol/src/base/mongol_text_align.dart';
@@ -195,7 +195,7 @@ class MongolRenderEditable extends RenderBox
   /// the number of lines. By default, it is 1, meaning this is a single-line
   /// text field. If it is not null, it must be greater than zero.
   ///
-  /// The [offset] is required and must not be null. You can use
+  /// The [_offset] is required and must not be null. You can use
   /// [ViewportOffset.zero] if you have no need for scrolling.
   MongolRenderEditable({
     TextSpan? text,
@@ -203,8 +203,8 @@ class MongolRenderEditable extends RenderBox
     Color? cursorColor,
     ValueNotifier<bool>? showCursor,
     bool? hasFocus,
-    required LayerLink startHandleLayerLink,
-    required LayerLink endHandleLayerLink,
+    required this._startHandleLayerLink,
+    required this._endHandleLayerLink,
     int? maxLines = 1,
     int? minLines,
     bool expands = false,
@@ -217,19 +217,19 @@ class MongolRenderEditable extends RenderBox
     double textScaleFactor = 1.0,
     TextScaler textScaler = TextScaler.noScaling,
     TextSelection? selection,
-    required ViewportOffset offset,
+    required this._offset,
     this.ignorePointer = false,
-    bool readOnly = false,
-    bool forceLine = true,
+    this._readOnly = false,
+    this._forceLine = true,
     String obscuringCharacter = '•',
-    bool obscureText = false,
+    this._obscureText = false,
     double? cursorWidth,
     double cursorHeight = 1.0,
     Radius? cursorRadius,
     Offset cursorOffset = Offset.zero,
-    double devicePixelRatio = 1.0,
-    bool? enableInteractiveSelection,
-    Clip clipBehavior = Clip.hardEdge,
+    this._devicePixelRatio = 1.0,
+    this._enableInteractiveSelection,
+    this._clipBehavior = Clip.hardEdge,
     required this.textSelectionDelegate,
     MongolRenderEditablePainter? painter,
     MongolRenderEditablePainter? foregroundPainter,
@@ -259,18 +259,9 @@ class MongolRenderEditable extends RenderBox
         _minLines = minLines,
         _expands = expands,
         _selection = selection,
-        _offset = offset,
         _cursorWidth = cursorWidth,
         _cursorHeight = cursorHeight,
-        _enableInteractiveSelection = enableInteractiveSelection,
-        _devicePixelRatio = devicePixelRatio,
-        _startHandleLayerLink = startHandleLayerLink,
-        _endHandleLayerLink = endHandleLayerLink,
-        _obscuringCharacter = obscuringCharacter,
-        _obscureText = obscureText,
-        _readOnly = readOnly,
-        _forceLine = forceLine,
-        _clipBehavior = clipBehavior {
+        _obscuringCharacter = obscuringCharacter {
     assert(!_showCursor.value || cursorColor != null);
     this.hasFocus = hasFocus ?? false;
 
@@ -2246,9 +2237,8 @@ class MongolRenderEditable extends RenderBox
 
 class _MongolRenderEditableCustomPaint extends RenderBox {
   _MongolRenderEditableCustomPaint({
-    MongolRenderEditablePainter? painter,
-  })  : _painter = painter,
-        super();
+    this._painter,
+  })  : super();
 
   @override
   MongolRenderEditable? get parent => super.parent as MongolRenderEditable?;
@@ -2357,9 +2347,8 @@ abstract class MongolRenderEditablePainter extends ChangeNotifier {
 }
 
 class _TextHighlightPainter extends MongolRenderEditablePainter {
-  _TextHighlightPainter({TextRange? highlightedRange, Color? highlightColor})
-      : _highlightedRange = highlightedRange,
-        _highlightColor = highlightColor;
+  _TextHighlightPainter()
+      : _highlightColor = null, _highlightedRange = null;
 
   final Paint highlightPaint = Paint();
 

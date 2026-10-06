@@ -8,7 +8,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'
+import 'package:material_ui/material_ui.dart'
     show
         ColorScheme,
         Colors,
@@ -356,9 +356,9 @@ class MongolListTileTheme extends InheritedTheme {
   const MongolListTileTheme({
     Key? key,
     MongolListTileThemeData? data,
-    bool? dense,
+    this._dense,
     ShapeBorder? shape,
-    ListTileStyle? style,
+    this._style,
     Color? selectedColor,
     Color? iconColor,
     Color? textColor,
@@ -386,9 +386,7 @@ class MongolListTileTheme extends InheritedTheme {
                     minLeadingHeight) ==
                 null),
         _data = data,
-        _dense = dense,
         _shape = shape,
-        _style = style,
         _selectedColor = selectedColor,
         _iconColor = iconColor,
         _textColor = textColor,
@@ -442,86 +440,86 @@ class MongolListTileTheme extends InheritedTheme {
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.dense] property instead.
-  bool? get dense => _data != null ? _data?.dense : _dense;
+  bool? get dense => _data != null ? _data.dense : _dense;
 
   /// Overrides the default value of [ListTile.shape].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.shape] property instead.
-  ShapeBorder? get shape => _data != null ? _data?.shape : _shape;
+  ShapeBorder? get shape => _data != null ? _data.shape : _shape;
 
   /// Overrides the default value of [ListTile.style].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.style] property instead.
-  ListTileStyle? get style => _data != null ? _data?.style : _style;
+  ListTileStyle? get style => _data != null ? _data.style : _style;
 
   /// Overrides the default value of [MongolListTile.selectedColor].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.selectedColor] property instead.
   Color? get selectedColor =>
-      _data != null ? _data?.selectedColor : _selectedColor;
+      _data != null ? _data.selectedColor : _selectedColor;
 
   /// Overrides the default value of [MongolListTile.iconColor].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.iconColor] property instead.
-  Color? get iconColor => _data != null ? _data?.iconColor : _iconColor;
+  Color? get iconColor => _data != null ? _data.iconColor : _iconColor;
 
   /// Overrides the default value of [MongolListTile.textColor].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.textColor] property instead.
-  Color? get textColor => _data != null ? _data?.textColor : _textColor;
+  Color? get textColor => _data != null ? _data.textColor : _textColor;
 
   /// Overrides the default value of [MongolListTile.contentPadding].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.contentPadding] property instead.
   EdgeInsetsGeometry? get contentPadding =>
-      _data != null ? _data?.contentPadding : _contentPadding;
+      _data != null ? _data.contentPadding : _contentPadding;
 
   /// Overrides the default value of [MongolListTile.tileColor].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.tileColor] property instead.
-  Color? get tileColor => _data != null ? _data?.tileColor : _tileColor;
+  Color? get tileColor => _data != null ? _data.tileColor : _tileColor;
 
   /// Overrides the default value of [MongolListTile.selectedTileColor].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.selectedTileColor] property instead.
   Color? get selectedTileColor =>
-      _data != null ? _data?.selectedTileColor : _selectedTileColor;
+      _data != null ? _data.selectedTileColor : _selectedTileColor;
 
   /// Overrides the default value of [MongolListTile.verticalTitleGap].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.verticalTitleGap] property instead.
   double? get verticalTitleGap =>
-      _data != null ? _data?.verticalTitleGap : _verticalTitleGap;
+      _data != null ? _data.verticalTitleGap : _verticalTitleGap;
 
   /// Overrides the default value of [MongolListTile.minHorizontalPadding].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.minHorizontalPadding] property instead.
   double? get minHorizontalPadding =>
-      _data != null ? _data?.minHorizontalPadding : _minHorizontalPadding;
+      _data != null ? _data.minHorizontalPadding : _minHorizontalPadding;
 
   /// Overrides the default value of [MongolListTile.minLeadingHeight].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.minLeadingHeight] property instead.
   double? get minLeadingHeight =>
-      _data != null ? _data?.minLeadingHeight : _minLeadingHeight;
+      _data != null ? _data.minLeadingHeight : _minLeadingHeight;
 
   /// Overrides the default value of [MongolListTile.enableFeedback].
   ///
   /// This property is obsolete: please use the [data]
   /// [MongolListTileThemeData.enableFeedback] property instead.
   bool? get enableFeedback =>
-      _data != null ? _data?.enableFeedback : _enableFeedback;
+      _data != null ? _data.enableFeedback : _enableFeedback;
 
   /// The [data] property of the closest instance of this class that
   /// encloses the given context.
@@ -1632,24 +1630,16 @@ class _MongolListTile
 class _MongolRenderListTile extends RenderBox
     with SlottedContainerRenderObjectMixin<_ListTileSlot, RenderBox> {
   _MongolRenderListTile({
-    required bool isDense,
-    required VisualDensity visualDensity,
-    required bool isThreeLine,
-    required TextBaseline titleBaselineType,
-    TextBaseline? subtitleBaselineType,
-    required double verticalTitleGap,
-    required double minHorizontalPadding,
-    required double minLeadingHeight,
-    required MongolListTileTitleAlignment titleAlignment,
-  })  : _isDense = isDense,
-        _visualDensity = visualDensity,
-        _isThreeLine = isThreeLine,
-        _titleBaselineType = titleBaselineType,
-        _subtitleBaselineType = subtitleBaselineType,
-        _verticalTitleGap = verticalTitleGap,
-        _minHorizontalPadding = minHorizontalPadding,
-        _minLeadingHeight = minLeadingHeight,
-        _titleAlignment = titleAlignment;
+    required this._isDense,
+    required this._visualDensity,
+    required this._isThreeLine,
+    required this._titleBaselineType,
+    this._subtitleBaselineType,
+    required this._verticalTitleGap,
+    required this._minHorizontalPadding,
+    required this._minLeadingHeight,
+    required this._titleAlignment,
+  });
 
   RenderBox? get leading => childForSlot(_ListTileSlot.leading);
   RenderBox? get title => childForSlot(_ListTileSlot.title);
@@ -1660,10 +1650,10 @@ class _MongolRenderListTile extends RenderBox
   @override
   Iterable<RenderBox> get children {
     return <RenderBox>[
-      if (leading != null) leading!,
-      if (title != null) title!,
-      if (subtitle != null) subtitle!,
-      if (trailing != null) trailing!,
+      ?leading,
+      ?title,
+      ?subtitle,
+      ?trailing,
     ];
   }
 

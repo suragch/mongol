@@ -4,12 +4,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use
+//
+
+// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart' show Theme, TextSelectionTheme, Icons;
+import 'package:material_ui/material_ui.dart' show Theme, TextSelectionTheme, Icons;
 import 'package:flutter/widgets.dart';
 
 import 'mongol_text_selection_toolbar.dart';

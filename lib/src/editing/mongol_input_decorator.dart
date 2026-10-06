@@ -10,7 +10,7 @@ import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart'
+import 'package:material_ui/material_ui.dart'
     show
         InputBorder,
         Colors,
@@ -655,18 +655,13 @@ class _RenderDecorationLayout {
 class _RenderDecoration extends RenderBox
     with SlottedContainerRenderObjectMixin<_DecorationSlot, RenderBox> {
   _RenderDecoration({
-    required _Decoration decoration,
-    required TextBaseline textBaseline,
-    required bool isFocused,
-    required bool expands,
-    required bool isEmpty,
-    TextAlignHorizontal? textAlignHorizontal,
-  })  : _decoration = decoration,
-        _textBaseline = textBaseline,
-        _textAlignHorizontal = textAlignHorizontal,
-        _isFocused = isFocused,
-        _expands = expands,
-        _isEmpty = isEmpty;
+    required this._decoration,
+    required this._textBaseline,
+    required this._isFocused,
+    required this._expands,
+    required this._isEmpty,
+    this._textAlignHorizontal,
+  });
 
   static const double subtextGap = 8.0;
 
@@ -696,17 +691,17 @@ class _RenderDecoration extends RenderBox
   @override
   Iterable<RenderBox> get children {
     return <RenderBox>[
-      if (icon != null) icon!,
-      if (input != null) input!,
-      if (prefixIcon != null) prefixIcon!,
-      if (suffixIcon != null) suffixIcon!,
-      if (prefix != null) prefix!,
-      if (suffix != null) suffix!,
-      if (label != null) label!,
-      if (hint != null) hint!,
-      if (helperError != null) helperError!,
-      if (counter != null) counter!,
-      if (container != null) container!,
+      ?icon,
+      ?input,
+      ?prefixIcon,
+      ?suffixIcon,
+      ?prefix,
+      ?suffix,
+      ?label,
+      ?hint,
+      ?helperError,
+      ?counter,
+      ?container,
     ];
   }
 

@@ -29,7 +29,7 @@ class MongolRenderParagraph extends RenderBox
   MongolRenderParagraph(
     TextSpan text, {
     MongolTextAlign textAlign = MongolTextAlign.top,
-    bool softWrap = true,
+    this._softWrap = true,
     TextOverflow overflow = TextOverflow.clip,
     @Deprecated(
       'Use textScaler instead. '
@@ -46,7 +46,6 @@ class MongolRenderParagraph extends RenderBox
           textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
           'Use textScaler instead.',
         ),
-        _softWrap = softWrap,
         _overflow = overflow,
         _textPainter = MongolTextPainter(
           text: text,

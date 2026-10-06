@@ -425,7 +425,7 @@ class MongolTextPainter {
   /// The [maxLines] property, if non-null, must be greater than zero.
   MongolTextPainter({
     TextSpan? text,
-    MongolTextAlign textAlign = MongolTextAlign.top,
+    this._textAlign = MongolTextAlign.top,
     @Deprecated(
       'Use textScaler instead. '
       'Use of textScaleFactor was deprecated in preparation for the upcoming nonlinear text scaling support. '
@@ -434,9 +434,9 @@ class MongolTextPainter {
     double textScaleFactor = 1.0,
     TextScaler textScaler = TextScaler.noScaling,
     int? maxLines,
-    String? ellipsis,
-    TextHeightBasis textHeightBasis = TextHeightBasis.parent,
-    bool rotateCJK = true,
+    this._ellipsis,
+    this._textHeightBasis = TextHeightBasis.parent,
+    this._rotateCJK = true,
   })  : assert(text == null || text.debugAssertIsValid()),
         assert(maxLines == null || maxLines > 0),
         assert(
@@ -444,14 +444,10 @@ class MongolTextPainter {
                 identical(textScaler, TextScaler.noScaling),
             'Use textScaler instead.'),
         _text = text,
-        _textAlign = textAlign,
         _textScaler = textScaler == TextScaler.noScaling
             ? TextScaler.linear(textScaleFactor)
             : textScaler,
-        _maxLines = maxLines,
-        _ellipsis = ellipsis,
-        _textHeightBasis = textHeightBasis,
-        _rotateCJK = rotateCJK;
+        _maxLines = maxLines;
 
   /// Computes the height of a configured [MongolTextPainter].
   ///

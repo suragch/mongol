@@ -4,6 +4,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+//
+
 // ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
 import 'dart:async';
@@ -14,7 +16,7 @@ import 'package:characters/characters.dart'
     show CharacterRange, StringCharacters;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart' show DragStartBehavior;
-import 'package:flutter/material.dart'
+import 'package:material_ui/material_ui.dart'
     show
         ContentInsertionConfiguration,
         kDefaultContentInsertionMimeTypes,
@@ -122,6 +124,7 @@ import 'package:flutter/widgets.dart'
         TransposeCharactersIntent,
         UndoTextIntent,
         UpdateSelectionIntent,
+        View,
         Widget,
         WidgetsBinding,
         WidgetsBindingObserver,
@@ -1141,11 +1144,11 @@ class MongolEditableText extends StatefulWidget {
   /// * [SelectableRegion.getSelectableButtonItems], which performs a similar
   ///   role but for content that is selectable but not editable.
   static List<ContextMenuButtonItem> getEditableButtonItems({
-    required final ClipboardStatus? clipboardStatus,
-    required final VoidCallback? onCopy,
-    required final VoidCallback? onCut,
-    required final VoidCallback? onPaste,
-    required final VoidCallback? onSelectAll,
+    required ClipboardStatus? clipboardStatus,
+    required VoidCallback? onCopy,
+    required VoidCallback? onCut,
+    required VoidCallback? onPaste,
+    required VoidCallback? onSelectAll,
   }) {
     // If the paste button is enabled, don't render anything until the state
     // of the clipboard is known, since it's used to determine if paste is
@@ -1454,7 +1457,7 @@ class MongolEditableTextState extends State<MongolEditableText>
   bool get wantKeepAlive => widget.focusNode.hasFocus;
 
   Color get _cursorColor =>
-      widget.cursorColor.withOpacity(_cursorBlinkOpacityController.value);
+      widget.cursorColor.withValues(alpha: _cursorBlinkOpacityController.value);
 
   @override
   bool get cutEnabled {
@@ -1864,7 +1867,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     }
 
     // Restart or stop the blinking cursor when TickerMode changes.
-    final bool newTickerEnabled = TickerMode.of(context);
+    final bool newTickerEnabled = TickerMode.valuesOf(context).enabled;
     if (_tickersEnabled != newTickerEnabled) {
       _tickersEnabled = newTickerEnabled;
       if (_tickersEnabled && _cursorActive) {
@@ -1946,12 +1949,14 @@ class MongolEditableTextState extends State<MongolEditableText>
       // The _textInputConnection will pick up the new style when it attaches in
       // _openInputConnection.
       if (_hasInputConnection) {
-        _textInputConnection!.setStyle(
-          fontFamily: style.fontFamily,
-          fontSize: style.fontSize,
-          fontWeight: style.fontWeight,
-          textDirection: TextDirection.ltr,
-          textAlign: _rotatedTextAlign(widget.textAlign),
+        _textInputConnection!.updateStyle(
+          TextInputStyle(
+            fontFamily: style.fontFamily,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            textDirection: TextDirection.ltr,
+            textAlign: _rotatedTextAlign(widget.textAlign),
+          ),
         );
       }
     }
@@ -2056,7 +2061,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       _handleSelectionChanged(
           value.selection,
           (_textInputConnection?.scribbleInProgress ?? false)
-              ? SelectionChangedCause.scribble
+              ? SelectionChangedCause.stylusHandwriting
               : SelectionChangedCause.keyboard);
     } else {
       // Only hide the toolbar overlay, the selection handle's visibility will be handled
@@ -2361,12 +2366,14 @@ class MongolEditableTextState extends State<MongolEditableText>
 
       final style = widget.style;
       _textInputConnection!
-        ..setStyle(
-          fontFamily: style.fontFamily,
-          fontSize: style.fontSize,
-          fontWeight: style.fontWeight,
-          textDirection: TextDirection.ltr,
-          textAlign: _rotatedTextAlign(widget.textAlign),
+        ..updateStyle(
+          TextInputStyle(
+            fontFamily: style.fontFamily,
+            fontSize: style.fontSize,
+            fontWeight: style.fontWeight,
+            textDirection: TextDirection.ltr,
+            textAlign: _rotatedTextAlign(widget.textAlign),
+          ),
         )
         ..setEditingState(localValue);
     } else {
@@ -2424,12 +2431,14 @@ class MongolEditableTextState extends State<MongolEditableText>
     final TextStyle style = widget.style;
     newConnection
       ..show()
-      ..setStyle(
-        fontFamily: style.fontFamily,
-        fontSize: style.fontSize,
-        fontWeight: style.fontWeight,
-        textDirection: TextDirection.ltr,
-        textAlign: _rotatedTextAlign(widget.textAlign),
+      ..updateStyle(
+        TextInputStyle(
+          fontFamily: style.fontFamily,
+          fontSize: style.fontSize,
+          fontWeight: style.fontWeight,
+          textDirection: TextDirection.ltr,
+          textAlign: _rotatedTextAlign(widget.textAlign),
+        ),
       )
       ..setEditingState(_value);
     _lastKnownRemoteTextEditingValue = _value;
@@ -2533,7 +2542,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       case SelectionChangedCause.drag:
       case SelectionChangedCause.forcePress:
       case SelectionChangedCause.longPress:
-      case SelectionChangedCause.scribble:
+      case SelectionChangedCause.stylusHandwriting:
       case SelectionChangedCause.tap:
       case SelectionChangedCause.toolbar:
         requestKeyboard();
@@ -2663,19 +2672,21 @@ class MongolEditableTextState extends State<MongolEditableText>
 
   @override
   void didChangeMetrics() {
-    if (_lastBottomViewInset !=
-        WidgetsBinding.instance.window.viewInsets.bottom) {
+    if (!mounted) {
+      return;
+    }
+    final ui.FlutterView view = View.of(context);
+    if (_lastBottomViewInset != view.viewInsets.bottom) {
       SchedulerBinding.instance.addPostFrameCallback((Duration _) {
         _selectionOverlay?.updateForScroll();
       });
-      if (_lastBottomViewInset <
-          WidgetsBinding.instance.window.viewInsets.bottom) {
+      if (_lastBottomViewInset < view.viewInsets.bottom) {
         // Because the metrics change signal from engine will come here every frame
         // (on both iOS and Android). So we don't need to show caret with animation.
         _scheduleShowCaretOnScreen(withAnimation: false);
       }
     }
-    _lastBottomViewInset = WidgetsBinding.instance.window.viewInsets.bottom;
+    _lastBottomViewInset = view.viewInsets.bottom;
   }
 
   @pragma('vm:notify-debugger-on-exception')
@@ -2734,7 +2745,7 @@ class MongolEditableTextState extends State<MongolEditableText>
 
   void _onCursorColorTick() {
     renderEditable.cursorColor =
-        widget.cursorColor.withOpacity(_cursorBlinkOpacityController.value);
+        widget.cursorColor.withValues(alpha: _cursorBlinkOpacityController.value);
     _cursorVisibilityNotifier.value =
         widget.showCursor && _cursorBlinkOpacityController.value > 0;
   }
@@ -2850,7 +2861,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     if (_hasFocus) {
       // Listen for changing viewInsets, which indicates keyboard showing up.
       WidgetsBinding.instance.addObserver(this);
-      _lastBottomViewInset = WidgetsBinding.instance.window.viewInsets.bottom;
+      _lastBottomViewInset = View.of(context).viewInsets.bottom;
       if (!widget.readOnly) {
         _scheduleShowCaretOnScreen(withAnimation: true);
       }

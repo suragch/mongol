@@ -4,14 +4,16 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use_from_same_package, deprecated_member_use
+//
+
+// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart'
     show ValueListenable, defaultTargetPlatform, listEquals;
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart' show kMinInteractiveDimension;
+import 'package:material_ui/material_ui.dart' show kMinInteractiveDimension;
 import 'package:flutter/scheduler.dart' show SchedulerBinding, SchedulerPhase;
 import 'package:flutter/services.dart'
     show
@@ -36,7 +38,7 @@ class MongolTextSelectionOverlay {
   ///
   /// The [context] must not be null and must have an [Overlay] as an ancestor.
   MongolTextSelectionOverlay({
-    required TextEditingValue value,
+    required this._value,
     required this.context,
     Widget? debugRequiredFor,
     required LayerLink toolbarLayerLink,
@@ -44,15 +46,14 @@ class MongolTextSelectionOverlay {
     required LayerLink endHandleLayerLink,
     required this.renderObject,
     this.selectionControls,
-    bool handlesVisible = false,
+    this._handlesVisible = false,
     required this.selectionDelegate,
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     VoidCallback? onSelectionHandleTapped,
     ClipboardStatusNotifier? clipboardStatus,
     this.contextMenuBuilder,
     required TextMagnifierConfiguration magnifierConfiguration,
-  })  : _handlesVisible = handlesVisible,
-        _value = value {
+  }) {
     renderObject.selectionStartInViewport
         .addListener(_updateTextSelectionOverlayVisibilities);
     renderObject.selectionEndInViewport
@@ -1847,20 +1848,20 @@ class MongolSelectionOverlay {
   MongolSelectionOverlay({
     required this.context,
     this.debugRequiredFor,
-    required TextSelectionHandleType startHandleType,
-    required double lineWidthAtStart,
+    required this._startHandleType,
+    required this._lineWidthAtStart,
     this.startHandlesVisible,
     this.onStartHandleDragStart,
     this.onStartHandleDragUpdate,
     this.onStartHandleDragEnd,
-    required TextSelectionHandleType endHandleType,
-    required double lineWidthAtEnd,
+    required this._endHandleType,
+    required this._lineWidthAtEnd,
     this.endHandlesVisible,
     this.onEndHandleDragStart,
     this.onEndHandleDragUpdate,
     this.onEndHandleDragEnd,
     this.toolbarVisible,
-    required List<TextSelectionPoint> selectionEndpoints,
+    required this._selectionEndpoints,
     required this.selectionControls,
     @Deprecated(
       'Use `contextMenuBuilder` in `showToolbar` instead. '
@@ -1879,12 +1880,7 @@ class MongolSelectionOverlay {
     )
     Offset? toolbarLocation,
     this.magnifierConfiguration = TextMagnifierConfiguration.disabled,
-  })  : _startHandleType = startHandleType,
-        _lineWidthAtStart = lineWidthAtStart,
-        _endHandleType = endHandleType,
-        _lineWidthAtEnd = lineWidthAtEnd,
-        _selectionEndpoints = selectionEndpoints,
-        assert(debugCheckHasOverlay(context));
+  })  : assert(debugCheckHasOverlay(context));
 
   /// Build context where the overlay will go
   final BuildContext context;

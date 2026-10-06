@@ -4,8 +4,8 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart' show CupertinoCheckbox;
+import 'package:material_ui/material_ui.dart';
+import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoCheckbox;
 
 import 'mongol_list_tile.dart';
 import 'mongol_radio_list_tile.dart';

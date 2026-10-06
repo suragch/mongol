@@ -12,7 +12,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
-import 'package:flutter/material.dart'
+import 'package:material_ui/material_ui.dart'
     show
         ThemeData,
         Theme,
@@ -514,8 +514,8 @@ class _MongolTooltipState extends State<MongolTooltip>
     // cross-axis minimum becomes this one's width.
     width = widget.width ??
         tooltipTheme.constraints?.minHeight ??
-        // ignore: deprecated_member_use
-        tooltipTheme.height ??
+        //
+        tooltipTheme.constraints?.minHeight ??
         _getDefaultTooltipWidth();
     padding = widget.padding ?? tooltipTheme.padding ?? _getDefaultPadding();
     margin = widget.margin ?? tooltipTheme.margin ?? _defaultMargin;

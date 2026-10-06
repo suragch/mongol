@@ -7,7 +7,7 @@
 // ignore_for_file: todo
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/widgets.dart';
 import 'package:mongol/mongol.dart';
 
