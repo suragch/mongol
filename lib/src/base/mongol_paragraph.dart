@@ -333,42 +333,31 @@ class MongolParagraph {
 
   // Internally this translates a horizontal run width to the vertical name
   // that it is known as externally.
+  //
+  // Both values describe the text itself, so they are computed from _runs and
+  // not from _lines: _lines has been truncated by maxLines and clipped to the
+  // input height, and an intrinsic dimension that tracked either of those would
+  // not be intrinsic. This mirrors ui.Paragraph, whose maxIntrinsicWidth is
+  // unchanged by maxLines and by the layout width.
   void _calculateIntrinsicHeight() {
-    var sum = 0.0;
+    // The widest single run: the least extent that holds the text without
+    // having to break a run apart.
     var maxRunWidth = 0.0;
-    var maxLineEndsWithNewLine = 0.0;
-    var minLineEndsWithoutNewLine = double.infinity;
-    for (var index = 0; index < _lines.length; index++) {
-      final line = _lines[index];
-      _TextRun? lastRun;
-      for (var i = line.textRunStart; i < line.textRunEnd; i++) {
-        lastRun = _runs[i];
-        final width = lastRun.width;
-        maxRunWidth = math.max(width, maxRunWidth);
-        sum += width;
+    // A hard newline cannot be undone by a taller box, so each one starts a new
+    // segment and segments are maximised over rather than summed.
+    var segmentExtent = 0.0;
+    var maxSegmentExtent = 0.0;
+    for (final run in _runs) {
+      maxRunWidth = math.max(run.width, maxRunWidth);
+      segmentExtent += run.width;
+      if (_runEndsWithNewLine(run)) {
+        maxSegmentExtent = math.max(maxSegmentExtent, segmentExtent);
+        segmentExtent = 0;
       }
-      final bool endsWithNewLine;
-      if (lastRun != null) {
-        endsWithNewLine = _runEndsWithNewLine(lastRun);
-      } else {
-        endsWithNewLine = false;
-      }
-      final hasNextLine = index < _lines.length - 1;
-      if (hasNextLine && !endsWithNewLine) {
-        final nextLine = _lines[index + 1];
-        sum += _runs[nextLine.textRunStart].width;
-        minLineEndsWithoutNewLine = math.min(minLineEndsWithoutNewLine, sum);
-      } else {
-        maxLineEndsWithNewLine = math.max(maxLineEndsWithNewLine, sum);
-      }
-      sum = 0;
     }
-    if (minLineEndsWithoutNewLine == double.infinity) {
-      minLineEndsWithoutNewLine = 0;
-    }
+    maxSegmentExtent = math.max(maxSegmentExtent, segmentExtent);
     _minIntrinsicHeight = maxRunWidth;
-    _maxIntrinsicHeight =
-        math.max(minLineEndsWithoutNewLine, maxLineEndsWithNewLine);
+    _maxIntrinsicHeight = maxSegmentExtent;
   }
 
   /// Returns the text position closest to the given offset.
