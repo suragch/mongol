@@ -6,6 +6,7 @@
 
 import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
+
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/foundation.dart';
 
@@ -217,21 +218,25 @@ class MongolFilledButton extends MongolButtonStyleButton {
   }) {
     final WidgetStateProperty<Color?>? backgroundColorProp =
         (backgroundColor == null && disabledBackgroundColor == null)
-            ? null
-            : _MongolFilledButtonDefaultColor(
-                backgroundColor, disabledBackgroundColor);
+        ? null
+        : _MongolFilledButtonDefaultColor(
+            backgroundColor,
+            disabledBackgroundColor,
+          );
     final Color? foreground = foregroundColor;
     final Color? disabledForeground = disabledForegroundColor;
     final WidgetStateProperty<Color?>? foregroundColorProp =
         (foreground == null && disabledForeground == null)
-            ? null
-            : _MongolFilledButtonDefaultColor(foreground, disabledForeground);
+        ? null
+        : _MongolFilledButtonDefaultColor(foreground, disabledForeground);
     final WidgetStateProperty<Color?>? overlayColor = (foreground == null)
         ? null
         : _MongolFilledButtonDefaultOverlay(foreground);
     final WidgetStateProperty<MouseCursor?> mouseCursor =
         _MongolFilledButtonDefaultMouseCursor(
-            enabledMouseCursor, disabledMouseCursor);
+          enabledMouseCursor,
+          disabledMouseCursor,
+        );
 
     return ButtonStyle(
       textStyle: WidgetStatePropertyAll<TextStyle?>(textStyle),
@@ -447,9 +452,12 @@ class _MongolFilledButtonDefaultOverlay extends WidgetStateProperty<Color?>
 
 @immutable
 class _MongolFilledButtonDefaultMouseCursor
-    extends WidgetStateProperty<MouseCursor?> with Diagnosticable {
+    extends WidgetStateProperty<MouseCursor?>
+    with Diagnosticable {
   _MongolFilledButtonDefaultMouseCursor(
-      this.enabledCursor, this.disabledCursor);
+    this.enabledCursor,
+    this.disabledCursor,
+  );
 
   final MouseCursor? enabledCursor;
   final MouseCursor? disabledCursor;
@@ -478,9 +486,10 @@ class _MongolFilledButtonWithIcon extends MongolFilledButton {
     required Widget icon,
     required Widget label,
   }) : super(
-            autofocus: autofocus ?? false,
-            clipBehavior: clipBehavior ?? Clip.none,
-            child: _MongolFilledButtonWithIconChild(icon: icon, label: label));
+         autofocus: autofocus ?? false,
+         clipBehavior: clipBehavior ?? Clip.none,
+         child: _MongolFilledButtonWithIconChild(icon: icon, label: label),
+       );
 
   _MongolFilledButtonWithIcon.tonal({
     super.key,
@@ -496,9 +505,10 @@ class _MongolFilledButtonWithIcon extends MongolFilledButton {
     required Widget icon,
     required Widget label,
   }) : super.tonal(
-            autofocus: autofocus ?? false,
-            clipBehavior: clipBehavior ?? Clip.none,
-            child: _MongolFilledButtonWithIconChild(icon: icon, label: label));
+         autofocus: autofocus ?? false,
+         clipBehavior: clipBehavior ?? Clip.none,
+         child: _MongolFilledButtonWithIconChild(icon: icon, label: label),
+       );
 
   @override
   ButtonStyle defaultStyleOf(BuildContext context) {
@@ -529,8 +539,10 @@ class _MongolFilledButtonWithIcon extends MongolFilledButton {
 }
 
 class _MongolFilledButtonWithIconChild extends StatelessWidget {
-  const _MongolFilledButtonWithIconChild(
-      {required this.label, required this.icon});
+  const _MongolFilledButtonWithIconChild({
+    required this.label,
+    required this.icon,
+  });
 
   final Widget label;
   final Widget icon;
@@ -542,11 +554,16 @@ class _MongolFilledButtonWithIconChild extends StatelessWidget {
     final double scale = MediaQuery.textScalerOf(context).scale(14.0) / 14.0;
     // Adjust the gap based on the text scale factor. Start at 8, and lerp
     // to 4 based on how large the text is.
-    final double gap =
-        scale <= 1 ? 8 : lerpDouble(8, 4, math.min(scale - 1, 1))!;
+    final double gap = scale <= 1
+        ? 8
+        : lerpDouble(8, 4, math.min(scale - 1, 1))!;
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[icon, SizedBox(height: gap), Flexible(child: label)],
+      children: <Widget>[
+        icon,
+        SizedBox(height: gap),
+        Flexible(child: label),
+      ],
     );
   }
 }
@@ -560,11 +577,11 @@ class _MongolFilledButtonWithIconChild extends StatelessWidget {
 
 class _MongolFilledButtonDefaultsM3 extends ButtonStyle {
   _MongolFilledButtonDefaultsM3(this.context)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   late final ColorScheme _colors = Theme.of(context).colorScheme;
@@ -572,7 +589,8 @@ class _MongolFilledButtonDefaultsM3 extends ButtonStyle {
   @override
   WidgetStateProperty<TextStyle?> get textStyle =>
       WidgetStatePropertyAll<TextStyle?>(
-          Theme.of(context).textTheme.labelLarge);
+        Theme.of(context).textTheme.labelLarge,
+      );
 
   @override
   WidgetStateProperty<Color?>? get backgroundColor =>
@@ -685,11 +703,11 @@ class _MongolFilledButtonDefaultsM3 extends ButtonStyle {
 
 class _MongolFilledTonalButtonDefaultsM3 extends ButtonStyle {
   _MongolFilledTonalButtonDefaultsM3(this.context)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   late final ColorScheme _colors = Theme.of(context).colorScheme;
@@ -697,7 +715,8 @@ class _MongolFilledTonalButtonDefaultsM3 extends ButtonStyle {
   @override
   WidgetStateProperty<TextStyle?> get textStyle =>
       WidgetStatePropertyAll<TextStyle?>(
-          Theme.of(context).textTheme.labelLarge);
+        Theme.of(context).textTheme.labelLarge,
+      );
 
   @override
   WidgetStateProperty<Color?>? get backgroundColor =>

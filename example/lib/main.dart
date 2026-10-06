@@ -33,9 +33,7 @@ class DemoApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       builder: (context, child) => MongolTextEditingShortcuts(child: child),
       title: 'mongol',
-      theme: ThemeData(
-        fontFamily: 'MenksoftQagan',
-      ),
+      theme: ThemeData(fontFamily: 'MenksoftQagan'),
       home: Scaffold(
         appBar: AppBar(title: const Text(versionTitle)),
         body: const HomeScreen(),
@@ -51,81 +49,38 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       children: const <Widget>[
-        DemoTile(
-          title: 'MongolText',
-          destination: TextDemo(),
-        ),
-        DemoTile(
-          title: 'MongolText.rich',
-          destination: RichTextDemo(),
-        ),
-        DemoTile(
-          title: 'Emoji and CJK',
-          destination: EmojiCjkDemo(),
-        ),
-        DemoTile(
-          title: 'MongolTextField',
-          destination: MongolTextFieldDemo(),
-        ),
+        DemoTile(title: 'MongolText', destination: TextDemo()),
+        DemoTile(title: 'MongolText.rich', destination: RichTextDemo()),
+        DemoTile(title: 'Emoji and CJK', destination: EmojiCjkDemo()),
+        DemoTile(title: 'MongolTextField', destination: MongolTextFieldDemo()),
         DemoTile(
           title: 'Input decoration',
           destination: InputDecorationsDemo(),
         ),
-        DemoTile(
-          title: 'Input Shortcuts',
-          destination: InputShortcutsDemo(),
-        ),
+        DemoTile(title: 'Input Shortcuts', destination: InputShortcutsDemo()),
         DemoTile(
           title: 'MongolEditableText',
           destination: MongolEditableTextDemo(),
         ),
-        DemoTile(
-          title: 'MongolAlertDialog',
-          destination: AlertDialogDemo(),
-        ),
-        DemoTile(
-          title: 'Keyboard',
-          destination: KeyboardDemo(),
-        ),
+        DemoTile(title: 'MongolAlertDialog', destination: AlertDialogDemo()),
+        DemoTile(title: 'Keyboard', destination: KeyboardDemo()),
         DemoTile(
           title: 'Horizontal Listview',
           destination: HorizontalListviewDemo(),
         ),
-        DemoTile(
-          title: 'Max lines',
-          destination: MaxLinesDemo(),
-        ),
-        DemoTile(
-          title: 'Resizable text',
-          destination: ResizableTextDemo(),
-        ),
-        DemoTile(
-          title: 'Popup Menu',
-          destination: PopupMenuDemo(),
-        ),
-        DemoTile(
-          title: 'MongolListTile',
-          destination: ListTileDemo(),
-        ),
-        DemoTile(
-          title: 'Buttons',
-          destination: ButtonDemo(),
-        ),
-        DemoTile(
-          title: 'MongolTextPainter',
-          destination: TextPainterDemo(),
-        ),
+        DemoTile(title: 'Max lines', destination: MaxLinesDemo()),
+        DemoTile(title: 'Resizable text', destination: ResizableTextDemo()),
+        DemoTile(title: 'Popup Menu', destination: PopupMenuDemo()),
+        DemoTile(title: 'MongolListTile', destination: ListTileDemo()),
+        DemoTile(title: 'Buttons', destination: ButtonDemo()),
+        DemoTile(title: 'MongolTextPainter', destination: TextPainterDemo()),
       ],
     );
   }
 }
 
 class DemoTile extends StatelessWidget {
-  const DemoTile({
-    super.key,
-    required this.title,
-    required this.destination,
-  });
+  const DemoTile({super.key, required this.title, required this.destination});
 
   final String title;
   final Widget destination;

@@ -4,14 +4,13 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-//
-
 // ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart' show Theme, TextSelectionTheme, Icons;
+import 'package:material_ui/material_ui.dart'
+    show Theme, TextSelectionTheme, Icons;
 import 'package:flutter/widgets.dart';
 
 import 'mongol_text_selection_toolbar.dart';
@@ -61,8 +60,9 @@ class MongolTextSelectionControls extends TextSelectionControls {
       handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
       handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
       handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
-      handleSelectAll:
-          canSelectAll(delegate) ? () => handleSelectAll(delegate) : null,
+      handleSelectAll: canSelectAll(delegate)
+          ? () => handleSelectAll(delegate)
+          : null,
     );
   }
 
@@ -71,18 +71,22 @@ class MongolTextSelectionControls extends TextSelectionControls {
   /// Width and height terms are in vertical text layout context
   @override
   Widget buildHandle(
-      BuildContext context, TextSelectionHandleType type, double textLineWidth,
-      [VoidCallback? onTap, double? startGlyphWidth, double? endGlyphWidth]) {
+    BuildContext context,
+    TextSelectionHandleType type,
+    double textLineWidth, [
+    VoidCallback? onTap,
+    double? startGlyphWidth,
+    double? endGlyphWidth,
+  ]) {
     final theme = Theme.of(context);
-    final handleColor = TextSelectionTheme.of(context).selectionHandleColor ??
+    final handleColor =
+        TextSelectionTheme.of(context).selectionHandleColor ??
         theme.colorScheme.primary;
     final Widget handle = SizedBox(
       width: _kHandleSize,
       height: _kHandleSize,
       child: CustomPaint(
-        painter: _TextSelectionHandlePainter(
-          color: handleColor,
-        ),
+        painter: _TextSelectionHandlePainter(color: handleColor),
       ),
     );
 
@@ -91,17 +95,11 @@ class MongolTextSelectionControls extends TextSelectionControls {
     // down-right, up-left, or left depending on the handle type.
     switch (type) {
       case TextSelectionHandleType.left: // points down-right
-        return Transform.rotate(
-          angle: math.pi,
-          child: handle,
-        );
+        return Transform.rotate(angle: math.pi, child: handle);
       case TextSelectionHandleType.right: // points up-left
         return handle;
       case TextSelectionHandleType.collapsed: // points left
-        return Transform.rotate(
-          angle: -math.pi / 4.0,
-          child: handle,
-        );
+        return Transform.rotate(angle: -math.pi / 4.0, child: handle);
     }
   }
 
@@ -111,8 +109,12 @@ class MongolTextSelectionControls extends TextSelectionControls {
   ///
   /// See [TextSelectionControls.getHandleAnchor].
   @override
-  Offset getHandleAnchor(TextSelectionHandleType type, double textLineWidth,
-      [double? startGlyphWidth, double? endGlyphWidth]) {
+  Offset getHandleAnchor(
+    TextSelectionHandleType type,
+    double textLineWidth, [
+    double? startGlyphWidth,
+    double? endGlyphWidth,
+  ]) {
     switch (type) {
       case TextSelectionHandleType.left:
         return const Offset(_kHandleSize, _kHandleSize);
@@ -178,7 +180,8 @@ class _TextSelectionControlsToolbar extends StatefulWidget {
 }
 
 class _TextSelectionControlsToolbarState
-    extends State<_TextSelectionControlsToolbar> with TickerProviderStateMixin {
+    extends State<_TextSelectionControlsToolbar>
+    with TickerProviderStateMixin {
   void _onChangedClipboardStatus() {
     setState(() {
       // Inform the widget that the value of clipboardStatus has changed.
@@ -225,19 +228,22 @@ class _TextSelectionControlsToolbarState
     // Calculate the positioning of the menu. It is placed to the left of the
     // selection if there is enough room, or otherwise to the right.
     final startTextSelectionPoint = widget.endpoints[0];
-    final endTextSelectionPoint =
-        widget.endpoints.length > 1 ? widget.endpoints[1] : widget.endpoints[0];
+    final endTextSelectionPoint = widget.endpoints.length > 1
+        ? widget.endpoints[1]
+        : widget.endpoints[0];
     final anchorLeft = Offset(
-        widget.globalEditableRegion.left +
-            startTextSelectionPoint.point.dx -
-            widget.textLineWidth -
-            _kToolbarContentDistance,
-        widget.globalEditableRegion.top + widget.selectionMidpoint.dy);
+      widget.globalEditableRegion.left +
+          startTextSelectionPoint.point.dx -
+          widget.textLineWidth -
+          _kToolbarContentDistance,
+      widget.globalEditableRegion.top + widget.selectionMidpoint.dy,
+    );
     final anchorRight = Offset(
-        widget.globalEditableRegion.left +
-            endTextSelectionPoint.point.dx +
-            _kToolbarContentDistanceRight,
-        widget.globalEditableRegion.top + widget.selectionMidpoint.dy);
+      widget.globalEditableRegion.left +
+          endTextSelectionPoint.point.dx +
+          _kToolbarContentDistanceRight,
+      widget.globalEditableRegion.top + widget.selectionMidpoint.dy,
+    );
 
     // Determine which buttons will appear so that the order and total number is
     // known.
@@ -273,13 +279,14 @@ class _TextSelectionControlsToolbarState
     return MongolTextSelectionToolbar(
       anchorLeft: anchorLeft,
       anchorRight: anchorRight,
-      children: itemData
-          .asMap()
-          .entries
-          .map((MapEntry<int, _TextSelectionToolbarItemData> entry) {
+      children: itemData.asMap().entries.map((
+        MapEntry<int, _TextSelectionToolbarItemData> entry,
+      ) {
         return MongolTextSelectionToolbarButton(
           padding: MongolTextSelectionToolbarButton.getPadding(
-              entry.key, itemData.length),
+            entry.key,
+            itemData.length,
+          ),
           onPressed: entry.value.onPressed,
           child: Icon(entry.value.icon),
         );
@@ -298,8 +305,10 @@ class _TextSelectionHandlePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = color;
     final radius = size.width / 2.0;
-    final circle =
-        Rect.fromCircle(center: Offset(radius, radius), radius: radius);
+    final circle = Rect.fromCircle(
+      center: Offset(radius, radius),
+      radius: radius,
+    );
     final point = Rect.fromLTWH(0.0, 0.0, radius, radius);
     final path = Path()
       ..addOval(circle)

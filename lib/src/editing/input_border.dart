@@ -64,8 +64,10 @@ class SidelineInputBorder extends InputBorder {
   bool get isOutline => false;
 
   @override
-  SidelineInputBorder copyWith(
-      {BorderSide? borderSide, BorderRadius? borderRadius}) {
+  SidelineInputBorder copyWith({
+    BorderSide? borderSide,
+    BorderRadius? borderRadius,
+  }) {
     return SidelineInputBorder(
       borderSide: borderSide ?? this.borderSide,
       borderRadius: borderRadius ?? this.borderRadius,
@@ -84,9 +86,14 @@ class SidelineInputBorder extends InputBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return Path()
-      ..addRect(Rect.fromLTWH(rect.left, rect.top,
-          math.max(0.0, rect.width - borderSide.width), rect.height));
+    return Path()..addRect(
+      Rect.fromLTWH(
+        rect.left,
+        rect.top,
+        math.max(0.0, rect.width - borderSide.width),
+        rect.height,
+      ),
+    );
   }
 
   @override
@@ -263,11 +270,12 @@ class MongolOutlineInputBorder extends InputBorder {
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return Path()
-      ..addRRect(borderRadius
+    return Path()..addRRect(
+      borderRadius
           .resolve(textDirection)
           .toRRect(rect)
-          .deflate(borderSide.width));
+          .deflate(borderSide.width),
+    );
   }
 
   @override
@@ -276,7 +284,11 @@ class MongolOutlineInputBorder extends InputBorder {
   }
 
   Path _gapBorderPath(
-      Canvas canvas, RRect center, double start, double extent) {
+    Canvas canvas,
+    RRect center,
+    double start,
+    double extent,
+  ) {
     // When the corner radii on any side add up to be greater than the
     // given width, each radius has to be scaled to not exceed the
     // size of the width/height of the RRect.

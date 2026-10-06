@@ -10,22 +10,26 @@ import 'package:mongol/mongol.dart';
 /// The field lays out along the vertical axis, so it is given a fixed height
 /// and left free to take whatever width it needs.
 Widget boxed(Widget child, {double height = 300.0}) => MaterialApp(
-      home: Scaffold(
-        body: Align(
-          alignment: Alignment.topLeft,
-          child: SizedBox(height: height, child: child),
-        ),
-      ),
-    );
+  home: Scaffold(
+    body: Align(
+      alignment: Alignment.topLeft,
+      child: SizedBox(height: height, child: child),
+    ),
+  ),
+);
 
 /// find.text matches nothing here: these widgets render MongolText.
-Finder findMongolText(String text) => find
-    .byWidgetPredicate((widget) => widget is MongolText && widget.data == text);
+Finder findMongolText(String text) => find.byWidgetPredicate(
+  (widget) => widget is MongolText && widget.data == text,
+);
 
 /// tester.enterText looks for Flutter's EditableText, which this package does
 /// not use, so focus the field first and drive the input connection directly.
 Future<void> enterMongolText(
-    WidgetTester tester, Finder finder, String text) async {
+  WidgetTester tester,
+  Finder finder,
+  String text,
+) async {
   await tester.tap(finder);
   await tester.pump();
   tester.testTextInput.enterText(text);
@@ -34,10 +38,12 @@ Future<void> enterMongolText(
 
 /// The hint is faded rather than removed, so read the opacity that wraps it.
 double hintOpacity(WidgetTester tester) => tester
-    .widget<AnimatedOpacity>(find.ancestor(
-      of: findMongolText('hint'),
-      matching: find.byType(AnimatedOpacity),
-    ))
+    .widget<AnimatedOpacity>(
+      find.ancestor(
+        of: findMongolText('hint'),
+        matching: find.byType(AnimatedOpacity),
+      ),
+    )
     .opacity;
 
 void main() {
@@ -51,16 +57,16 @@ void main() {
     expect(controller.text, equals('hello'));
   });
 
-  testWidgets('typing updates the controller and calls onChanged',
-      (tester) async {
+  testWidgets('typing updates the controller and calls onChanged', (
+    tester,
+  ) async {
     final controller = TextEditingController();
     addTearDown(controller.dispose);
     final changes = <String>[];
 
-    await tester.pumpWidget(boxed(MongolTextField(
-      controller: controller,
-      onChanged: changes.add,
-    )));
+    await tester.pumpWidget(
+      boxed(MongolTextField(controller: controller, onChanged: changes.add)),
+    );
 
     await enterMongolText(tester, find.byType(MongolTextField), 'abc');
     await tester.pump();
@@ -71,9 +77,9 @@ void main() {
 
   testWidgets('onSubmitted fires when the action is sent', (tester) async {
     String? submitted;
-    await tester.pumpWidget(boxed(MongolTextField(
-      onSubmitted: (value) => submitted = value,
-    )));
+    await tester.pumpWidget(
+      boxed(MongolTextField(onSubmitted: (value) => submitted = value)),
+    );
 
     await enterMongolText(tester, find.byType(MongolTextField), 'done');
     await tester.testTextInput.receiveAction(TextInputAction.done);
@@ -82,22 +88,25 @@ void main() {
     expect(submitted, equals('done'));
   });
 
-  testWidgets('readOnly keeps the existing text and takes no input',
-      (tester) async {
+  testWidgets('readOnly keeps the existing text and takes no input', (
+    tester,
+  ) async {
     final controller = TextEditingController(text: 'fixed');
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(boxed(MongolTextField(
-      controller: controller,
-      readOnly: true,
-    )));
+    await tester.pumpWidget(
+      boxed(MongolTextField(controller: controller, readOnly: true)),
+    );
 
     await tester.tap(find.byType(MongolTextField));
     await tester.pump();
 
     expect(controller.text, equals('fixed'));
-    expect(tester.testTextInput.hasAnyClients, isFalse,
-        reason: 'a read only field should not connect to the keyboard');
+    expect(
+      tester.testTextInput.hasAnyClients,
+      isFalse,
+      reason: 'a read only field should not connect to the keyboard',
+    );
   });
 
   testWidgets('enabled: false does not focus on tap', (tester) async {
@@ -113,10 +122,9 @@ void main() {
     final controller = TextEditingController();
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(boxed(MongolTextField(
-      controller: controller,
-      maxLength: 3,
-    )));
+    await tester.pumpWidget(
+      boxed(MongolTextField(controller: controller, maxLength: 3)),
+    );
 
     await enterMongolText(tester, find.byType(MongolTextField), 'abcdef');
     await tester.pump();
@@ -124,15 +132,20 @@ void main() {
     expect(controller.text.length, equals(3));
   });
 
-  testWidgets('hintText is shown while empty and faded out once typed',
-      (tester) async {
+  testWidgets('hintText is shown while empty and faded out once typed', (
+    tester,
+  ) async {
     final controller = TextEditingController();
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(boxed(MongolTextField(
-      controller: controller,
-      decoration: const InputDecoration(hintText: 'hint'),
-    )));
+    await tester.pumpWidget(
+      boxed(
+        MongolTextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'hint'),
+        ),
+      ),
+    );
     expect(findMongolText('hint'), findsOneWidget);
     expect(hintOpacity(tester), equals(1.0));
 
@@ -144,21 +157,24 @@ void main() {
     expect(hintOpacity(tester), equals(0.0));
   });
 
-  testWidgets('obscureText replaces the glyphs but not the value',
-      (tester) async {
+  testWidgets('obscureText replaces the glyphs but not the value', (
+    tester,
+  ) async {
     final controller = TextEditingController();
     addTearDown(controller.dispose);
 
-    await tester.pumpWidget(boxed(MongolTextField(
-      controller: controller,
-      obscureText: true,
-    )));
+    await tester.pumpWidget(
+      boxed(MongolTextField(controller: controller, obscureText: true)),
+    );
 
     await enterMongolText(tester, find.byType(MongolTextField), 'secret');
     await tester.pump();
 
-    expect(controller.text, equals('secret'),
-        reason: 'obscuring is a display concern, the value is unchanged');
+    expect(
+      controller.text,
+      equals('secret'),
+      reason: 'obscuring is a display concern, the value is unchanged',
+    );
     expect(findMongolText('secret'), findsNothing);
   });
 }

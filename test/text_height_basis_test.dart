@@ -37,47 +37,53 @@ void main() {
     expect(tester.getSize(find.byType(MongolText)).height, equals(boxHeight));
   });
 
-  testWidgets('MongolText with longestLine takes only what it needs',
-      (tester) async {
-    await tester.pumpWidget(wrap(
-      MongolText(wrappingText, textHeightBasis: TextHeightBasis.longestLine),
-    ));
-    expect(
-        tester.getSize(find.byType(MongolText)).height, lessThan(boxHeight));
+  testWidgets('MongolText with longestLine takes only what it needs', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      wrap(
+        MongolText(wrappingText, textHeightBasis: TextHeightBasis.longestLine),
+      ),
+    );
+    expect(tester.getSize(find.byType(MongolText)).height, lessThan(boxHeight));
   });
 
   testWidgets('MongolRichText honours textHeightBasis', (tester) async {
-    await tester.pumpWidget(wrap(MongolRichText(
-      text: TextSpan(text: wrappingText),
-    )));
+    await tester.pumpWidget(
+      wrap(MongolRichText(text: TextSpan(text: wrappingText))),
+    );
     final double parent = tester.getSize(find.byType(MongolRichText)).height;
 
-    await tester.pumpWidget(wrap(MongolRichText(
-      text: TextSpan(text: wrappingText),
-      textHeightBasis: TextHeightBasis.longestLine,
-    )));
-    final double longestLine =
-        tester.getSize(find.byType(MongolRichText)).height;
+    await tester.pumpWidget(
+      wrap(
+        MongolRichText(
+          text: TextSpan(text: wrappingText),
+          textHeightBasis: TextHeightBasis.longestLine,
+        ),
+      ),
+    );
+    final double longestLine = tester
+        .getSize(find.byType(MongolRichText))
+        .height;
 
     expect(parent, equals(boxHeight));
     expect(longestLine, lessThan(parent));
   });
 
-  testWidgets('an ambient DefaultTextStyle supplies the basis',
-      (tester) async {
-    await tester.pumpWidget(wrap(
-      MongolText(wrappingText),
-      defaultBasis: TextWidthBasis.longestLine,
-    ));
-    expect(
-        tester.getSize(find.byType(MongolText)).height, lessThan(boxHeight));
+  testWidgets('an ambient DefaultTextStyle supplies the basis', (tester) async {
+    await tester.pumpWidget(
+      wrap(MongolText(wrappingText), defaultBasis: TextWidthBasis.longestLine),
+    );
+    expect(tester.getSize(find.byType(MongolText)).height, lessThan(boxHeight));
   });
 
   testWidgets('an explicit basis beats the DefaultTextStyle', (tester) async {
-    await tester.pumpWidget(wrap(
-      MongolText(wrappingText, textHeightBasis: TextHeightBasis.parent),
-      defaultBasis: TextWidthBasis.longestLine,
-    ));
+    await tester.pumpWidget(
+      wrap(
+        MongolText(wrappingText, textHeightBasis: TextHeightBasis.parent),
+        defaultBasis: TextWidthBasis.longestLine,
+      ),
+    );
     expect(tester.getSize(find.byType(MongolText)).height, equals(boxHeight));
   });
 }

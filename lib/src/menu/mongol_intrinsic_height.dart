@@ -43,10 +43,13 @@ class MongolIntrinsicHeight extends SingleChildRenderObjectWidget {
   /// Creates a widget that sizes its child to the child's intrinsic height.
   ///
   /// This class is relatively expensive. Avoid using it where possible.
-  const MongolIntrinsicHeight(
-      {super.key, this.stepHeight, this.stepWidth, super.child})
-      : assert(stepHeight == null || stepHeight >= 0.0),
-        assert(stepWidth == null || stepWidth >= 0.0);
+  const MongolIntrinsicHeight({
+    super.key,
+    this.stepHeight,
+    this.stepWidth,
+    super.child,
+  }) : assert(stepHeight == null || stepHeight >= 0.0),
+       assert(stepWidth == null || stepWidth >= 0.0);
 
   /// If non-null, force the child's height to be a multiple of this value.
   ///
@@ -74,12 +77,16 @@ class MongolIntrinsicHeight extends SingleChildRenderObjectWidget {
   @override
   MongolRenderIntrinsicHeight createRenderObject(BuildContext context) {
     return MongolRenderIntrinsicHeight(
-        stepHeight: _stepHeight, stepWidth: _stepWidth);
+      stepHeight: _stepHeight,
+      stepWidth: _stepWidth,
+    );
   }
 
   @override
   void updateRenderObject(
-      BuildContext context, MongolRenderIntrinsicHeight renderObject) {
+    BuildContext context,
+    MongolRenderIntrinsicHeight renderObject,
+  ) {
     renderObject
       ..stepHeight = _stepHeight
       ..stepWidth = _stepWidth;
@@ -127,11 +134,11 @@ class MongolRenderIntrinsicHeight extends RenderProxyBox {
     double? stepHeight,
     double? stepWidth,
     RenderBox? child,
-  })  : assert(stepHeight == null || stepHeight > 0.0),
-        assert(stepWidth == null || stepWidth > 0.0),
-        _stepHeight = stepHeight,
-        _stepWidth = stepWidth,
-        super(child);
+  }) : assert(stepHeight == null || stepHeight > 0.0),
+       assert(stepWidth == null || stepWidth > 0.0),
+       _stepHeight = stepHeight,
+       _stepWidth = stepWidth,
+       super(child);
 
   /// If non-null, force the child's height to be a multiple of this value.
   ///
@@ -193,16 +200,19 @@ class MongolRenderIntrinsicHeight extends RenderProxyBox {
     return _applyStep(width, _stepWidth);
   }
 
-  Size _computeSize(
-      {required ChildLayouter layoutChild,
-      required BoxConstraints constraints}) {
+  Size _computeSize({
+    required ChildLayouter layoutChild,
+    required BoxConstraints constraints,
+  }) {
     if (child != null) {
       if (!constraints.hasTightHeight) {
-        final double height =
-            child!.getMaxIntrinsicHeight(constraints.maxWidth);
+        final double height = child!.getMaxIntrinsicHeight(
+          constraints.maxWidth,
+        );
         assert(height.isFinite);
-        constraints =
-            constraints.tighten(height: _applyStep(height, _stepHeight));
+        constraints = constraints.tighten(
+          height: _applyStep(height, _stepHeight),
+        );
       }
       if (_stepWidth != null) {
         final double width = child!.getMaxIntrinsicWidth(constraints.maxHeight);

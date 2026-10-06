@@ -23,10 +23,7 @@ void main() {
 
   testWidgets('MongolText able to set font', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const MongolText(
-        'T',
-        style: TextStyle(fontFamily: 'Some Font'),
-      ),
+      const MongolText('T', style: TextStyle(fontFamily: 'Some Font')),
     );
 
     final text = tester.firstWidget(find.byType(MongolText)) as MongolText;

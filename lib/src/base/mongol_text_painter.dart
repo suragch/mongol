@@ -101,10 +101,14 @@ class MongolWordBoundary extends TextBoundary {
       return null;
     }
     return switch (codeUnitAtIndex & 0xFC00) {
-      0xD800 =>
-        _codePointFromSurrogates(codeUnitAtIndex, _text.codeUnitAt(index + 1)!),
-      0xDC00 =>
-        _codePointFromSurrogates(_text.codeUnitAt(index - 1)!, codeUnitAtIndex),
+      0xD800 => _codePointFromSurrogates(
+        codeUnitAtIndex,
+        _text.codeUnitAt(index + 1)!,
+      ),
+      0xDC00 => _codePointFromSurrogates(
+        _text.codeUnitAt(index - 1)!,
+        codeUnitAtIndex,
+      ),
       _ => codeUnitAtIndex,
     };
   }
@@ -129,15 +133,18 @@ class MongolWordBoundary extends TextBoundary {
     // https://unicode-org.github.io/icu/userguide/boundaryanalysis/break-rules.html#word-dictionaries
     //
     // WB1 & WB2: always break at the start or the end of the text.
-    final bool hardBreakRulesApply = innerCodePoint == null ||
+    final bool hardBreakRulesApply =
+        innerCodePoint == null ||
         outerCodeUnit == null
         // WB3a & WB3b: always break before and after newlines.
         ||
         _isNewline(innerCodePoint) ||
         _isNewline(outerCodeUnit);
     return hardBreakRulesApply ||
-        !RegExp(r'[\p{Space_Separator}\p{Punctuation}]', unicode: true)
-            .hasMatch(String.fromCharCode(innerCodePoint));
+        !RegExp(
+          r'[\p{Space_Separator}\p{Punctuation}]',
+          unicode: true,
+        ).hasMatch(String.fromCharCode(innerCodePoint));
   }
 
   /// Returns a [TextBoundary] suitable for handling keyboard navigation
@@ -151,8 +158,10 @@ class MongolWordBoundary extends TextBoundary {
   /// except that word breaks end on a space separator or a punctuation will be
   /// skipped, to match the behavior of most platforms. Additional rules may be
   /// added in the future to better match platform behaviors.
-  late final TextBoundary moveByWordBoundary =
-      _UntilTextBoundary(this, _skipSpacesAndPunctuations);
+  late final TextBoundary moveByWordBoundary = _UntilTextBoundary(
+    this,
+    _skipSpacesAndPunctuations,
+  );
 }
 
 class _UntilTextBoundary extends TextBoundary {
@@ -174,8 +183,9 @@ class _UntilTextBoundary extends TextBoundary {
 
   @override
   int? getTrailingTextBoundaryAt(int position) {
-    final int? offset =
-        _textBoundary.getTrailingTextBoundaryAt(max(position, 0));
+    final int? offset = _textBoundary.getTrailingTextBoundaryAt(
+      max(position, 0),
+    );
     return offset == null || _predicate(offset, true)
         ? offset
         : getTrailingTextBoundaryAt(offset);
@@ -235,11 +245,19 @@ class _MongolTextLayout {
 // depends on the current text layout, which will be invalidated as soon as the
 // text layout is invalidated.
 class _TextPainterLayoutCacheWithOffset {
-  _TextPainterLayoutCacheWithOffset(this.layout, this.textAlignment,
-      double minHeight, double maxHeight, TextHeightBasis heightBasis)
-      : contentHeight =
-            _contentHeightFor(minHeight, maxHeight, heightBasis, layout),
-        assert(textAlignment >= 0.0 && textAlignment <= 1.0);
+  _TextPainterLayoutCacheWithOffset(
+    this.layout,
+    this.textAlignment,
+    double minHeight,
+    double maxHeight,
+    TextHeightBasis heightBasis,
+  ) : contentHeight = _contentHeightFor(
+        minHeight,
+        maxHeight,
+        heightBasis,
+        layout,
+      ),
+      assert(textAlignment >= 0.0 && textAlignment <= 1.0);
 
   final _MongolTextLayout layout;
 
@@ -268,13 +286,23 @@ class _TextPainterLayoutCacheWithOffset {
 
   MongolParagraph get paragraph => layout._paragraph;
 
-  static double _contentHeightFor(double minHeight, double maxHeight,
-      TextHeightBasis heightBasis, _MongolTextLayout layout) {
+  static double _contentHeightFor(
+    double minHeight,
+    double maxHeight,
+    TextHeightBasis heightBasis,
+    _MongolTextLayout layout,
+  ) {
     return switch (heightBasis) {
-      TextHeightBasis.longestLine =>
-        clampDouble(layout.longestLine, minHeight, maxHeight),
-      TextHeightBasis.parent =>
-        clampDouble(layout.maxIntrinsicLineExtent, minHeight, maxHeight),
+      TextHeightBasis.longestLine => clampDouble(
+        layout.longestLine,
+        minHeight,
+        maxHeight,
+      ),
+      TextHeightBasis.parent => clampDouble(
+        layout.maxIntrinsicLineExtent,
+        minHeight,
+        maxHeight,
+      ),
     };
   }
 
@@ -284,7 +312,10 @@ class _TextPainterLayoutCacheWithOffset {
   // Returns false if the new constraints require re-computing the line breaks,
   // in which case no side effects will occur.
   bool _resizeToFit(
-      double minHeight, double maxHeight, TextHeightBasis heightBasis) {
+    double minHeight,
+    double maxHeight,
+    TextHeightBasis heightBasis,
+  ) {
     assert(layout.maxIntrinsicLineExtent.isFinite);
     // The assumption here is that if a MongolParagraph's height is already >= its
     // maxIntrinsicHeight, further increasing the input height does not change its
@@ -297,8 +328,12 @@ class _TextPainterLayoutCacheWithOffset {
     // of double.infinity, and to make the text visible the paintOffset.dy is
     // bound to be double.negativeInfinity, which invalidates all arithmetic
     // operations.
-    final double newContentHeight =
-        _contentHeightFor(minHeight, maxHeight, heightBasis, layout);
+    final double newContentHeight = _contentHeightFor(
+      minHeight,
+      maxHeight,
+      heightBasis,
+      layout,
+    );
     if (newContentHeight == contentHeight) {
       return true;
     }
@@ -437,17 +472,17 @@ class MongolTextPainter {
     this._ellipsis,
     this._textHeightBasis = TextHeightBasis.parent,
     this._rotateCJK = true,
-  })  : assert(text == null || text.debugAssertIsValid()),
-        assert(maxLines == null || maxLines > 0),
-        assert(
-            textScaleFactor == 1.0 ||
-                identical(textScaler, TextScaler.noScaling),
-            'Use textScaler instead.'),
-        _text = text,
-        _textScaler = textScaler == TextScaler.noScaling
-            ? TextScaler.linear(textScaleFactor)
-            : textScaler,
-        _maxLines = maxLines;
+  }) : assert(text == null || text.debugAssertIsValid()),
+       assert(maxLines == null || maxLines > 0),
+       assert(
+         textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
+         'Use textScaler instead.',
+       ),
+       _text = text,
+       _textScaler = textScaler == TextScaler.noScaling
+           ? TextScaler.linear(textScaleFactor)
+           : textScaler,
+       _maxLines = maxLines;
 
   /// Computes the height of a configured [MongolTextPainter].
   ///
@@ -566,10 +601,11 @@ class MongolTextPainter {
         ErrorSummary('Text layout not available'),
         if (_debugMarkNeedsLayoutCallStack != null)
           DiagnosticsStackTrace(
-              'The calls that first invalidated the text layout were',
-              _debugMarkNeedsLayoutCallStack)
+            'The calls that first invalidated the text layout were',
+            _debugMarkNeedsLayoutCallStack,
+          )
         else
-          ErrorDescription('The TextPainter has never been laid out.')
+          ErrorDescription('The TextPainter has never been laid out.'),
       ]);
     }
     return true;
@@ -920,13 +956,11 @@ class MongolTextPainter {
     return builder.build();
   }
 
-  void _addStyleToText(
-    MongolParagraphBuilder builder,
-    InlineSpan inlineSpan,
-  ) {
+  void _addStyleToText(MongolParagraphBuilder builder, InlineSpan inlineSpan) {
     if (inlineSpan is! TextSpan) {
       throw UnimplementedError(
-          'Inline span support has not yet been implemented for MongolTextPainter');
+        'Inline span support has not yet been implemented for MongolTextPainter',
+      );
     }
     final textSpan = inlineSpan;
     final style = textSpan.style;
@@ -968,7 +1002,8 @@ class MongolTextPainter {
     final TextSpan? text = this.text;
     if (text == null) {
       throw StateError(
-          'MongolTextPainter.text must be set to a non-null value before using the MongolTextPainter.');
+        'MongolTextPainter.text must be set to a non-null value before using the MongolTextPainter.',
+      );
     }
 
     final double paintOffsetAlignment = _computePaintOffsetFraction(textAlign);
@@ -1136,7 +1171,8 @@ class MongolTextPainter {
     const int newlineCodeUnit = 10;
 
     // Check for multi-code-unit glyphs such as emojis or zero width joiner.
-    final bool needsSearch = isHighSurrogate(prevCodeUnit) ||
+    final bool needsSearch =
+        isHighSurrogate(prevCodeUnit) ||
         isLowSurrogate(prevCodeUnit) ||
         _text!.codeUnitAt(offset) == _zwjUtf16 ||
         _isUnicodeDirectionality(prevCodeUnit);
@@ -1144,8 +1180,10 @@ class MongolTextPainter {
     List<Rect> boxes = <Rect>[];
     while (boxes.isEmpty) {
       final int prevRuneOffset = offset - graphemeClusterLength;
-      boxes = _layoutCache!.paragraph
-          .getBoxesForRange(max(0, prevRuneOffset), offset);
+      boxes = _layoutCache!.paragraph.getBoxesForRange(
+        max(0, prevRuneOffset),
+        offset,
+      );
       // When the range does not include a full cluster, no boxes will be returned.
       if (boxes.isEmpty) {
         // When we are at the beginning of the line, a non-surrogate position will
@@ -1186,11 +1224,13 @@ class MongolTextPainter {
       return null;
     }
     // We cap the offset at the final index of plain text.
-    final int nextCodeUnit =
-        plainText.codeUnitAt(min(offset, plainTextLength - 1));
+    final int nextCodeUnit = plainText.codeUnitAt(
+      min(offset, plainTextLength - 1),
+    );
 
     // Check for multi-code-unit glyphs such as emojis or zero width joiner
-    final bool needsSearch = isHighSurrogate(nextCodeUnit) ||
+    final bool needsSearch =
+        isHighSurrogate(nextCodeUnit) ||
         isLowSurrogate(nextCodeUnit) ||
         nextCodeUnit == _zwjUtf16 ||
         _isUnicodeDirectionality(nextCodeUnit);
@@ -1252,8 +1292,9 @@ class MongolTextPainter {
     final Offset rawOffset;
     switch (caretMetrics) {
       case _EmptyLineCaretMetrics(:final double lineHorizontalOffset):
-        final double paintOffsetAlignment =
-            _computePaintOffsetFraction(textAlign);
+        final double paintOffsetAlignment = _computePaintOffsetFraction(
+          textAlign,
+        );
         // The full height is not (height - caretPrototype.height)
         // because MongolRenderEditable reserves cursor height on the bottom. Ideally this
         // should be handled by MongolRenderEditable instead.
@@ -1270,9 +1311,10 @@ class MongolTextPainter {
     // MongolRenderEditable reserves height for showing the caret, it's best to handle
     // the clamping there).
     final double adjustedDy = clampDouble(
-        rawOffset.dy + layoutCache.paintOffset.dy,
-        0,
-        layoutCache.contentHeight);
+      rawOffset.dy + layoutCache.paintOffset.dy,
+      0,
+      layoutCache.contentHeight,
+    );
     return Offset(rawOffset.dx + layoutCache.paintOffset.dx, adjustedDy);
   }
 
@@ -1342,8 +1384,8 @@ class MongolTextPainter {
     return offset == Offset.zero
         ? boxes
         : boxes
-            .map((Rect box) => _shiftTextBox(box, offset))
-            .toList(growable: false);
+              .map((Rect box) => _shiftTextBox(box, offset))
+              .toList(growable: false);
   }
 
   /// Returns the position within the text for the given pixel offset.
@@ -1351,8 +1393,9 @@ class MongolTextPainter {
     assert(_debugAssertTextLayoutIsValid);
     assert(!_debugNeedsRelayout);
     final _TextPainterLayoutCacheWithOffset cachedLayout = _layoutCache!;
-    return cachedLayout.paragraph
-        .getPositionForOffset(offset - cachedLayout.paintOffset);
+    return cachedLayout.paragraph.getPositionForOffset(
+      offset - cachedLayout.paintOffset,
+    );
   }
 
   /// Returns the text range of the word at the given offset. Characters not
@@ -1387,7 +1430,9 @@ class MongolTextPainter {
   }
 
   static MongolLineMetrics _shiftLineMetrics(
-      MongolLineMetrics metrics, Offset offset) {
+    MongolLineMetrics metrics,
+    Offset offset,
+  ) {
     assert(offset.dx.isFinite);
     assert(offset.dy.isFinite);
     return MongolLineMetrics(
@@ -1437,9 +1482,11 @@ class MongolTextPainter {
     return offset == Offset.zero
         ? rawMetrics
         : rawMetrics
-            .map((MongolLineMetrics metrics) =>
-                _shiftLineMetrics(metrics, offset))
-            .toList(growable: false);
+              .map(
+                (MongolLineMetrics metrics) =>
+                    _shiftLineMetrics(metrics, offset),
+              )
+              .toList(growable: false);
   }
 
   bool _disposed = false;

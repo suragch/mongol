@@ -22,9 +22,7 @@ import 'package:flutter/foundation.dart';
 ///    prefix, input, and suffix within an [MongolInputDecorator].
 class TextAlignHorizontal {
   /// Creates a TextAlignHorizontal from any x value between -1.0 and 1.0.
-  const TextAlignHorizontal({
-    required this.x,
-  }) : assert(x >= -1.0 && x <= 1.0);
+  const TextAlignHorizontal({required this.x}) : assert(x >= -1.0 && x <= 1.0);
 
   /// A value ranging from -1.0 to 1.0 that defines the leftmost and rightmost
   /// locations of the left and right sides of the input box.

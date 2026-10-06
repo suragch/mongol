@@ -39,9 +39,9 @@ enum _CheckboxType { material, adaptive }
 /// This widget does not coordinate the [selected] state and the [value] state; to have the list tile
 /// appear selected when the checkbox is checked, pass the same value to both.
 ///
-/// The checkbox is shown on the bottom (i.e. the trailing edge). This can be 
-/// changed using [controlAffinity]. The [secondary] widget is placed on the 
-/// opposite side. This maps to the [MongolListTile.leading] and [MongolListTile.trailing] 
+/// The checkbox is shown on the bottom (i.e. the trailing edge). This can be
+/// changed using [controlAffinity]. The [secondary] widget is placed on the
+/// opposite side. This maps to the [MongolListTile.leading] and [MongolListTile.trailing]
 /// properties of [MongolListTile].
 ///
 /// This widget requires a [Material] widget ancestor in the tree to paint
@@ -88,14 +88,14 @@ enum _CheckboxType { material, adaptive }
 /// ```dart
 /// import 'package:flutter/material.dart';
 /// import 'package:flutter/scheduler.dart' show timeDilation;
-/// 
+///
 /// /// Flutter code sample for [CheckboxListTile].
-/// 
+///
 /// void main() => runApp(const CheckboxListTileApp());
-/// 
+///
 /// class CheckboxListTileApp extends StatelessWidget {
 ///   const CheckboxListTileApp({super.key});
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return MaterialApp(
@@ -104,15 +104,15 @@ enum _CheckboxType { material, adaptive }
 ///     );
 ///   }
 /// }
-/// 
+///
 /// class CheckboxListTileExample extends StatefulWidget {
 ///   const CheckboxListTileExample({super.key});
-/// 
+///
 ///   @override
 ///   State<CheckboxListTileExample> createState() =>
 ///       _CheckboxListTileExampleState();
 /// }
-/// 
+///
 /// class _CheckboxListTileExampleState extends State<CheckboxListTileExample> {
 ///   @override
 ///   Widget build(BuildContext context) {
@@ -143,12 +143,12 @@ enum _CheckboxType { material, adaptive }
 /// import 'package:flutter/material.dart';
 ///
 /// /// Flutter code sample for [CheckboxListTile].
-/// 
+///
 /// void main() => runApp(const CheckboxListTileApp());
-/// 
+///
 /// class CheckboxListTileApp extends StatelessWidget {
 ///   const CheckboxListTileApp({super.key});
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return MaterialApp(
@@ -157,20 +157,20 @@ enum _CheckboxType { material, adaptive }
 ///     );
 ///   }
 /// }
-/// 
+///
 /// class CheckboxListTileExample extends StatefulWidget {
 ///   const CheckboxListTileExample({super.key});
-/// 
+///
 ///   @override
 ///   State<CheckboxListTileExample> createState() =>
 ///       _CheckboxListTileExampleState();
 /// }
-/// 
+///
 /// class _CheckboxListTileExampleState extends State<CheckboxListTileExample> {
 ///   bool checkboxValue1 = true;
 ///   bool checkboxValue2 = true;
 ///   bool checkboxValue3 = true;
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return Scaffold(
@@ -248,14 +248,14 @@ enum _CheckboxType { material, adaptive }
 /// ```dart
 /// import 'package:flutter/gestures.dart';
 /// import 'package:flutter/material.dart';
-/// 
+///
 /// /// Flutter code sample for custom labeled checkbox.
-/// 
+///
 /// void main() => runApp(const LabeledCheckboxApp());
-/// 
+///
 /// class LabeledCheckboxApp extends StatelessWidget {
 ///   const LabeledCheckboxApp({super.key});
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return MaterialApp(
@@ -264,7 +264,7 @@ enum _CheckboxType { material, adaptive }
 ///     );
 ///   }
 /// }
-/// 
+///
 /// class LinkedLabelCheckbox extends StatelessWidget {
 ///   const LinkedLabelCheckbox({
 ///     super.key,
@@ -273,12 +273,12 @@ enum _CheckboxType { material, adaptive }
 ///     required this.value,
 ///     required this.onChanged,
 ///   });
-/// 
+///
 ///   final String label;
 ///   final EdgeInsets padding;
 ///   final bool value;
 ///   final ValueChanged<bool> onChanged;
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return Padding(
@@ -359,14 +359,14 @@ enum _CheckboxType { material, adaptive }
 ///
 /// ```dart
 /// import 'package:flutter/material.dart';
-/// 
+///
 /// Flutter code sample for custom labeled checkbox.
-/// 
+///
 /// void main() => runApp(const LabeledCheckboxApp());
-/// 
+///
 /// class LabeledCheckboxApp extends StatelessWidget {
 ///   const LabeledCheckboxApp({super.key});
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return MaterialApp(
@@ -375,7 +375,7 @@ enum _CheckboxType { material, adaptive }
 ///     );
 ///   }
 /// }
-/// 
+///
 /// class LabeledCheckbox extends StatelessWidget {
 ///   const LabeledCheckbox({
 ///     super.key,
@@ -384,12 +384,12 @@ enum _CheckboxType { material, adaptive }
 ///     required this.value,
 ///     required this.onChanged,
 ///   });
-/// 
+///
 ///   final String label;
 ///   final EdgeInsets padding;
 ///   final bool value;
 ///   final ValueChanged<bool> onChanged;
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return InkWell(
@@ -413,17 +413,17 @@ enum _CheckboxType { material, adaptive }
 ///     );
 ///   }
 /// }
-/// 
+///
 /// class LabeledCheckboxExample extends StatefulWidget {
 ///   const LabeledCheckboxExample({super.key});
-/// 
+///
 ///   @override
 ///   State<LabeledCheckboxExample> createState() => _LabeledCheckboxExampleState();
 /// }
-/// 
+///
 /// class _LabeledCheckboxExampleState extends State<LabeledCheckboxExample> {
 ///   bool _isSelected = false;
-/// 
+///
 ///   @override
 ///   Widget build(BuildContext context) {
 ///     return Scaffold(
@@ -502,9 +502,9 @@ class MongolCheckboxListTile extends StatelessWidget {
     this.onFocusChange,
     this.enableFeedback,
     this.checkboxSemanticLabel,
-  })  : _checkboxType = _CheckboxType.material,
-        assert(tristate || value != null),
-        assert(!isThreeLine || subtitle != null);
+  }) : _checkboxType = _CheckboxType.material,
+       assert(tristate || value != null),
+       assert(!isThreeLine || subtitle != null);
 
   /// Creates a combination of a list tile and a platform adaptive checkbox.
   ///
@@ -546,9 +546,9 @@ class MongolCheckboxListTile extends StatelessWidget {
     this.onFocusChange,
     this.enableFeedback,
     this.checkboxSemanticLabel,
-  })  : _checkboxType = _CheckboxType.adaptive,
-        assert(tristate || value != null),
-        assert(!isThreeLine || subtitle != null);
+  }) : _checkboxType = _CheckboxType.adaptive,
+       assert(tristate || value != null),
+       assert(!isThreeLine || subtitle != null);
 
   /// Whether this checkbox is checked.
   final bool? value;
@@ -839,7 +839,8 @@ class MongolCheckboxListTile extends StatelessWidget {
     final Set<WidgetState> states = <WidgetState>{
       if (selected) WidgetState.selected,
     };
-    final Color effectiveActiveColor = activeColor ??
+    final Color effectiveActiveColor =
+        activeColor ??
         checkboxTheme.fillColor?.resolve(states) ??
         theme.colorScheme.secondary;
     return MergeSemantics(

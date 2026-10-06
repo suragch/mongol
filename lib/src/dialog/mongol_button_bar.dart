@@ -20,8 +20,8 @@ class MongolButtonBar extends StatelessWidget {
     this.buttonPadding,
     this.layoutBehavior,
     this.children = const <Widget>[],
-  })  : assert(buttonMinWidth == null || buttonMinWidth >= 0.0),
-        assert(buttonHeight == null || buttonHeight >= 0.0);
+  }) : assert(buttonMinWidth == null || buttonMinWidth >= 0.0),
+       assert(buttonHeight == null || buttonHeight >= 0.0);
 
   /// How the children should be placed along the vertical axis.
   ///
@@ -56,16 +56,19 @@ class MongolButtonBar extends StatelessWidget {
     final barTheme = ButtonBarTheme.of(context);
 
     final buttonTheme = parentButtonTheme.copyWith(
-      textTheme: buttonTextTheme ??
+      textTheme:
+          buttonTextTheme ??
           barTheme.buttonTextTheme ??
           ButtonTextTheme.primary,
       minWidth: buttonMinWidth ?? barTheme.buttonMinWidth ?? 36.0,
       height: buttonHeight ?? barTheme.buttonHeight ?? 64.0,
-      padding: buttonPadding ??
+      padding:
+          buttonPadding ??
           barTheme.buttonPadding ??
           const EdgeInsets.symmetric(vertical: 8.0),
       alignedDropdown: false,
-      layoutBehavior: layoutBehavior ??
+      layoutBehavior:
+          layoutBehavior ??
           barTheme.layoutBehavior ??
           ButtonBarLayoutBehavior.padded,
     );
@@ -127,7 +130,9 @@ class _ButtonBarColumn extends Flex {
 
   @override
   void updateRenderObject(
-      BuildContext context, covariant _RenderButtonBarColumn renderObject) {
+    BuildContext context,
+    covariant _RenderButtonBarColumn renderObject,
+  ) {
     renderObject
       ..direction = direction
       ..mainAxisAlignment = mainAxisAlignment
@@ -176,8 +181,10 @@ class _RenderButtonBarColumn extends RenderFlex {
             childParentData.offset = Offset(midpoint, currentWidth);
             break;
           case MainAxisAlignment.end:
-            childParentData.offset =
-                Offset(constraints.maxHeight - child.size.height, currentWidth);
+            childParentData.offset = Offset(
+              constraints.maxHeight - child.size.height,
+              currentWidth,
+            );
             break;
           default:
             childParentData.offset = Offset(0, currentWidth);

@@ -14,9 +14,7 @@ class _TextPainterDemoState extends State<TextPainterDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('MongolTextPainter'),
-      ),
+      appBar: AppBar(title: const Text('MongolTextPainter')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Column(
@@ -34,7 +32,8 @@ class _TextPainterDemoState extends State<TextPainterDemo> {
                 ),
                 IconButton(
                   onPressed: () {
-                    _controller.text = 'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ 👨‍👩‍👧 ᠭᠣᠷᠪᠠ '
+                    _controller.text =
+                        'ᠨᠢᠭᠡ ᠬᠣᠶᠠᠷ 👨‍👩‍👧 ᠭᠣᠷᠪᠠ '
                         'ᠳᠥᠷᠪᠡ ᠲᠠᠪᠤ ᠵᠢᠷᠭᠤᠭ᠎ᠠ ᠳᠣᠯᠣᠭ᠎ᠠ 四五六 ᠨᠠᠢᠮᠠ ᠶᠢᠰᠦ ᠠᠷᠪᠠ';
 
                     setState(() {});
@@ -47,16 +46,14 @@ class _TextPainterDemoState extends State<TextPainterDemo> {
             Row(
               children: [
                 Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(),
-                  ),
+                  decoration: BoxDecoration(border: Border.all()),
                   child: CustomPaint(
                     size: const Size(100, 300),
                     painter: MyPainter(text: _controller.text),
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -65,10 +62,7 @@ class _TextPainterDemoState extends State<TextPainterDemo> {
 }
 
 class MyPainter extends CustomPainter {
-  const MyPainter({
-    required this.text,
-    super.repaint,
-  });
+  const MyPainter({required this.text, super.repaint});
   final String text;
 
   @override
@@ -78,17 +72,9 @@ class MyPainter extends CustomPainter {
       fontSize: 30,
       fontFamily: 'MenksoftQagan',
     );
-    final textSpan = TextSpan(
-      text: text,
-      style: textStyle,
-    );
-    final textPainter = MongolTextPainter(
-      text: textSpan,
-    );
-    textPainter.layout(
-      minHeight: 0,
-      maxHeight: size.height,
-    );
+    final textSpan = TextSpan(text: text, style: textStyle);
+    final textPainter = MongolTextPainter(text: textSpan);
+    textPainter.layout(minHeight: 0, maxHeight: size.height);
     textPainter.paint(canvas, Offset.zero);
 
     final rectPaint = Paint()

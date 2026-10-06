@@ -27,122 +27,207 @@ class MongolTextEditingShortcuts extends StatelessWidget {
 
   static final Map<ShortcutActivator, Intent> _selectionPageShortcuts =
       <ShortcutActivator, Intent>{
-    const SingleActivator(LogicalKeyboardKey.pageUp, shift: true):
-        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
-      forward: false,
-      collapseSelection: false,
-    ),
-    const SingleActivator(LogicalKeyboardKey.pageDown, shift: true):
-        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
-      forward: true,
-      collapseSelection: false,
-    ),
-  };
+        const SingleActivator(
+          LogicalKeyboardKey.pageUp,
+          shift: true,
+        ): const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.pageDown,
+          shift: true,
+        ): const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
+      };
 
   static final Map<ShortcutActivator, Intent> _commonPageShortcuts =
       <ShortcutActivator, Intent>{
-    const SingleActivator(LogicalKeyboardKey.pageUp):
-        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
-      forward: false,
-      collapseSelection: true,
-    ),
-    const SingleActivator(LogicalKeyboardKey.pageDown):
-        const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
-      forward: true,
-      collapseSelection: true,
-    ),
-    ..._selectionPageShortcuts,
-  };
+        const SingleActivator(
+          LogicalKeyboardKey.pageUp,
+        ): const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.pageDown,
+        ): const MongolExtendSelectionHorizontallyToAdjacentPageIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
+        ..._selectionPageShortcuts,
+      };
 
   static final Map<ShortcutActivator, Intent> _macPageShortcuts =
       <ShortcutActivator, Intent>{
-    const SingleActivator(LogicalKeyboardKey.pageUp): const ScrollIntent(
-      direction: AxisDirection.left,
-      type: ScrollIncrementType.page,
-    ),
-    const SingleActivator(LogicalKeyboardKey.pageDown): const ScrollIntent(
-      direction: AxisDirection.right,
-      type: ScrollIncrementType.page,
-    ),
-    ..._selectionPageShortcuts,
-  };
+        const SingleActivator(LogicalKeyboardKey.pageUp): const ScrollIntent(
+          direction: AxisDirection.left,
+          type: ScrollIncrementType.page,
+        ),
+        const SingleActivator(LogicalKeyboardKey.pageDown): const ScrollIntent(
+          direction: AxisDirection.right,
+          type: ScrollIncrementType.page,
+        ),
+        ..._selectionPageShortcuts,
+      };
 
   // These shortcuts are shared between most platforms except macOS, which
   // uses different modifier keys for the line/word modifier.
   static final Map<ShortcutActivator, Intent> _commonShortcuts =
       <ShortcutActivator, Intent>{
-    ..._commonPageShortcuts,
-    // Arrow: Move Selection.
-    const SingleActivator(LogicalKeyboardKey.arrowUp):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowDown):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: true, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowRight):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: true, collapseSelection: true),
+        ..._commonPageShortcuts,
+        // Arrow: Move Selection.
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
 
-    // Shift + Arrow: Extend Selection.
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: true, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, shift: true):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: true, collapseSelection: false),
+        // Shift + Arrow: Extend Selection.
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          shift: true,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          shift: true,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          shift: true,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          shift: true,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: true, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: true, collapseSelection: true),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          alt: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          alt: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: true, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowRight,
-            shift: true, alt: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: true, collapseSelection: false),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp, control: true):
-        const MongolExtendSelectionToNextWordBoundaryIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, control: true):
-        const MongolExtendSelectionToNextWordBoundaryIntent(
-            forward: true, collapseSelection: true),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          control: true,
+        ): const MongolExtendSelectionToNextWordBoundaryIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          control: true,
+        ): const MongolExtendSelectionToNextWordBoundaryIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp,
-            shift: true, control: true):
-        const MongolExtendSelectionToNextWordBoundaryIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowDown,
-            shift: true, control: true):
-        const MongolExtendSelectionToNextWordBoundaryIntent(
-            forward: true, collapseSelection: false),
-  };
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          shift: true,
+          control: true,
+        ): const MongolExtendSelectionToNextWordBoundaryIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          shift: true,
+          control: true,
+        ): const MongolExtendSelectionToNextWordBoundaryIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
+      };
 
   // The following key combinations have no effect on text editing on this
   // platform:
@@ -175,88 +260,184 @@ class MongolTextEditingShortcuts extends StatelessWidget {
   // platforms.
   static final Map<ShortcutActivator, Intent> _macShortcuts =
       <ShortcutActivator, Intent>{
-    ..._macPageShortcuts,
-    const SingleActivator(LogicalKeyboardKey.arrowUp):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowDown):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: true, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowRight):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: true, collapseSelection: true),
+        ..._macPageShortcuts,
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
 
-    // Shift + Arrow: Extend Selection.
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true):
-        const MongolExtendSelectionByCharacterIntent(
-            forward: true, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, shift: true):
-        const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-            forward: true, collapseSelection: false),
+        // Shift + Arrow: Extend Selection.
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          shift: true,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          shift: true,
+        ): const MongolExtendSelectionByCharacterIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          shift: true,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          shift: true,
+        ): const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp, alt: true):
-        const MongolExtendSelectionToNextWordBoundaryIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, alt: true):
-        const MongolExtendSelectionToNextWordBoundaryIntent(
-            forward: true, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: true, collapseSelection: true),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          alt: true,
+        ): const MongolExtendSelectionToNextWordBoundaryIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          alt: true,
+        ): const MongolExtendSelectionToNextWordBoundaryIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, alt: true):
-        const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
-            forward: false),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, shift: true, alt: true):
-        const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
-            forward: true),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, shift: true, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: false, collapseSelection: false, collapseAtReversal: true),
-    const SingleActivator(LogicalKeyboardKey.arrowRight,
-            shift: true, alt: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: true, collapseSelection: false, collapseAtReversal: true),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
+          forward: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
+          forward: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: false,
+          collapseSelection: false,
+          collapseAtReversal: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          shift: true,
+          alt: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: true,
+          collapseSelection: false,
+          collapseAtReversal: true,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp, meta: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowDown, meta: true):
-        const MongolExtendSelectionToLineBreakIntent(
-            forward: true, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft, meta: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: false, collapseSelection: true),
-    const SingleActivator(LogicalKeyboardKey.arrowRight, meta: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: true, collapseSelection: true),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          meta: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          meta: true,
+        ): const MongolExtendSelectionToLineBreakIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          meta: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: false,
+          collapseSelection: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          meta: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: true,
+          collapseSelection: true,
+        ),
 
-    const SingleActivator(LogicalKeyboardKey.arrowUp, shift: true, meta: true):
-        const MongolExpandSelectionToLineBreakIntent(forward: false),
-    const SingleActivator(LogicalKeyboardKey.arrowDown,
-            shift: true, meta: true):
-        const MongolExpandSelectionToLineBreakIntent(forward: true),
-    const SingleActivator(LogicalKeyboardKey.arrowLeft,
-            shift: true, meta: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: false, collapseSelection: false),
-    const SingleActivator(LogicalKeyboardKey.arrowRight,
-            shift: true, meta: true):
-        const MongolExtendSelectionToDocumentBoundaryIntent(
-            forward: true, collapseSelection: false),
-  };
+        const SingleActivator(
+          LogicalKeyboardKey.arrowUp,
+          shift: true,
+          meta: true,
+        ): const MongolExpandSelectionToLineBreakIntent(
+          forward: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowDown,
+          shift: true,
+          meta: true,
+        ): const MongolExpandSelectionToLineBreakIntent(
+          forward: true,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowLeft,
+          shift: true,
+          meta: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: false,
+          collapseSelection: false,
+        ),
+        const SingleActivator(
+          LogicalKeyboardKey.arrowRight,
+          shift: true,
+          meta: true,
+        ): const MongolExtendSelectionToDocumentBoundaryIntent(
+          forward: true,
+          collapseSelection: false,
+        ),
+      };
 
   // There is no complete documentation of iOS shortcuts. Use mac shortcuts for
   // now.
@@ -285,8 +466,9 @@ class MongolTextEditingShortcuts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Shortcuts(
-        debugLabel: '<Mongol Text Editing Shortcuts>',
-        shortcuts: shortcuts,
-        child: child ?? const SizedBox.shrink());
+      debugLabel: '<Mongol Text Editing Shortcuts>',
+      shortcuts: shortcuts,
+      child: child ?? const SizedBox.shrink(),
+    );
   }
 }

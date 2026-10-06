@@ -31,6 +31,7 @@ import 'package:material_ui/material_ui.dart'
         kThemeChangeDuration;
 import 'package:flutter/widgets.dart';
 import 'package:flutter/rendering.dart';
+
 import 'mongol_checkbox_list_tile.dart';
 import 'mongol_radio_list_tile.dart';
 import 'mongol_switch_list_tile.dart';
@@ -206,7 +207,10 @@ class MongolListTileThemeData with Diagnosticable {
 
   /// Linearly interpolate between MongolListTileThemeData objects.
   static MongolListTileThemeData? lerp(
-      MongolListTileThemeData? a, MongolListTileThemeData? b, double t) {
+    MongolListTileThemeData? a,
+    MongolListTileThemeData? b,
+    double t,
+  ) {
     if (identical(a, b)) {
       return a;
     }
@@ -218,18 +222,33 @@ class MongolListTileThemeData with Diagnosticable {
       iconColor: Color.lerp(a?.iconColor, b?.iconColor, t),
       textColor: Color.lerp(a?.textColor, b?.textColor, t),
       titleTextStyle: TextStyle.lerp(a?.titleTextStyle, b?.titleTextStyle, t),
-      subtitleTextStyle:
-          TextStyle.lerp(a?.subtitleTextStyle, b?.subtitleTextStyle, t),
+      subtitleTextStyle: TextStyle.lerp(
+        a?.subtitleTextStyle,
+        b?.subtitleTextStyle,
+        t,
+      ),
       leadingAndTrailingTextStyle: TextStyle.lerp(
-          a?.leadingAndTrailingTextStyle, b?.leadingAndTrailingTextStyle, t),
-      contentPadding:
-          EdgeInsetsGeometry.lerp(a?.contentPadding, b?.contentPadding, t),
+        a?.leadingAndTrailingTextStyle,
+        b?.leadingAndTrailingTextStyle,
+        t,
+      ),
+      contentPadding: EdgeInsetsGeometry.lerp(
+        a?.contentPadding,
+        b?.contentPadding,
+        t,
+      ),
       tileColor: Color.lerp(a?.tileColor, b?.tileColor, t),
-      selectedTileColor:
-          Color.lerp(a?.selectedTileColor, b?.selectedTileColor, t),
+      selectedTileColor: Color.lerp(
+        a?.selectedTileColor,
+        b?.selectedTileColor,
+        t,
+      ),
       verticalTitleGap: lerpDouble(a?.verticalTitleGap, b?.verticalTitleGap, t),
-      minHorizontalPadding:
-          lerpDouble(a?.minHorizontalPadding, b?.minHorizontalPadding, t),
+      minHorizontalPadding: lerpDouble(
+        a?.minHorizontalPadding,
+        b?.minHorizontalPadding,
+        t,
+      ),
       minLeadingHeight: lerpDouble(a?.minLeadingHeight, b?.minLeadingHeight, t),
       enableFeedback: t < 0.5 ? a?.enableFeedback : b?.enableFeedback,
       mouseCursor: t < 0.5 ? a?.mouseCursor : b?.mouseCursor,
@@ -240,26 +259,26 @@ class MongolListTileThemeData with Diagnosticable {
 
   @override
   int get hashCode => Object.hash(
-        dense,
-        shape,
-        style,
-        selectedColor,
-        iconColor,
-        textColor,
-        titleTextStyle,
-        subtitleTextStyle,
-        leadingAndTrailingTextStyle,
-        contentPadding,
-        tileColor,
-        selectedTileColor,
-        verticalTitleGap,
-        minHorizontalPadding,
-        minLeadingHeight,
-        enableFeedback,
-        mouseCursor,
-        visualDensity,
-        titleAlignment,
-      );
+    dense,
+    shape,
+    style,
+    selectedColor,
+    iconColor,
+    textColor,
+    titleTextStyle,
+    subtitleTextStyle,
+    leadingAndTrailingTextStyle,
+    contentPadding,
+    tileColor,
+    selectedTileColor,
+    verticalTitleGap,
+    minHorizontalPadding,
+    minLeadingHeight,
+    enableFeedback,
+    mouseCursor,
+    visualDensity,
+    titleAlignment,
+  );
 
   @override
   bool operator ==(Object other) {
@@ -294,48 +313,93 @@ class MongolListTileThemeData with Diagnosticable {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(DiagnosticsProperty<bool>('dense', dense, defaultValue: null));
     properties.add(
-        DiagnosticsProperty<ShapeBorder>('shape', shape, defaultValue: null));
-    properties
-        .add(EnumProperty<ListTileStyle>('style', style, defaultValue: null));
-    properties
-        .add(ColorProperty('selectedColor', selectedColor, defaultValue: null));
+      DiagnosticsProperty<bool>('dense', dense, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<ShapeBorder>('shape', shape, defaultValue: null),
+    );
+    properties.add(
+      EnumProperty<ListTileStyle>('style', style, defaultValue: null),
+    );
+    properties.add(
+      ColorProperty('selectedColor', selectedColor, defaultValue: null),
+    );
     properties.add(ColorProperty('iconColor', iconColor, defaultValue: null));
     properties.add(ColorProperty('textColor', textColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<TextStyle>(
-        'titleTextStyle', titleTextStyle,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<TextStyle>(
-        'subtitleTextStyle', subtitleTextStyle,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<TextStyle>(
-        'leadingAndTrailingTextStyle', leadingAndTrailingTextStyle,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>(
-        'contentPadding', contentPadding,
-        defaultValue: null));
+    properties.add(
+      DiagnosticsProperty<TextStyle>(
+        'titleTextStyle',
+        titleTextStyle,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextStyle>(
+        'subtitleTextStyle',
+        subtitleTextStyle,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextStyle>(
+        'leadingAndTrailingTextStyle',
+        leadingAndTrailingTextStyle,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<EdgeInsetsGeometry>(
+        'contentPadding',
+        contentPadding,
+        defaultValue: null,
+      ),
+    );
     properties.add(ColorProperty('tileColor', tileColor, defaultValue: null));
-    properties.add(ColorProperty('selectedTileColor', selectedTileColor,
-        defaultValue: null));
-    properties.add(DoubleProperty('verticalTitleGap', verticalTitleGap,
-        defaultValue: null));
-    properties.add(DoubleProperty('minHorizontalPadding', minHorizontalPadding,
-        defaultValue: null));
-    properties.add(DoubleProperty('minLeadingHeight', minLeadingHeight,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<bool>('enableFeedback', enableFeedback,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<WidgetStateProperty<MouseCursor?>>(
-        'mouseCursor', mouseCursor,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<VisualDensity>(
-        'visualDensity', visualDensity,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<MongolListTileTitleAlignment>(
-        'titleAlignment', titleAlignment,
-        defaultValue: null));
+    properties.add(
+      ColorProperty('selectedTileColor', selectedTileColor, defaultValue: null),
+    );
+    properties.add(
+      DoubleProperty('verticalTitleGap', verticalTitleGap, defaultValue: null),
+    );
+    properties.add(
+      DoubleProperty(
+        'minHorizontalPadding',
+        minHorizontalPadding,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DoubleProperty('minLeadingHeight', minLeadingHeight, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>(
+        'enableFeedback',
+        enableFeedback,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<WidgetStateProperty<MouseCursor?>>(
+        'mouseCursor',
+        mouseCursor,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<VisualDensity>(
+        'visualDensity',
+        visualDensity,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<MongolListTileTitleAlignment>(
+        'titleAlignment',
+        titleAlignment,
+        defaultValue: null,
+      ),
+    );
   }
 }
 
@@ -371,33 +435,35 @@ class MongolListTileTheme extends InheritedTheme {
     double? minHorizontalPadding,
     double? minLeadingHeight,
     required super.child,
-  })  : assert(data == null ||
-            (shape ??
-                    selectedColor ??
-                    iconColor ??
-                    textColor ??
-                    contentPadding ??
-                    tileColor ??
-                    selectedTileColor ??
-                    enableFeedback ??
-                    mouseCursor ??
-                    verticalTitleGap ??
-                    minHorizontalPadding ??
-                    minLeadingHeight) ==
-                null),
-        _data = data,
-        _shape = shape,
-        _selectedColor = selectedColor,
-        _iconColor = iconColor,
-        _textColor = textColor,
-        _contentPadding = contentPadding,
-        _tileColor = tileColor,
-        _selectedTileColor = selectedTileColor,
-        _enableFeedback = enableFeedback,
-        _mouseCursor = mouseCursor,
-        _verticalTitleGap = verticalTitleGap,
-        _minHorizontalPadding = minHorizontalPadding,
-        _minLeadingHeight = minLeadingHeight;
+  }) : assert(
+         data == null ||
+             (shape ??
+                     selectedColor ??
+                     iconColor ??
+                     textColor ??
+                     contentPadding ??
+                     tileColor ??
+                     selectedTileColor ??
+                     enableFeedback ??
+                     mouseCursor ??
+                     verticalTitleGap ??
+                     minHorizontalPadding ??
+                     minLeadingHeight) ==
+                 null,
+       ),
+       _data = data,
+       _shape = shape,
+       _selectedColor = selectedColor,
+       _iconColor = iconColor,
+       _textColor = textColor,
+       _contentPadding = contentPadding,
+       _tileColor = tileColor,
+       _selectedTileColor = selectedTileColor,
+       _enableFeedback = enableFeedback,
+       _mouseCursor = mouseCursor,
+       _verticalTitleGap = verticalTitleGap,
+       _minHorizontalPadding = minHorizontalPadding,
+       _minLeadingHeight = minLeadingHeight;
 
   final MongolListTileThemeData? _data;
   final bool? _dense;
@@ -533,8 +599,8 @@ class MongolListTileTheme extends InheritedTheme {
   /// MongolListTileThemeData theme = MongolListTileTheme.of(context);
   /// ```
   static MongolListTileThemeData of(BuildContext context) {
-    final MongolListTileTheme? result =
-        context.dependOnInheritedWidgetOfExactType<MongolListTileTheme>();
+    final MongolListTileTheme? result = context
+        .dependOnInheritedWidgetOfExactType<MongolListTileTheme>();
     return result?.data ?? const MongolListTileThemeData();
   }
 
@@ -577,7 +643,8 @@ class MongolListTileTheme extends InheritedTheme {
             textColor: textColor ?? parent.textColor,
             titleTextStyle: titleTextStyle ?? parent.titleTextStyle,
             subtitleTextStyle: subtitleTextStyle ?? parent.subtitleTextStyle,
-            leadingAndTrailingTextStyle: leadingAndTrailingTextStyle ??
+            leadingAndTrailingTextStyle:
+                leadingAndTrailingTextStyle ??
                 parent.leadingAndTrailingTextStyle,
             contentPadding: contentPadding ?? parent.contentPadding,
             tileColor: tileColor ?? parent.tileColor,
@@ -1180,10 +1247,11 @@ class MongolListTile extends StatelessWidget {
   ///
   ///  * [VerticalDivider], which you can use to obtain this effect manually.
   /// todo material make it equal to ListTile.divideTiles
-  static Iterable<Widget> divideTiles(
-      {BuildContext? context,
-      required Iterable<Widget> tiles,
-      Color? color}) sync* {
+  static Iterable<Widget> divideTiles({
+    BuildContext? context,
+    required Iterable<Widget> tiles,
+    Color? color,
+  }) sync* {
     assert(color != null || context != null);
 
     final Iterator<Widget> iterator = tiles.iterator;
@@ -1191,9 +1259,7 @@ class MongolListTile extends StatelessWidget {
     if (!hasNext) return;
 
     final Decoration decoration = BoxDecoration(
-      border: Border(
-        right: Divider.createBorderSide(context, color: color),
-      ),
+      border: Border(right: Divider.createBorderSide(context, color: color)),
     );
 
     Widget tile = iterator.current;
@@ -1212,12 +1278,15 @@ class MongolListTile extends StatelessWidget {
     return dense ?? tileTheme?.dense ?? theme.listTileTheme.dense ?? false;
   }
 
-  Color _tileBackgroundColor(ThemeData theme, MongolListTileThemeData tileTheme,
-      MongolListTileThemeData defaults) {
+  Color _tileBackgroundColor(
+    ThemeData theme,
+    MongolListTileThemeData tileTheme,
+    MongolListTileThemeData defaults,
+  ) {
     final Color? color = selected
         ? selectedTileColor ??
-            tileTheme.selectedTileColor ??
-            theme.listTileTheme.selectedTileColor
+              tileTheme.selectedTileColor ??
+              theme.listTileTheme.selectedTileColor
         : tileColor ?? tileTheme.tileColor ?? theme.listTileTheme.tileColor;
     return color ?? defaults.tileColor!;
   }
@@ -1227,7 +1296,8 @@ class MongolListTile extends StatelessWidget {
     assert(debugCheckHasMaterial(context));
     final ThemeData theme = Theme.of(context);
     final MongolListTileThemeData tileTheme = MongolListTileTheme.of(context);
-    final ListTileStyle listTileStyle = style ??
+    final ListTileStyle listTileStyle =
+        style ??
         tileTheme.style ??
         theme.listTileTheme.style ??
         ListTileStyle.list;
@@ -1240,8 +1310,11 @@ class MongolListTile extends StatelessWidget {
     };
 
     Color? resolveColor(
-        Color? explicitColor, Color? selectedColor, Color? enabledColor,
-        [Color? disabledColor]) {
+      Color? explicitColor,
+      Color? selectedColor,
+      Color? enabledColor, [
+      Color? disabledColor,
+    ]) {
       return _IndividualOverrides(
         explicitColor: explicitColor,
         selectedColor: selectedColor,
@@ -1252,38 +1325,57 @@ class MongolListTile extends StatelessWidget {
 
     final Color? effectiveIconColor =
         resolveColor(iconColor, selectedColor, iconColor) ??
-            resolveColor(tileTheme.iconColor, tileTheme.selectedColor,
-                tileTheme.iconColor) ??
-            resolveColor(
-                theme.listTileTheme.iconColor,
-                theme.listTileTheme.selectedColor,
-                theme.listTileTheme.iconColor) ??
-            resolveColor(defaults.iconColor, defaults.selectedColor,
-                defaults.iconColor, theme.disabledColor);
+        resolveColor(
+          tileTheme.iconColor,
+          tileTheme.selectedColor,
+          tileTheme.iconColor,
+        ) ??
+        resolveColor(
+          theme.listTileTheme.iconColor,
+          theme.listTileTheme.selectedColor,
+          theme.listTileTheme.iconColor,
+        ) ??
+        resolveColor(
+          defaults.iconColor,
+          defaults.selectedColor,
+          defaults.iconColor,
+          theme.disabledColor,
+        );
     final Color? effectiveColor =
         resolveColor(textColor, selectedColor, textColor) ??
-            resolveColor(tileTheme.textColor, tileTheme.selectedColor,
-                tileTheme.textColor) ??
-            resolveColor(
-                theme.listTileTheme.textColor,
-                theme.listTileTheme.selectedColor,
-                theme.listTileTheme.textColor) ??
-            resolveColor(defaults.textColor, defaults.selectedColor,
-                defaults.textColor, theme.disabledColor);
-    final IconThemeData iconThemeData =
-        IconThemeData(color: effectiveIconColor);
+        resolveColor(
+          tileTheme.textColor,
+          tileTheme.selectedColor,
+          tileTheme.textColor,
+        ) ??
+        resolveColor(
+          theme.listTileTheme.textColor,
+          theme.listTileTheme.selectedColor,
+          theme.listTileTheme.textColor,
+        ) ??
+        resolveColor(
+          defaults.textColor,
+          defaults.selectedColor,
+          defaults.textColor,
+          theme.disabledColor,
+        );
+    final IconThemeData iconThemeData = IconThemeData(
+      color: effectiveIconColor,
+    );
     final IconButtonThemeData iconButtonThemeData = IconButtonThemeData(
       style: IconButton.styleFrom(foregroundColor: effectiveIconColor),
     );
 
     TextStyle? leadingAndTrailingStyle;
     if (leading != null || trailing != null) {
-      leadingAndTrailingStyle = leadingAndTrailingTextStyle ??
+      leadingAndTrailingStyle =
+          leadingAndTrailingTextStyle ??
           tileTheme.leadingAndTrailingTextStyle ??
           defaults.leadingAndTrailingTextStyle!;
       final Color? leadingAndTrailingTextColor = effectiveColor;
-      leadingAndTrailingStyle =
-          leadingAndTrailingStyle.copyWith(color: leadingAndTrailingTextColor);
+      leadingAndTrailingStyle = leadingAndTrailingStyle.copyWith(
+        color: leadingAndTrailingTextColor,
+      );
     }
 
     Widget? leadingIcon;
@@ -1311,7 +1403,8 @@ class MongolListTile extends StatelessWidget {
     Widget? subtitleText;
     TextStyle? subtitleStyle;
     if (subtitle != null) {
-      subtitleStyle = subtitleTextStyle ??
+      subtitleStyle =
+          subtitleTextStyle ??
           tileTheme.subtitleTextStyle ??
           defaults.subtitleTextStyle!;
       final Color? subtitleColor = effectiveColor;
@@ -1335,13 +1428,14 @@ class MongolListTile extends StatelessWidget {
       );
     }
 
-    const EdgeInsets defaultContentPadding =
-        EdgeInsets.symmetric(vertical: 16.0);
+    const EdgeInsets defaultContentPadding = EdgeInsets.symmetric(
+      vertical: 16.0,
+    );
     const TextDirection textDirection = TextDirection.ltr;
     final EdgeInsets resolvedContentPadding =
         contentPadding?.resolve(textDirection) ??
-            tileTheme.contentPadding?.resolve(textDirection) ??
-            defaultContentPadding;
+        tileTheme.contentPadding?.resolve(textDirection) ??
+        defaultContentPadding;
 
     // Show basic cursor when MongolListTile isn't enabled or gesture callbacks are null.
     final Set<WidgetState> mouseStates = <WidgetState>{
@@ -1350,15 +1444,15 @@ class MongolListTile extends StatelessWidget {
     };
     final MouseCursor effectiveMouseCursor =
         WidgetStateProperty.resolveAs<MouseCursor?>(mouseCursor, mouseStates) ??
-            tileTheme.mouseCursor?.resolve(mouseStates) ??
-            WidgetStateMouseCursor.clickable.resolve(mouseStates);
+        tileTheme.mouseCursor?.resolve(mouseStates) ??
+        WidgetStateMouseCursor.clickable.resolve(mouseStates);
 
     final MongolListTileTitleAlignment effectiveTitleAlignment =
         titleAlignment ??
-            tileTheme.titleAlignment ??
-            (theme.useMaterial3
-                ? MongolListTileTitleAlignment.threeLine
-                : MongolListTileTitleAlignment.titleWidth);
+        tileTheme.titleAlignment ??
+        (theme.useMaterial3
+            ? MongolListTileTitleAlignment.threeLine
+            : MongolListTileTitleAlignment.titleWidth);
 
     return InkWell(
       customBorder: shape ?? tileTheme.shape,
@@ -1395,20 +1489,25 @@ class MongolListTile extends StatelessWidget {
                   subtitle: subtitleText,
                   trailing: trailingIcon,
                   isDense: _isDenseLayout(theme, tileTheme),
-                  visualDensity: visualDensity ??
+                  visualDensity:
+                      visualDensity ??
                       tileTheme.visualDensity ??
                       theme.visualDensity,
                   isThreeLine: isThreeLine,
-                  titleBaselineType: titleStyle.textBaseline ??
+                  titleBaselineType:
+                      titleStyle.textBaseline ??
                       defaults.titleTextStyle!.textBaseline!,
-                  subtitleBaselineType: subtitleStyle?.textBaseline ??
+                  subtitleBaselineType:
+                      subtitleStyle?.textBaseline ??
                       defaults.subtitleTextStyle!.textBaseline!,
                   verticalTitleGap:
                       verticalTitleGap ?? tileTheme.verticalTitleGap ?? 16,
-                  minHorizontalPadding: minHorizontalPadding ??
+                  minHorizontalPadding:
+                      minHorizontalPadding ??
                       tileTheme.minHorizontalPadding ??
                       defaults.minHorizontalPadding!,
-                  minLeadingHeight: minLeadingHeight ??
+                  minLeadingHeight:
+                      minLeadingHeight ??
                       tileTheme.minLeadingHeight ??
                       defaults.minLeadingHeight!,
                   titleAlignment: effectiveTitleAlignment,
@@ -1425,89 +1524,175 @@ class MongolListTile extends StatelessWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(
-        DiagnosticsProperty<Widget>('leading', leading, defaultValue: null));
-    properties
-        .add(DiagnosticsProperty<Widget>('title', title, defaultValue: null));
+      DiagnosticsProperty<Widget>('leading', leading, defaultValue: null),
+    );
     properties.add(
-        DiagnosticsProperty<Widget>('subtitle', subtitle, defaultValue: null));
+      DiagnosticsProperty<Widget>('title', title, defaultValue: null),
+    );
     properties.add(
-        DiagnosticsProperty<Widget>('trailing', trailing, defaultValue: null));
-    properties.add(FlagProperty('isThreeLine',
+      DiagnosticsProperty<Widget>('subtitle', subtitle, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<Widget>('trailing', trailing, defaultValue: null),
+    );
+    properties.add(
+      FlagProperty(
+        'isThreeLine',
         value: isThreeLine,
         ifTrue: 'THREE_LINE',
         ifFalse: 'TWO_LINE',
         showName: true,
-        defaultValue: false));
-    properties.add(FlagProperty('dense',
-        value: dense, ifTrue: 'true', ifFalse: 'false', showName: true));
-    properties.add(DiagnosticsProperty<VisualDensity>(
-        'visualDensity', visualDensity,
-        defaultValue: null));
+        defaultValue: false,
+      ),
+    );
     properties.add(
-        DiagnosticsProperty<ShapeBorder>('shape', shape, defaultValue: null));
+      FlagProperty(
+        'dense',
+        value: dense,
+        ifTrue: 'true',
+        ifFalse: 'false',
+        showName: true,
+      ),
+    );
     properties.add(
-        DiagnosticsProperty<ListTileStyle>('style', style, defaultValue: null));
-    properties
-        .add(ColorProperty('selectedColor', selectedColor, defaultValue: null));
+      DiagnosticsProperty<VisualDensity>(
+        'visualDensity',
+        visualDensity,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<ShapeBorder>('shape', shape, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<ListTileStyle>('style', style, defaultValue: null),
+    );
+    properties.add(
+      ColorProperty('selectedColor', selectedColor, defaultValue: null),
+    );
     properties.add(ColorProperty('iconColor', iconColor, defaultValue: null));
     properties.add(ColorProperty('textColor', textColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<TextStyle>(
-        'titleTextStyle', titleTextStyle,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<TextStyle>(
-        'subtitleTextStyle', subtitleTextStyle,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<TextStyle>(
-        'leadingAndTrailingTextStyle', leadingAndTrailingTextStyle,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>(
-        'contentPadding', contentPadding,
-        defaultValue: null));
-    properties.add(FlagProperty('enabled',
+    properties.add(
+      DiagnosticsProperty<TextStyle>(
+        'titleTextStyle',
+        titleTextStyle,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextStyle>(
+        'subtitleTextStyle',
+        subtitleTextStyle,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextStyle>(
+        'leadingAndTrailingTextStyle',
+        leadingAndTrailingTextStyle,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<EdgeInsetsGeometry>(
+        'contentPadding',
+        contentPadding,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      FlagProperty(
+        'enabled',
         value: enabled,
         ifTrue: 'true',
         ifFalse: 'false',
         showName: true,
-        defaultValue: true));
-    properties
-        .add(DiagnosticsProperty<Function>('onTap', onTap, defaultValue: null));
-    properties.add(DiagnosticsProperty<Function>('onLongPress', onLongPress,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<MouseCursor>('mouseCursor', mouseCursor,
-        defaultValue: null));
-    properties.add(FlagProperty('selected',
+        defaultValue: true,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<Function>('onTap', onTap, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<Function>(
+        'onLongPress',
+        onLongPress,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<MouseCursor>(
+        'mouseCursor',
+        mouseCursor,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      FlagProperty(
+        'selected',
         value: selected,
         ifTrue: 'true',
         ifFalse: 'false',
         showName: true,
-        defaultValue: false));
+        defaultValue: false,
+      ),
+    );
     properties.add(ColorProperty('focusColor', focusColor, defaultValue: null));
     properties.add(ColorProperty('hoverColor', hoverColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode,
-        defaultValue: null));
-    properties.add(FlagProperty('autofocus',
+    properties.add(
+      DiagnosticsProperty<FocusNode>(
+        'focusNode',
+        focusNode,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      FlagProperty(
+        'autofocus',
         value: autofocus,
         ifTrue: 'true',
         ifFalse: 'false',
         showName: true,
-        defaultValue: false));
+        defaultValue: false,
+      ),
+    );
     properties.add(ColorProperty('tileColor', tileColor, defaultValue: null));
-    properties.add(ColorProperty('selectedTileColor', selectedTileColor,
-        defaultValue: null));
-    properties.add(FlagProperty('enableFeedback',
+    properties.add(
+      ColorProperty('selectedTileColor', selectedTileColor, defaultValue: null),
+    );
+    properties.add(
+      FlagProperty(
+        'enableFeedback',
         value: enableFeedback,
         ifTrue: 'true',
         ifFalse: 'false',
-        showName: true));
-    properties.add(DoubleProperty('horizontalTitleGap', verticalTitleGap,
-        defaultValue: null));
-    properties.add(DoubleProperty('minVerticalPadding', minHorizontalPadding,
-        defaultValue: null));
-    properties.add(DoubleProperty('minLeadingWidth', minLeadingHeight,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<MongolListTileTitleAlignment>(
-        'titleAlignment', titleAlignment,
-        defaultValue: null));
+        showName: true,
+      ),
+    );
+    properties.add(
+      DoubleProperty(
+        'horizontalTitleGap',
+        verticalTitleGap,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DoubleProperty(
+        'minVerticalPadding',
+        minHorizontalPadding,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DoubleProperty('minLeadingWidth', minLeadingHeight, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<MongolListTileTitleAlignment>(
+        'titleAlignment',
+        titleAlignment,
+        defaultValue: null,
+      ),
+    );
   }
 }
 
@@ -1540,12 +1725,7 @@ class _IndividualOverrides extends WidgetStateProperty<Color?> {
 }
 
 // Identifies the children of a _MongolListTileElement.
-enum _ListTileSlot {
-  leading,
-  title,
-  subtitle,
-  trailing,
-}
+enum _ListTileSlot { leading, title, subtitle, trailing }
 
 class _MongolListTile
     extends SlottedMultiChildRenderObjectWidget<_ListTileSlot, RenderBox> {
@@ -1613,7 +1793,9 @@ class _MongolListTile
 
   @override
   void updateRenderObject(
-      BuildContext context, _MongolRenderListTile renderObject) {
+    BuildContext context,
+    _MongolRenderListTile renderObject,
+  ) {
     renderObject
       ..isThreeLine = isThreeLine
       ..isDense = isDense
@@ -1649,12 +1831,7 @@ class _MongolRenderListTile extends RenderBox
   // The returned list is ordered for hit testing.
   @override
   Iterable<RenderBox> get children {
-    return <RenderBox>[
-      ?leading,
-      ?title,
-      ?subtitle,
-      ?trailing,
-    ];
+    return <RenderBox>[?leading, ?title, ?subtitle, ?trailing];
   }
 
   bool get isDense => _isDense;
@@ -1749,7 +1926,7 @@ class _MongolRenderListTile extends RenderBox
   double computeMinIntrinsicHeight(double width) {
     final double leadingHeight = leading != null
         ? math.max(leading!.getMinIntrinsicHeight(width), _minLeadingHeight) +
-            _effectiveVerticalTitleGap
+              _effectiveVerticalTitleGap
         : 0.0;
     return leadingHeight +
         math.max(_minHeight(title, width), _minHeight(subtitle, width)) +
@@ -1760,7 +1937,7 @@ class _MongolRenderListTile extends RenderBox
   double computeMaxIntrinsicHeight(double width) {
     final double leadingHeight = leading != null
         ? math.max(leading!.getMaxIntrinsicHeight(width), _minLeadingHeight) +
-            _effectiveVerticalTitleGap
+              _effectiveVerticalTitleGap
         : 0.0;
     return leadingHeight +
         math.max(_maxHeight(title, width), _maxHeight(subtitle, width)) +
@@ -1816,10 +1993,11 @@ class _MongolRenderListTile extends RenderBox
 
   @override
   Size computeDryLayout(BoxConstraints constraints) {
-    assert(debugCannotComputeDryLayout(
-      reason:
-          'Layout requires baseline metrics, which are only available after a full layout.',
-    ));
+    assert(
+      debugCannotComputeDryLayout(
+        reason: 'Layout requires baseline metrics, which are only available after a full layout.',
+      ),
+    );
     return Size.zero;
   }
 
@@ -1844,8 +2022,9 @@ class _MongolRenderListTile extends RenderBox
       maxWidth: (isDense ? 48.0 : 56.0) + densityAdjustment.dx,
     );
     final BoxConstraints looseConstraints = constraints.loosen();
-    final BoxConstraints iconConstraints =
-        looseConstraints.enforce(maxIconWidthConstraint);
+    final BoxConstraints iconConstraints = looseConstraints.enforce(
+      maxIconWidthConstraint,
+    );
 
     final double tileHeight = looseConstraints.maxHeight;
     final Size leadingSize = _layoutBox(leading, iconConstraints);
@@ -1865,13 +2044,14 @@ class _MongolRenderListTile extends RenderBox
 
     final double titleStart = hasLeading
         ? math.max(_minLeadingHeight, leadingSize.height) +
-            _effectiveVerticalTitleGap
+              _effectiveVerticalTitleGap
         : 0.0;
     final double adjustedLeadingHeight = hasLeading
         ? math.max(leadingSize.height + _effectiveVerticalTitleGap, 32.0)
         : 0.0;
-    final double adjustedTrailingHeight =
-        hasTrailing ? math.max(trailingSize.height, 32.0) : 0.0;
+    final double adjustedTrailingHeight = hasTrailing
+        ? math.max(trailingSize.height, 32.0)
+        : 0.0;
     final BoxConstraints textConstraints = looseConstraints.tighten(
       height: tileHeight - titleStart - adjustedTrailingHeight,
     );
@@ -1897,12 +2077,15 @@ class _MongolRenderListTile extends RenderBox
     double? subtitleX;
     if (!hasSubtitle) {
       tileWidth = math.max(
-          defaultTileWidth, titleSize.width + 2.0 * _minHorizontalPadding);
+        defaultTileWidth,
+        titleSize.width + 2.0 * _minHorizontalPadding,
+      );
       titleX = (tileWidth - titleSize.width) / 2.0;
     } else {
       assert(subtitleBaselineType != null);
       titleX = titleBaseline! - _boxBaseline(title!, titleBaselineType)!;
-      subtitleX = subtitleBaseline! -
+      subtitleX =
+          subtitleBaseline! -
           _boxBaseline(subtitle!, subtitleBaselineType!)! +
           visualDensity.horizontal * 2.0;
       tileWidth = defaultTileWidth;
@@ -1993,7 +2176,9 @@ class _MongolRenderListTile extends RenderBox
     }
     if (hasTrailing) {
       _positionBox(
-          trailing!, Offset(trailingX, tileHeight - trailingSize.height));
+        trailing!,
+        Offset(trailingX, tileHeight - trailingSize.height),
+      );
     }
 
     size = constraints.constrain(Size(tileWidth, tileHeight));
@@ -2039,13 +2224,13 @@ class _MongolRenderListTile extends RenderBox
 
 class _LisTileDefaultsM2 extends MongolListTileThemeData {
   _LisTileDefaultsM2(this.context, ListTileStyle style)
-      : super(
-          contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
-          minLeadingHeight: 40,
-          minHorizontalPadding: 4,
-          shape: const Border(),
-          style: style,
-        );
+    : super(
+        contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+        minLeadingHeight: 40,
+        minHorizontalPadding: 4,
+        shape: const Border(),
+        style: style,
+      );
 
   final BuildContext context;
   late final ThemeData _theme = Theme.of(context);
@@ -2096,13 +2281,15 @@ class _LisTileDefaultsM2 extends MongolListTileThemeData {
 
 class _LisTileDefaultsM3 extends MongolListTileThemeData {
   _LisTileDefaultsM3(this.context)
-      : super(
-          contentPadding:
-              const EdgeInsetsDirectional.only(top: 16.0, bottom: 24.0),
-          minLeadingHeight: 24,
-          minHorizontalPadding: 8,
-          shape: const RoundedRectangleBorder(),
-        );
+    : super(
+        contentPadding: const EdgeInsetsDirectional.only(
+          top: 16.0,
+          bottom: 24.0,
+        ),
+        minLeadingHeight: 24,
+        minHorizontalPadding: 8,
+        shape: const RoundedRectangleBorder(),
+      );
 
   final BuildContext context;
   late final ThemeData _theme = Theme.of(context);

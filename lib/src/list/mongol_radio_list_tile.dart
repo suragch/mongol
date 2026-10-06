@@ -18,7 +18,6 @@ import 'mongol_switch_list_tile.dart';
 import '../text/mongol_text.dart';
 import '../text/mongol_rich_text.dart';
 
-
 enum _RadioType { material, adaptive }
 
 /// A [MongolListTile] with a [Radio]. In other words, a radio button with a label.
@@ -609,7 +608,7 @@ class MongolRadioListTile<T> extends StatefulWidget {
     this.useCupertinoCheckmarkStyle = false,
   }) : _radioType = _RadioType.adaptive,
        assert(!isThreeLine || subtitle != null);
-  
+
   /// The value represented by this radio button.
   final T value;
 
@@ -840,8 +839,7 @@ class MongolRadioListTile<T> extends StatefulWidget {
   final bool useCupertinoCheckmarkStyle;
 
   @override
-  State<MongolRadioListTile<T>> createState() =>
-      _MongolRadioListTileState<T>();
+  State<MongolRadioListTile<T>> createState() => _MongolRadioListTileState<T>();
 }
 
 class _MongolRadioListTileState<T> extends State<MongolRadioListTile<T>>
@@ -863,8 +861,9 @@ class _MongolRadioListTileState<T> extends State<MongolRadioListTile<T>>
 
   bool get checked => radioValue == effectiveGroupValue;
 
-  late final _MongolRadioRegistry<T> _radioRegistry =
-      _MongolRadioRegistry<T>(this);
+  late final _MongolRadioRegistry<T> _radioRegistry = _MongolRadioRegistry<T>(
+    this,
+  );
 
   /// A [RadioGroup] ancestor takes precedence over the deprecated groupValue.
   T? get effectiveGroupValue => registry?.groupValue ?? widget.groupValue;
@@ -903,37 +902,43 @@ class _MongolRadioListTileState<T> extends State<MongolRadioListTile<T>>
     switch (widget._radioType) {
       case _RadioType.material:
         control = ExcludeFocus(
-            child: Radio<T>(
-          value: widget.value,
-          groupRegistry: _radioRegistry,
-          enabled: _enabled,
-          toggleable: widget.toggleable,
-          activeColor: widget.activeColor,
-          materialTapTargetSize: widget.materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
-          autofocus: widget.autofocus,
-          fillColor: widget.fillColor,
-          mouseCursor: widget.mouseCursor,
-          hoverColor: widget.hoverColor,
-          overlayColor: widget.overlayColor,
-          splashRadius: widget.splashRadius,
-        ));
+          child: Radio<T>(
+            value: widget.value,
+            groupRegistry: _radioRegistry,
+            enabled: _enabled,
+            toggleable: widget.toggleable,
+            activeColor: widget.activeColor,
+            materialTapTargetSize:
+                widget.materialTapTargetSize ??
+                MaterialTapTargetSize.shrinkWrap,
+            autofocus: widget.autofocus,
+            fillColor: widget.fillColor,
+            mouseCursor: widget.mouseCursor,
+            hoverColor: widget.hoverColor,
+            overlayColor: widget.overlayColor,
+            splashRadius: widget.splashRadius,
+          ),
+        );
       case _RadioType.adaptive:
         control = ExcludeFocus(
-            child: Radio<T>.adaptive(
-          value: widget.value,
-          groupRegistry: _radioRegistry,
-          enabled: _enabled,
-          toggleable: widget.toggleable,
-          activeColor: widget.activeColor,
-          materialTapTargetSize: widget.materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
-          autofocus: widget.autofocus,
-          fillColor: widget.fillColor,
-          mouseCursor: widget.mouseCursor,
-          hoverColor: widget.hoverColor,
-          overlayColor: widget.overlayColor,
-          splashRadius: widget.splashRadius,
-          useCupertinoCheckmarkStyle: widget.useCupertinoCheckmarkStyle,
-        ));
+          child: Radio<T>.adaptive(
+            value: widget.value,
+            groupRegistry: _radioRegistry,
+            enabled: _enabled,
+            toggleable: widget.toggleable,
+            activeColor: widget.activeColor,
+            materialTapTargetSize:
+                widget.materialTapTargetSize ??
+                MaterialTapTargetSize.shrinkWrap,
+            autofocus: widget.autofocus,
+            fillColor: widget.fillColor,
+            mouseCursor: widget.mouseCursor,
+            hoverColor: widget.hoverColor,
+            overlayColor: widget.overlayColor,
+            splashRadius: widget.splashRadius,
+            useCupertinoCheckmarkStyle: widget.useCupertinoCheckmarkStyle,
+          ),
+        );
     }
 
     Widget? leading, trailing;
@@ -951,9 +956,10 @@ class _MongolRadioListTileState<T> extends State<MongolRadioListTile<T>>
     final Set<WidgetState> states = <WidgetState>{
       if (widget.selected) WidgetState.selected,
     };
-    final Color effectiveActiveColor = widget.activeColor
-      ?? radioThemeData.fillColor?.resolve(states)
-      ?? theme.colorScheme.secondary;
+    final Color effectiveActiveColor =
+        widget.activeColor ??
+        radioThemeData.fillColor?.resolve(states) ??
+        theme.colorScheme.secondary;
     return MergeSemantics(
       child: MongolListTile(
         selectedColor: effectiveActiveColor,
@@ -979,7 +985,6 @@ class _MongolRadioListTileState<T> extends State<MongolRadioListTile<T>>
     );
   }
 }
-
 
 class _MongolRadioRegistry<T> extends RadioGroupRegistry<T> {
   _MongolRadioRegistry(this.state);

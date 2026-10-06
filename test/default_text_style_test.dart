@@ -11,8 +11,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mongol/mongol.dart';
 
 void main() {
-  testWidgets('DefaultTextStyle changes propagate to MongolRichText',
-      (WidgetTester tester) async {
+  testWidgets('DefaultTextStyle changes propagate to MongolRichText', (
+    WidgetTester tester,
+  ) async {
     const textWidget = MongolText('Hello');
     const s1 = TextStyle(
       fontSize: 10.0,
@@ -20,10 +21,9 @@ void main() {
       height: 123.0,
     );
 
-    await tester.pumpWidget(const DefaultTextStyle(
-      style: s1,
-      child: textWidget,
-    ));
+    await tester.pumpWidget(
+      const DefaultTextStyle(style: s1, child: textWidget),
+    );
 
     final text =
         tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
@@ -31,8 +31,9 @@ void main() {
     expect(text.text.style, s1);
   });
 
-  testWidgets('AnimatedDefaultTextStyle changes propagate to MongolText',
-      (WidgetTester tester) async {
+  testWidgets('AnimatedDefaultTextStyle changes propagate to MongolText', (
+    WidgetTester tester,
+  ) async {
     const textWidget = MongolText('Hello');
     const s1 = TextStyle(
       fontSize: 10.0,
@@ -45,11 +46,13 @@ void main() {
       height: 1.0,
     );
 
-    await tester.pumpWidget(const AnimatedDefaultTextStyle(
-      style: s1,
-      duration: Duration(milliseconds: 1000),
-      child: textWidget,
-    ));
+    await tester.pumpWidget(
+      const AnimatedDefaultTextStyle(
+        style: s1,
+        duration: Duration(milliseconds: 1000),
+        child: textWidget,
+      ),
+    );
 
     final text1 =
         tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
@@ -62,18 +65,21 @@ void main() {
     // expect(text1.textWidthBasis, TextWidthBasis.parent);
     // expect(text1.textHeightBehavior, isNull);
 
-    await tester.pumpWidget(const AnimatedDefaultTextStyle(
-      style: s2,
-      textAlign: TextAlign.justify,
-      softWrap: false,
-      overflow: TextOverflow.fade,
-      maxLines: 3,
-      textWidthBasis: TextWidthBasis.longestLine,
-      textHeightBehavior:
-          ui.TextHeightBehavior(applyHeightToFirstAscent: false),
-      duration: Duration(milliseconds: 1000),
-      child: textWidget,
-    ));
+    await tester.pumpWidget(
+      const AnimatedDefaultTextStyle(
+        style: s2,
+        textAlign: TextAlign.justify,
+        softWrap: false,
+        overflow: TextOverflow.fade,
+        maxLines: 3,
+        textWidthBasis: TextWidthBasis.longestLine,
+        textHeightBehavior: ui.TextHeightBehavior(
+          applyHeightToFirstAscent: false,
+        ),
+        duration: Duration(milliseconds: 1000),
+        child: textWidget,
+      ),
+    );
 
     final text2 =
         tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;

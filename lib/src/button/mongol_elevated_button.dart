@@ -216,21 +216,25 @@ class MongolElevatedButton extends MongolButtonStyleButton {
     final Color? disabledBackground = disabledBackgroundColor;
     final WidgetStateProperty<Color?>? backgroundColorProp =
         (background == null && disabledBackground == null)
-            ? null
-            : _ElevatedButtonDefaultColor(background, disabledBackground);
+        ? null
+        : _ElevatedButtonDefaultColor(background, disabledBackground);
     final Color? foreground = foregroundColor;
     final Color? disabledForeground = disabledForegroundColor;
     final WidgetStateProperty<Color?>? foregroundColorProp =
         (foreground == null && disabledForeground == null)
-            ? null
-            : _ElevatedButtonDefaultColor(foreground, disabledForeground);
-    final WidgetStateProperty<Color?>? overlayColor =
-        (foreground == null) ? null : _ElevatedButtonDefaultOverlay(foreground);
-    final WidgetStateProperty<double>? elevationValue =
-        (elevation == null) ? null : _ElevatedButtonDefaultElevation(elevation);
+        ? null
+        : _ElevatedButtonDefaultColor(foreground, disabledForeground);
+    final WidgetStateProperty<Color?>? overlayColor = (foreground == null)
+        ? null
+        : _ElevatedButtonDefaultOverlay(foreground);
+    final WidgetStateProperty<double>? elevationValue = (elevation == null)
+        ? null
+        : _ElevatedButtonDefaultElevation(elevation);
     final WidgetStateProperty<MouseCursor?> mouseCursor =
         _ElevatedButtonDefaultMouseCursor(
-            enabledMouseCursor, disabledMouseCursor);
+          enabledMouseCursor,
+          disabledMouseCursor,
+        );
 
     return ButtonStyle(
       textStyle: WidgetStateProperty.all<TextStyle?>(textStyle),
@@ -386,10 +390,12 @@ class MongolElevatedButton extends MongolButtonStyleButton {
         : styleFrom(
             backgroundColor: colorScheme.primary,
             foregroundColor: colorScheme.onPrimary,
-            disabledBackgroundColor:
-                colorScheme.onSurface.withValues(alpha: 0.12),
-            disabledForegroundColor:
-                colorScheme.onSurface.withValues(alpha: 0.38),
+            disabledBackgroundColor: colorScheme.onSurface.withValues(
+              alpha: 0.12,
+            ),
+            disabledForegroundColor: colorScheme.onSurface.withValues(
+              alpha: 0.38,
+            ),
             shadowColor: theme.shadowColor,
             elevation: 2,
             textStyle: theme.textTheme.labelLarge,
@@ -398,7 +404,8 @@ class MongolElevatedButton extends MongolButtonStyleButton {
             maximumSize: Size.infinite,
             side: null,
             shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4))),
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+            ),
             enabledMouseCursor: SystemMouseCursors.click,
             disabledMouseCursor: SystemMouseCursors.basic,
             visualDensity: theme.visualDensity,
@@ -499,7 +506,8 @@ class _ElevatedButtonDefaultElevation extends WidgetStateProperty<double>
 
 @immutable
 class _ElevatedButtonDefaultMouseCursor
-    extends WidgetStateProperty<MouseCursor?> with Diagnosticable {
+    extends WidgetStateProperty<MouseCursor?>
+    with Diagnosticable {
   _ElevatedButtonDefaultMouseCursor(this.enabledCursor, this.disabledCursor);
 
   final MouseCursor? enabledCursor;
@@ -529,10 +537,10 @@ class _MongolElevatedButtonWithIcon extends MongolElevatedButton {
     required Widget icon,
     required Widget label,
   }) : super(
-          autofocus: autofocus ?? false,
-          clipBehavior: clipBehavior ?? Clip.none,
-          child: _MongolElevatedButtonWithIconChild(icon: icon, label: label),
-        );
+         autofocus: autofocus ?? false,
+         clipBehavior: clipBehavior ?? Clip.none,
+         child: _MongolElevatedButtonWithIconChild(icon: icon, label: label),
+       );
 
   @override
   ButtonStyle defaultStyleOf(BuildContext context) {
@@ -563,8 +571,10 @@ class _MongolElevatedButtonWithIcon extends MongolElevatedButton {
 }
 
 class _MongolElevatedButtonWithIconChild extends StatelessWidget {
-  const _MongolElevatedButtonWithIconChild(
-      {required this.label, required this.icon});
+  const _MongolElevatedButtonWithIconChild({
+    required this.label,
+    required this.icon,
+  });
 
   final Widget label;
   final Widget icon;
@@ -574,11 +584,16 @@ class _MongolElevatedButtonWithIconChild extends StatelessWidget {
     // Mirrors Flutter's own icon-button gap calculation: scale a reference font
     // size rather than reading the deprecated linear factor off the scaler.
     final double scale = MediaQuery.textScalerOf(context).scale(14.0) / 14.0;
-    final double gap =
-        scale <= 1 ? 8 : lerpDouble(8, 4, math.min(scale - 1, 1))!;
+    final double gap = scale <= 1
+        ? 8
+        : lerpDouble(8, 4, math.min(scale - 1, 1))!;
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[icon, SizedBox(height: gap), Flexible(child: label)],
+      children: <Widget>[
+        icon,
+        SizedBox(height: gap),
+        Flexible(child: label),
+      ],
     );
   }
 }
@@ -592,11 +607,11 @@ class _MongolElevatedButtonWithIconChild extends StatelessWidget {
 
 class _ElevatedButtonDefaultsM3 extends ButtonStyle {
   _ElevatedButtonDefaultsM3(this.context)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   late final ColorScheme _colors = Theme.of(context).colorScheme;
@@ -604,7 +619,8 @@ class _ElevatedButtonDefaultsM3 extends ButtonStyle {
   @override
   WidgetStateProperty<TextStyle?> get textStyle =>
       WidgetStatePropertyAll<TextStyle?>(
-          Theme.of(context).textTheme.labelLarge);
+        Theme.of(context).textTheme.labelLarge,
+      );
 
   @override
   WidgetStateProperty<Color?>? get backgroundColor =>

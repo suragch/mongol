@@ -12,8 +12,10 @@ import 'package:flutter/widgets.dart';
 class MongolExtendSelectionByCharacterIntent
     extends ExtendSelectionByCharacterIntent {
   /// Creates an [MongolExtendSelectionByCharacterIntent].
-  const MongolExtendSelectionByCharacterIntent(
-      {required super.forward, required super.collapseSelection});
+  const MongolExtendSelectionByCharacterIntent({
+    required super.forward,
+    required super.collapseSelection,
+  });
 }
 
 /// Extends, or moves the current selection from the current
@@ -22,8 +24,10 @@ class MongolExtendSelectionByCharacterIntent
 class MongolExtendSelectionHorizontallyToAdjacentLineIntent
     extends ExtendSelectionVerticallyToAdjacentLineIntent {
   /// Creates an [MongolExtendSelectionHorizontallyToAdjacentLineIntent].
-  const MongolExtendSelectionHorizontallyToAdjacentLineIntent(
-      {required super.forward, required super.collapseSelection});
+  const MongolExtendSelectionHorizontallyToAdjacentLineIntent({
+    required super.forward,
+    required super.collapseSelection,
+  });
 }
 
 /// Extends, or moves the current selection from the current
@@ -67,11 +71,12 @@ class MongolExpandSelectionToLineBreakIntent
 class MongolExtendSelectionToLineBreakIntent
     extends ExtendSelectionToLineBreakIntent {
   /// Creates an [MongolExtendSelectionToLineBreakIntent].
-  const MongolExtendSelectionToLineBreakIntent(
-      {required super.forward,
-      required super.collapseSelection,
-      super.collapseAtReversal,
-      super.continuesAtWrap});
+  const MongolExtendSelectionToLineBreakIntent({
+    required super.forward,
+    required super.collapseSelection,
+    super.collapseAtReversal,
+    super.continuesAtWrap,
+  });
 }
 
 /// Extends, or moves the current selection from the current
@@ -84,8 +89,10 @@ class MongolExtendSelectionToLineBreakIntent
 class MongolExtendSelectionToDocumentBoundaryIntent
     extends ExtendSelectionToDocumentBoundaryIntent {
   /// Creates an [MongolExtendSelectionToDocumentBoundaryIntent].
-  const MongolExtendSelectionToDocumentBoundaryIntent(
-      {required super.forward, required super.collapseSelection});
+  const MongolExtendSelectionToDocumentBoundaryIntent({
+    required super.forward,
+    required super.collapseSelection,
+  });
 }
 
 /// Extends, or moves the current selection from the current
@@ -94,8 +101,10 @@ class MongolExtendSelectionToDocumentBoundaryIntent
 class MongolExtendSelectionToNextWordBoundaryIntent
     extends ExtendSelectionToNextWordBoundaryIntent {
   /// Creates an [MongolExtendSelectionToNextWordBoundaryIntent].
-  const MongolExtendSelectionToNextWordBoundaryIntent(
-      {required super.forward, required super.collapseSelection});
+  const MongolExtendSelectionToNextWordBoundaryIntent({
+    required super.forward,
+    required super.collapseSelection,
+  });
 }
 
 /// Extends, or moves the current selection from the current
@@ -112,6 +121,7 @@ class MongolExtendSelectionToNextWordBoundaryIntent
 class MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent
     extends ExtendSelectionToNextWordBoundaryOrCaretLocationIntent {
   /// Creates an [MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent].
-  const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent(
-      {required super.forward});
+  const MongolExtendSelectionToNextWordBoundaryOrCaretLocationIntent({
+    required super.forward,
+  });
 }

@@ -179,12 +179,19 @@ abstract class MongolButtonStyleButton extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(FlagProperty('enabled', value: enabled, ifFalse: 'disabled'));
     properties.add(
-        DiagnosticsProperty<ButtonStyle>('style', style, defaultValue: null));
-    properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode,
-        defaultValue: null));
+      FlagProperty('enabled', value: enabled, ifFalse: 'disabled'),
+    );
+    properties.add(
+      DiagnosticsProperty<ButtonStyle>('style', style, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<FocusNode>(
+        'focusNode',
+        focusNode,
+        defaultValue: null,
+      ),
+    );
   }
 }
 
@@ -268,76 +275,99 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
     }
 
     T? resolve<T>(
-        WidgetStateProperty<T>? Function(ButtonStyle? style) getProperty) {
+      WidgetStateProperty<T>? Function(ButtonStyle? style) getProperty,
+    ) {
       return effectiveValue(
         (ButtonStyle? style) =>
             getProperty(style)?.resolve(statesController.value),
       );
     }
 
-    final double? resolvedElevation =
-        resolve<double?>((ButtonStyle? style) => style?.elevation);
-    final TextStyle? resolvedTextStyle =
-        resolve<TextStyle?>((ButtonStyle? style) => style?.textStyle);
-    Color? resolvedBackgroundColor =
-        resolve<Color?>((ButtonStyle? style) => style?.backgroundColor);
-    final Color? resolvedForegroundColor =
-        resolve<Color?>((ButtonStyle? style) => style?.foregroundColor);
-    final Color? resolvedShadowColor =
-        resolve<Color?>((ButtonStyle? style) => style?.shadowColor);
-    final Color? resolvedSurfaceTintColor =
-        resolve<Color?>((ButtonStyle? style) => style?.surfaceTintColor);
-    final EdgeInsetsGeometry? resolvedPadding =
-        resolve<EdgeInsetsGeometry?>((ButtonStyle? style) => style?.padding);
-    final Size? resolvedMinimumSize =
-        resolve<Size?>((ButtonStyle? style) => style?.minimumSize);
-    final Size? resolvedFixedSize =
-        resolve<Size?>((ButtonStyle? style) => style?.fixedSize);
-    final Size? resolvedMaximumSize =
-        resolve<Size?>((ButtonStyle? style) => style?.maximumSize);
-    final Color? resolvedIconColor =
-        resolve<Color?>((ButtonStyle? style) => style?.iconColor);
-    final double? resolvedIconSize =
-        resolve<double?>((ButtonStyle? style) => style?.iconSize);
-    final BorderSide? resolvedSide =
-        resolve<BorderSide?>((ButtonStyle? style) => style?.side);
-    final OutlinedBorder? resolvedShape =
-        resolve<OutlinedBorder?>((ButtonStyle? style) => style?.shape);
+    final double? resolvedElevation = resolve<double?>(
+      (ButtonStyle? style) => style?.elevation,
+    );
+    final TextStyle? resolvedTextStyle = resolve<TextStyle?>(
+      (ButtonStyle? style) => style?.textStyle,
+    );
+    Color? resolvedBackgroundColor = resolve<Color?>(
+      (ButtonStyle? style) => style?.backgroundColor,
+    );
+    final Color? resolvedForegroundColor = resolve<Color?>(
+      (ButtonStyle? style) => style?.foregroundColor,
+    );
+    final Color? resolvedShadowColor = resolve<Color?>(
+      (ButtonStyle? style) => style?.shadowColor,
+    );
+    final Color? resolvedSurfaceTintColor = resolve<Color?>(
+      (ButtonStyle? style) => style?.surfaceTintColor,
+    );
+    final EdgeInsetsGeometry? resolvedPadding = resolve<EdgeInsetsGeometry?>(
+      (ButtonStyle? style) => style?.padding,
+    );
+    final Size? resolvedMinimumSize = resolve<Size?>(
+      (ButtonStyle? style) => style?.minimumSize,
+    );
+    final Size? resolvedFixedSize = resolve<Size?>(
+      (ButtonStyle? style) => style?.fixedSize,
+    );
+    final Size? resolvedMaximumSize = resolve<Size?>(
+      (ButtonStyle? style) => style?.maximumSize,
+    );
+    final Color? resolvedIconColor = resolve<Color?>(
+      (ButtonStyle? style) => style?.iconColor,
+    );
+    final double? resolvedIconSize = resolve<double?>(
+      (ButtonStyle? style) => style?.iconSize,
+    );
+    final BorderSide? resolvedSide = resolve<BorderSide?>(
+      (ButtonStyle? style) => style?.side,
+    );
+    final OutlinedBorder? resolvedShape = resolve<OutlinedBorder?>(
+      (ButtonStyle? style) => style?.shape,
+    );
 
     final WidgetStateMouseCursor resolvedMouseCursor = _MouseCursor(
       (Set<WidgetState> states) => effectiveValue(
-          (ButtonStyle? style) => style?.mouseCursor?.resolve(states)),
+        (ButtonStyle? style) => style?.mouseCursor?.resolve(states),
+      ),
     );
 
     final WidgetStateProperty<Color?> overlayColor =
         WidgetStateProperty.resolveWith<Color?>(
-      (Set<WidgetState> states) => effectiveValue(
-          (ButtonStyle? style) => style?.overlayColor?.resolve(states)),
-    );
+          (Set<WidgetState> states) => effectiveValue(
+            (ButtonStyle? style) => style?.overlayColor?.resolve(states),
+          ),
+        );
 
-    final VisualDensity? resolvedVisualDensity =
-        effectiveValue((ButtonStyle? style) => style?.visualDensity);
-    final MaterialTapTargetSize? resolvedTapTargetSize =
-        effectiveValue((ButtonStyle? style) => style?.tapTargetSize);
-    final Duration? resolvedAnimationDuration =
-        effectiveValue((ButtonStyle? style) => style?.animationDuration);
-    final bool? resolvedEnableFeedback =
-        effectiveValue((ButtonStyle? style) => style?.enableFeedback);
-    final AlignmentGeometry? resolvedAlignment =
-        effectiveValue((ButtonStyle? style) => style?.alignment);
+    final VisualDensity? resolvedVisualDensity = effectiveValue(
+      (ButtonStyle? style) => style?.visualDensity,
+    );
+    final MaterialTapTargetSize? resolvedTapTargetSize = effectiveValue(
+      (ButtonStyle? style) => style?.tapTargetSize,
+    );
+    final Duration? resolvedAnimationDuration = effectiveValue(
+      (ButtonStyle? style) => style?.animationDuration,
+    );
+    final bool? resolvedEnableFeedback = effectiveValue(
+      (ButtonStyle? style) => style?.enableFeedback,
+    );
+    final AlignmentGeometry? resolvedAlignment = effectiveValue(
+      (ButtonStyle? style) => style?.alignment,
+    );
     final Offset densityAdjustment = resolvedVisualDensity!.baseSizeAdjustment;
-    final InteractiveInkFeatureFactory? resolvedSplashFactory =
-        effectiveValue((ButtonStyle? style) => style?.splashFactory);
-
-    BoxConstraints effectiveConstraints =
-        resolvedVisualDensity.effectiveConstraints(
-      BoxConstraints(
-        minWidth: resolvedMinimumSize!.width,
-        minHeight: resolvedMinimumSize.height,
-        maxWidth: resolvedMaximumSize!.width,
-        maxHeight: resolvedMaximumSize.height,
-      ),
+    final InteractiveInkFeatureFactory? resolvedSplashFactory = effectiveValue(
+      (ButtonStyle? style) => style?.splashFactory,
     );
+
+    BoxConstraints effectiveConstraints = resolvedVisualDensity
+        .effectiveConstraints(
+          BoxConstraints(
+            minWidth: resolvedMinimumSize!.width,
+            minHeight: resolvedMinimumSize.height,
+            maxWidth: resolvedMaximumSize!.width,
+            maxHeight: resolvedMaximumSize.height,
+          ),
+        );
     if (resolvedFixedSize != null) {
       final Size size = effectiveConstraints.constrain(resolvedFixedSize);
       if (size.width.isFinite) {
@@ -382,14 +412,15 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
         resolvedElevation == 0) {
       if (_controller?.duration != resolvedAnimationDuration) {
         _controller?.dispose();
-        _controller = AnimationController(
-          duration: resolvedAnimationDuration,
-          vsync: this,
-        )..addStatusListener((AnimationStatus status) {
-            if (status == AnimationStatus.completed) {
-              setState(() {}); // Rebuild with the final background color.
-            }
-          });
+        _controller =
+            AnimationController(
+              duration: resolvedAnimationDuration,
+              vsync: this,
+            )..addStatusListener((AnimationStatus status) {
+              if (status == AnimationStatus.completed) {
+                setState(() {}); // Rebuild with the final background color.
+              }
+            });
       }
       // Defer changing the background color.
       resolvedBackgroundColor = _backgroundColor;
@@ -430,8 +461,9 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
           statesController: statesController,
           child: IconTheme.merge(
             data: IconThemeData(
-                color: resolvedIconColor ?? resolvedForegroundColor,
-                size: resolvedIconSize),
+              color: resolvedIconColor ?? resolvedForegroundColor,
+              size: resolvedIconSize,
+            ),
             child: Padding(
               padding: padding,
               child: Align(
@@ -465,10 +497,7 @@ class _MongolButtonStyleState extends State<MongolButtonStyleButton>
       container: true,
       button: true,
       enabled: widget.enabled,
-      child: _InputPadding(
-        minSize: minSize,
-        child: result,
-      ),
+      child: _InputPadding(minSize: minSize, child: result),
     );
   }
 }
@@ -491,10 +520,7 @@ class _MouseCursor extends WidgetStateMouseCursor {
 /// of the child. This increases the size of the button and the button's
 /// "tap target", but not its material or its ink splashes.
 class _InputPadding extends SingleChildRenderObjectWidget {
-  const _InputPadding({
-    super.child,
-    required this.minSize,
-  });
+  const _InputPadding({super.child, required this.minSize});
 
   final Size minSize;
 
@@ -505,7 +531,9 @@ class _InputPadding extends SingleChildRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, covariant _RenderInputPadding renderObject) {
+    BuildContext context,
+    covariant _RenderInputPadding renderObject,
+  ) {
     renderObject.minSize = minSize;
   }
 }
@@ -553,9 +581,10 @@ class _RenderInputPadding extends RenderShiftedBox {
     return 0.0;
   }
 
-  Size _computeSize(
-      {required BoxConstraints constraints,
-      required ChildLayouter layoutChild}) {
+  Size _computeSize({
+    required BoxConstraints constraints,
+    required ChildLayouter layoutChild,
+  }) {
     if (child != null) {
       final Size childSize = layoutChild(child!, constraints);
       final double height = math.max(childSize.width, minSize.width);
@@ -581,8 +610,9 @@ class _RenderInputPadding extends RenderShiftedBox {
     );
     if (child != null) {
       final BoxParentData childParentData = child!.parentData! as BoxParentData;
-      childParentData.offset =
-          Alignment.center.alongOffset(size - child!.size as Offset);
+      childParentData.offset = Alignment.center.alongOffset(
+        size - child!.size as Offset,
+      );
     }
   }
 

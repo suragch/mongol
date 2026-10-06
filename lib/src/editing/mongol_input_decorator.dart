@@ -217,16 +217,15 @@ class _BorderContainerState extends State<_BorderContainer>
       parent: _controller,
       curve: _kTransitionCurve,
     );
-    _border = _InputBorderTween(
-      begin: widget.border,
-      end: widget.border,
-    );
+    _border = _InputBorderTween(begin: widget.border, end: widget.border);
     _hoverAnimation = CurvedAnimation(
       parent: _hoverColorController,
       curve: Curves.linear,
     );
-    _hoverColorTween =
-        ColorTween(begin: Colors.transparent, end: widget.hoverColor);
+    _hoverColorTween = ColorTween(
+      begin: Colors.transparent,
+      end: widget.hoverColor,
+    );
   }
 
   @override
@@ -240,17 +239,16 @@ class _BorderContainerState extends State<_BorderContainer>
   void didUpdateWidget(_BorderContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.border != oldWidget.border) {
-      _border = _InputBorderTween(
-        begin: oldWidget.border,
-        end: widget.border,
-      );
+      _border = _InputBorderTween(begin: oldWidget.border, end: widget.border);
       _controller
         ..value = 0.0
         ..forward();
     }
     if (widget.hoverColor != oldWidget.hoverColor) {
-      _hoverColorTween =
-          ColorTween(begin: Colors.transparent, end: widget.hoverColor);
+      _hoverColorTween = ColorTween(
+        begin: Colors.transparent,
+        end: widget.hoverColor,
+      );
     }
     if (widget.isHovering != oldWidget.isHovering) {
       if (widget.isHovering) {
@@ -286,10 +284,8 @@ class _BorderContainerState extends State<_BorderContainer>
 // Used to "shake" the floating label to the up and down
 // when the errorText first appears.
 class _Shaker extends AnimatedWidget {
-  const _Shaker({
-    required Animation<double> animation,
-    this.child,
-  }) : super(listenable: animation);
+  const _Shaker({required Animation<double> animation, this.child})
+    : super(listenable: animation);
 
   final Widget? child;
 
@@ -393,7 +389,8 @@ class _HelperErrorState extends State<_HelperError>
 
     final errorTextStateChanged =
         (newErrorText != null) != (oldErrorText != null);
-    final helperTextStateChanged = newErrorText == null &&
+    final helperTextStateChanged =
+        newErrorText == null &&
         (newHelperText != null) != (oldHelperText != null);
 
     if (errorTextStateChanged || helperTextStateChanged) {
@@ -479,10 +476,7 @@ class _HelperErrorState extends State<_HelperError>
     if (widget.errorText != null) {
       return Stack(
         children: <Widget>[
-          Opacity(
-            opacity: 1.0 - _controller.value,
-            child: _helper,
-          ),
+          Opacity(opacity: 1.0 - _controller.value, child: _helper),
           _buildError(),
         ],
       );
@@ -492,10 +486,7 @@ class _HelperErrorState extends State<_HelperError>
       return Stack(
         children: <Widget>[
           _buildHelper(),
-          Opacity(
-            opacity: _controller.value,
-            child: _error,
-          ),
+          Opacity(opacity: _controller.value, child: _error),
         ],
       );
     }
@@ -607,27 +598,27 @@ class _Decoration {
 
   @override
   int get hashCode => Object.hash(
-        contentPadding,
-        floatingLabelWidth,
-        floatingLabelProgress,
-        floatingLabelAlignment,
-        border,
-        borderGap,
-        alignLabelWithHint,
-        isDense,
-        visualDensity,
-        icon,
-        input,
-        label,
-        hint,
-        prefix,
-        suffix,
-        prefixIcon,
-        suffixIcon,
-        helperError,
-        counter,
-        container,
-      );
+    contentPadding,
+    floatingLabelWidth,
+    floatingLabelProgress,
+    floatingLabelAlignment,
+    border,
+    borderGap,
+    alignLabelWithHint,
+    isDense,
+    visualDensity,
+    icon,
+    input,
+    label,
+    hint,
+    prefix,
+    suffix,
+    prefixIcon,
+    suffixIcon,
+    helperError,
+    counter,
+    container,
+  );
 }
 
 // A container for the layout values computed by _RenderDecoration._layout.
@@ -876,7 +867,8 @@ class _RenderDecoration extends RenderBox
       }
       throw FlutterError.fromParts(<DiagnosticsNode>[
         ErrorSummary(
-            "One of MongolInputDecorator's children reported a negative baseline offset."),
+          "One of MongolInputDecorator's children reported a negative baseline offset.",
+        ),
         ErrorDescription(
           '${box.runtimeType}, of size ${box.size}, reported a negative '
           'alphabetic baseline of $baseline.',
@@ -915,10 +907,14 @@ class _RenderDecoration extends RenderBox
     final BoxConstraints containerConstraints = boxConstraints.copyWith(
       maxHeight: boxConstraints.maxHeight - _boxSize(icon).height,
     );
-    boxToBaseline[prefixIcon] =
-        _layoutLineBox(prefixIcon, containerConstraints);
-    boxToBaseline[suffixIcon] =
-        _layoutLineBox(suffixIcon, containerConstraints);
+    boxToBaseline[prefixIcon] = _layoutLineBox(
+      prefixIcon,
+      containerConstraints,
+    );
+    boxToBaseline[suffixIcon] = _layoutLineBox(
+      suffixIcon,
+      containerConstraints,
+    );
     final BoxConstraints contentConstraints = containerConstraints.copyWith(
       maxHeight: containerConstraints.maxHeight - contentPadding.vertical,
     );
@@ -938,11 +934,17 @@ class _RenderDecoration extends RenderBox
     );
     // Increase the available height for the label when it is scaled down.
     final double invertedLabelScale = lerpDouble(
-        1.00, 1 / _kFinalLabelScale, decoration.floatingLabelProgress)!;
+      1.00,
+      1 / _kFinalLabelScale,
+      decoration.floatingLabelProgress,
+    )!;
     double suffixIconHeight = _boxSize(suffixIcon).height;
     if (decoration.border!.isOutline) {
-      suffixIconHeight =
-          lerpDouble(suffixIconHeight, 0.0, decoration.floatingLabelProgress)!;
+      suffixIconHeight = lerpDouble(
+        suffixIconHeight,
+        0.0,
+        decoration.floatingLabelProgress,
+      )!;
     }
     final double labelHeight = math.max(
       0.0,
@@ -965,7 +967,9 @@ class _RenderDecoration extends RenderBox
       helperError,
       contentConstraints.copyWith(
         maxHeight: math.max(
-            0.0, contentConstraints.maxHeight - _boxSize(counter).height),
+          0.0,
+          contentConstraints.maxHeight - _boxSize(counter).height,
+        ),
       ),
     );
 
@@ -975,42 +979,39 @@ class _RenderDecoration extends RenderBox
     final double leftWidth = decoration.border!.isOutline
         ? math.max(labelWidth - boxToBaseline[label]!, 0)
         : labelWidth;
-    final double counterWidth =
-        counter == null ? 0 : boxToBaseline[counter]! + subtextGap;
+    final double counterWidth = counter == null
+        ? 0
+        : boxToBaseline[counter]! + subtextGap;
     final bool helperErrorExists =
         helperError?.size != null && helperError!.size.width > 0;
-    final double helperErrorWidth =
-        !helperErrorExists ? 0 : helperError!.size.width + subtextGap;
-    final double rightWidth = math.max(
-      counterWidth,
-      helperErrorWidth,
-    );
+    final double helperErrorWidth = !helperErrorExists
+        ? 0
+        : helperError!.size.width + subtextGap;
+    final double rightWidth = math.max(counterWidth, helperErrorWidth);
     final Offset densityOffset = decoration.visualDensity!.baseSizeAdjustment;
 
     boxToBaseline[hint] = _layoutLineBox(
       hint,
       boxConstraints
-          .deflate(EdgeInsets.only(
-            left: contentPadding.left + leftWidth + densityOffset.dx / 2,
-            right: contentPadding.right + rightWidth + densityOffset.dx / 2,
-          ))
-          .copyWith(
-            minHeight: inputHeight,
-            maxHeight: inputHeight,
-          ),
+          .deflate(
+            EdgeInsets.only(
+              left: contentPadding.left + leftWidth + densityOffset.dx / 2,
+              right: contentPadding.right + rightWidth + densityOffset.dx / 2,
+            ),
+          )
+          .copyWith(minHeight: inputHeight, maxHeight: inputHeight),
     );
 
     boxToBaseline[input] = _layoutLineBox(
       input,
       boxConstraints
-          .deflate(EdgeInsets.only(
-            left: contentPadding.left + leftWidth + densityOffset.dx / 2,
-            right: contentPadding.right + rightWidth + densityOffset.dx / 2,
-          ))
-          .copyWith(
-            minHeight: inputHeight,
-            maxHeight: inputHeight,
-          ),
+          .deflate(
+            EdgeInsets.only(
+              left: contentPadding.left + leftWidth + densityOffset.dx / 2,
+              right: contentPadding.right + rightWidth + densityOffset.dx / 2,
+            ),
+          )
+          .copyWith(minHeight: inputHeight, maxHeight: inputHeight),
     );
 
     // The field can be occupied by a hint or by the input itself
@@ -1047,10 +1048,12 @@ class _RenderDecoration extends RenderBox
     );
 
     // Calculate the width of the input text container.
-    final double prefixIconWidth =
-        prefixIcon == null ? 0 : prefixIcon!.size.width;
-    final double suffixIconWidth =
-        suffixIcon == null ? 0 : suffixIcon!.size.width;
+    final double prefixIconWidth = prefixIcon == null
+        ? 0
+        : prefixIcon!.size.width;
+    final double suffixIconWidth = suffixIcon == null
+        ? 0
+        : suffixIcon!.size.width;
     final double fixIconWidth = math.max(prefixIconWidth, suffixIconWidth);
     final double contentWidth = math.max(
       fixIconWidth,
@@ -1064,13 +1067,15 @@ class _RenderDecoration extends RenderBox
     );
     final double minContainerWidth =
         decoration.isDense! || decoration.isCollapsed || expands
-            ? 0.0
-            : kMinInteractiveDimension;
+        ? 0.0
+        : kMinInteractiveDimension;
     final double maxContainerWidth = boxConstraints.maxWidth - rightWidth;
     final double containerWidth = expands
         ? maxContainerWidth
         : math.min(
-            math.max(contentWidth, minContainerWidth), maxContainerWidth);
+            math.max(contentWidth, minContainerWidth),
+            maxContainerWidth,
+          );
 
     // Ensure the text is horizontally centered in cases where the content is
     // shorter than kMinInteractiveDimension.
@@ -1093,7 +1098,8 @@ class _RenderDecoration extends RenderBox
         fixLeftOfInput - overflow * (1 - textAlignHorizontalFactor);
 
     // The baselines that will be used to draw the actual input text content.
-    final double leftInputBaseline = contentPadding.left +
+    final double leftInputBaseline =
+        contentPadding.left +
         leftWidth +
         inputInternalBaseline +
         baselineAdjustment +
@@ -1117,7 +1123,8 @@ class _RenderDecoration extends RenderBox
     // That means that if the padding is uneven, center is not the exact
     // midpoint of left and right. To account for this, the left of center and
     // right of center alignments are interpolated independently.
-    final double outlineCenterBaseline = inputInternalBaseline +
+    final double outlineCenterBaseline =
+        inputInternalBaseline +
         baselineAdjustment / 2.0 +
         (containerWidth - (2.0 + inputWidth)) / 2.0;
     final double outlineLeftBaseline = leftInputBaseline;
@@ -1170,8 +1177,12 @@ class _RenderDecoration extends RenderBox
   // alignment is greater than zero, it interpolates between the centered box's
   // left and the position that would align the right of the box with the right
   // padding.
-  double _interpolateThree(double begin, double middle, double end,
-      TextAlignHorizontal textAlignHorizontal) {
+  double _interpolateThree(
+    double begin,
+    double middle,
+    double end,
+    TextAlignHorizontal textAlignHorizontal,
+  ) {
     if (textAlignHorizontal.x <= 0) {
       // It's possible for begin, middle, and end to not be in order because of
       // excessive padding. Those cases are handled by using middle.
@@ -1246,10 +1257,14 @@ class _RenderDecoration extends RenderBox
     final double counterWidth = _minWidth(counter, height);
     final double counterHeight = _minHeight(counter, counterWidth);
 
-    final double helperErrorAvailableHeight =
-        math.max(height - counterHeight, 0.0);
-    final double helperErrorWidth =
-        _minWidth(helperError, helperErrorAvailableHeight);
+    final double helperErrorAvailableHeight = math.max(
+      height - counterHeight,
+      0.0,
+    );
+    final double helperErrorWidth = _minWidth(
+      helperError,
+      helperErrorAvailableHeight,
+    );
     double subtextWidth = math.max(counterWidth, helperErrorWidth);
     if (subtextWidth > 0.0) {
       subtextWidth += subtextGap;
@@ -1262,19 +1277,26 @@ class _RenderDecoration extends RenderBox
     final double suffixHeight = _minHeight(suffix, suffixWidth);
 
     final double availableInputHeight = math.max(
-        height -
-            prefixHeight -
-            suffixHeight -
-            prefixIconHeight -
-            suffixIconHeight,
-        0.0);
-    final double inputWidth =
-        _lineWidth(availableInputHeight, <RenderBox?>[input, hint]);
-    final double inputMaxWidth =
-        <double>[inputWidth, prefixWidth, suffixWidth].reduce(math.max);
+      height -
+          prefixHeight -
+          suffixHeight -
+          prefixIconHeight -
+          suffixIconHeight,
+      0.0,
+    );
+    final double inputWidth = _lineWidth(availableInputHeight, <RenderBox?>[
+      input,
+      hint,
+    ]);
+    final double inputMaxWidth = <double>[
+      inputWidth,
+      prefixWidth,
+      suffixWidth,
+    ].reduce(math.max);
 
     final Offset densityOffset = decoration.visualDensity!.baseSizeAdjustment;
-    final double contentWidth = contentPadding.left +
+    final double contentWidth =
+        contentPadding.left +
         (label == null ? 0.0 : decoration.floatingLabelWidth) +
         inputMaxWidth +
         contentPadding.right +
@@ -1283,10 +1305,11 @@ class _RenderDecoration extends RenderBox
       iconWidth,
       contentWidth,
       prefixIconWidth,
-      suffixIconWidth
+      suffixIconWidth,
     ].reduce(math.max);
-    final double minContainerWidth =
-        decoration.isDense! || expands ? 0.0 : kMinInteractiveDimension;
+    final double minContainerWidth = decoration.isDense! || expands
+        ? 0.0
+        : kMinInteractiveDimension;
     return math.max(containerWidth, minContainerWidth) + subtextWidth;
   }
 
@@ -1306,10 +1329,11 @@ class _RenderDecoration extends RenderBox
 
   @override
   Size computeDryLayout(BoxConstraints constraints) {
-    assert(debugCannotComputeDryLayout(
-      reason:
-          'Layout requires baseline metrics, which are only available after a full layout.',
-    ));
+    assert(
+      debugCannotComputeDryLayout(
+        reason: 'Layout requires baseline metrics, which are only available after a full layout.',
+      ),
+    );
     return Size.zero;
   }
 
@@ -1340,8 +1364,10 @@ class _RenderDecoration extends RenderBox
 
     double? baseline;
     double baselineLayout(RenderBox box, double y) {
-      _boxParentData(box).offset =
-          Offset(baseline! - layout.boxToBaseline[box]!, y);
+      _boxParentData(box).offset = Offset(
+        baseline! - layout.boxToBaseline[box]!,
+        y,
+      );
       return box.size.height;
     }
 
@@ -1349,8 +1375,9 @@ class _RenderDecoration extends RenderBox
     final double bottom = overallHeight - contentPadding.bottom;
 
     width = layout.containerWidth;
-    baseline =
-        _isOutlineAligned ? layout.outlineBaseline : layout.inputBaseline;
+    baseline = _isOutlineAligned
+        ? layout.outlineBaseline
+        : layout.inputBaseline;
 
     if (icon != null) {
       const double y = 0.0;
@@ -1421,8 +1448,11 @@ class _RenderDecoration extends RenderBox
       // The value of _InputBorderGap.start is relative to the origin of the
       // _BorderContainer which is inset by the icon's height. Although, when
       // floating label is centered, it's already relative to _BorderContainer.
-      decoration.borderGap!.start = lerpDouble(labelY - _boxSize(icon).height,
-          _boxSize(container).height / 2.0 - floatHeight / 2.0, floatAlign);
+      decoration.borderGap!.start = lerpDouble(
+        labelY - _boxSize(icon).height,
+        _boxSize(container).height / 2.0 - floatHeight / 2.0,
+        floatAlign,
+      );
 
       decoration.borderGap!.extent = label!.size.height * _kFinalLabelScale;
     } else {
@@ -1467,12 +1497,16 @@ class _RenderDecoration extends RenderBox
           ? (-labelWidth * _kFinalLabelScale) / 2.0 + borderWeight / 2.0
           : contentPadding.left;
       final double scale = lerpDouble(1.0, _kFinalLabelScale, t)!;
-      final double centeredFloatY = _boxParentData(container!).offset.dy +
+      final double centeredFloatY =
+          _boxParentData(container!).offset.dy +
           _boxSize(container).height / 2.0 -
           floatHeight / 2.0;
       final double floatStartY = labelOffset.dy;
-      final double floatEndY =
-          lerpDouble(floatStartY, centeredFloatY, floatAlign)!;
+      final double floatEndY = lerpDouble(
+        floatStartY,
+        centeredFloatY,
+        floatAlign,
+      )!;
       final double dy = lerpDouble(floatStartY, floatEndY, t)!;
       final double dx = lerpDouble(0.0, floatingX - labelOffset.dx, t)!;
       _labelTransform = Matrix4.identity()
@@ -1598,7 +1632,9 @@ class _Decorator
 
   @override
   void updateRenderObject(
-      BuildContext context, _RenderDecoration renderObject) {
+    BuildContext context,
+    _RenderDecoration renderObject,
+  ) {
     renderObject
       ..decoration = decoration
       ..expands = expands
@@ -1791,13 +1827,20 @@ class MongolInputDecorator extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties
-        .add(DiagnosticsProperty<InputDecoration>('decoration', decoration));
-    properties.add(DiagnosticsProperty<TextStyle>('baseStyle', baseStyle,
-        defaultValue: null));
+    properties.add(
+      DiagnosticsProperty<InputDecoration>('decoration', decoration),
+    );
+    properties.add(
+      DiagnosticsProperty<TextStyle>(
+        'baseStyle',
+        baseStyle,
+        defaultValue: null,
+      ),
+    );
     properties.add(DiagnosticsProperty<bool>('isFocused', isFocused));
     properties.add(
-        DiagnosticsProperty<bool>('expands', expands, defaultValue: false));
+      DiagnosticsProperty<bool>('expands', expands, defaultValue: false),
+    );
     properties.add(DiagnosticsProperty<bool>('isEmpty', isEmpty));
   }
 }
@@ -1811,25 +1854,29 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   static const OrdinalSortKey _kPrefixSemanticsSortOrder = OrdinalSortKey(0);
   static const OrdinalSortKey _kInputSemanticsSortOrder = OrdinalSortKey(1);
   static const OrdinalSortKey _kSuffixSemanticsSortOrder = OrdinalSortKey(2);
-  static const SemanticsTag _kPrefixSemanticsTag =
-      SemanticsTag('_InputDecoratorState.prefix');
-  static const SemanticsTag _kSuffixSemanticsTag =
-      SemanticsTag('_InputDecoratorState.suffix');
+  static const SemanticsTag _kPrefixSemanticsTag = SemanticsTag(
+    '_InputDecoratorState.prefix',
+  );
+  static const SemanticsTag _kSuffixSemanticsTag = SemanticsTag(
+    '_InputDecoratorState.suffix',
+  );
 
   @override
   void initState() {
     super.initState();
 
-    final labelIsInitiallyFloating = widget.decoration.floatingLabelBehavior ==
+    final labelIsInitiallyFloating =
+        widget.decoration.floatingLabelBehavior ==
             FloatingLabelBehavior.always ||
         (widget.decoration.floatingLabelBehavior !=
                 FloatingLabelBehavior.never &&
             widget._labelShouldWithdraw);
 
     _floatingLabelController = AnimationController(
-        duration: _kTransitionDuration,
-        vsync: this,
-        value: labelIsInitiallyFloating ? 1.0 : 0.0);
+      duration: _kTransitionDuration,
+      vsync: this,
+      value: labelIsInitiallyFloating ? 1.0 : 0.0,
+    );
     _floatingLabelController.addListener(_handleChange);
     _floatingLabelAnimation = CurvedAnimation(
       parent: _floatingLabelController,
@@ -1864,8 +1911,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
   InputDecoration? _effectiveDecoration;
 
-  InputDecoration get decoration => _effectiveDecoration ??=
-      widget.decoration.applyDefaults(Theme.of(context).inputDecorationTheme);
+  InputDecoration get decoration => _effectiveDecoration ??= widget.decoration
+      .applyDefaults(Theme.of(context).inputDecorationTheme);
 
   MongolTextAlign? get textAlign => widget.textAlign;
 
@@ -1889,7 +1936,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
       _effectiveDecoration = null;
     }
 
-    final floatBehaviorChanged = widget.decoration.floatingLabelBehavior !=
+    final floatBehaviorChanged =
+        widget.decoration.floatingLabelBehavior !=
         old.decoration.floatingLabelBehavior;
 
     if (widget._labelShouldWithdraw != old._labelShouldWithdraw ||
@@ -1934,7 +1982,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     }
     final Color enabledColor = themeData.colorScheme.onSurface.withAlpha(0x61);
     if (isHovering) {
-      final Color hoverColor = decoration.hoverColor ??
+      final Color hoverColor =
+          decoration.hoverColor ??
           themeData.inputDecorationTheme.hoverColor ??
           themeData.hoverColor;
       return Color.alphaBlend(hoverColor.withAlpha(0x1f), enabledColor);
@@ -1949,7 +1998,9 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     }
     if (decoration.fillColor != null) {
       return WidgetStateProperty.resolveAs(
-          decoration.fillColor!, materialState);
+        decoration.fillColor!,
+        materialState,
+      );
     }
     return WidgetStateProperty.resolveAs(defaults.fillColor!, materialState);
   }
@@ -1969,25 +2020,39 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   Color _getIconColor(ThemeData themeData, InputDecorationTheme defaults) {
     return WidgetStateProperty.resolveAs(decoration.iconColor, materialState) ??
         WidgetStateProperty.resolveAs(
-            themeData.inputDecorationTheme.iconColor, materialState) ??
+          themeData.inputDecorationTheme.iconColor,
+          materialState,
+        ) ??
         WidgetStateProperty.resolveAs(defaults.iconColor!, materialState);
   }
 
   Color _getPrefixIconColor(
-      ThemeData themeData, InputDecorationTheme defaults) {
+    ThemeData themeData,
+    InputDecorationTheme defaults,
+  ) {
     return WidgetStateProperty.resolveAs(
-            decoration.prefixIconColor, materialState) ??
+          decoration.prefixIconColor,
+          materialState,
+        ) ??
         WidgetStateProperty.resolveAs(
-            themeData.inputDecorationTheme.prefixIconColor, materialState) ??
+          themeData.inputDecorationTheme.prefixIconColor,
+          materialState,
+        ) ??
         WidgetStateProperty.resolveAs(defaults.prefixIconColor!, materialState);
   }
 
   Color _getSuffixIconColor(
-      ThemeData themeData, InputDecorationTheme defaults) {
+    ThemeData themeData,
+    InputDecorationTheme defaults,
+  ) {
     return WidgetStateProperty.resolveAs(
-            decoration.suffixIconColor, materialState) ??
+          decoration.suffixIconColor,
+          materialState,
+        ) ??
         WidgetStateProperty.resolveAs(
-            themeData.inputDecorationTheme.suffixIconColor, materialState) ??
+          themeData.inputDecorationTheme.suffixIconColor,
+          materialState,
+        ) ??
         WidgetStateProperty.resolveAs(defaults.suffixIconColor!, materialState);
   }
 
@@ -2007,14 +2072,20 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   // The base style for the inline label when they're displayed "inline",
   // i.e. when they appear in place of the empty text field.
   TextStyle _getInlineLabelStyle(
-      ThemeData themeData, InputDecorationTheme defaults) {
-    final TextStyle defaultStyle =
-        WidgetStateProperty.resolveAs(defaults.labelStyle!, materialState);
+    ThemeData themeData,
+    InputDecorationTheme defaults,
+  ) {
+    final TextStyle defaultStyle = WidgetStateProperty.resolveAs(
+      defaults.labelStyle!,
+      materialState,
+    );
 
     final TextStyle? style =
         WidgetStateProperty.resolveAs(decoration.labelStyle, materialState) ??
-            WidgetStateProperty.resolveAs(
-                themeData.inputDecorationTheme.labelStyle, materialState);
+        WidgetStateProperty.resolveAs(
+          themeData.inputDecorationTheme.labelStyle,
+          materialState,
+        );
 
     return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
@@ -2026,14 +2097,20 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   // The base style for the inline hint when they're displayed "inline",
   // i.e. when they appear in place of the empty text field.
   TextStyle _getInlineHintStyle(
-      ThemeData themeData, InputDecorationTheme defaults) {
-    final TextStyle defaultStyle =
-        WidgetStateProperty.resolveAs(defaults.hintStyle!, materialState);
+    ThemeData themeData,
+    InputDecorationTheme defaults,
+  ) {
+    final TextStyle defaultStyle = WidgetStateProperty.resolveAs(
+      defaults.hintStyle!,
+      materialState,
+    );
 
     final TextStyle? style =
         WidgetStateProperty.resolveAs(decoration.hintStyle, materialState) ??
-            WidgetStateProperty.resolveAs(
-                themeData.inputDecorationTheme.hintStyle, materialState);
+        WidgetStateProperty.resolveAs(
+          themeData.inputDecorationTheme.hintStyle,
+          materialState,
+        );
 
     return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
@@ -2042,20 +2119,31 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   }
 
   TextStyle _getFloatingLabelStyle(
-      ThemeData themeData, InputDecorationTheme defaults) {
+    ThemeData themeData,
+    InputDecorationTheme defaults,
+  ) {
     TextStyle defaultTextStyle = WidgetStateProperty.resolveAs(
-        defaults.floatingLabelStyle!, materialState);
+      defaults.floatingLabelStyle!,
+      materialState,
+    );
     if (_hasError && decoration.errorStyle?.color != null) {
-      defaultTextStyle =
-          defaultTextStyle.copyWith(color: decoration.errorStyle?.color);
+      defaultTextStyle = defaultTextStyle.copyWith(
+        color: decoration.errorStyle?.color,
+      );
     }
-    defaultTextStyle = defaultTextStyle
-        .merge(decoration.floatingLabelStyle ?? decoration.labelStyle);
+    defaultTextStyle = defaultTextStyle.merge(
+      decoration.floatingLabelStyle ?? decoration.labelStyle,
+    );
 
-    final TextStyle? style = WidgetStateProperty.resolveAs(
-            decoration.floatingLabelStyle, materialState) ??
+    final TextStyle? style =
         WidgetStateProperty.resolveAs(
-            themeData.inputDecorationTheme.floatingLabelStyle, materialState);
+          decoration.floatingLabelStyle,
+          materialState,
+        ) ??
+        WidgetStateProperty.resolveAs(
+          themeData.inputDecorationTheme.floatingLabelStyle,
+          materialState,
+        );
 
     return themeData.textTheme.titleMedium!
         .merge(widget.baseStyle)
@@ -2065,15 +2153,22 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   }
 
   TextStyle _getHelperStyle(
-      ThemeData themeData, InputDecorationTheme defaults) {
-    return WidgetStateProperty.resolveAs(defaults.helperStyle!, materialState)
-        .merge(WidgetStateProperty.resolveAs(
-            decoration.helperStyle, materialState));
+    ThemeData themeData,
+    InputDecorationTheme defaults,
+  ) {
+    return WidgetStateProperty.resolveAs(
+      defaults.helperStyle!,
+      materialState,
+    ).merge(
+      WidgetStateProperty.resolveAs(decoration.helperStyle, materialState),
+    );
   }
 
   TextStyle _getErrorStyle(ThemeData themeData, InputDecorationTheme defaults) {
-    return WidgetStateProperty.resolveAs(defaults.errorStyle!, materialState)
-        .merge(decoration.errorStyle);
+    return WidgetStateProperty.resolveAs(
+      defaults.errorStyle!,
+      materialState,
+    ).merge(decoration.errorStyle);
   }
 
   Set<WidgetState> get materialState {
@@ -2086,10 +2181,12 @@ class _InputDecoratorState extends State<MongolInputDecorator>
   }
 
   InputBorder _getDefaultBorder(
-      ThemeData themeData, InputDecorationTheme defaults) {
+    ThemeData themeData,
+    InputDecorationTheme defaults,
+  ) {
     final InputBorder border =
         WidgetStateProperty.resolveAs(decoration.border, materialState) ??
-            const SidelineInputBorder();
+        const SidelineInputBorder();
 
     if (decoration.border is WidgetStateProperty<InputBorder>) {
       return border;
@@ -2103,26 +2200,31 @@ class _InputDecoratorState extends State<MongolInputDecorator>
       if (decoration.filled!) {
         return border.copyWith(
           borderSide: WidgetStateProperty.resolveAs(
-              defaults.activeIndicatorBorder, materialState),
+            defaults.activeIndicatorBorder,
+            materialState,
+          ),
         );
       } else {
         return border.copyWith(
           borderSide: WidgetStateProperty.resolveAs(
-              defaults.outlineBorder, materialState),
+            defaults.outlineBorder,
+            materialState,
+          ),
         );
       }
     } else {
       return border.copyWith(
         borderSide: BorderSide(
           color: _getDefaultM2BorderColor(themeData),
-          width: ((decoration.isCollapsed ??
+          width:
+              ((decoration.isCollapsed ??
                       themeData.inputDecorationTheme.isCollapsed) ||
                   decoration.border == InputBorder.none ||
                   !decoration.enabled)
               ? 0.0
               : isFocused
-                  ? 2.0
-                  : 1.0,
+              ? 2.0
+              : 1.0,
         ),
       );
     }
@@ -2160,8 +2262,9 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     if (!decoration.enabled) {
       border = _hasError ? decoration.errorBorder : decoration.disabledBorder;
     } else if (isFocused) {
-      border =
-          _hasError ? decoration.focusedErrorBorder : decoration.focusedBorder;
+      border = _hasError
+          ? decoration.focusedErrorBorder
+          : decoration.focusedBorder;
     } else {
       border = _hasError ? decoration.errorBorder : decoration.enabledBorder;
     }
@@ -2178,28 +2281,29 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
     final Widget? label =
         decoration.labelText == null && decoration.label == null
-            ? null
-            : _Shaker(
-                animation: _shakingLabelController.view,
-                child: AnimatedOpacity(
-                  duration: _kTransitionDuration,
-                  curve: _kTransitionCurve,
-                  opacity: _shouldShowLabel ? 1.0 : 0.0,
-                  child: AnimatedDefaultTextStyle(
-                    duration: _kTransitionDuration,
-                    curve: _kTransitionCurve,
-                    style: widget._labelShouldWithdraw
-                        ? _getFloatingLabelStyle(themeData, defaults)
-                        : labelStyle,
-                    child: decoration.label ??
-                        MongolText(
-                          decoration.labelText!,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: textAlign,
-                        ),
-                  ),
-                ),
-              );
+        ? null
+        : _Shaker(
+            animation: _shakingLabelController.view,
+            child: AnimatedOpacity(
+              duration: _kTransitionDuration,
+              curve: _kTransitionCurve,
+              opacity: _shouldShowLabel ? 1.0 : 0.0,
+              child: AnimatedDefaultTextStyle(
+                duration: _kTransitionDuration,
+                curve: _kTransitionCurve,
+                style: widget._labelShouldWithdraw
+                    ? _getFloatingLabelStyle(themeData, defaults)
+                    : labelStyle,
+                child:
+                    decoration.label ??
+                    MongolText(
+                      decoration.labelText!,
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: textAlign,
+                    ),
+              ),
+            ),
+          );
 
     final bool hasPrefix =
         decoration.prefix != null || decoration.prefixText != null;
@@ -2209,18 +2313,23 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     Widget? input = widget.child;
     // If at least two out of the three are visible, it needs semantics sort
     // order.
-    final bool needsSemanticsSortOrder = widget._labelShouldWithdraw &&
+    final bool needsSemanticsSortOrder =
+        widget._labelShouldWithdraw &&
         (input != null ? (hasPrefix || hasSuffix) : (hasPrefix && hasSuffix));
 
     final Widget? prefix = hasPrefix
         ? _AffixText(
             labelIsFloating: widget._labelShouldWithdraw,
             text: decoration.prefixText,
-            style: WidgetStateProperty.resolveAs(
-                    decoration.prefixStyle, materialState) ??
+            style:
+                WidgetStateProperty.resolveAs(
+                  decoration.prefixStyle,
+                  materialState,
+                ) ??
                 hintStyle,
-            semanticsSortKey:
-                needsSemanticsSortOrder ? _kPrefixSemanticsSortOrder : null,
+            semanticsSortKey: needsSemanticsSortOrder
+                ? _kPrefixSemanticsSortOrder
+                : null,
             semanticsTag: _kPrefixSemanticsTag,
             child: decoration.prefix,
           )
@@ -2230,21 +2339,22 @@ class _InputDecoratorState extends State<MongolInputDecorator>
         ? _AffixText(
             labelIsFloating: widget._labelShouldWithdraw,
             text: decoration.suffixText,
-            style: WidgetStateProperty.resolveAs(
-                    decoration.suffixStyle, materialState) ??
+            style:
+                WidgetStateProperty.resolveAs(
+                  decoration.suffixStyle,
+                  materialState,
+                ) ??
                 hintStyle,
-            semanticsSortKey:
-                needsSemanticsSortOrder ? _kSuffixSemanticsSortOrder : null,
+            semanticsSortKey: needsSemanticsSortOrder
+                ? _kSuffixSemanticsSortOrder
+                : null,
             semanticsTag: _kSuffixSemanticsTag,
             child: decoration.suffix,
           )
         : null;
 
     if (input != null && needsSemanticsSortOrder) {
-      input = Semantics(
-        sortKey: _kInputSemanticsSortOrder,
-        child: input,
-      );
+      input = Semantics(sortKey: _kInputSemanticsSortOrder, child: input);
     }
 
     final bool decorationIsDense = decoration.isDense ?? false;
@@ -2274,7 +2384,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
             child: MouseRegion(
               cursor: SystemMouseCursors.basic,
               child: ConstrainedBox(
-                constraints: decoration.prefixIconConstraints ??
+                constraints:
+                    decoration.prefixIconConstraints ??
                     themeData.visualDensity.effectiveConstraints(
                       const BoxConstraints(
                         minWidth: kMinInteractiveDimension,
@@ -2289,14 +2400,14 @@ class _InputDecoratorState extends State<MongolInputDecorator>
                   child: IconButtonTheme(
                     data: IconButtonThemeData(
                       style: IconButton.styleFrom(
-                        foregroundColor:
-                            _getPrefixIconColor(themeData, defaults),
+                        foregroundColor: _getPrefixIconColor(
+                          themeData,
+                          defaults,
+                        ),
                         iconSize: iconSize,
                       ),
                     ),
-                    child: Semantics(
-                      child: decoration.prefixIcon,
-                    ),
+                    child: Semantics(child: decoration.prefixIcon),
                   ),
                 ),
               ),
@@ -2311,7 +2422,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
             child: MouseRegion(
               cursor: SystemMouseCursors.basic,
               child: ConstrainedBox(
-                constraints: decoration.suffixIconConstraints ??
+                constraints:
+                    decoration.suffixIconConstraints ??
                     themeData.visualDensity.effectiveConstraints(
                       const BoxConstraints(
                         minWidth: kMinInteractiveDimension,
@@ -2326,14 +2438,14 @@ class _InputDecoratorState extends State<MongolInputDecorator>
                   child: IconButtonTheme(
                     data: IconButtonThemeData(
                       style: IconButton.styleFrom(
-                        foregroundColor:
-                            _getSuffixIconColor(themeData, defaults),
+                        foregroundColor: _getSuffixIconColor(
+                          themeData,
+                          defaults,
+                        ),
                         iconSize: iconSize,
                       ),
                     ),
-                    child: Semantics(
-                      child: decoration.suffixIcon,
-                    ),
+                    child: Semantics(child: decoration.suffixIcon),
                   ),
                 ),
               ),
@@ -2361,8 +2473,11 @@ class _InputDecoratorState extends State<MongolInputDecorator>
         child: MongolText(
           decoration.counterText!,
           style: _getHelperStyle(themeData, defaults).merge(
-              WidgetStateProperty.resolveAs(
-                  decoration.counterStyle, materialState)),
+            WidgetStateProperty.resolveAs(
+              decoration.counterStyle,
+              materialState,
+            ),
+          ),
           overflow: TextOverflow.ellipsis,
           semanticsLabel: decoration.semanticCounterText,
         ),
@@ -2372,8 +2487,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     // The _Decoration widget and _RenderDecoration assume that contentPadding
     // has been resolved to EdgeInsets.
     const textDirection = TextDirection.ltr;
-    final EdgeInsets? decorationContentPadding =
-        decoration.contentPadding?.resolve(textDirection);
+    final EdgeInsets? decorationContentPadding = decoration.contentPadding
+        ?.resolve(textDirection);
 
     final EdgeInsets contentPadding;
     final double floatingLabelWidth;
@@ -2385,7 +2500,8 @@ class _InputDecoratorState extends State<MongolInputDecorator>
       floatingLabelWidth = MediaQuery.textScalerOf(context)
           .scale((4.0 + 0.75 * labelStyle.fontSize!));
       if (decoration.filled ?? false) {
-        contentPadding = decorationContentPadding ??
+        contentPadding =
+            decorationContentPadding ??
             (decorationIsDense
                 ? const EdgeInsets.fromLTRB(8.0, 12.0, 8.0, 12.0)
                 : const EdgeInsets.fromLTRB(12.0, 12.0, 12.0, 12.0));
@@ -2393,14 +2509,16 @@ class _InputDecoratorState extends State<MongolInputDecorator>
         // Not top or bottom padding for underline borders that aren't filled
         // is a small concession to backwards compatibility. This eliminates
         // the most noticeable layout change introduced by #13734.
-        contentPadding = decorationContentPadding ??
+        contentPadding =
+            decorationContentPadding ??
             (decorationIsDense
                 ? const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0.0)
                 : const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0));
       }
     } else {
       floatingLabelWidth = 0.0;
-      contentPadding = decorationContentPadding ??
+      contentPadding =
+          decorationContentPadding ??
           (decorationIsDense
               ? const EdgeInsets.fromLTRB(20.0, 12.0, 12.0, 12.0)
               : const EdgeInsets.fromLTRB(24.0, 12.0, 16.0, 12.0));
@@ -2408,28 +2526,30 @@ class _InputDecoratorState extends State<MongolInputDecorator>
 
     final _Decorator decorator = _Decorator(
       decoration: _Decoration(
-          contentPadding: contentPadding,
-          isCollapsed: decoration.isCollapsed ??
-              themeData.inputDecorationTheme.isCollapsed,
-          floatingLabelWidth: floatingLabelWidth,
-          floatingLabelAlignment: decoration.floatingLabelAlignment!,
-          floatingLabelProgress: _floatingLabelAnimation.value,
-          border: border,
-          borderGap: _borderGap,
-          alignLabelWithHint: decoration.alignLabelWithHint ?? false,
-          isDense: decoration.isDense,
-          visualDensity: themeData.visualDensity,
-          icon: icon,
-          input: input,
-          label: label,
-          hint: hint,
-          prefix: prefix,
-          suffix: suffix,
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
-          helperError: helperError,
-          counter: counter,
-          container: container),
+        contentPadding: contentPadding,
+        isCollapsed:
+            decoration.isCollapsed ??
+            themeData.inputDecorationTheme.isCollapsed,
+        floatingLabelWidth: floatingLabelWidth,
+        floatingLabelAlignment: decoration.floatingLabelAlignment!,
+        floatingLabelProgress: _floatingLabelAnimation.value,
+        border: border,
+        borderGap: _borderGap,
+        alignLabelWithHint: decoration.alignLabelWithHint ?? false,
+        isDense: decoration.isDense,
+        visualDensity: themeData.visualDensity,
+        icon: icon,
+        input: input,
+        label: label,
+        hint: hint,
+        prefix: prefix,
+        suffix: suffix,
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
+        helperError: helperError,
+        counter: counter,
+        container: container,
+      ),
       textBaseline: textBaseline,
       textAlignHorizontal: widget.textAlignHorizontal,
       isFocused: isFocused,
@@ -2440,10 +2560,7 @@ class _InputDecoratorState extends State<MongolInputDecorator>
     final BoxConstraints? constraints =
         decoration.constraints ?? themeData.inputDecorationTheme.constraints;
     if (constraints != null) {
-      return ConstrainedBox(
-        constraints: constraints,
-        child: decorator,
-      );
+      return ConstrainedBox(constraints: constraints, child: decorator);
     }
     return decorator;
   }
@@ -2488,29 +2605,29 @@ class _InputDecoratorDefaultsM2 extends InputDecorationTheme {
       });
 
   @override
-  TextStyle? get helperStyle =>
-      WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
-        final ThemeData themeData = Theme.of(context);
-        if (states.contains(WidgetState.disabled)) {
-          return themeData.textTheme.bodySmall!
-              .copyWith(color: Colors.transparent);
-        }
+  TextStyle? get helperStyle => WidgetStateTextStyle.resolveWith((
+    Set<WidgetState> states,
+  ) {
+    final ThemeData themeData = Theme.of(context);
+    if (states.contains(WidgetState.disabled)) {
+      return themeData.textTheme.bodySmall!.copyWith(color: Colors.transparent);
+    }
 
-        return themeData.textTheme.bodySmall!
-            .copyWith(color: themeData.hintColor);
-      });
+    return themeData.textTheme.bodySmall!.copyWith(color: themeData.hintColor);
+  });
 
   @override
-  TextStyle? get errorStyle =>
-      WidgetStateTextStyle.resolveWith((Set<WidgetState> states) {
-        final ThemeData themeData = Theme.of(context);
-        if (states.contains(WidgetState.disabled)) {
-          return themeData.textTheme.bodySmall!
-              .copyWith(color: Colors.transparent);
-        }
-        return themeData.textTheme.bodySmall!
-            .copyWith(color: themeData.colorScheme.error);
-      });
+  TextStyle? get errorStyle => WidgetStateTextStyle.resolveWith((
+    Set<WidgetState> states,
+  ) {
+    final ThemeData themeData = Theme.of(context);
+    if (states.contains(WidgetState.disabled)) {
+      return themeData.textTheme.bodySmall!.copyWith(color: Colors.transparent);
+    }
+    return themeData.textTheme.bodySmall!.copyWith(
+      color: themeData.colorScheme.error,
+    );
+  });
 
   @override
   Color? get fillColor =>
@@ -2691,7 +2808,8 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
         final TextStyle textStyle = _textTheme.bodyLarge ?? const TextStyle();
         if (states.contains(WidgetState.disabled)) {
           return textStyle.copyWith(
-              color: _colors.onSurface.withValues(alpha: 0.38));
+            color: _colors.onSurface.withValues(alpha: 0.38),
+          );
         }
         if (states.contains(WidgetState.error)) {
           if (states.contains(WidgetState.hovered)) {
@@ -2717,7 +2835,8 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
         final TextStyle textStyle = _textTheme.bodyLarge ?? const TextStyle();
         if (states.contains(WidgetState.disabled)) {
           return textStyle.copyWith(
-              color: _colors.onSurface.withValues(alpha: 0.38));
+            color: _colors.onSurface.withValues(alpha: 0.38),
+          );
         }
         if (states.contains(WidgetState.error)) {
           if (states.contains(WidgetState.hovered)) {
@@ -2743,7 +2862,8 @@ class _InputDecoratorDefaultsM3 extends InputDecorationTheme {
         final TextStyle textStyle = _textTheme.bodySmall ?? const TextStyle();
         if (states.contains(WidgetState.disabled)) {
           return textStyle.copyWith(
-              color: _colors.onSurface.withValues(alpha: 0.38));
+            color: _colors.onSurface.withValues(alpha: 0.38),
+          );
         }
         return textStyle.copyWith(color: _colors.onSurfaceVariant);
       });

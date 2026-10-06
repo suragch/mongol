@@ -119,8 +119,17 @@ class MongolLineMetrics {
   }
 
   @override
-  int get hashCode => Object.hash(hardBreak, ascent, descent, unscaledAscent,
-      height, width, top, baseline, lineNumber);
+  int get hashCode => Object.hash(
+    hardBreak,
+    ascent,
+    descent,
+    unscaledAscent,
+    height,
+    width,
+    top,
+    baseline,
+    lineNumber,
+  );
 
   @override
   String toString() {
@@ -364,7 +373,9 @@ class MongolParagraph {
   TextPosition getPositionForOffset(Offset offset) {
     final encoded = _getPositionForOffset(offset.dx, offset.dy);
     return TextPosition(
-        offset: encoded[0], affinity: TextAffinity.values[encoded[1]]);
+      offset: encoded[0],
+      affinity: TextAffinity.values[encoded[1]],
+    );
   }
 
   // Both the line info and the text run are in horizontal orientation,
@@ -424,8 +435,9 @@ class MongolParagraph {
 
     // find the affinity
     final lineEndCharOffset = matchedRun.end;
-    final textAffinity =
-        (textOffset == lineEndCharOffset) ? upstream : downstream;
+    final textAffinity = (textOffset == lineEndCharOffset)
+        ? upstream
+        : downstream;
     return [textOffset, textAffinity];
   }
 
@@ -458,7 +470,11 @@ class MongolParagraph {
   }
 
   void _drawEachRunInCurrentLine(
-      Canvas canvas, _LineInfo line, bool shouldDrawEllipsis, bool isLastLine) {
+    Canvas canvas,
+    _LineInfo line,
+    bool shouldDrawEllipsis,
+    bool isLastLine,
+  ) {
     canvas.save();
 
     var runSpacing = 0.0;
@@ -785,8 +801,10 @@ class MongolParagraph {
         }
         ascent = math.max(runMetrics?.ascent ?? 0, ascent);
         descent = math.max(runMetrics?.descent ?? 0, descent);
-        unscaledAscent =
-            math.max(runMetrics?.unscaledAscent ?? 0, unscaledAscent);
+        unscaledAscent = math.max(
+          runMetrics?.unscaledAscent ?? 0,
+          unscaledAscent,
+        );
         width = math.max(runMetrics?.height ?? 0, width);
         height += runMetrics?.width ?? textRun.width;
         final previousMetrics = index > 0 ? metrics[index - 1] : null;
@@ -861,7 +879,8 @@ class MongolParagraph {
     }());
     return disposed ??
         (throw StateError(
-            '$runtimeType.debugDisposed is only available when asserts are enabled.'));
+          '$runtimeType.debugDisposed is only available when asserts are enabled.',
+        ));
   }
 }
 
@@ -871,9 +890,7 @@ class MongolParagraph {
 ///
 /// The only constraint that can be specified is the [height].
 class MongolParagraphConstraints {
-  const MongolParagraphConstraints({
-    required this.height,
-  });
+  const MongolParagraphConstraints({required this.height});
 
   /// The height the paragraph should use when computing the positions of glyphs.
   final double height;
@@ -919,10 +936,10 @@ class MongolParagraphBuilder {
     this._maxLines,
     this._ellipsis,
     this._rotateCJK = true,
-  })  : _paragraphStyle = style,
-        _textScaler = textScaler == TextScaler.noScaling
-            ? TextScaler.linear(textScaleFactor)
-            : textScaler;
+  }) : _paragraphStyle = style,
+       _textScaler = textScaler == TextScaler.noScaling
+           ? TextScaler.linear(textScaleFactor)
+           : textScaler;
 
   ui.ParagraphStyle? _paragraphStyle;
   final MongolTextAlign _textAlign;
@@ -1120,7 +1137,8 @@ class LineBreaker implements Iterator<RotatableString> {
   RotatableString get current {
     if (_currentTextRun == null) {
       throw StateError(
-          'Current is undefined before moveNext is called or after last element.');
+        'Current is undefined before moveNext is called or after last element.',
+      );
     }
     return _currentTextRun!;
   }

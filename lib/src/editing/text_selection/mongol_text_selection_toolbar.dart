@@ -71,9 +71,7 @@ class MongolTextSelectionToolbar extends StatelessWidget {
 
   // Build the default text selection menu toolbar.
   static Widget _defaultToolbarBuilder(BuildContext context, Widget child) {
-    return _TextSelectionToolbarContainer(
-      child: child,
-    );
+    return _TextSelectionToolbarContainer(child: child);
   }
 
   @override
@@ -181,23 +179,23 @@ class _TextSelectionToolbarOverflowableState
         // API 28.
         duration: const Duration(milliseconds: 140),
         child: widget.toolbarBuilder(
-            context,
-            _TextSelectionToolbarItemsLayout(
-              isLeft: widget.isLeft,
-              overflowOpen: _overflowOpen,
-              children: <Widget>[
-                _TextSelectionToolbarOverflowButton(
-                  icon:
-                      Icon(_overflowOpen ? Icons.arrow_back : Icons.more_horiz),
-                  onPressed: () {
-                    setState(() {
-                      _overflowOpen = !_overflowOpen;
-                    });
-                  },
-                ),
-                ...widget.children,
-              ],
-            )),
+          context,
+          _TextSelectionToolbarItemsLayout(
+            isLeft: widget.isLeft,
+            overflowOpen: _overflowOpen,
+            children: <Widget>[
+              _TextSelectionToolbarOverflowButton(
+                icon: Icon(_overflowOpen ? Icons.arrow_back : Icons.more_horiz),
+                onPressed: () {
+                  setState(() {
+                    _overflowOpen = !_overflowOpen;
+                  });
+                },
+              ),
+              ...widget.children,
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -219,23 +217,25 @@ class _TextSelectionToolbarTrailingEdgeAlign
 
   @override
   _TextSelectionToolbarTrailingEdgeAlignRenderBox createRenderObject(
-      BuildContext context) {
+    BuildContext context,
+  ) {
     return _TextSelectionToolbarTrailingEdgeAlignRenderBox(
       overflowOpen: overflowOpen,
     );
   }
 
   @override
-  void updateRenderObject(BuildContext context,
-      _TextSelectionToolbarTrailingEdgeAlignRenderBox renderObject) {
+  void updateRenderObject(
+    BuildContext context,
+    _TextSelectionToolbarTrailingEdgeAlignRenderBox renderObject,
+  ) {
     renderObject.overflowOpen = overflowOpen;
   }
 }
 
 class _TextSelectionToolbarTrailingEdgeAlignRenderBox extends RenderProxyBox {
-  _TextSelectionToolbarTrailingEdgeAlignRenderBox({
-    required this._overflowOpen,
-  })  : super();
+  _TextSelectionToolbarTrailingEdgeAlignRenderBox({required this._overflowOpen})
+    : super();
 
   // The height of the menu when it was closed. This is used to achieve the
   // behavior where the open menu aligns its trailing edge to the closed menu's
@@ -264,24 +264,23 @@ class _TextSelectionToolbarTrailingEdgeAlignRenderBox extends RenderProxyBox {
       _closedHeight = child!.size.height;
     }
 
-    size = constraints.constrain(Size(
-      child!.size.width,
-      // If the open menu is higher than the closed menu, just use its own height
-      // and don't worry about aligning the trailing edges.
-      // _closedHeight is used even when the menu is closed to allow it to
-      // animate its size while keeping the same edge alignment.
-      _closedHeight == null || child!.size.height > _closedHeight!
-          ? child!.size.height
-          : _closedHeight!,
-    ));
+    size = constraints.constrain(
+      Size(
+        child!.size.width,
+        // If the open menu is higher than the closed menu, just use its own height
+        // and don't worry about aligning the trailing edges.
+        // _closedHeight is used even when the menu is closed to allow it to
+        // animate its size while keeping the same edge alignment.
+        _closedHeight == null || child!.size.height > _closedHeight!
+            ? child!.size.height
+            : _closedHeight!,
+      ),
+    );
 
     // Set the offset in the parent data such that the child will be aligned to
     // the trailing edge.
     final childParentData = child!.parentData! as ToolbarItemsParentData;
-    childParentData.offset = Offset(
-      0.0,
-      size.height - child!.size.height,
-    );
+    childParentData.offset = Offset(0.0, size.height - child!.size.height);
   }
 
   // Paint at the offset set in the parent data.
@@ -317,7 +316,11 @@ class _TextSelectionToolbarTrailingEdgeAlignRenderBox extends RenderProxyBox {
   void applyPaintTransform(RenderObject child, Matrix4 transform) {
     final childParentData = child.parentData! as ToolbarItemsParentData;
     transform.translateByDouble(
-        childParentData.offset.dx, childParentData.offset.dy, 0, 1);
+      childParentData.offset.dx,
+      childParentData.offset.dy,
+      0,
+      1,
+    );
     super.applyPaintTransform(child, transform);
   }
 }
@@ -336,7 +339,8 @@ class _TextSelectionToolbarItemsLayout extends MultiChildRenderObjectWidget {
 
   @override
   _RenderTextSelectionToolbarItemsLayout createRenderObject(
-      BuildContext context) {
+    BuildContext context,
+  ) {
     return _RenderTextSelectionToolbarItemsLayout(
       isLeft: isLeft,
       overflowOpen: overflowOpen,
@@ -344,8 +348,10 @@ class _TextSelectionToolbarItemsLayout extends MultiChildRenderObjectWidget {
   }
 
   @override
-  void updateRenderObject(BuildContext context,
-      _RenderTextSelectionToolbarItemsLayout renderObject) {
+  void updateRenderObject(
+    BuildContext context,
+    _RenderTextSelectionToolbarItemsLayout renderObject,
+  ) {
     renderObject
       ..isLeft = isLeft
       ..overflowOpen = overflowOpen;
@@ -358,9 +364,7 @@ class _TextSelectionToolbarItemsLayout extends MultiChildRenderObjectWidget {
 
 class _TextSelectionToolbarItemsLayoutElement
     extends MultiChildRenderObjectElement {
-  _TextSelectionToolbarItemsLayoutElement(
-    super.widget,
-  );
+  _TextSelectionToolbarItemsLayoutElement(super.widget);
 
   static bool _shouldPaint(Element child) {
     return (child.renderObject!.parentData! as ToolbarItemsParentData)
@@ -378,7 +382,7 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
   _RenderTextSelectionToolbarItemsLayout({
     required this._isLeft,
     required this._overflowOpen,
-  })  : super();
+  }) : super();
 
   // The index of the last item that doesn't overflow.
   int _lastIndexThatFits = -1;
@@ -409,10 +413,7 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
     // When overflow is not open, the toolbar is always a specific width.
     final sizedConstraints = _overflowOpen
         ? constraints
-        : BoxConstraints.loose(Size(
-            _kToolbarWidth,
-            constraints.maxHeight,
-          ));
+        : BoxConstraints.loose(Size(_kToolbarWidth, constraints.maxHeight));
 
     var i = -1;
     var height = 0.0;
@@ -494,10 +495,7 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
       if (!overflowOpen) {
         childParentData.offset = Offset(0.0, fitHeight);
         fitHeight += child.size.height;
-        nextSize = Size(
-          math.max(child.size.width, nextSize.width),
-          fitHeight,
-        );
+        nextSize = Size(math.max(child.size.width, nextSize.width), fitHeight);
       } else {
         childParentData.offset = Offset(overflowWidth, 0.0);
         overflowWidth += child.size.width;
@@ -513,16 +511,19 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
     if (_shouldPaintChild(firstChild!, 0)) {
       navButtonParentData.shouldPaint = true;
       if (overflowOpen) {
-        navButtonParentData.offset =
-            isLeft ? Offset(overflowWidth, 0.0) : Offset.zero;
+        navButtonParentData.offset = isLeft
+            ? Offset(overflowWidth, 0.0)
+            : Offset.zero;
         nextSize = Size(
           isLeft ? nextSize.width + navButton.size.width : nextSize.width,
           nextSize.height,
         );
       } else {
         navButtonParentData.offset = Offset(0.0, fitHeight);
-        nextSize =
-            Size(nextSize.width, nextSize.height + navButton.size.height);
+        nextSize = Size(
+          nextSize.width,
+          nextSize.height + navButton.size.height,
+        );
       }
     } else {
       navButtonParentData.shouldPaint = false;
@@ -608,9 +609,7 @@ class _RenderTextSelectionToolbarItemsLayout extends RenderBox
 // The Material-styled toolbar outline. Fill it with any widgets you want. No
 // overflow ability.
 class _TextSelectionToolbarContainer extends StatelessWidget {
-  const _TextSelectionToolbarContainer({
-    required this.child,
-  });
+  const _TextSelectionToolbarContainer({required this.child});
 
   final Widget child;
 
@@ -647,11 +646,7 @@ class _TextSelectionToolbarOverflowButton extends StatelessWidget {
     return Material(
       type: MaterialType.card,
       color: const Color(0x00000000),
-      child: IconButton(
-        icon: icon,
-        onPressed: onPressed,
-        tooltip: tooltip,
-      ),
+      child: IconButton(icon: icon, onPressed: onPressed, tooltip: tooltip),
     );
   }
 }

@@ -14,10 +14,7 @@ class _PopupMenuDemoState extends State<PopupMenuDemo> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: ThemeData(
-        fontFamily: 'MenksoftQagan',
-        useMaterial3: _material3,
-      ),
+      data: ThemeData(fontFamily: 'MenksoftQagan', useMaterial3: _material3),
       child: Scaffold(
         appBar: AppBar(
           title: const Text('MongolPopupMenuButton'),

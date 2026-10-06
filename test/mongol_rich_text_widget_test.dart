@@ -14,9 +14,7 @@ void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('MongolRichText has text', (WidgetTester tester) async {
-    await tester.pumpWidget(MongolRichText(
-      text: TextSpan(text: 'T'),
-    ));
+    await tester.pumpWidget(MongolRichText(text: TextSpan(text: 'T')));
 
     final finder = find.byType(MongolRichText);
     expect(finder, findsOneWidget);
@@ -25,8 +23,9 @@ void main() {
     expect(richText.text.text, equals('T'));
   });
 
-  testWidgets('MongolRichText has correct size for single word',
-      (WidgetTester tester) async {
+  testWidgets('MongolRichText has correct size for single word', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const Center(child: MongolText('Hello')));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
@@ -37,33 +36,32 @@ void main() {
     expect(baseSize.height, equals(70.0));
   });
 
-  testWidgets('MongolRichText should not wrap when less than height constraint',
-      (WidgetTester tester) async {
-    await binding.setSurfaceSize(const Size(1000, 1000));
-    addTearDown(() => binding.setSurfaceSize(null));
+  testWidgets(
+    'MongolRichText should not wrap when less than height constraint',
+    (WidgetTester tester) async {
+      await binding.setSurfaceSize(const Size(1000, 1000));
+      addTearDown(() => binding.setSurfaceSize(null));
 
-    const myString = 'A string that should not wrap';
-    await tester.pumpWidget(
-      const Center(child: MongolText(myString)),
-    );
+      const myString = 'A string that should not wrap';
+      await tester.pumpWidget(const Center(child: MongolText(myString)));
 
-    final text = tester.firstWidget(find.byType(MongolRichText));
-    expect(text, isNotNull);
+      final text = tester.firstWidget(find.byType(MongolRichText));
+      expect(text, isNotNull);
 
-    final baseSize = tester.getSize(find.byType(MongolRichText));
-    expect(baseSize.width, equals(14.0));
-  });
+      final baseSize = tester.getSize(find.byType(MongolRichText));
+      expect(baseSize.width, equals(14.0));
+    },
+  );
 
-  testWidgets('MongolRichText wraps text when taller than height constraint',
-      (WidgetTester tester) async {
+  testWidgets('MongolRichText wraps text when taller than height constraint', (
+    WidgetTester tester,
+  ) async {
     // set the height of the surface so that the text will wrap
     await binding.setSurfaceSize(const Size(1000, 500));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'A long long long string that should wrap';
-    await tester.pumpWidget(
-      const Center(child: MongolText(myString)),
-    );
+    await tester.pumpWidget(const Center(child: MongolText(myString)));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -73,15 +71,14 @@ void main() {
     expect(baseSize.height, equals(500.0));
   });
 
-  testWidgets('MongolRichText wraps text for new line character',
-      (WidgetTester tester) async {
+  testWidgets('MongolRichText wraps text for new line character', (
+    WidgetTester tester,
+  ) async {
     await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'A string that\nshould wrap';
-    await tester.pumpWidget(
-      const Center(child: MongolText(myString)),
-    );
+    await tester.pumpWidget(const Center(child: MongolText(myString)));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -91,15 +88,14 @@ void main() {
     expect(baseSize.height, equals(182.0));
   });
 
-  testWidgets('MongolRichText wraps text for new line character before space',
-      (WidgetTester tester) async {
+  testWidgets('MongolRichText wraps text for new line character before space', (
+    WidgetTester tester,
+  ) async {
     await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'A string that\n should wrap';
-    await tester.pumpWidget(
-      const Center(child: MongolText(myString)),
-    );
+    await tester.pumpWidget(const Center(child: MongolText(myString)));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -109,8 +105,9 @@ void main() {
     expect(baseSize.height, equals(182.0));
   });
 
-  testWidgets('MongolRichText has correct intrinsic width',
-      (WidgetTester tester) async {
+  testWidgets('MongolRichText has correct intrinsic width', (
+    WidgetTester tester,
+  ) async {
     final paragraph = MongolRenderParagraph(const TextSpan(text: 'A string'));
 
     final textHeight = paragraph.getMaxIntrinsicHeight(double.infinity);
@@ -123,25 +120,24 @@ void main() {
     expect(wrappedTextHeight, lessThan(textHeight));
     expect(oneLineTextWidth, lessThan(twoLinesTextWidth));
     expect(twoLinesTextWidth, lessThan(oneLineTextWidth * 3.0));
-    expect(paragraph.getMaxIntrinsicWidth(double.infinity),
-        equals(oneLineTextWidth));
-    expect(paragraph.getMaxIntrinsicWidth(constrainedHeight),
-        equals(twoLinesTextWidth));
+    expect(
+      paragraph.getMaxIntrinsicWidth(double.infinity),
+      equals(oneLineTextWidth),
+    );
+    expect(
+      paragraph.getMaxIntrinsicWidth(constrainedHeight),
+      equals(twoLinesTextWidth),
+    );
   });
 
-  testWidgets('MongolText rotates emoji automatically',
-      (WidgetTester tester) async {
+  testWidgets('MongolText rotates emoji automatically', (
+    WidgetTester tester,
+  ) async {
     await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = '🇲🇳';
-    await tester.pumpWidget(
-      const Center(
-        child: MongolText(
-          myString,
-        ),
-      ),
-    );
+    await tester.pumpWidget(const Center(child: MongolText(myString)));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -151,19 +147,14 @@ void main() {
     expect(baseSize.height, equals(28.0));
   });
 
-  testWidgets('MongolText rotates and stacks two CJK character',
-      (WidgetTester tester) async {
+  testWidgets('MongolText rotates and stacks two CJK character', (
+    WidgetTester tester,
+  ) async {
     await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = '你好';
-    await tester.pumpWidget(
-      const Center(
-        child: MongolText(
-          myString,
-        ),
-      ),
-    );
+    await tester.pumpWidget(const Center(child: MongolText(myString)));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -173,19 +164,14 @@ void main() {
     expect(baseSize.height, equals(28.0));
   });
 
-  testWidgets('MongolText handles embedded formatting characters',
-      (WidgetTester tester) async {
+  testWidgets('MongolText handles embedded formatting characters', (
+    WidgetTester tester,
+  ) async {
     await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'ᠨᠠ\u200dᠢᠮᠠ';
-    await tester.pumpWidget(
-      const Center(
-        child: MongolText(
-          myString,
-        ),
-      ),
-    );
+    await tester.pumpWidget(const Center(child: MongolText(myString)));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -195,19 +181,14 @@ void main() {
     expect(baseSize.height, equals(70.0));
   });
 
-  testWidgets('MongolText handles normal and rotated mix without spaces',
-      (WidgetTester tester) async {
+  testWidgets('MongolText handles normal and rotated mix without spaces', (
+    WidgetTester tester,
+  ) async {
     await binding.setSurfaceSize(const Size(1000, 1000));
     addTearDown(() => binding.setSurfaceSize(null));
 
     const myString = 'a你';
-    await tester.pumpWidget(
-      const Center(
-        child: MongolText(
-          myString,
-        ),
-      ),
-    );
+    await tester.pumpWidget(const Center(child: MongolText(myString)));
 
     final text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);

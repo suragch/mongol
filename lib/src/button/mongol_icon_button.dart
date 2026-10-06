@@ -5,6 +5,7 @@
 // found in the LICENSE file.
 
 import 'dart:math' as math;
+
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart'
     show
@@ -231,22 +232,30 @@ class MongolIconButton extends IconButton {
   }) {
     final WidgetStateProperty<Color?>? buttonBackgroundColor =
         (backgroundColor == null && disabledBackgroundColor == null)
-            ? null
-            : _IconButtonDefaultBackground(
-                backgroundColor, disabledBackgroundColor);
+        ? null
+        : _IconButtonDefaultBackground(
+            backgroundColor,
+            disabledBackgroundColor,
+          );
     final WidgetStateProperty<Color?>? buttonForegroundColor =
         (foregroundColor == null && disabledForegroundColor == null)
-            ? null
-            : _IconButtonDefaultForeground(
-                foregroundColor, disabledForegroundColor);
+        ? null
+        : _IconButtonDefaultForeground(
+            foregroundColor,
+            disabledForegroundColor,
+          );
     final WidgetStateProperty<Color?>? overlayColor =
         (foregroundColor == null &&
-                hoverColor == null &&
-                focusColor == null &&
-                highlightColor == null)
-            ? null
-            : _IconButtonDefaultOverlay(
-                foregroundColor, focusColor, hoverColor, highlightColor);
+            hoverColor == null &&
+            focusColor == null &&
+            highlightColor == null)
+        ? null
+        : _IconButtonDefaultOverlay(
+            foregroundColor,
+            focusColor,
+            hoverColor,
+            highlightColor,
+          );
     final WidgetStateProperty<MouseCursor?> mouseCursor =
         _IconButtonDefaultMouseCursor(enabledMouseCursor, disabledMouseCursor);
 
@@ -313,10 +322,7 @@ class MongolIconButton extends IconButton {
 
       Widget iconButton = effectiveIcon;
       if (tooltip != null) {
-        iconButton = MongolTooltip(
-          message: tooltip!,
-          child: effectiveIcon,
-        );
+        iconButton = MongolTooltip(message: tooltip!, child: effectiveIcon);
       }
 
       return _SelectableIconButton(
@@ -342,13 +348,14 @@ class MongolIconButton extends IconButton {
     final VisualDensity effectiveVisualDensity =
         visualDensity ?? theme.visualDensity;
 
-    final BoxConstraints unadjustedConstraints = constraints ??
+    final BoxConstraints unadjustedConstraints =
+        constraints ??
         const BoxConstraints(
           minWidth: _kMinButtonSize,
           minHeight: _kMinButtonSize,
         );
-    final BoxConstraints adjustedConstraints =
-        effectiveVisualDensity.effectiveConstraints(unadjustedConstraints);
+    final BoxConstraints adjustedConstraints = effectiveVisualDensity
+        .effectiveConstraints(unadjustedConstraints);
     final double effectiveIconSize =
         iconSize ?? IconTheme.of(context).size ?? 24.0;
     final EdgeInsetsGeometry effectivePadding =
@@ -366,10 +373,7 @@ class MongolIconButton extends IconButton {
           child: Align(
             alignment: effectiveAlignment,
             child: IconTheme.merge(
-              data: IconThemeData(
-                size: effectiveIconSize,
-                color: currentColor,
-              ),
+              data: IconThemeData(size: effectiveIconSize, color: currentColor),
               child: icon,
             ),
           ),
@@ -378,10 +382,7 @@ class MongolIconButton extends IconButton {
     );
 
     if (tooltip != null) {
-      result = MongolTooltip(
-        message: tooltip!,
-        child: result,
-      );
+      result = MongolTooltip(message: tooltip!, child: result);
     }
 
     return Semantics(
@@ -392,7 +393,8 @@ class MongolIconButton extends IconButton {
         autofocus: autofocus,
         canRequestFocus: onPressed != null,
         onTap: onPressed,
-        mouseCursor: mouseCursor ??
+        mouseCursor:
+            mouseCursor ??
             (onPressed == null
                 ? SystemMouseCursors.basic
                 : SystemMouseCursors.click),
@@ -401,12 +403,15 @@ class MongolIconButton extends IconButton {
         hoverColor: hoverColor ?? theme.hoverColor,
         highlightColor: highlightColor ?? theme.highlightColor,
         splashColor: splashColor ?? theme.splashColor,
-        radius: splashRadius ??
+        radius:
+            splashRadius ??
             math.max(
               Material.defaultSplashRadius,
               (effectiveIconSize +
-                      math.min(effectivePadding.horizontal,
-                          effectivePadding.vertical)) *
+                      math.min(
+                        effectivePadding.horizontal,
+                        effectivePadding.vertical,
+                      )) *
                   0.7,
               // x 0.5 for diameter -> radius and + 40% overflow derived from other Material apps.
             ),
@@ -448,8 +453,9 @@ class _SelectableIconButtonState extends State<_SelectableIconButton> {
     if (widget.isSelected == null) {
       statesController = WidgetStatesController();
     } else {
-      statesController = WidgetStatesController(
-          <WidgetState>{if (widget.isSelected!) WidgetState.selected});
+      statesController = WidgetStatesController(<WidgetState>{
+        if (widget.isSelected!) WidgetState.selected,
+      });
     }
   }
 
@@ -479,10 +485,7 @@ class _SelectableIconButtonState extends State<_SelectableIconButton> {
       onPressed: widget.onPressed,
       variant: widget.variant,
       toggleable: toggleable,
-      child: Semantics(
-        selected: widget.isSelected,
-        child: widget.child,
-      ),
+      child: Semantics(selected: widget.isSelected, child: widget.child),
     );
   }
 
@@ -504,10 +507,11 @@ class _IconButtonM3 extends ButtonStyleButton {
     required this.toggleable,
     required Widget super.child,
   }) : super(
-            onLongPress: null,
-            onHover: null,
-            onFocusChange: null,
-            clipBehavior: Clip.none);
+         onLongPress: null,
+         onHover: null,
+         onFocusChange: null,
+         clipBehavior: Clip.none,
+       );
 
   final _IconButtonVariant variant;
   final bool toggleable;
@@ -584,8 +588,9 @@ class _IconButtonM3 extends ButtonStyleButton {
         iconTheme.size == const IconThemeData.fallback().size;
 
     final ButtonStyle iconThemeStyle = IconButton.styleFrom(
-        foregroundColor: isDefaultColor ? null : iconTheme.color,
-        iconSize: isDefaultSize ? null : iconTheme.size);
+      foregroundColor: isDefaultColor ? null : iconTheme.color,
+      iconSize: isDefaultSize ? null : iconTheme.size,
+    );
 
     return IconButtonTheme.of(context).style?.merge(iconThemeStyle) ??
         iconThemeStyle;
@@ -616,7 +621,9 @@ class _IconButtonDefaultBackground extends WidgetStateProperty<Color?> {
 @immutable
 class _IconButtonDefaultForeground extends WidgetStateProperty<Color?> {
   _IconButtonDefaultForeground(
-      this.foregroundColor, this.disabledForegroundColor);
+    this.foregroundColor,
+    this.disabledForegroundColor,
+  );
 
   final Color? foregroundColor;
   final Color? disabledForegroundColor;
@@ -637,8 +644,12 @@ class _IconButtonDefaultForeground extends WidgetStateProperty<Color?> {
 
 @immutable
 class _IconButtonDefaultOverlay extends WidgetStateProperty<Color?> {
-  _IconButtonDefaultOverlay(this.foregroundColor, this.focusColor,
-      this.hoverColor, this.highlightColor);
+  _IconButtonDefaultOverlay(
+    this.foregroundColor,
+    this.focusColor,
+    this.hoverColor,
+    this.highlightColor,
+  );
 
   final Color? foregroundColor;
   final Color? focusColor;
@@ -702,11 +713,11 @@ class _IconButtonDefaultMouseCursor extends WidgetStateProperty<MouseCursor?>
 
 class _IconButtonDefaultsM3 extends ButtonStyle {
   _IconButtonDefaultsM3(this.context, this.toggleable)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   final bool toggleable;
@@ -825,11 +836,11 @@ class _IconButtonDefaultsM3 extends ButtonStyle {
 
 class _FilledIconButtonDefaultsM3 extends ButtonStyle {
   _FilledIconButtonDefaultsM3(this.context, this.toggleable)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   final bool toggleable;
@@ -976,11 +987,11 @@ class _FilledIconButtonDefaultsM3 extends ButtonStyle {
 
 class _FilledTonalIconButtonDefaultsM3 extends ButtonStyle {
   _FilledTonalIconButtonDefaultsM3(this.context, this.toggleable)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   final bool toggleable;
@@ -1127,11 +1138,11 @@ class _FilledTonalIconButtonDefaultsM3 extends ButtonStyle {
 
 class _OutlinedIconButtonDefaultsM3 extends ButtonStyle {
   _OutlinedIconButtonDefaultsM3(this.context, this.toggleable)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   final bool toggleable;

@@ -13,29 +13,28 @@ import 'package:mongol/mongol.dart';
 
 void main() {
   testWidgets('MongolText respects media query', (WidgetTester tester) async {
-    await tester.pumpWidget(const MediaQuery(
-      data: MediaQueryData(textScaler: TextScaler.linear(1.3)),
-      child: Center(
-        child: MongolText('Hello'),
+    await tester.pumpWidget(
+      const MediaQuery(
+        data: MediaQueryData(textScaler: TextScaler.linear(1.3)),
+        child: Center(child: MongolText('Hello')),
       ),
-    ));
+    );
 
     var text =
         tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.3);
 
-    await tester.pumpWidget(const Center(
-      child: MongolText('Hello'),
-    ));
+    await tester.pumpWidget(const Center(child: MongolText('Hello')));
 
     text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
     expect(text.textScaleFactor, 1.0);
   });
 
-  testWidgets('MongolText respects textScaleFactor with default font size',
-      (WidgetTester tester) async {
+  testWidgets('MongolText respects textScaleFactor with default font size', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(const Center(child: MongolText('Hello')));
 
     var text =
@@ -46,12 +45,9 @@ void main() {
     expect(baseSize.width, equals(14.0));
     expect(baseSize.height, equals(70.0));
 
-    await tester.pumpWidget(const Center(
-      child: MongolText(
-        'Hello',
-        textScaleFactor: 1.5,
-      ),
-    ));
+    await tester.pumpWidget(
+      const Center(child: MongolText('Hello', textScaleFactor: 1.5)),
+    );
 
     text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -61,11 +57,14 @@ void main() {
     expect(largeSize.height, equals(105.0));
   });
 
-  testWidgets('MongolText respects textScaleFactor with explicit font size',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(const Center(
-      child: MongolText('Hello', style: TextStyle(fontSize: 20.0)),
-    ));
+  testWidgets('MongolText respects textScaleFactor with explicit font size', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const Center(
+        child: MongolText('Hello', style: TextStyle(fontSize: 20.0)),
+      ),
+    );
 
     var text =
         tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
@@ -75,10 +74,15 @@ void main() {
     expect(baseSize.width, equals(20.0));
     expect(baseSize.height, equals(100.0));
 
-    await tester.pumpWidget(const Center(
-      child: MongolText('Hello',
-          style: TextStyle(fontSize: 20.0), textScaleFactor: 1.3),
-    ));
+    await tester.pumpWidget(
+      const Center(
+        child: MongolText(
+          'Hello',
+          style: TextStyle(fontSize: 20.0),
+          textScaleFactor: 1.3,
+        ),
+      ),
+    );
 
     text = tester.firstWidget(find.byType(MongolRichText));
     expect(text, isNotNull);
@@ -89,36 +93,35 @@ void main() {
   });
 
   testWidgets(
-      'MongolText can be created from TextSpans and uses defaultTextStyle',
-      (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const DefaultTextStyle(
-        style: TextStyle(
-          fontSize: 20.0,
-        ),
-        child: MongolText.rich(
-          TextSpan(
-            text: 'Hello',
-            children: <TextSpan>[
-              TextSpan(
-                text: ' beautiful ',
-                style: TextStyle(fontStyle: FontStyle.italic),
-              ),
-              TextSpan(
-                text: 'world',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ],
+    'MongolText can be created from TextSpans and uses defaultTextStyle',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const DefaultTextStyle(
+          style: TextStyle(fontSize: 20.0),
+          child: MongolText.rich(
+            TextSpan(
+              text: 'Hello',
+              children: <TextSpan>[
+                TextSpan(
+                  text: ' beautiful ',
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+                TextSpan(
+                  text: 'world',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
 
-    final text =
-        tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
-    expect(text, isNotNull);
-    expect(text.text.style!.fontSize, 20.0);
-  });
+      final text =
+          tester.firstWidget(find.byType(MongolRichText)) as MongolRichText;
+      expect(text, isNotNull);
+      expect(text.text.style!.fontSize, 20.0);
+    },
+  );
 
   // TODO the following features and tests need to be added:
 

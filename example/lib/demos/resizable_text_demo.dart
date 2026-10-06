@@ -48,11 +48,7 @@ class _ResizableTextDemoState extends State<ResizableTextDemo> {
             scale = (height) / scaledHeight;
           });
         },
-        child: Container(
-          color: Colors.red,
-          width: 20,
-          height: 20,
-        ),
+        child: Container(color: Colors.red, width: 20, height: 20),
       ),
     );
   }
@@ -69,11 +65,7 @@ class _ResizableTextDemoState extends State<ResizableTextDemo> {
         onVerticalDragEnd: (details) {
           scaledHeight = height / scale;
         },
-        child: Container(
-          color: Colors.green,
-          width: 20,
-          height: 20,
-        ),
+        child: Container(color: Colors.green, width: 20, height: 20),
       ),
     );
   }

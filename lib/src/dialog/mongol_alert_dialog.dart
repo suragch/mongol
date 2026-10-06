@@ -29,14 +29,16 @@ class MongolDialog extends StatelessWidget {
 
   static const RoundedRectangleBorder _defaultDialogShape =
       RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(2.0)));
+        borderRadius: BorderRadius.all(Radius.circular(2.0)),
+      );
   static const double _defaultElevation = 24.0;
 
   @override
   Widget build(BuildContext context) {
     final dialogTheme = DialogTheme.of(context);
     return AnimatedPadding(
-      padding: MediaQuery.of(context).viewInsets +
+      padding:
+          MediaQuery.of(context).viewInsets +
           const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
       duration: insetAnimationDuration,
       curve: insetAnimationCurve,
@@ -50,7 +52,8 @@ class MongolDialog extends StatelessWidget {
           child: ConstrainedBox(
             constraints: const BoxConstraints(minHeight: 280.0),
             child: Material(
-              color: backgroundColor ??
+              color:
+                  backgroundColor ??
                   dialogTheme.backgroundColor ??
                   Theme.of(context).dialogTheme.backgroundColor,
               elevation:
@@ -109,17 +112,15 @@ class MongolAlertDialog extends StatelessWidget {
     Widget? actionsWidget;
     if (title != null) {
       titleWidget = Padding(
-        padding: titlePadding ??
+        padding:
+            titlePadding ??
             EdgeInsets.fromLTRB(24.0, 24.0, 24.0, content == null ? 20.0 : 0.0),
         child: DefaultTextStyle(
-          style: titleTextStyle ??
+          style:
+              titleTextStyle ??
               dialogTheme.titleTextStyle ??
               theme.textTheme.titleLarge!,
-          child: Semantics(
-            namesRoute: true,
-            container: true,
-            child: title,
-          ),
+          child: Semantics(namesRoute: true, container: true, child: title),
         ),
       );
     }
@@ -128,7 +129,8 @@ class MongolAlertDialog extends StatelessWidget {
       contentWidget = Padding(
         padding: contentPadding,
         child: DefaultTextStyle(
-          style: contentTextStyle ??
+          style:
+              contentTextStyle ??
               dialogTheme.contentTextStyle ??
               theme.textTheme.titleMedium!,
           child: content!,

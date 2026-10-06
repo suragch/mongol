@@ -32,9 +32,7 @@ void showAlertDialog(BuildContext context) {
   final alert = MongolAlertDialog(
     title: const MongolText('ᠠᠰᠠᠭᠤᠳᠠᠯ ᠲᠠᠢ'),
     content: const MongolText('ᠬᠣᠯᠪᠣᠭᠳᠠᠬᠤ ᠪᠣᠯᠤᠮᠵᠢ ᠦᠭᠡᠢ ᠪᠠᠶᠢᠨ᠎ᠠ'),
-    actions: [
-      actionButton,
-    ],
+    actions: [actionButton],
   );
 
   // show the dialog

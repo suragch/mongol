@@ -85,15 +85,17 @@ class MongolRichText extends LeafRenderObjectWidget {
     this.maxLines,
     this.rotateCJK = true,
     this.textHeightBasis = TextHeightBasis.parent,
-  })  : assert(maxLines == null || maxLines > 0),
-        assert(
-          textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
-          'Use textScaler instead.',
-        ),
-        textScaler = _effectiveTextScalerFrom(textScaler, textScaleFactor);
+  }) : assert(maxLines == null || maxLines > 0),
+       assert(
+         textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
+         'Use textScaler instead.',
+       ),
+       textScaler = _effectiveTextScalerFrom(textScaler, textScaleFactor);
 
   static TextScaler _effectiveTextScalerFrom(
-      TextScaler textScaler, double textScaleFactor) {
+    TextScaler textScaler,
+    double textScaleFactor,
+  ) {
     if (textScaleFactor == 1.0) return textScaler;
     if (identical(textScaler, TextScaler.noScaling)) {
       return TextScaler.linear(textScaleFactor);
@@ -170,7 +172,9 @@ class MongolRichText extends LeafRenderObjectWidget {
 
   @override
   void updateRenderObject(
-      BuildContext context, MongolRenderParagraph renderObject) {
+    BuildContext context,
+    MongolRenderParagraph renderObject,
+  ) {
     renderObject
       ..text = text
       ..textAlign = textAlign
@@ -186,22 +190,45 @@ class MongolRichText extends LeafRenderObjectWidget {
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(StringProperty('text', text.toPlainText()));
-    properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
-        defaultValue: MongolTextAlign.top));
-    properties.add(FlagProperty('softWrap',
+    properties.add(
+      EnumProperty<MongolTextAlign>(
+        'textAlign',
+        textAlign,
+        defaultValue: MongolTextAlign.top,
+      ),
+    );
+    properties.add(
+      FlagProperty(
+        'softWrap',
         value: softWrap,
         ifTrue: 'wrapping at box height',
         ifFalse: 'no wrapping except at line break characters',
-        showName: true));
-    properties.add(EnumProperty<TextOverflow>('overflow', overflow,
-        defaultValue: TextOverflow.clip));
-    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler,
-        defaultValue: TextScaler.noScaling));
+        showName: true,
+      ),
+    );
+    properties.add(
+      EnumProperty<TextOverflow>(
+        'overflow',
+        overflow,
+        defaultValue: TextOverflow.clip,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextScaler>(
+        'textScaler',
+        textScaler,
+        defaultValue: TextScaler.noScaling,
+      ),
+    );
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
-    properties.add(FlagProperty('rotateCJK',
+    properties.add(
+      FlagProperty(
+        'rotateCJK',
         value: rotateCJK,
         ifTrue: 'rotate CJK characters',
         ifFalse: 'do not rotate CJK characters',
-        showName: true));
+        showName: true,
+      ),
+    );
   }
 }

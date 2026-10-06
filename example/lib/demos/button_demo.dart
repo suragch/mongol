@@ -14,15 +14,10 @@ class _ButtonDemoState extends State<ButtonDemo> {
   @override
   Widget build(BuildContext context) {
     return Theme(
-      data: ThemeData(
-        fontFamily: 'MenksoftQagan',
-        useMaterial3: _material3,
-      ),
+      data: ThemeData(fontFamily: 'MenksoftQagan', useMaterial3: _material3),
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: const Text('Buttons'),
-        ),
+        appBar: AppBar(title: const Text('Buttons')),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             setState(() {

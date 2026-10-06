@@ -94,11 +94,11 @@ class MongolText extends StatelessWidget {
     this.maxLines,
     this.semanticsLabel,
     this.rotateCJK = true,
-  })  : assert(
-          data != null,
-          'A non-null String must be provided to a MongolText widget.',
-        ),
-        textSpan = null;
+  }) : assert(
+         data != null,
+         'A non-null String must be provided to a MongolText widget.',
+       ),
+       textSpan = null;
 
   /// Creates a vertical Mongolian text widget with a [TextSpan].
   ///
@@ -123,11 +123,11 @@ class MongolText extends StatelessWidget {
     this.maxLines,
     this.semanticsLabel,
     this.rotateCJK = true,
-  })  : assert(
-          textSpan != null,
-          'A non-null TextSpan must be provided to a Text.rich widget.',
-        ),
-        data = null;
+  }) : assert(
+         textSpan != null,
+         'A non-null TextSpan must be provided to a Text.rich widget.',
+       ),
+       data = null;
 
   /// This is the text that the MongolText widget will display.
   final String? data;
@@ -218,23 +218,28 @@ class MongolText extends StatelessWidget {
       effectiveTextStyle = defaultTextStyle.style.merge(effectiveTextStyle);
     }
     if (MediaQuery.boldTextOf(context)) {
-      effectiveTextStyle = effectiveTextStyle!
-          .merge(const TextStyle(fontWeight: FontWeight.bold));
+      effectiveTextStyle = effectiveTextStyle!.merge(
+        const TextStyle(fontWeight: FontWeight.bold),
+      );
     }
-    final defaultTextAlign =
-        mapHorizontalToMongolTextAlign(defaultTextStyle.textAlign);
+    final defaultTextAlign = mapHorizontalToMongolTextAlign(
+      defaultTextStyle.textAlign,
+    );
     Widget result = MongolRichText(
       textAlign: textAlign ?? defaultTextAlign ?? MongolTextAlign.top,
       softWrap: softWrap ?? defaultTextStyle.softWrap,
       overflow: overflow ?? defaultTextStyle.overflow,
-      textScaler: textScaler ??
+      textScaler:
+          textScaler ??
           (textScaleFactor != null
               ? TextScaler.linear(textScaleFactor!)
               : MediaQuery.textScalerOf(context)),
       maxLines: maxLines ?? defaultTextStyle.maxLines,
-      textHeightBasis: textHeightBasis ??
+      textHeightBasis:
+          textHeightBasis ??
           mapHorizontalToMongolTextHeightBasis(
-              defaultTextStyle.textWidthBasis) ??
+            defaultTextStyle.textWidthBasis,
+          ) ??
           TextHeightBasis.parent,
       rotateCJK: rotateCJK,
       text: TextSpan(
@@ -247,9 +252,7 @@ class MongolText extends StatelessWidget {
       result = Semantics(
         textDirection: TextDirection.ltr,
         label: semanticsLabel,
-        child: ExcludeSemantics(
-          child: result,
-        ),
+        child: ExcludeSemantics(child: result),
       );
     }
     return result;
@@ -260,29 +263,48 @@ class MongolText extends StatelessWidget {
     super.debugFillProperties(properties);
     properties.add(StringProperty('data', data, showName: false));
     if (textSpan != null) {
-      properties.add(textSpan!.toDiagnosticsNode(
-          name: 'textSpan', style: DiagnosticsTreeStyle.transition));
+      properties.add(
+        textSpan!.toDiagnosticsNode(
+          name: 'textSpan',
+          style: DiagnosticsTreeStyle.transition,
+        ),
+      );
     }
     style?.debugFillProperties(properties);
-    properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
-        defaultValue: null));
-    properties.add(FlagProperty('softWrap',
+    properties.add(
+      EnumProperty<MongolTextAlign>('textAlign', textAlign, defaultValue: null),
+    );
+    properties.add(
+      FlagProperty(
+        'softWrap',
         value: softWrap,
         ifTrue: 'wrapping at box height',
         ifFalse: 'no wrapping except at line break characters',
-        showName: true));
+        showName: true,
+      ),
+    );
     properties.add(
-        EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null));
-    properties.add(DiagnosticsProperty<TextScaler>('textScaler', textScaler,
-        defaultValue: null));
+      EnumProperty<TextOverflow>('overflow', overflow, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<TextScaler>(
+        'textScaler',
+        textScaler,
+        defaultValue: null,
+      ),
+    );
     properties.add(IntProperty('maxLines', maxLines, defaultValue: null));
     if (semanticsLabel != null) {
       properties.add(StringProperty('semanticsLabel', semanticsLabel));
     }
-    properties.add(FlagProperty('rotateCJK',
+    properties.add(
+      FlagProperty(
+        'rotateCJK',
         value: rotateCJK,
         ifTrue: 'rotate CJK characters',
         ifFalse: 'do not rotate CJK characters',
-        showName: true));
+        showName: true,
+      ),
+    );
   }
 }

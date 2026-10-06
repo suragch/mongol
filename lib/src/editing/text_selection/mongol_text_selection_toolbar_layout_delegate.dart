@@ -8,13 +8,14 @@ import 'dart:math' as math;
 
 import 'package:flutter/rendering.dart';
 
-/// Positions the toolbar to the left of [anchorLeft] if it fits, or otherwise 
+/// Positions the toolbar to the left of [anchorLeft] if it fits, or otherwise
 /// to the right of [anchorRight].
 ///
 /// See also:
 ///
 ///   * [MongolTextSelectionToolbar], which uses this to position itself.
-class MongolTextSelectionToolbarLayoutDelegate extends SingleChildLayoutDelegate {
+class MongolTextSelectionToolbarLayoutDelegate
+    extends SingleChildLayoutDelegate {
   /// Creates an instance of MongolTextSelectionToolbarLayoutDelegate.
   MongolTextSelectionToolbarLayoutDelegate({
     required this.anchorLeft,
@@ -22,17 +23,17 @@ class MongolTextSelectionToolbarLayoutDelegate extends SingleChildLayoutDelegate
     this.fitsLeft,
   });
 
-  /// The focal point to the left of which the toolbar attempts to position 
+  /// The focal point to the left of which the toolbar attempts to position
   /// itself.
   ///
-  /// If there is not enough room to the left before reaching the left of the 
-  /// screen, then the toolbar will position itself to the right of 
+  /// If there is not enough room to the left before reaching the left of the
+  /// screen, then the toolbar will position itself to the right of
   /// [anchorRight].
   ///
   /// Should be provided in local coordinates.
   final Offset anchorLeft;
 
-  /// The focal point to the right of which the toolbar attempts to position 
+  /// The focal point to the right of which the toolbar attempts to position
   /// itself, if it doesn't fit to the left of [anchorLeft].
   ///
   /// Should be provided in local coordinates.
@@ -76,21 +77,15 @@ class MongolTextSelectionToolbarLayoutDelegate extends SingleChildLayoutDelegate
     final anchor = fitsLeft ? anchorLeft : anchorRight;
 
     return Offset(
-      fitsLeft
-        ? math.max(0.0, anchor.dx - childSize.width)
-        : anchor.dx,
-      _centerOn(
-        anchor.dy,
-        childSize.height,
-        size.height,
-      ),
+      fitsLeft ? math.max(0.0, anchor.dx - childSize.width) : anchor.dx,
+      _centerOn(anchor.dy, childSize.height, size.height),
     );
   }
 
   @override
   bool shouldRelayout(MongolTextSelectionToolbarLayoutDelegate oldDelegate) {
-    return anchorLeft != oldDelegate.anchorLeft
-        || anchorRight != oldDelegate.anchorRight
-        || fitsLeft != oldDelegate.fitsLeft;
+    return anchorLeft != oldDelegate.anchorLeft ||
+        anchorRight != oldDelegate.anchorRight ||
+        fitsLeft != oldDelegate.fitsLeft;
   }
 }

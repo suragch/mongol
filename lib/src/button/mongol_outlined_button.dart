@@ -184,20 +184,22 @@ class MongolOutlinedButton extends MongolButtonStyleButton {
     final Color? disabledForeground = disabledForegroundColor;
     final WidgetStateProperty<Color?>? foregroundColorProp =
         (foreground == null && disabledForeground == null)
-            ? null
-            : _OutlinedButtonDefaultColor(foreground, disabledForeground);
+        ? null
+        : _OutlinedButtonDefaultColor(foreground, disabledForeground);
     final WidgetStateProperty<Color?>? backgroundColorProp =
         (backgroundColor == null && disabledBackgroundColor == null)
-            ? null
-            : disabledBackgroundColor == null
-                ? ButtonStyleButton.allOrNull<Color?>(backgroundColor)
-                : _OutlinedButtonDefaultColor(
-                    backgroundColor, disabledBackgroundColor);
-    final WidgetStateProperty<Color?>? overlayColor =
-        (foreground == null) ? null : _OutlinedButtonDefaultOverlay(foreground);
+        ? null
+        : disabledBackgroundColor == null
+        ? ButtonStyleButton.allOrNull<Color?>(backgroundColor)
+        : _OutlinedButtonDefaultColor(backgroundColor, disabledBackgroundColor);
+    final WidgetStateProperty<Color?>? overlayColor = (foreground == null)
+        ? null
+        : _OutlinedButtonDefaultOverlay(foreground);
     final WidgetStateProperty<MouseCursor?> mouseCursor =
         _OutlinedButtonDefaultMouseCursor(
-            enabledMouseCursor, disabledMouseCursor);
+          enabledMouseCursor,
+          disabledMouseCursor,
+        );
 
     return ButtonStyle(
       textStyle: ButtonStyleButton.allOrNull<TextStyle>(textStyle),
@@ -328,8 +330,9 @@ class MongolOutlinedButton extends MongolButtonStyleButton {
         ? _MongolOutlinedButtonDefaultsM3(context)
         : styleFrom(
             foregroundColor: colorScheme.primary,
-            disabledForegroundColor:
-                colorScheme.onSurface.withValues(alpha: 0.38),
+            disabledForegroundColor: colorScheme.onSurface.withValues(
+              alpha: 0.38,
+            ),
             backgroundColor: Colors.transparent,
             disabledBackgroundColor: Colors.transparent,
             shadowColor: theme.shadowColor,
@@ -339,13 +342,12 @@ class MongolOutlinedButton extends MongolButtonStyleButton {
             minimumSize: const Size(36, 64),
             maximumSize: Size.infinite,
             side: BorderSide(
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
+              color: Theme.of(context).colorScheme.onSurface
                   .withValues(alpha: 0.12),
             ),
             shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4))),
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+            ),
             enabledMouseCursor: SystemMouseCursors.click,
             disabledMouseCursor: SystemMouseCursors.basic,
             visualDensity: theme.visualDensity,
@@ -418,7 +420,8 @@ class _OutlinedButtonDefaultOverlay extends WidgetStateProperty<Color?>
 
 @immutable
 class _OutlinedButtonDefaultMouseCursor
-    extends WidgetStateProperty<MouseCursor?> with Diagnosticable {
+    extends WidgetStateProperty<MouseCursor?>
+    with Diagnosticable {
   _OutlinedButtonDefaultMouseCursor(this.enabledCursor, this.disabledCursor);
 
   final MouseCursor? enabledCursor;
@@ -446,10 +449,10 @@ class _MongolOutlinedButtonWithIcon extends MongolOutlinedButton {
     required Widget icon,
     required Widget label,
   }) : super(
-          autofocus: autofocus ?? false,
-          clipBehavior: clipBehavior ?? Clip.none,
-          child: _MongolOutlinedButtonWithIconChild(icon: icon, label: label),
-        );
+         autofocus: autofocus ?? false,
+         clipBehavior: clipBehavior ?? Clip.none,
+         child: _MongolOutlinedButtonWithIconChild(icon: icon, label: label),
+       );
 
   @override
   ButtonStyle defaultStyleOf(BuildContext context) {
@@ -488,11 +491,16 @@ class _MongolOutlinedButtonWithIconChild extends StatelessWidget {
     // Mirrors Flutter's own icon-button gap calculation: scale a reference font
     // size rather than reading the deprecated linear factor off the scaler.
     final double scale = MediaQuery.textScalerOf(context).scale(14.0) / 14.0;
-    final double gap =
-        scale <= 1 ? 8 : lerpDouble(8, 4, math.min(scale - 1, 1))!;
+    final double gap = scale <= 1
+        ? 8
+        : lerpDouble(8, 4, math.min(scale - 1, 1))!;
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[icon, SizedBox(height: gap), Flexible(child: label)],
+      children: <Widget>[
+        icon,
+        SizedBox(height: gap),
+        Flexible(child: label),
+      ],
     );
   }
 }
@@ -506,11 +514,11 @@ class _MongolOutlinedButtonWithIconChild extends StatelessWidget {
 
 class _MongolOutlinedButtonDefaultsM3 extends ButtonStyle {
   _MongolOutlinedButtonDefaultsM3(this.context)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   late final ColorScheme _colors = Theme.of(context).colorScheme;
@@ -518,7 +526,8 @@ class _MongolOutlinedButtonDefaultsM3 extends ButtonStyle {
   @override
   WidgetStateProperty<TextStyle?> get textStyle =>
       WidgetStatePropertyAll<TextStyle?>(
-          Theme.of(context).textTheme.labelLarge);
+        Theme.of(context).textTheme.labelLarge,
+      );
 
   @override
   WidgetStateProperty<Color?>? get backgroundColor =>

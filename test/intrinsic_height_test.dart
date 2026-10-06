@@ -45,15 +45,20 @@ void main() {
     // kept, so it collapsed to the height of the box and the layout cache was
     // reused when a taller box would have fitted more text.
     for (final int? maxLines in <int?>[null, 1, 2, 3]) {
-      expect(intrinsicAt(200, maxLines: maxLines), 460.0,
-          reason: 'maxLines $maxLines');
+      expect(
+        intrinsicAt(200, maxLines: maxLines),
+        460.0,
+        reason: 'maxLines $maxLines',
+      );
     }
   });
 
   test('maxIntrinsicHeight agrees with the engine for the same text', () {
     expect(intrinsicAt(200), engineMaxIntrinsicWidth(text));
-    expect(intrinsicAt(200, maxLines: 1),
-        engineMaxIntrinsicWidth(text, maxLines: 1));
+    expect(
+      intrinsicAt(200, maxLines: 1),
+      engineMaxIntrinsicWidth(text, maxLines: 1),
+    );
   });
 
   test('a hard newline bounds a segment rather than summing through it', () {

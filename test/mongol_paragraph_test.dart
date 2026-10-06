@@ -254,21 +254,25 @@ void main() {
 
   group('getPositionForOffset -', () {
     test('control test', () {
-      const text = 'I polished up that handle so carefullee\n'
+      const text =
+          'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
 
       final paragraph = getParagraph(text, 1000);
 
-      final position20 =
-          paragraph.getPositionForOffset(const Offset(5.0, 20.0));
+      final position20 = paragraph.getPositionForOffset(
+        const Offset(5.0, 20.0),
+      );
       expect(position20.offset, greaterThan(0.0));
 
-      final position40 =
-          paragraph.getPositionForOffset(const Offset(5.0, 40.0));
+      final position40 = paragraph.getPositionForOffset(
+        const Offset(5.0, 40.0),
+      );
       expect(position40.offset, greaterThan(position20.offset));
 
-      final positionRight =
-          paragraph.getPositionForOffset(const Offset(20.0, 5.0));
+      final positionRight = paragraph.getPositionForOffset(
+        const Offset(20.0, 5.0),
+      );
       expect(positionRight.offset, greaterThan(position40.offset));
     });
 
@@ -276,22 +280,27 @@ void main() {
       const text = '';
       final paragraph = getParagraph(text, 1000);
       final position = paragraph.getPositionForOffset(const Offset(400, 300));
-      expect(position,
-          const TextPosition(offset: 0, affinity: ui.TextAffinity.downstream));
+      expect(
+        position,
+        const TextPosition(offset: 0, affinity: ui.TextAffinity.downstream),
+      );
     });
 
     test('ending with new line does not crash', () {
       const text = 'hello\n';
       final paragraph = getParagraph(text, 1000);
       final position = paragraph.getPositionForOffset(const Offset(400, 300));
-      expect(position,
-          const TextPosition(offset: 5, affinity: ui.TextAffinity.downstream));
+      expect(
+        position,
+        const TextPosition(offset: 5, affinity: ui.TextAffinity.downstream),
+      );
     });
   });
 
   group('miscellaneous methods -', () {
     test('getWordBoundary control test', () {
-      const text = 'I polished up that handle so carefullee\n'
+      const text =
+          'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
 
       final paragraph = getParagraph(text, 1000);
@@ -313,13 +322,15 @@ void main() {
       expect(range85, const TextRange(start: 85, end: 85));
 
       // https://github.com/flutter/flutter/issues/75494
-      final range1000 =
-          paragraph.getWordBoundary(const TextPosition(offset: 1000));
+      final range1000 = paragraph.getWordBoundary(
+        const TextPosition(offset: 1000),
+      );
       expect(range1000, const TextRange(start: 85, end: 1000));
     });
 
     test('getLineBoundary control test', () {
-      const text = 'I polished up that handle so carefullee\n'
+      const text =
+          'I polished up that handle so carefullee\n'
           "That now I am the Ruler of the Queen's Navee!";
 
       final paragraph = getParagraph(text, 1000);
@@ -342,15 +353,17 @@ void main() {
         equals("That now I am the Ruler of the Queen's Navee!"),
       );
 
-      final rangeLength =
-          paragraph.getLineBoundary(const TextPosition(offset: text.length));
+      final rangeLength = paragraph.getLineBoundary(
+        const TextPosition(offset: text.length),
+      );
       expect(
         rangeLength.textInside(text),
         equals("That now I am the Ruler of the Queen's Navee!"),
       );
 
-      final range1000 =
-          paragraph.getLineBoundary(const TextPosition(offset: 1000));
+      final range1000 = paragraph.getLineBoundary(
+        const TextPosition(offset: 1000),
+      );
       expect(range1000, TextRange.empty);
     });
 
@@ -361,51 +374,45 @@ void main() {
       final paragraph = getParagraph(text, 1000);
 
       var range = paragraph.getLineBoundary(const TextPosition(offset: 0));
-      expect(
-        range.textInside(text),
-        equals('aaa'),
-      );
+      expect(range.textInside(text), equals('aaa'));
       expect(range.start, 0);
       expect(range.end, 3);
 
       range = paragraph.getLineBoundary(const TextPosition(offset: 5));
-      expect(
-        range.textInside(text),
-        equals('bbb'),
-      );
+      expect(range.textInside(text), equals('bbb'));
       expect(range.start, 4);
       expect(range.end, 7);
     });
 
-// https://github.com/flutter/flutter/issues/83392
-// test('getLineBoundary includes newline characters', () {
-//   const text = 'aaa\nbbb';
+    // https://github.com/flutter/flutter/issues/83392
+    // test('getLineBoundary includes newline characters', () {
+    //   const text = 'aaa\nbbb';
 
-//   final paragraphStyle = ui.ParagraphStyle(
-//     textDirection: ui.TextDirection.ltr,
-//   );
-//   final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
-//     ..addText(text);
-//   final constraints = ui.ParagraphConstraints(width: 1000);
-//   final paragraph = paragraphBuilder.build();
-//   paragraph.layout(constraints);
+    //   final paragraphStyle = ui.ParagraphStyle(
+    //     textDirection: ui.TextDirection.ltr,
+    //   );
+    //   final paragraphBuilder = ui.ParagraphBuilder(paragraphStyle)
+    //     ..addText(text);
+    //   final constraints = ui.ParagraphConstraints(width: 1000);
+    //   final paragraph = paragraphBuilder.build();
+    //   paragraph.layout(constraints);
 
-//   var range = paragraph.getLineBoundary(const TextPosition(offset: 0));
-//   expect(
-//     range.textInside(text),
-//     equals('aaa\n'),
-//   );
-//   expect(range.start, 0);
-//   expect(range.end, 4);
+    //   var range = paragraph.getLineBoundary(const TextPosition(offset: 0));
+    //   expect(
+    //     range.textInside(text),
+    //     equals('aaa\n'),
+    //   );
+    //   expect(range.start, 0);
+    //   expect(range.end, 4);
 
-//   range = paragraph.getLineBoundary(const TextPosition(offset: 5));
-//   expect(
-//     range.textInside(text),
-//     equals('bbb'),
-//   );
-//   expect(range.start, 4);
-//   expect(range.end, 7);
-// });
+    //   range = paragraph.getLineBoundary(const TextPosition(offset: 5));
+    //   expect(
+    //     range.textInside(text),
+    //     equals('bbb'),
+    //   );
+    //   expect(range.start, 4);
+    //   expect(range.end, 7);
+    // });
   });
 
   group('maxlines -', () {

@@ -41,23 +41,24 @@ class MongolRenderParagraph extends RenderBox
     int? maxLines,
     bool rotateCJK = true,
     TextHeightBasis textHeightBasis = TextHeightBasis.parent,
-  })  : assert(maxLines == null || maxLines > 0),
-        assert(
-          textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
-          'Use textScaler instead.',
-        ),
-        _overflow = overflow,
-        _textPainter = MongolTextPainter(
-          text: text,
-          textAlign: textAlign,
-          textScaler: textScaler == TextScaler.noScaling && textScaleFactor != 1.0
-              ? TextScaler.linear(textScaleFactor)
-              : textScaler,
-          maxLines: maxLines,
-          ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,
-          rotateCJK: rotateCJK,
-          textHeightBasis: textHeightBasis,
-        );
+  }) : assert(maxLines == null || maxLines > 0),
+       assert(
+         textScaleFactor == 1.0 || identical(textScaler, TextScaler.noScaling),
+         'Use textScaler instead.',
+       ),
+       _overflow = overflow,
+       _textPainter = MongolTextPainter(
+         text: text,
+         textAlign: textAlign,
+         textScaler:
+             textScaler == TextScaler.noScaling && textScaleFactor != 1.0
+             ? TextScaler.linear(textScaleFactor)
+             : textScaler,
+         maxLines: maxLines,
+         ellipsis: overflow == TextOverflow.ellipsis ? _kEllipsis : null,
+         rotateCJK: rotateCJK,
+         textHeightBasis: textHeightBasis,
+       );
 
   @override
   void setupParentData(RenderBox child) {
@@ -373,7 +374,9 @@ class MongolRenderParagraph extends RenderBox
   List<DiagnosticsNode> debugDescribeChildren() {
     return <DiagnosticsNode>[
       text.toDiagnosticsNode(
-          name: 'text', style: DiagnosticsTreeStyle.transition)
+        name: 'text',
+        style: DiagnosticsTreeStyle.transition,
+      ),
     ];
   }
 
@@ -381,17 +384,23 @@ class MongolRenderParagraph extends RenderBox
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign));
-    properties.add(FlagProperty(
-      'softWrap',
-      value: softWrap,
-      ifTrue: 'wrapping at box height',
-      ifFalse: 'no wrapping except at line break characters',
-      showName: true,
-    ));
+    properties.add(
+      FlagProperty(
+        'softWrap',
+        value: softWrap,
+        ifTrue: 'wrapping at box height',
+        ifFalse: 'no wrapping except at line break characters',
+        showName: true,
+      ),
+    );
     properties.add(EnumProperty<TextOverflow>('overflow', overflow));
     properties.add(
-        DiagnosticsProperty<TextScaler>('textScaler', textScaler,
-            defaultValue: TextScaler.noScaling));
+      DiagnosticsProperty<TextScaler>(
+        'textScaler',
+        textScaler,
+        defaultValue: TextScaler.noScaling,
+      ),
+    );
     properties.add(IntProperty('maxLines', maxLines, ifNull: 'unlimited'));
   }
 }

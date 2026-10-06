@@ -9,20 +9,24 @@ class InputShortcutsDemo extends StatefulWidget {
 }
 
 class _InputShortcutsDemoState extends State<InputShortcutsDemo> {
-  final mongolInputController = TextEditingController(text: '''
+  final mongolInputController = TextEditingController(
+    text: '''
 // arrowUp arrowDown
 // arrowLeft arrowRight
 // macos ios meta
 // windows android fushia control
 // alt
-// + shift''');
-  final systemInputController = TextEditingController(text: '''
+// + shift''',
+  );
+  final systemInputController = TextEditingController(
+    text: '''
 // arrowUp arrowDown
 // arrowLeft arrowRight
 // macos ios meta
 // windows android fushia control
 // alt
-// + shift''');
+// + shift''',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +42,7 @@ class _InputShortcutsDemoState extends State<InputShortcutsDemo> {
                 maxLines: null,
                 textAlignHorizontal: TextAlignHorizontal.left,
                 expands: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
             ),
           ),
@@ -52,9 +54,7 @@ class _InputShortcutsDemoState extends State<InputShortcutsDemo> {
                 maxLines: null,
                 textAlignVertical: TextAlignVertical.top,
                 expands: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
+                decoration: const InputDecoration(border: OutlineInputBorder()),
               ),
             ),
           ),

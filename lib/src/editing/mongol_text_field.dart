@@ -4,8 +4,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-//
-
 // ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
 
 import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoTheme;
@@ -39,10 +37,9 @@ import 'text_selection/mongol_text_selection_controls.dart';
 
 class _TextFieldSelectionGestureDetectorBuilder
     extends MongolTextSelectionGestureDetectorBuilder {
-  _TextFieldSelectionGestureDetectorBuilder({
-    required _TextFieldState state,
-  })  : _state = state,
-        super(delegate: state);
+  _TextFieldSelectionGestureDetectorBuilder({required _TextFieldState state})
+    : _state = state,
+      super(delegate: state);
 
   final _TextFieldState _state;
 
@@ -286,42 +283,46 @@ class MongolTextField extends StatefulWidget {
     this.autofillHints,
     this.restorationId,
     this.contentInsertionConfiguration,
-  })  : assert(obscuringCharacter.length == 1),
-        assert(maxLines == null || maxLines > 0),
-        assert(minLines == null || minLines > 0),
-        assert(
-          (maxLines == null) || (minLines == null) || (maxLines >= minLines),
-          "minLines can't be greater than maxLines",
-        ),
-        assert(
-          !expands || (maxLines == null && minLines == null),
-          'minLines and maxLines must be null when expands is true.',
-        ),
-        assert(!obscureText || maxLines == 1,
-            'Obscured fields cannot be multiline.'),
-        assert(maxLength == null ||
-            maxLength == MongolTextField.noMaxLength ||
-            maxLength > 0),
-        // Assert the following instead of setting it directly to avoid surprising the user by silently changing the value they set.
-        assert(
-            !identical(textInputAction, TextInputAction.newline) ||
-                maxLines == 1 ||
-                !identical(keyboardType, TextInputType.text),
-            'Use keyboardType TextInputType.multiline when using TextInputAction.newline on a multiline TextField.'),
-        keyboardType = keyboardType ??
-            (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
-        toolbarOptions = toolbarOptions ??
-            (obscureText
-                ? const ToolbarOptions(
-                    selectAll: true,
-                    paste: true,
-                  )
-                : const ToolbarOptions(
-                    copy: true,
-                    cut: true,
-                    selectAll: true,
-                    paste: true,
-                  ));
+  }) : assert(obscuringCharacter.length == 1),
+       assert(maxLines == null || maxLines > 0),
+       assert(minLines == null || minLines > 0),
+       assert(
+         (maxLines == null) || (minLines == null) || (maxLines >= minLines),
+         "minLines can't be greater than maxLines",
+       ),
+       assert(
+         !expands || (maxLines == null && minLines == null),
+         'minLines and maxLines must be null when expands is true.',
+       ),
+       assert(
+         !obscureText || maxLines == 1,
+         'Obscured fields cannot be multiline.',
+       ),
+       assert(
+         maxLength == null ||
+             maxLength == MongolTextField.noMaxLength ||
+             maxLength > 0,
+       ),
+       // Assert the following instead of setting it directly to avoid surprising the user by silently changing the value they set.
+       assert(
+         !identical(textInputAction, TextInputAction.newline) ||
+             maxLines == 1 ||
+             !identical(keyboardType, TextInputType.text),
+         'Use keyboardType TextInputType.multiline when using TextInputAction.newline on a multiline TextField.',
+       ),
+       keyboardType =
+           keyboardType ??
+           (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
+       toolbarOptions =
+           toolbarOptions ??
+           (obscureText
+               ? const ToolbarOptions(selectAll: true, paste: true)
+               : const ToolbarOptions(
+                   copy: true,
+                   cut: true,
+                   selectAll: true,
+                   paste: true,
+                 ));
 
   /// Controls the text being edited.
   ///
@@ -1049,81 +1050,169 @@ class MongolTextField extends StatefulWidget {
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<TextEditingController>(
-        'controller', controller,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<FocusNode>('focusNode', focusNode,
-        defaultValue: null));
-    properties
-        .add(DiagnosticsProperty<bool>('enabled', enabled, defaultValue: null));
-    properties.add(DiagnosticsProperty<InputDecoration>(
-        'decoration', decoration,
-        defaultValue: const InputDecoration()));
-    properties.add(DiagnosticsProperty<TextInputType>(
-        'keyboardType', keyboardType,
-        defaultValue: TextInputType.text));
     properties.add(
-        DiagnosticsProperty<TextStyle>('style', style, defaultValue: null));
+      DiagnosticsProperty<TextEditingController>(
+        'controller',
+        controller,
+        defaultValue: null,
+      ),
+    );
     properties.add(
-        DiagnosticsProperty<bool>('autofocus', autofocus, defaultValue: false));
-    properties.add(DiagnosticsProperty<String>(
-        'obscuringCharacter', obscuringCharacter,
-        defaultValue: '•'));
-    properties.add(DiagnosticsProperty<bool>('obscureText', obscureText,
-        defaultValue: false));
-    properties.add(DiagnosticsProperty<bool>('autocorrect', autocorrect,
-        defaultValue: true));
-    properties.add(DiagnosticsProperty<bool>(
-        'enableSuggestions', enableSuggestions,
-        defaultValue: true));
+      DiagnosticsProperty<FocusNode>(
+        'focusNode',
+        focusNode,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>('enabled', enabled, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<InputDecoration>(
+        'decoration',
+        decoration,
+        defaultValue: const InputDecoration(),
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextInputType>(
+        'keyboardType',
+        keyboardType,
+        defaultValue: TextInputType.text,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextStyle>('style', style, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>('autofocus', autofocus, defaultValue: false),
+    );
+    properties.add(
+      DiagnosticsProperty<String>(
+        'obscuringCharacter',
+        obscuringCharacter,
+        defaultValue: '•',
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>(
+        'obscureText',
+        obscureText,
+        defaultValue: false,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>('autocorrect', autocorrect, defaultValue: true),
+    );
+    properties.add(
+      DiagnosticsProperty<bool>(
+        'enableSuggestions',
+        enableSuggestions,
+        defaultValue: true,
+      ),
+    );
     properties.add(IntProperty('maxLines', maxLines, defaultValue: 1));
     properties.add(IntProperty('minLines', minLines, defaultValue: null));
     properties.add(
-        DiagnosticsProperty<bool>('expands', expands, defaultValue: false));
+      DiagnosticsProperty<bool>('expands', expands, defaultValue: false),
+    );
     properties.add(IntProperty('maxLength', maxLength, defaultValue: null));
-    properties.add(EnumProperty<MaxLengthEnforcement>(
-        'maxLengthEnforcement', maxLengthEnforcement,
-        defaultValue: null));
-    properties.add(EnumProperty<TextInputAction>(
-        'textInputAction', textInputAction,
-        defaultValue: null));
-    properties.add(EnumProperty<MongolTextAlign>('textAlign', textAlign,
-        defaultValue: MongolTextAlign.top));
-    properties.add(DiagnosticsProperty<TextAlignHorizontal>(
-        'textAlignHorizontal', textAlignHorizontal,
-        defaultValue: null));
-    properties
-        .add(DoubleProperty('cursorWidth', cursorWidth, defaultValue: null));
-    properties
-        .add(DoubleProperty('cursorHeight', cursorHeight, defaultValue: 2.0));
-    properties.add(DiagnosticsProperty<Radius>('cursorRadius', cursorRadius,
-        defaultValue: null));
-    properties
-        .add(ColorProperty('cursorColor', cursorColor, defaultValue: null));
-    properties.add(DiagnosticsProperty<Brightness>(
-        'keyboardAppearance', keyboardAppearance,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>(
-        'scrollPadding', scrollPadding,
-        defaultValue: const EdgeInsets.all(20.0)));
-    properties.add(FlagProperty('selectionEnabled',
+    properties.add(
+      EnumProperty<MaxLengthEnforcement>(
+        'maxLengthEnforcement',
+        maxLengthEnforcement,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      EnumProperty<TextInputAction>(
+        'textInputAction',
+        textInputAction,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      EnumProperty<MongolTextAlign>(
+        'textAlign',
+        textAlign,
+        defaultValue: MongolTextAlign.top,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextAlignHorizontal>(
+        'textAlignHorizontal',
+        textAlignHorizontal,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DoubleProperty('cursorWidth', cursorWidth, defaultValue: null),
+    );
+    properties.add(
+      DoubleProperty('cursorHeight', cursorHeight, defaultValue: 2.0),
+    );
+    properties.add(
+      DiagnosticsProperty<Radius>(
+        'cursorRadius',
+        cursorRadius,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      ColorProperty('cursorColor', cursorColor, defaultValue: null),
+    );
+    properties.add(
+      DiagnosticsProperty<Brightness>(
+        'keyboardAppearance',
+        keyboardAppearance,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<EdgeInsetsGeometry>(
+        'scrollPadding',
+        scrollPadding,
+        defaultValue: const EdgeInsets.all(20.0),
+      ),
+    );
+    properties.add(
+      FlagProperty(
+        'selectionEnabled',
         value: selectionEnabled,
         defaultValue: true,
-        ifFalse: 'selection disabled'));
-    properties.add(DiagnosticsProperty<TextSelectionControls>(
-        'selectionControls', selectionControls,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<ScrollController>(
-        'scrollController', scrollController,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<ScrollPhysics>(
-        'scrollPhysics', scrollPhysics,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<List<String>>('contentCommitMimeTypes',
+        ifFalse: 'selection disabled',
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<TextSelectionControls>(
+        'selectionControls',
+        selectionControls,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<ScrollController>(
+        'scrollController',
+        scrollController,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<ScrollPhysics>(
+        'scrollPhysics',
+        scrollPhysics,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<List<String>>(
+        'contentCommitMimeTypes',
         contentInsertionConfiguration?.allowedMimeTypes ?? const <String>[],
         defaultValue: contentInsertionConfiguration == null
             ? const <String>[]
-            : kDefaultContentInsertionMimeTypes));
+            : kDefaultContentInsertionMimeTypes,
+      ),
+    );
   }
 }
 
@@ -1141,7 +1230,8 @@ class _TextFieldState extends State<MongolTextField>
   MaxLengthEnforcement get _effectiveMaxLengthEnforcement =>
       widget.maxLengthEnforcement ??
       LengthLimitingTextInputFormatter.getDefaultMaxLengthEnforcement(
-          Theme.of(context).platform);
+        Theme.of(context).platform,
+      );
 
   bool _isHovering = false;
 
@@ -1153,7 +1243,7 @@ class _TextFieldState extends State<MongolTextField>
   bool _showSelectionHandles = false;
 
   late _TextFieldSelectionGestureDetectorBuilder
-      _selectionGestureDetectorBuilder;
+  _selectionGestureDetectorBuilder;
 
   // API for MongolTextSelectionGestureDetectorBuilderDelegate.
   @override
@@ -1230,18 +1320,23 @@ class _TextFieldState extends State<MongolTextField>
     if (widget.maxLength! > 0) {
       // Show the maxLength in the counter
       counterText += '/${widget.maxLength}';
-      final remaining =
-          (widget.maxLength! - currentLength).clamp(0, widget.maxLength!);
-      semanticCounterText =
-          localizations.remainingTextFieldCharacterCount(remaining);
+      final remaining = (widget.maxLength! - currentLength).clamp(
+        0,
+        widget.maxLength!,
+      );
+      semanticCounterText = localizations.remainingTextFieldCharacterCount(
+        remaining,
+      );
     }
 
     if (_hasIntrinsicError) {
       return effectiveDecoration.copyWith(
         errorText: effectiveDecoration.errorText ?? '',
-        counterStyle: effectiveDecoration.errorStyle ??
-            themeData.textTheme.bodySmall!
-                .copyWith(color: themeData.colorScheme.error),
+        counterStyle:
+            effectiveDecoration.errorStyle ??
+            themeData.textTheme.bodySmall!.copyWith(
+              color: themeData.colorScheme.error,
+            ),
         counterText: counterText,
         semanticCounterText: semanticCounterText,
       );
@@ -1265,7 +1360,8 @@ class _TextFieldState extends State<MongolTextField>
   }
 
   bool get _canRequestFocus {
-    final mode = MediaQuery.maybeOf(context)?.navigationMode ??
+    final mode =
+        MediaQuery.maybeOf(context)?.navigationMode ??
         NavigationMode.traditional;
     switch (mode) {
       case NavigationMode.traditional:
@@ -1362,7 +1458,9 @@ class _TextFieldState extends State<MongolTextField>
   }
 
   void _handleSelectionChanged(
-      TextSelection selection, SelectionChangedCause? cause) {
+    TextSelection selection,
+    SelectionChangedCause? cause,
+  ) {
     final willShowSelectionHandles = _shouldShowSelectionHandles(cause);
     if (willShowSelectionHandles != _showSelectionHandles) {
       setState(() {
@@ -1413,8 +1511,9 @@ class _TextFieldState extends State<MongolTextField>
     );
 
     final ThemeData theme = Theme.of(context);
-    final DefaultSelectionStyle selectionStyle =
-        DefaultSelectionStyle.of(context);
+    final DefaultSelectionStyle selectionStyle = DefaultSelectionStyle.of(
+      context,
+    );
     final TextStyle style = theme.textTheme.titleMedium!.merge(widget.style);
     final Brightness keyboardAppearance =
         widget.keyboardAppearance ?? theme.brightness;
@@ -1442,14 +1541,18 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = true;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
-        cursorColor = widget.cursorColor ??
+        cursorColor =
+            widget.cursorColor ??
             selectionStyle.cursorColor ??
             cupertinoTheme.primaryColor;
-        selectionColor = selectionStyle.selectionColor ??
+        selectionColor =
+            selectionStyle.selectionColor ??
             cupertinoTheme.primaryColor.withValues(alpha: 0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
-            iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
+          iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio,
+          0,
+        );
         break;
 
       case TargetPlatform.macOS:
@@ -1457,14 +1560,18 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = false;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
-        cursorColor = widget.cursorColor ??
+        cursorColor =
+            widget.cursorColor ??
             selectionStyle.cursorColor ??
             cupertinoTheme.primaryColor;
-        selectionColor = selectionStyle.selectionColor ??
+        selectionColor =
+            selectionStyle.selectionColor ??
             cupertinoTheme.primaryColor.withValues(alpha: 0.40);
         cursorRadius ??= const Radius.circular(2.0);
         cursorOffset = Offset(
-            iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio, 0);
+          iOSHorizontalOffset / MediaQuery.of(context).devicePixelRatio,
+          0,
+        );
         break;
 
       case TargetPlatform.android:
@@ -1472,10 +1579,12 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = false;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
-        cursorColor = widget.cursorColor ??
+        cursorColor =
+            widget.cursorColor ??
             selectionStyle.cursorColor ??
             theme.colorScheme.primary;
-        selectionColor = selectionStyle.selectionColor ??
+        selectionColor =
+            selectionStyle.selectionColor ??
             theme.colorScheme.primary.withValues(alpha: 0.40);
         break;
 
@@ -1484,10 +1593,12 @@ class _TextFieldState extends State<MongolTextField>
         forcePressEnabled = false;
         textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
-        cursorColor = widget.cursorColor ??
+        cursorColor =
+            widget.cursorColor ??
             selectionStyle.cursorColor ??
             theme.colorScheme.primary;
-        selectionColor = selectionStyle.selectionColor ??
+        selectionColor =
+            selectionStyle.selectionColor ??
             theme.colorScheme.primary.withValues(alpha: 0.40);
         break;
     }
@@ -1517,8 +1628,9 @@ class _TextFieldState extends State<MongolTextField>
           minLines: widget.minLines,
           expands: widget.expands,
           selectionColor: selectionColor,
-          selectionControls:
-              widget.selectionEnabled ? textSelectionControls : null,
+          selectionControls: widget.selectionEnabled
+              ? textSelectionControls
+              : null,
           onChanged: widget.onChanged,
           onSelectionChanged: _handleSelectionChanged,
           onEditingComplete: widget.onEditingComplete,
@@ -1605,7 +1717,8 @@ class _TextFieldState extends State<MongolTextField>
                         if (!_effectiveController.selection.isValid) {
                           _effectiveController.selection =
                               TextSelection.collapsed(
-                                  offset: _effectiveController.text.length);
+                                offset: _effectiveController.text.length,
+                              );
                         }
                         _requestKeyboard();
                       },

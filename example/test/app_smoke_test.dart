@@ -23,8 +23,10 @@ void main() {
   group('Demo App Smoke Tests', () {
     setUp(() {
       final binding = TestWidgetsFlutterBinding.ensureInitialized();
-      binding.platformDispatcher.views.first.physicalSize =
-          const Size(1200, 900);
+      binding.platformDispatcher.views.first.physicalSize = const Size(
+        1200,
+        900,
+      );
       binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
     });
 
@@ -34,8 +36,9 @@ void main() {
       binding.platformDispatcher.views.first.resetDevicePixelRatio();
     });
 
-    testWidgets('boots and displays HomeScreen with title and list',
-        (WidgetTester tester) async {
+    testWidgets('boots and displays HomeScreen with title and list', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const DemoApp());
       await tester.pumpAndSettle();
 
@@ -43,8 +46,9 @@ void main() {
       expect(find.byType(HomeScreen), findsOneWidget);
     });
 
-    testWidgets('navigates to every demo screen and back to HomeScreen',
-        (WidgetTester tester) async {
+    testWidgets('navigates to every demo screen and back to HomeScreen', (
+      WidgetTester tester,
+    ) async {
       final demos = <(String, Type)>[
         ('MongolText', TextDemo),
         ('MongolText.rich', RichTextDemo),
@@ -97,8 +101,9 @@ void main() {
       }
     });
 
-    testWidgets('MongolAlertDialog demo opens and closes dialog',
-        (WidgetTester tester) async {
+    testWidgets('MongolAlertDialog demo opens and closes dialog', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const DemoApp());
       await tester.pumpAndSettle();
 
@@ -114,8 +119,10 @@ void main() {
       expect(find.byType(AlertDialogDemo), findsOneWidget);
 
       // Open the MongolAlertDialog.
-      final showDialogButton =
-          find.widgetWithText(ElevatedButton, 'Show Dialog');
+      final showDialogButton = find.widgetWithText(
+        ElevatedButton,
+        'Show Dialog',
+      );
       expect(showDialogButton, findsOneWidget);
       await tester.tap(showDialogButton);
       await tester.pumpAndSettle();
@@ -138,8 +145,9 @@ void main() {
       expect(find.byType(HomeScreen), findsOneWidget);
     });
 
-    testWidgets('Horizontal Listview demo scrolls horizontally',
-        (WidgetTester tester) async {
+    testWidgets('Horizontal Listview demo scrolls horizontally', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const DemoApp());
       await tester.pumpAndSettle();
 
@@ -166,8 +174,9 @@ void main() {
       expect(find.byType(HomeScreen), findsOneWidget);
     });
 
-    testWidgets('Buttons demo displays vertical Mongol buttons',
-        (WidgetTester tester) async {
+    testWidgets('Buttons demo displays vertical Mongol buttons', (
+      WidgetTester tester,
+    ) async {
       await tester.pumpWidget(const DemoApp());
       await tester.pumpAndSettle();
 

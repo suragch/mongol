@@ -39,9 +39,7 @@ class MyStatefulWidgetState extends State<BodyWidget> {
                     borderRadius: BorderRadius.circular(3),
                   ),
                 ),
-                style: const TextStyle(
-                  fontSize: 24,
-                ),
+                style: const TextStyle(fontSize: 24),
                 showCursor: true,
               ),
             ),
@@ -125,8 +123,11 @@ class MyTextInputControl with TextInputControl {
   void insertText(String myText) {
     final text = _editingState.text;
     final textSelection = _editingState.selection;
-    final newText =
-        text.replaceRange(textSelection.start, textSelection.end, myText);
+    final newText = text.replaceRange(
+      textSelection.start,
+      textSelection.end,
+      myText,
+    );
     final myTextLength = myText.length;
     _editingState = _editingState.copyWith(
       text: newText,
@@ -146,14 +147,18 @@ class MyTextInputControl with TextInputControl {
 
     // There is a selection.
     if (selectionLength > 0) {
-      final newText =
-          text.replaceRange(textSelection.start, textSelection.end, '');
+      final newText = text.replaceRange(
+        textSelection.start,
+        textSelection.end,
+        '',
+      );
       _editingState = _editingState.copyWith(
-          text: newText,
-          selection: textSelection.copyWith(
-            baseOffset: textSelection.start,
-            extentOffset: textSelection.start,
-          ));
+        text: newText,
+        selection: textSelection.copyWith(
+          baseOffset: textSelection.start,
+          extentOffset: textSelection.start,
+        ),
+      );
       // Request the attached client to update accordingly.
       TextInput.updateEditingValue(_editingState);
       return;
@@ -169,22 +174,19 @@ class MyTextInputControl with TextInputControl {
     final newEnd = textSelection.start;
     final newText = text.replaceRange(newStart, newEnd, '');
     _editingState = _editingState.copyWith(
-        text: newText,
-        selection: textSelection.copyWith(
-          baseOffset: newStart,
-          extentOffset: newStart,
-        ));
+      text: newText,
+      selection: textSelection.copyWith(
+        baseOffset: newStart,
+        extentOffset: newStart,
+      ),
+    );
     // Request the attached client to update accordingly.
     TextInput.updateEditingValue(_editingState);
   }
 }
 
 class MongolKeyboard extends StatelessWidget {
-  const MongolKeyboard({
-    super.key,
-    this.onTextInput,
-    this.onBackspace,
-  });
+  const MongolKeyboard({super.key, this.onTextInput, this.onBackspace});
 
   final ValueSetter<String>? onTextInput;
   final VoidCallback? onBackspace;
@@ -218,38 +220,14 @@ class MongolKeyboard extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          MongolKeyboardKey(
-            text: 'ᠠ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠡ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠢ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠣ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠤ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠥ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠦ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠧ',
-            onTextInput: textInputHandler,
-          ),
+          MongolKeyboardKey(text: 'ᠠ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠡ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠢ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠣ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠤ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠥ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠦ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠧ', onTextInput: textInputHandler),
         ],
       ),
     );
@@ -259,38 +237,14 @@ class MongolKeyboard extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          MongolKeyboardKey(
-            text: 'ᠨ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠩ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠪ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠫ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠬ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠭ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠮ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠯ',
-            onTextInput: textInputHandler,
-          ),
+          MongolKeyboardKey(text: 'ᠨ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠩ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠪ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠫ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠬ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠭ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠮ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠯ', onTextInput: textInputHandler),
         ],
       ),
     );
@@ -300,38 +254,14 @@ class MongolKeyboard extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          MongolKeyboardKey(
-            text: 'ᠰ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠱ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠲ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠳ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠴ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠵ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠶ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠷ',
-            onTextInput: textInputHandler,
-          ),
+          MongolKeyboardKey(text: 'ᠰ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠱ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠲ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠳ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠴ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠵ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠶ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠷ', onTextInput: textInputHandler),
         ],
       ),
     );
@@ -341,46 +271,16 @@ class MongolKeyboard extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          MongolKeyboardKey(
-            text: 'ᠸ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠹ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠻ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠼ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠽ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠾ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᠿ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᡀ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᡁ',
-            onTextInput: textInputHandler,
-          ),
-          MongolKeyboardKey(
-            text: 'ᡂ',
-            onTextInput: textInputHandler,
-          ),
+          MongolKeyboardKey(text: 'ᠸ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠹ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠻ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠼ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠽ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠾ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᠿ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᡀ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᡁ', onTextInput: textInputHandler),
+          MongolKeyboardKey(text: 'ᡂ', onTextInput: textInputHandler),
         ],
       ),
     );
@@ -426,11 +326,7 @@ class MongolKeyboard extends StatelessWidget {
     return Expanded(
       child: Row(
         children: [
-          MongolKeyboardKey(
-            text: ' ',
-            flex: 4,
-            onTextInput: textInputHandler,
-          ),
+          MongolKeyboardKey(text: ' ', flex: 4, onTextInput: textInputHandler),
           BackspaceKey(
             onBackspace: () {
               onBackspace?.call();
@@ -484,11 +380,7 @@ class MongolKeyboardKey extends StatelessWidget {
 }
 
 class BackspaceKey extends StatelessWidget {
-  const BackspaceKey({
-    super.key,
-    this.onBackspace,
-    this.flex = 1,
-  });
+  const BackspaceKey({super.key, this.onBackspace, this.flex = 1});
 
   final VoidCallback? onBackspace;
   final int flex;
@@ -505,9 +397,7 @@ class BackspaceKey extends StatelessWidget {
             onTap: () {
               onBackspace?.call();
             },
-            child: const Center(
-              child: Icon(Icons.backspace),
-            ),
+            child: const Center(child: Icon(Icons.backspace)),
           ),
         ),
       ),

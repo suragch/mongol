@@ -229,23 +229,23 @@ class MongolTextButton extends MongolButtonStyleButton {
     final Color? disabledForeground = disabledForegroundColor;
     final WidgetStateProperty<Color?>? foregroundColorProp =
         (foreground == null && disabledForeground == null)
-            ? null
-            : _TextButtonDefaultColor(foreground, disabledForeground);
-    final WidgetStateProperty<Color?>? backgroundColorProp = (backgroundColor ==
-                null &&
-            disabledBackgroundColor == null)
+        ? null
+        : _TextButtonDefaultColor(foreground, disabledForeground);
+    final WidgetStateProperty<Color?>? backgroundColorProp =
+        (backgroundColor == null && disabledBackgroundColor == null)
         ? null
         : disabledBackgroundColor == null
-            ? ButtonStyleButton.allOrNull<Color?>(backgroundColor)
-            : _TextButtonDefaultColor(backgroundColor, disabledBackgroundColor);
-    final WidgetStateProperty<Color?>? overlayColor =
-        (foreground == null) ? null : _TextButtonDefaultOverlay(foreground);
+        ? ButtonStyleButton.allOrNull<Color?>(backgroundColor)
+        : _TextButtonDefaultColor(backgroundColor, disabledBackgroundColor);
+    final WidgetStateProperty<Color?>? overlayColor = (foreground == null)
+        ? null
+        : _TextButtonDefaultOverlay(foreground);
     final WidgetStateProperty<Color?>? iconColorProp =
         (iconColor == null && disabledIconColor == null)
-            ? null
-            : disabledIconColor == null
-                ? ButtonStyleButton.allOrNull<Color?>(iconColor)
-                : _TextButtonDefaultIconColor(iconColor, disabledIconColor);
+        ? null
+        : disabledIconColor == null
+        ? ButtonStyleButton.allOrNull<Color?>(iconColor)
+        : _TextButtonDefaultIconColor(iconColor, disabledIconColor);
     final WidgetStateProperty<MouseCursor?> mouseCursor =
         _TextButtonDefaultMouseCursor(enabledMouseCursor, disabledMouseCursor);
 
@@ -393,8 +393,9 @@ class MongolTextButton extends MongolButtonStyleButton {
         ? _MongolTextButtonDefaultsM3(context)
         : styleFrom(
             foregroundColor: colorScheme.primary,
-            disabledForegroundColor:
-                colorScheme.onSurface.withValues(alpha: 0.38),
+            disabledForegroundColor: colorScheme.onSurface.withValues(
+              alpha: 0.38,
+            ),
             backgroundColor: Colors.transparent,
             disabledBackgroundColor: Colors.transparent,
             shadowColor: theme.shadowColor,
@@ -404,7 +405,8 @@ class MongolTextButton extends MongolButtonStyleButton {
             minimumSize: const Size(36, 64),
             maximumSize: Size.infinite,
             shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(4))),
+              borderRadius: BorderRadius.all(Radius.circular(4)),
+            ),
             enabledMouseCursor: SystemMouseCursors.click,
             disabledMouseCursor: SystemMouseCursors.basic,
             visualDensity: theme.visualDensity,
@@ -539,10 +541,10 @@ class _MongolTextButtonWithIcon extends MongolTextButton {
     required Widget icon,
     required Widget label,
   }) : super(
-          autofocus: autofocus ?? false,
-          clipBehavior: clipBehavior ?? Clip.none,
-          child: _MongolTextButtonWithIconChild(icon: icon, label: label),
-        );
+         autofocus: autofocus ?? false,
+         clipBehavior: clipBehavior ?? Clip.none,
+         child: _MongolTextButtonWithIconChild(icon: icon, label: label),
+       );
 
   @override
   ButtonStyle defaultStyleOf(BuildContext context) {
@@ -580,11 +582,16 @@ class _MongolTextButtonWithIconChild extends StatelessWidget {
     // Mirrors Flutter's own icon-button gap calculation: scale a reference font
     // size rather than reading the deprecated linear factor off the scaler.
     final double scale = MediaQuery.textScalerOf(context).scale(14.0) / 14.0;
-    final double gap =
-        scale <= 1 ? 8 : lerpDouble(8, 4, math.min(scale - 1, 1))!;
+    final double gap = scale <= 1
+        ? 8
+        : lerpDouble(8, 4, math.min(scale - 1, 1))!;
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: <Widget>[icon, SizedBox(height: gap), Flexible(child: label)],
+      children: <Widget>[
+        icon,
+        SizedBox(height: gap),
+        Flexible(child: label),
+      ],
     );
   }
 }
@@ -598,11 +605,11 @@ class _MongolTextButtonWithIconChild extends StatelessWidget {
 
 class _MongolTextButtonDefaultsM3 extends ButtonStyle {
   _MongolTextButtonDefaultsM3(this.context)
-      : super(
-          animationDuration: kThemeChangeDuration,
-          enableFeedback: true,
-          alignment: Alignment.center,
-        );
+    : super(
+        animationDuration: kThemeChangeDuration,
+        enableFeedback: true,
+        alignment: Alignment.center,
+      );
 
   final BuildContext context;
   late final ColorScheme _colors = Theme.of(context).colorScheme;
@@ -610,7 +617,8 @@ class _MongolTextButtonDefaultsM3 extends ButtonStyle {
   @override
   WidgetStateProperty<TextStyle?> get textStyle =>
       WidgetStatePropertyAll<TextStyle?>(
-          Theme.of(context).textTheme.labelLarge);
+        Theme.of(context).textTheme.labelLarge,
+      );
 
   @override
   WidgetStateProperty<Color?>? get backgroundColor =>

@@ -10,17 +10,22 @@ import 'package:mongol/mongol.dart';
 /// Eight short words, far more than fits in one column of the boxes below.
 final String text = List.filled(8, '\u1828\u1822\u182D').join(' ');
 
-Future<double> heightAt(WidgetTester tester, double boxHeight,
-    {int? maxLines}) async {
-  await tester.pumpWidget(MaterialApp(
-    home: Align(
-      alignment: Alignment.topLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: boxHeight),
-        child: MongolText(text, maxLines: maxLines),
+Future<double> heightAt(
+  WidgetTester tester,
+  double boxHeight, {
+  int? maxLines,
+}) async {
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Align(
+        alignment: Alignment.topLeft,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxHeight: boxHeight),
+          child: MongolText(text, maxLines: maxLines),
+        ),
       ),
     ),
-  ));
+  );
   return tester.getSize(find.byType(MongolText)).height;
 }
 
@@ -31,12 +36,16 @@ void main() {
     final double bigAgain = await heightAt(tester, 400.0, maxLines: 1);
 
     expect(small, lessThan(big), reason: 'a smaller box holds less text');
-    expect(bigAgain, equals(big),
-        reason: 'returning to the original box must restore the layout');
+    expect(
+      bigAgain,
+      equals(big),
+      reason: 'returning to the original box must restore the layout',
+    );
   });
 
-  testWidgets('maxLines text keeps growing past its original size',
-      (tester) async {
+  testWidgets('maxLines text keeps growing past its original size', (
+    tester,
+  ) async {
     await heightAt(tester, 400.0, maxLines: 1);
     await heightAt(tester, 200.0, maxLines: 1);
     final double bigger = await heightAt(tester, 600.0, maxLines: 1);

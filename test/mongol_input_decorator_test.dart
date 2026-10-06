@@ -37,8 +37,9 @@ Widget buildInputDecorator({
   );
 }
 
-Finder findMongolText(String text) =>
-    find.byWidgetPredicate((widget) => widget is MongolText && widget.data == text);
+Finder findMongolText(String text) => find.byWidgetPredicate(
+  (widget) => widget is MongolText && widget.data == text,
+);
 
 Size decoratorSize(WidgetTester tester) =>
     tester.getSize(find.byType(MongolInputDecorator));
@@ -49,52 +50,64 @@ void main() {
     expect(findMongolText(inputText), findsOneWidget);
   });
 
-  testWidgets('MongolInputDecorator fills the height it is given',
-      (tester) async {
+  testWidgets('MongolInputDecorator fills the height it is given', (
+    tester,
+  ) async {
     await tester.pumpWidget(buildInputDecorator(height: 300.0));
     expect(decoratorSize(tester).height, equals(300.0));
   });
 
   testWidgets('MongolInputDecorator shows hintText', (tester) async {
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(hintText: 'hint'),
-      isEmpty: true,
-    ));
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(hintText: 'hint'),
+        isEmpty: true,
+      ),
+    );
     await tester.pumpAndSettle();
     expect(findMongolText('hint'), findsOneWidget);
   });
 
   testWidgets('MongolInputDecorator shows labelText', (tester) async {
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(labelText: 'label'),
-      isEmpty: true,
-    ));
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(labelText: 'label'),
+        isEmpty: true,
+      ),
+    );
     await tester.pumpAndSettle();
     expect(findMongolText('label'), findsOneWidget);
   });
 
-  testWidgets('MongolInputDecorator shows prefixText and suffixText',
-      (tester) async {
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(prefixText: 'pre', suffixText: 'suf'),
-    ));
+  testWidgets('MongolInputDecorator shows prefixText and suffixText', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(prefixText: 'pre', suffixText: 'suf'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(findMongolText('pre'), findsOneWidget);
     expect(findMongolText('suf'), findsOneWidget);
   });
 
   testWidgets('MongolInputDecorator shows errorText', (tester) async {
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(errorText: 'error'),
-    ));
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(errorText: 'error'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(findMongolText('error'), findsOneWidget);
   });
 
   testWidgets('MongolInputDecorator shows counterText', (tester) async {
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(counterText: 'counter'),
-    ));
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(counterText: 'counter'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(findMongolText('counter'), findsOneWidget);
   });
@@ -106,10 +119,12 @@ void main() {
     await tester.pumpWidget(buildInputDecorator());
     final bare = decoratorSize(tester).width;
 
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(labelText: 'label'),
-      isEmpty: true,
-    ));
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(labelText: 'label'),
+        isEmpty: true,
+      ),
+    );
     await tester.pumpAndSettle();
     expect(decoratorSize(tester).width, greaterThan(bare));
   });
@@ -118,9 +133,11 @@ void main() {
     await tester.pumpWidget(buildInputDecorator());
     final bare = decoratorSize(tester).width;
 
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(errorText: 'error'),
-    ));
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(errorText: 'error'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(decoratorSize(tester).width, greaterThan(bare));
   });
@@ -129,18 +146,22 @@ void main() {
     await tester.pumpWidget(buildInputDecorator());
     final bare = decoratorSize(tester).width;
 
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(counterText: 'counter'),
-    ));
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(counterText: 'counter'),
+      ),
+    );
     await tester.pumpAndSettle();
     expect(decoratorSize(tester).width, greaterThan(bare));
   });
 
   group('icon', () {
     testWidgets('is shown at the default size', (tester) async {
-      await tester.pumpWidget(buildInputDecorator(
-        decoration: const InputDecoration(icon: Icon(Icons.pages)),
-      ));
+      await tester.pumpWidget(
+        buildInputDecorator(
+          decoration: const InputDecoration(icon: Icon(Icons.pages)),
+        ),
+      );
       await tester.pumpAndSettle();
       expect(find.byType(Icon), findsOneWidget);
       expect(tester.getSize(find.byType(Icon)), equals(const Size(24.0, 24.0)));
@@ -150,9 +171,11 @@ void main() {
       await tester.pumpWidget(buildInputDecorator());
       final withoutIcon = tester.getTopLeft(findMongolText(inputText));
 
-      await tester.pumpWidget(buildInputDecorator(
-        decoration: const InputDecoration(icon: Icon(Icons.pages)),
-      ));
+      await tester.pumpWidget(
+        buildInputDecorator(
+          decoration: const InputDecoration(icon: Icon(Icons.pages)),
+        ),
+      );
       await tester.pumpAndSettle();
       final withIcon = tester.getTopLeft(findMongolText(inputText));
 
@@ -162,9 +185,11 @@ void main() {
     });
 
     testWidgets('is placed before the input', (tester) async {
-      await tester.pumpWidget(buildInputDecorator(
-        decoration: const InputDecoration(icon: Icon(Icons.pages)),
-      ));
+      await tester.pumpWidget(
+        buildInputDecorator(
+          decoration: const InputDecoration(icon: Icon(Icons.pages)),
+        ),
+      );
       await tester.pumpAndSettle();
       final icon = tester.getTopLeft(find.byType(Icon));
       final input = tester.getTopLeft(findMongolText(inputText));
@@ -192,25 +217,31 @@ void main() {
     expect(inputOffsetFromCentre(tester), moreOrLessEquals(0.0, epsilon: 0.5));
   });
 
-  testWidgets('a wider prefixText does not push the input off centre',
-      (tester) async {
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(
-        prefixText: 'pre',
-        prefixStyle: wideAffix,
+  testWidgets('a wider prefixText does not push the input off centre', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(
+          prefixText: 'pre',
+          prefixStyle: wideAffix,
+        ),
       ),
-    ));
+    );
     expect(inputOffsetFromCentre(tester), moreOrLessEquals(0.0, epsilon: 0.5));
   });
 
-  testWidgets('a wider suffixText does not push the input off centre',
-      (tester) async {
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(
-        suffixText: 'suf',
-        suffixStyle: wideAffix,
+  testWidgets('a wider suffixText does not push the input off centre', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(
+          suffixText: 'suf',
+          suffixStyle: wideAffix,
+        ),
       ),
-    ));
+    );
     expect(inputOffsetFromCentre(tester), moreOrLessEquals(0.0, epsilon: 0.5));
   });
 
@@ -218,14 +249,19 @@ void main() {
     await tester.pumpWidget(buildInputDecorator());
     final double plain = decoratorSize(tester).width;
 
-    await tester.pumpWidget(buildInputDecorator(
-      decoration: const InputDecoration(
-        suffixText: 'suf',
-        suffixStyle: wideAffix,
+    await tester.pumpWidget(
+      buildInputDecorator(
+        decoration: const InputDecoration(
+          suffixText: 'suf',
+          suffixStyle: wideAffix,
+        ),
       ),
-    ));
+    );
 
-    expect(decoratorSize(tester).width, greaterThan(plain),
-        reason: 'the affix still has to fit');
+    expect(
+      decoratorSize(tester).width,
+      greaterThan(plain),
+      reason: 'the affix still has to fit',
+    );
   });
 }

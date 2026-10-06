@@ -52,11 +52,7 @@ class _InputDecorationsBodyState extends State<InputDecorationsBody> {
     super.dispose();
   }
 
-  final box = Container(
-    width: 10,
-    height: 10,
-    color: Colors.green,
-  );
+  final box = Container(width: 10, height: 10, color: Colors.green);
   static const text = 'ᠨᠢᠭᠡ ᠬᠤᠶᠠᠷ ᠭᠤᠷᠪᠠ';
   final icon = const Icon(Icons.star);
   final prefixIcon = const Icon(Icons.favorite);
@@ -318,7 +314,7 @@ class _InputDecorationsBodyState extends State<InputDecorationsBody> {
 enum BorderType {
   none,
   line, // underline or sideline
-  outline;
+  outline,
 }
 
 class CheckboxItem extends StatelessWidget {
@@ -337,10 +333,7 @@ class CheckboxItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Checkbox(
-          value: value,
-          onChanged: onChanged,
-        ),
+        Checkbox(value: value, onChanged: onChanged),
         Text(title),
       ],
     );

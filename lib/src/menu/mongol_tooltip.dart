@@ -221,27 +221,56 @@ class MongolTooltip extends StatefulWidget {
     super.debugFillProperties(properties);
     properties.add(StringProperty('message', message, showName: false));
     properties.add(DoubleProperty('width', width, defaultValue: null));
-    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>('padding', padding,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<EdgeInsetsGeometry>('margin', margin,
-        defaultValue: null));
-    properties.add(DoubleProperty('horizontal offset', horizontalOffset,
-        defaultValue: null));
-    properties.add(FlagProperty('position',
+    properties.add(
+      DiagnosticsProperty<EdgeInsetsGeometry>(
+        'padding',
+        padding,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<EdgeInsetsGeometry>(
+        'margin',
+        margin,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DoubleProperty('horizontal offset', horizontalOffset, defaultValue: null),
+    );
+    properties.add(
+      FlagProperty(
+        'position',
         value: preferRight,
         ifTrue: 'right',
         ifFalse: 'left',
         showName: true,
-        defaultValue: null));
-    properties.add(FlagProperty('semantics',
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      FlagProperty(
+        'semantics',
         value: excludeFromSemantics,
         ifTrue: 'excluded',
         showName: true,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<Duration>('wait duration', waitDuration,
-        defaultValue: null));
-    properties.add(DiagnosticsProperty<Duration>('show duration', showDuration,
-        defaultValue: null));
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<Duration>(
+        'wait duration',
+        waitDuration,
+        defaultValue: null,
+      ),
+    );
+    properties.add(
+      DiagnosticsProperty<Duration>(
+        'show duration',
+        showDuration,
+        defaultValue: null,
+      ),
+    );
   }
 }
 
@@ -283,8 +312,9 @@ class _MongolTooltipState extends State<MongolTooltip>
       vsync: this,
     )..addStatusListener(_handleStatusChanged);
     // Listen to see when a mouse is added.
-    RendererBinding.instance.mouseTracker
-        .addListener(_handleMouseTrackerChange);
+    RendererBinding.instance.mouseTracker.addListener(
+      _handleMouseTrackerChange,
+    );
     // Listen to global pointer events so that we can hide a tooltip immediately
     // if some other control is clicked on.
     GestureBinding.instance.pointerRouter.addGlobalRoute(_handlePointerEvent);
@@ -463,10 +493,12 @@ class _MongolTooltipState extends State<MongolTooltip>
 
   @override
   void dispose() {
-    GestureBinding.instance.pointerRouter
-        .removeGlobalRoute(_handlePointerEvent);
-    RendererBinding.instance.mouseTracker
-        .removeListener(_handleMouseTrackerChange);
+    GestureBinding.instance.pointerRouter.removeGlobalRoute(
+      _handlePointerEvent,
+    );
+    RendererBinding.instance.mouseTracker.removeListener(
+      _handleMouseTrackerChange,
+    );
     if (_entry != null) {
       _removeEntry();
     }
@@ -512,28 +544,33 @@ class _MongolTooltipState extends State<MongolTooltip>
     // still honoured by Flutter's own Tooltip, so a theme that sets it has to go
     // on working here too. This tooltip runs vertically, so the theme's
     // cross-axis minimum becomes this one's width.
-    width = widget.width ??
+    width =
+        widget.width ??
         tooltipTheme.constraints?.minHeight ??
         //
         tooltipTheme.constraints?.minHeight ??
         _getDefaultTooltipWidth();
     padding = widget.padding ?? tooltipTheme.padding ?? _getDefaultPadding();
     margin = widget.margin ?? tooltipTheme.margin ?? _defaultMargin;
-    horizontalOffset = widget.horizontalOffset ??
+    horizontalOffset =
+        widget.horizontalOffset ??
         tooltipTheme.verticalOffset ??
         _defaultHorizontalOffset;
     preferRight =
         widget.preferRight ?? tooltipTheme.preferBelow ?? _defaultPreferRight;
-    excludeFromSemantics = widget.excludeFromSemantics ??
+    excludeFromSemantics =
+        widget.excludeFromSemantics ??
         tooltipTheme.excludeFromSemantics ??
         _defaultExcludeFromSemantics;
     decoration =
         widget.decoration ?? tooltipTheme.decoration ?? defaultDecoration;
     textStyle = widget.textStyle ?? tooltipTheme.textStyle ?? defaultTextStyle;
-    waitDuration = widget.waitDuration ??
+    waitDuration =
+        widget.waitDuration ??
         tooltipTheme.waitDuration ??
         _defaultWaitDuration;
-    showDuration = widget.showDuration ??
+    showDuration =
+        widget.showDuration ??
         tooltipTheme.showDuration ??
         _defaultShowDuration;
 
@@ -657,10 +694,7 @@ class _MongolTooltipOverlay extends StatelessWidget {
                   child: Center(
                     widthFactor: 1.0,
                     heightFactor: 1.0,
-                    child: MongolText(
-                      message,
-                      style: textStyle,
-                    ),
+                    child: MongolText(message, style: textStyle),
                   ),
                 ),
               ),
@@ -715,8 +749,9 @@ Offset positionMongolDependentBox({
       target.dx + horizontalOffset + childSize.width <= size.width - margin;
   final bool fitsLeft =
       target.dx - horizontalOffset - childSize.width >= margin;
-  final bool tooltipRight =
-      preferRight ? fitsRight || !fitsLeft : !(fitsLeft || !fitsRight);
+  final bool tooltipRight = preferRight
+      ? fitsRight || !fitsLeft
+      : !(fitsLeft || !fitsRight);
   double x;
   if (tooltipRight) {
     x = math.min(target.dx + horizontalOffset, size.width - margin);
@@ -728,8 +763,10 @@ Offset positionMongolDependentBox({
   if (size.height - margin * 2.0 < childSize.height) {
     y = (size.height - childSize.height) / 2.0;
   } else {
-    final double normalizedTargetY =
-        target.dy.clamp(margin, size.height - margin);
+    final double normalizedTargetY = target.dy.clamp(
+      margin,
+      size.height - margin,
+    );
     final double edge = margin + childSize.height / 2.0;
     if (normalizedTargetY < edge) {
       y = margin;

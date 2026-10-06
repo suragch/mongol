@@ -81,7 +81,11 @@ void main() {
     for (final text in ['？', '！']) {
       final segments = BreakSegments(text);
       expect(segments.length, equals(1));
-      expect(segments.first.isRotatable, isTrue, reason: 'U+${text.runes.first.toRadixString(16).toUpperCase()}');
+      expect(
+        segments.first.isRotatable,
+        isTrue,
+        reason: 'U+${text.runes.first.toRadixString(16).toUpperCase()}',
+      );
     }
   });
 
