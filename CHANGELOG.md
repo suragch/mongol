@@ -1,4 +1,6 @@
-## [Unreleased]
+## [11.1.0 - 2026.10.08]
+
+PR (#77) from @Satsrag:
 
 - Add `contextMenuBuilder` to `MongolTextField`, matching Flutter's context
   menu API. The default builds the new `MongolAdaptiveTextSelectionToolbar`,
