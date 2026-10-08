@@ -4,8 +4,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
-
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui hide TextStyle;
@@ -164,6 +162,13 @@ const Duration _kCursorBlinkHalfPeriod = Duration(milliseconds: 500);
 // Number of cursor ticks during which the most recently entered character
 // is shown in an obscured text field.
 const int _kObscureShowLatestCharCursorTicks = 3;
+
+// Padding between the context menu and the selected line on the left.
+const double _kToolbarContentDistance = 8.0;
+
+// Padding between the context menu and the selected line on the right, leaving
+// room for the selection handle (handle size minus 2).
+const double _kToolbarContentDistanceRight = 20.0;
 
 // A time-value pair that represents a key frame in an animation.
 class _KeyFrame {
@@ -1748,9 +1753,9 @@ class MongolEditableTextState extends State<MongolEditableText>
       if (toolbarOptions.cut && cutEnabled)
         ContextMenuButtonItem(
           onPressed: () {
-            selectAll(SelectionChangedCause.toolbar);
+            cutSelection(SelectionChangedCause.toolbar);
           },
-          type: ContextMenuButtonType.selectAll,
+          type: ContextMenuButtonType.cut,
         ),
       if (toolbarOptions.copy && copyEnabled)
         ContextMenuButtonItem(
@@ -1824,6 +1829,11 @@ class MongolEditableTextState extends State<MongolEditableText>
   }
 
   /// Returns the anchor points for the default context menu.
+  ///
+  /// The text runs vertically, so the menu sits beside the selected line
+  /// rather than above or below it: the primary anchor is to the left of the
+  /// selection and the secondary anchor is to its right, clear of the
+  /// selection handle.
   TextSelectionToolbarAnchors get contextMenuAnchors {
     if (renderEditable.lastSecondaryTapDownPosition != null) {
       return TextSelectionToolbarAnchors(
@@ -1835,11 +1845,37 @@ class MongolEditableTextState extends State<MongolEditableText>
     final TextSelection selection = textEditingValue.selection;
     final List<TextSelectionPoint> points = renderEditable
         .getEndpointsForSelection(selection);
-    return TextSelectionToolbarAnchors.fromSelection(
-      renderBox: renderEditable,
-      startGlyphHeight: glyphWidths.start,
-      endGlyphHeight: glyphWidths.end,
-      selectionEndpoints: points,
+    final TextSelectionPoint start = points.first;
+    final TextSelectionPoint end = points.last;
+    final Rect editingRegion = Rect.fromPoints(
+      renderEditable.localToGlobal(Offset.zero),
+      renderEditable.localToGlobal(
+        renderEditable.size.bottomRight(Offset.zero),
+      ),
+    );
+
+    // If the selected text spans more than one line, vertically center the
+    // menu on the field instead of on the selection. The start point is the
+    // left edge of the first selected line and the end point is the right
+    // edge of the last one, so a single line spans exactly one line width.
+    final bool isMultiline =
+        end.point.dx - start.point.dx > glyphWidths.end * 1.5;
+    final double midY = isMultiline
+        ? editingRegion.height / 2
+        : (start.point.dy + end.point.dy) / 2;
+
+    return TextSelectionToolbarAnchors(
+      primaryAnchor: Offset(
+        editingRegion.left +
+            start.point.dx -
+            glyphWidths.start -
+            _kToolbarContentDistance,
+        editingRegion.top + midY,
+      ),
+      secondaryAnchor: Offset(
+        editingRegion.left + end.point.dx + _kToolbarContentDistanceRight,
+        editingRegion.top + midY,
+      ),
     );
   }
 
@@ -3093,6 +3129,7 @@ class MongolEditableTextState extends State<MongolEditableText>
       return false;
     }
 
+    clipboardStatus?.update();
     _selectionOverlay!.showToolbar();
     return true;
   }

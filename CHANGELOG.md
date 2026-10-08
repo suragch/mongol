@@ -1,3 +1,27 @@
+## [Unreleased]
+
+- Add `contextMenuBuilder` to `MongolTextField`, matching Flutter's context
+  menu API. The default builds the new `MongolAdaptiveTextSelectionToolbar`,
+  which lays the icon buttons out beside the selected line (#76).
+- Deprecate `MongolTextField.toolbarOptions` in favor of `contextMenuBuilder`.
+  It is now nullable; passing it still limits the default buttons.
+- Deprecate `MongolTextSelectionControls.buildToolbar`. Add
+  `MongolTextSelectionHandleControls` and `mongolTextSelectionHandleControls`,
+  which only draw the handles and leave the menu to `contextMenuBuilder`.
+  `MongolTextField` uses them by default; passing the legacy
+  `mongolTextSelectionControls` still builds the old toolbar.
+- Export `MongolTextSelectionControls`, `MongolTextSelectionToolbar`,
+  `MongolTextSelectionToolbarButton` and `MongolAdaptiveTextSelectionToolbar`
+  from the package.
+- Fix `MongolEditableTextState.contextMenuAnchors` to anchor left and right of
+  a vertical selection instead of above and below it.
+- Fix the `cut` entry of a `ToolbarOptions` producing a select-all button.
+- Show the context menu from `contextMenuBuilder` even when
+  `selectionControls` is null, and refresh the clipboard state before the
+  toolbar is shown, as Flutter does.
+- Silence the remaining legacy-toolbar deprecation warnings in
+  `analysis_options.yaml`, the way Flutter does, instead of per-file ignores.
+
 ## [11.0.0] - 2026.10.06
 
 - BREAKING CHANGE: `MongolRadioListTile` is no longer a `StatelessWidget`, and `groupValue`/`onChanged` are no

@@ -1,6 +1,13 @@
 include: package:lints/recommended.yaml
 
 analyzer:
+  errors:
+    # The text editing code keeps Flutter's legacy TextSelectionControls
+    # toolbar path alive for backwards compatibility, exactly as Flutter's own
+    # EditableText does. Flutter silences these the same way rather than
+    # deleting the deprecated members.
+    deprecated_member_use: ignore
+    deprecated_member_use_from_same_package: ignore
   exclude:
     - build/**
     - android/**

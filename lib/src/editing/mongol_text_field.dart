@@ -4,8 +4,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
-
 import 'package:cupertino_ui/cupertino_ui.dart' show CupertinoTheme;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -33,6 +31,7 @@ import 'alignment.dart';
 import 'mongol_editable_text.dart';
 import 'mongol_input_decorator.dart';
 import 'text_selection/mongol_text_selection.dart';
+import 'text_selection/mongol_adaptive_text_selection_toolbar.dart';
 import 'text_selection/mongol_text_selection_controls.dart';
 
 class _TextFieldSelectionGestureDetectorBuilder
@@ -247,7 +246,11 @@ class MongolTextField extends StatefulWidget {
     this.textAlign = MongolTextAlign.top,
     this.textAlignHorizontal,
     this.readOnly = false,
-    ToolbarOptions? toolbarOptions,
+    @Deprecated(
+      'Use `contextMenuBuilder` instead. '
+      'This feature was deprecated after v3.3.0-0.5.pre.',
+    )
+    this.toolbarOptions,
     this.showCursor,
     this.autofocus = false,
     this.onTapOutside,
@@ -283,6 +286,7 @@ class MongolTextField extends StatefulWidget {
     this.autofillHints,
     this.restorationId,
     this.contentInsertionConfiguration,
+    this.contextMenuBuilder = _defaultContextMenuBuilder,
   }) : assert(obscuringCharacter.length == 1),
        assert(maxLines == null || maxLines > 0),
        assert(minLines == null || minLines > 0),
@@ -312,17 +316,7 @@ class MongolTextField extends StatefulWidget {
        ),
        keyboardType =
            keyboardType ??
-           (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
-       toolbarOptions =
-           toolbarOptions ??
-           (obscureText
-               ? const ToolbarOptions(selectAll: true, paste: true)
-               : const ToolbarOptions(
-                   copy: true,
-                   cut: true,
-                   selectAll: true,
-                   paste: true,
-                 ));
+           (maxLines == 1 ? TextInputType.text : TextInputType.multiline);
 
   /// Controls the text being edited.
   ///
@@ -561,10 +555,15 @@ class MongolTextField extends StatefulWidget {
 
   /// Configuration of toolbar options.
   ///
-  /// If not set, select all and paste will default to be enabled. Copy and cut
-  /// will be disabled if [obscureText] is true. If [readOnly] is true,
-  /// paste and cut will be disabled regardless.
-  final ToolbarOptions toolbarOptions;
+  /// By default, all options are enabled. If [readOnly] is true, paste and cut
+  /// will be disabled regardless. If [obscureText] is true, cut and copy will
+  /// be disabled regardless. If [readOnly] and [obscureText] are both true,
+  /// select all will be disabled as well.
+  @Deprecated(
+    'Use `contextMenuBuilder` instead. '
+    'This feature was deprecated after v3.3.0-0.5.pre.',
+  )
+  final ToolbarOptions? toolbarOptions;
 
   /// Whether to show cursor.
   ///
@@ -1043,6 +1042,31 @@ class MongolTextField extends StatefulWidget {
   final String? restorationId;
 
   final ContentInsertionConfiguration? contentInsertionConfiguration;
+
+  /// Builds the text selection toolbar when requested by the user.
+  ///
+  /// The `editableTextState` gives access to the field's state, including
+  /// [MongolEditableTextState.contextMenuButtonItems] for the default buttons
+  /// and [MongolEditableTextState.contextMenuAnchors] for where to put them.
+  ///
+  /// If not provided, builds a [MongolAdaptiveTextSelectionToolbar] with icon
+  /// buttons for cut, copy, paste and select all. Set to null to show no
+  /// context menu at all.
+  ///
+  /// See also:
+  ///
+  ///  * [MongolAdaptiveTextSelectionToolbar], which is built by default.
+  ///  * [MongolEditableText.contextMenuBuilder], which this is passed to.
+  final MongolEditableTextContextMenuBuilder? contextMenuBuilder;
+
+  static Widget _defaultContextMenuBuilder(
+    BuildContext context,
+    MongolEditableTextState editableTextState,
+  ) {
+    return MongolAdaptiveTextSelectionToolbar.editableText(
+      editableTextState: editableTextState,
+    );
+  }
 
   @override
   State<MongolTextField> createState() => _TextFieldState();
@@ -1539,7 +1563,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.iOS:
         final cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = true;
-        textSelectionControls ??= mongolTextSelectionControls;
+        textSelectionControls ??= mongolTextSelectionHandleControls;
         cursorOpacityAnimates = true;
         cursorColor =
             widget.cursorColor ??
@@ -1558,7 +1582,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.macOS:
         final cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = false;
-        textSelectionControls ??= mongolTextSelectionControls;
+        textSelectionControls ??= mongolTextSelectionHandleControls;
         cursorOpacityAnimates = true;
         cursorColor =
             widget.cursorColor ??
@@ -1577,7 +1601,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
-        textSelectionControls ??= mongolTextSelectionControls;
+        textSelectionControls ??= mongolTextSelectionHandleControls;
         cursorOpacityAnimates = false;
         cursorColor =
             widget.cursorColor ??
@@ -1591,7 +1615,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.linux:
       case TargetPlatform.windows:
         forcePressEnabled = false;
-        textSelectionControls ??= mongolTextSelectionControls;
+        textSelectionControls ??= mongolTextSelectionHandleControls;
         cursorOpacityAnimates = false;
         cursorColor =
             widget.cursorColor ??
@@ -1656,6 +1680,7 @@ class _TextFieldState extends State<MongolTextField>
           autofillHints: widget.autofillHints,
           restorationId: 'editable',
           contentInsertionConfiguration: widget.contentInsertionConfiguration,
+          contextMenuBuilder: widget.contextMenuBuilder,
         ),
       ),
     );

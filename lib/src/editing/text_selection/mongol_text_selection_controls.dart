@@ -4,8 +4,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
-
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
@@ -39,6 +37,10 @@ class MongolTextSelectionControls extends TextSelectionControls {
       const Size(_kHandleSize, _kHandleSize);
 
   /// Builder for Mongol copy/paste text selection toolbar.
+  @Deprecated(
+    'Use `contextMenuBuilder` instead. '
+    'This feature was deprecated after v3.3.0-0.5.pre.',
+  )
   @override
   Widget buildToolbar(
     BuildContext context,
@@ -322,6 +324,25 @@ class _TextSelectionHandlePainter extends CustomPainter {
   }
 }
 
+/// Mongol styled text selection handle controls.
+///
+/// Specifically does not manage the toolbar, which is left to
+/// [MongolEditableText.contextMenuBuilder].
+class MongolTextSelectionHandleControls extends MongolTextSelectionControls
+    with TextSelectionHandleControls {}
+
+/// Text selection handle controls for vertical Mongolian text.
+///
+/// These leave the context menu to [MongolEditableText.contextMenuBuilder].
+/// [MongolTextField] uses this by default.
+final TextSelectionControls mongolTextSelectionHandleControls =
+    MongolTextSelectionHandleControls();
+
 /// Text selection controls that follow the Material Design specification.
+///
+/// These build the toolbar themselves via the deprecated
+/// [MongolTextSelectionControls.buildToolbar]. Prefer
+/// [mongolTextSelectionHandleControls] together with
+/// [MongolEditableText.contextMenuBuilder].
 final TextSelectionControls mongolTextSelectionControls =
     MongolTextSelectionControls();
