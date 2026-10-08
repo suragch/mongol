@@ -4,8 +4,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// ignore_for_file: deprecated_member_use, deprecated_member_use_from_same_package
-
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart'
@@ -182,7 +180,8 @@ class MongolTextSelectionOverlay {
   void showToolbar() {
     _updateSelectionOverlay();
 
-    if (selectionControls is! TextSelectionHandleControls) {
+    if (selectionControls != null &&
+        selectionControls is! TextSelectionHandleControls) {
       _selectionOverlay.showToolbar();
       return;
     }
@@ -310,7 +309,10 @@ class MongolTextSelectionOverlay {
 
   /// Whether the toolbar is currently visible.
   bool get toolbarIsVisible {
-    return selectionControls is TextSelectionHandleControls
+    // Without selection controls the only possible toolbar is the context
+    // menu built by contextMenuBuilder.
+    return selectionControls == null ||
+            selectionControls is TextSelectionHandleControls
         ? _selectionOverlay._contextMenuControllerIsShown
         : _selectionOverlay._toolbar != null;
   }
@@ -667,7 +669,8 @@ class MongolTextSelectionOverlay {
     if (!context.mounted) {
       return;
     }
-    if (selectionControls is! TextSelectionHandleControls) {
+    if (selectionControls != null &&
+        selectionControls is! TextSelectionHandleControls) {
       _selectionOverlay.hideMagnifier();
       if (!_selection.isCollapsed) {
         _selectionOverlay.showToolbar();
@@ -2495,6 +2498,7 @@ class MongolSelectionOverlay {
       offset: -editingRegion.topLeft,
       child: Builder(
         builder: (BuildContext context) {
+          // ignore: deprecated_member_use
           return selectionControls!.buildToolbar(
             context,
             editingRegion,

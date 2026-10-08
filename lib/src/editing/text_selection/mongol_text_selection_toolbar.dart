@@ -29,8 +29,8 @@ const double _kToolbarWidth = 44.0;
 ///
 /// See also:
 ///
-///  * [MongolTextSelectionControls.buildToolbar], where this is used by default to
-///    build an Android-style toolbar.
+///  * [MongolAdaptiveTextSelectionToolbar], which builds this with icon
+///    buttons for the default context menu of [MongolTextField].
 class MongolTextSelectionToolbar extends StatelessWidget {
   /// Creates an instance of MongolTextSelectionToolbar.
   const MongolTextSelectionToolbar({
