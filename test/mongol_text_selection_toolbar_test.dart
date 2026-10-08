@@ -74,7 +74,7 @@ void main() {
       final state = await pumpEditableText(
         tester,
         controller: controller,
-        selectionControls: mongolTextSelectionHandleControls,
+        selectionControls: mongolTextSelectionControls,
         // ignore: deprecated_member_use
         toolbarOptions: const ToolbarOptions(
           cut: true,
@@ -102,7 +102,7 @@ void main() {
       final state = await pumpEditableText(
         tester,
         controller: controller,
-        selectionControls: mongolTextSelectionHandleControls,
+        selectionControls: mongolTextSelectionControls,
       );
       final render = state.renderEditable;
       final region = Rect.fromPoints(
@@ -148,7 +148,7 @@ void main() {
       final state = await pumpEditableText(
         tester,
         controller: controller,
-        selectionControls: mongolTextSelectionHandleControls,
+        selectionControls: mongolTextSelectionControls,
         maxLines: null,
       );
       final render = state.renderEditable;
@@ -396,13 +396,14 @@ void main() {
     testWidgets('legacy selectionControls still build their own toolbar', (
       tester,
     ) async {
-      await pumpField(tester, selectionControls: mongolTextSelectionControls);
+      // Flutter's Material controls still implement the deprecated
+      // buildToolbar, so they exercise the legacy fallback path.
+      await pumpField(tester, selectionControls: materialTextSelectionControls);
 
       await longPressFirstGlyph(tester);
 
-      expect(find.byType(MongolTextSelectionToolbar), findsOneWidget);
+      expect(find.byType(TextSelectionToolbar), findsOneWidget);
       expect(find.byType(MongolAdaptiveTextSelectionToolbar), findsNothing);
-      expect(find.byIcon(Icons.copy), findsOneWidget);
     });
   });
 
@@ -434,33 +435,17 @@ void main() {
     });
   });
 
-  group('MongolTextSelectionHandleControls', () {
-    test('leaves the toolbar to contextMenuBuilder', () {
-      expect(
-        mongolTextSelectionHandleControls,
-        isA<TextSelectionHandleControls>(),
-      );
-      expect(
-        mongolTextSelectionHandleControls,
-        isA<MongolTextSelectionControls>(),
-      );
-    });
-
-    test('draws the same handle as the legacy controls', () {
-      expect(
-        mongolTextSelectionHandleControls.getHandleSize(20.0),
-        mongolTextSelectionControls.getHandleSize(20.0),
-      );
-      expect(
-        mongolTextSelectionHandleControls.getHandleAnchor(
-          TextSelectionHandleType.left,
-          20.0,
-        ),
-        mongolTextSelectionControls.getHandleAnchor(
-          TextSelectionHandleType.left,
-          20.0,
-        ),
-      );
-    });
+  group('MongolTextSelectionControls', () {
+    test(
+      'only draw the handles and leave the toolbar to contextMenuBuilder',
+      () {
+        expect(mongolTextSelectionControls, isA<TextSelectionHandleControls>());
+        expect(mongolTextSelectionControls, isA<MongolTextSelectionControls>());
+        expect(
+          mongolTextSelectionControls.getHandleSize(20.0),
+          const Size(22, 22),
+        );
+      },
+    );
   });
 }

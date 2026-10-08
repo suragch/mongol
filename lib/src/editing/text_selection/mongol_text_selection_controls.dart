@@ -6,67 +6,27 @@
 
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
-import 'package:material_ui/material_ui.dart'
-    show Theme, TextSelectionTheme, Icons;
+import 'package:material_ui/material_ui.dart' show Theme, TextSelectionTheme;
 import 'package:flutter/widgets.dart';
 
-import 'mongol_text_selection_toolbar.dart';
-import 'mongol_text_selection_toolbar_button.dart';
-
 // https://github.com/flutter/flutter/blob/master/packages/flutter/lib/src/material/text_selection.dart
-// This file builds the Copy/Paste toolbar that pops up when you long click, etc.
-// If you want a different style you can replace this class with another one.
-// That's what Flutter does to give a different style for Material, Cupertino
-// and others.
+// This file draws the selection handles. The copy/paste toolbar that pops up
+// when you long press is built separately by MongolEditableText's
+// contextMenuBuilder (MongolAdaptiveTextSelectionToolbar by default).
 
 const double _kHandleSize = 22.0;
 
-// Padding between the toolbar and the anchor.
-const double _kToolbarContentDistanceRight = _kHandleSize - 2.0;
-const double _kToolbarContentDistance = 8.0;
-
-/// Mongol styled text selection controls. (Adapted from Android Material version)
+/// Mongol styled text selection handle controls. (Adapted from Android
+/// Material version)
 ///
-/// In order to avoid Mongolian Unicode and font issues, the text editing
-/// controls use icons rather than text for the copy/cut/past/select buttons.
-class MongolTextSelectionControls extends TextSelectionControls {
+/// Specifically does not manage the toolbar, which is left to
+/// [MongolEditableText.contextMenuBuilder].
+class MongolTextSelectionControls extends TextSelectionControls
+    with TextSelectionHandleControls {
   /// Returns the size of the handle.
   @override
   Size getHandleSize(double textLineWidth) =>
       const Size(_kHandleSize, _kHandleSize);
-
-  /// Builder for Mongol copy/paste text selection toolbar.
-  @Deprecated(
-    'Use `contextMenuBuilder` instead. '
-    'This feature was deprecated after v3.3.0-0.5.pre.',
-  )
-  @override
-  Widget buildToolbar(
-    BuildContext context,
-    Rect globalEditableRegion,
-    double textLineWidth,
-    Offset selectionMidpoint,
-    List<TextSelectionPoint> endpoints,
-    TextSelectionDelegate delegate,
-    ValueListenable<ClipboardStatus>? clipboardStatus,
-    Offset? lastSecondaryTapDownPosition,
-  ) {
-    return _TextSelectionControlsToolbar(
-      globalEditableRegion: globalEditableRegion,
-      textLineWidth: textLineWidth,
-      selectionMidpoint: selectionMidpoint,
-      endpoints: endpoints,
-      delegate: delegate,
-      clipboardStatus: clipboardStatus,
-      handleCut: canCut(delegate) ? () => handleCut(delegate) : null,
-      handleCopy: canCopy(delegate) ? () => handleCopy(delegate) : null,
-      handlePaste: canPaste(delegate) ? () => handlePaste(delegate) : null,
-      handleSelectAll: canSelectAll(delegate)
-          ? () => handleSelectAll(delegate)
-          : null,
-    );
-  }
 
   /// Builder for material-style text selection handles.
   ///
@@ -126,175 +86,6 @@ class MongolTextSelectionControls extends TextSelectionControls {
         return const Offset(-4, _kHandleSize / 2);
     }
   }
-
-  @override
-  bool canSelectAll(TextSelectionDelegate delegate) {
-    // Android allows SelectAll when selection is not collapsed, unless
-    // everything has already been selected.
-    final value = delegate.textEditingValue;
-    return delegate.selectAllEnabled &&
-        value.text.isNotEmpty &&
-        !(value.selection.start == 0 &&
-            value.selection.end == value.text.length);
-  }
-}
-
-// The label and callback for the available default text selection menu buttons.
-class _TextSelectionToolbarItemData {
-  const _TextSelectionToolbarItemData({
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final VoidCallback onPressed;
-}
-
-// The highest level toolbar widget, built directly by buildToolbar.
-class _TextSelectionControlsToolbar extends StatefulWidget {
-  const _TextSelectionControlsToolbar({
-    required this.clipboardStatus,
-    required this.delegate,
-    required this.endpoints,
-    required this.globalEditableRegion,
-    required this.handleCut,
-    required this.handleCopy,
-    required this.handlePaste,
-    required this.handleSelectAll,
-    required this.selectionMidpoint,
-    required this.textLineWidth,
-  });
-
-  final ValueListenable<ClipboardStatus>? clipboardStatus;
-  final TextSelectionDelegate delegate;
-  final List<TextSelectionPoint> endpoints;
-  final Rect globalEditableRegion;
-  final VoidCallback? handleCut;
-  final VoidCallback? handleCopy;
-  final VoidCallback? handlePaste;
-  final VoidCallback? handleSelectAll;
-  final Offset selectionMidpoint;
-  final double textLineWidth;
-
-  @override
-  _TextSelectionControlsToolbarState createState() =>
-      _TextSelectionControlsToolbarState();
-}
-
-class _TextSelectionControlsToolbarState
-    extends State<_TextSelectionControlsToolbar>
-    with TickerProviderStateMixin {
-  void _onChangedClipboardStatus() {
-    setState(() {
-      // Inform the widget that the value of clipboardStatus has changed.
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.clipboardStatus?.addListener(_onChangedClipboardStatus);
-  }
-
-  @override
-  void didUpdateWidget(_TextSelectionControlsToolbar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.clipboardStatus != oldWidget.clipboardStatus) {
-      widget.clipboardStatus?.addListener(_onChangedClipboardStatus);
-      oldWidget.clipboardStatus?.removeListener(_onChangedClipboardStatus);
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.clipboardStatus?.removeListener(_onChangedClipboardStatus);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // If there are no buttons to be shown, don't render anything.
-    if (widget.handleCut == null &&
-        widget.handleCopy == null &&
-        widget.handlePaste == null &&
-        widget.handleSelectAll == null) {
-      return const SizedBox.shrink();
-    }
-    // If the paste button is desired, don't render anything until the state of
-    // the clipboard is known, since it's used to determine if paste is shown.
-    if (widget.handlePaste != null &&
-        widget.clipboardStatus?.value == ClipboardStatus.unknown) {
-      return const SizedBox.shrink();
-    }
-
-    // Calculate the positioning of the menu. It is placed to the left of the
-    // selection if there is enough room, or otherwise to the right.
-    final startTextSelectionPoint = widget.endpoints[0];
-    final endTextSelectionPoint = widget.endpoints.length > 1
-        ? widget.endpoints[1]
-        : widget.endpoints[0];
-    final anchorLeft = Offset(
-      widget.globalEditableRegion.left +
-          startTextSelectionPoint.point.dx -
-          widget.textLineWidth -
-          _kToolbarContentDistance,
-      widget.globalEditableRegion.top + widget.selectionMidpoint.dy,
-    );
-    final anchorRight = Offset(
-      widget.globalEditableRegion.left +
-          endTextSelectionPoint.point.dx +
-          _kToolbarContentDistanceRight,
-      widget.globalEditableRegion.top + widget.selectionMidpoint.dy,
-    );
-
-    // Determine which buttons will appear so that the order and total number is
-    // known.
-    final itemData = <_TextSelectionToolbarItemData>[
-      if (widget.handleCut != null)
-        _TextSelectionToolbarItemData(
-          icon: Icons.cut,
-          onPressed: widget.handleCut!,
-        ),
-      if (widget.handleCopy != null)
-        _TextSelectionToolbarItemData(
-          icon: Icons.copy,
-          onPressed: widget.handleCopy!,
-        ),
-      if (widget.handlePaste != null &&
-          widget.clipboardStatus?.value == ClipboardStatus.pasteable)
-        _TextSelectionToolbarItemData(
-          icon: Icons.paste,
-          onPressed: widget.handlePaste!,
-        ),
-      if (widget.handleSelectAll != null)
-        _TextSelectionToolbarItemData(
-          icon: Icons.select_all,
-          onPressed: widget.handleSelectAll!,
-        ),
-    ];
-
-    // If there is no option available, build an empty widget.
-    if (itemData.isEmpty) {
-      return const SizedBox(width: 0.0, height: 0.0);
-    }
-
-    return MongolTextSelectionToolbar(
-      anchorLeft: anchorLeft,
-      anchorRight: anchorRight,
-      children: itemData.asMap().entries.map((
-        MapEntry<int, _TextSelectionToolbarItemData> entry,
-      ) {
-        return MongolTextSelectionToolbarButton(
-          padding: MongolTextSelectionToolbarButton.getPadding(
-            entry.key,
-            itemData.length,
-          ),
-          onPressed: entry.value.onPressed,
-          child: Icon(entry.value.icon),
-        );
-      }).toList(),
-    );
-  }
 }
 
 /// Draws a single text selection handle which points up and to the left.
@@ -324,25 +115,9 @@ class _TextSelectionHandlePainter extends CustomPainter {
   }
 }
 
-/// Mongol styled text selection handle controls.
-///
-/// Specifically does not manage the toolbar, which is left to
-/// [MongolEditableText.contextMenuBuilder].
-class MongolTextSelectionHandleControls extends MongolTextSelectionControls
-    with TextSelectionHandleControls {}
-
 /// Text selection handle controls for vertical Mongolian text.
 ///
 /// These leave the context menu to [MongolEditableText.contextMenuBuilder].
 /// [MongolTextField] uses this by default.
-final TextSelectionControls mongolTextSelectionHandleControls =
-    MongolTextSelectionHandleControls();
-
-/// Text selection controls that follow the Material Design specification.
-///
-/// These build the toolbar themselves via the deprecated
-/// [MongolTextSelectionControls.buildToolbar]. Prefer
-/// [mongolTextSelectionHandleControls] together with
-/// [MongolEditableText.contextMenuBuilder].
 final TextSelectionControls mongolTextSelectionControls =
     MongolTextSelectionControls();

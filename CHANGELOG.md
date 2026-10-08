@@ -5,11 +5,11 @@
   which lays the icon buttons out beside the selected line (#76).
 - Deprecate `MongolTextField.toolbarOptions` in favor of `contextMenuBuilder`.
   It is now nullable; passing it still limits the default buttons.
-- Deprecate `MongolTextSelectionControls.buildToolbar`. Add
-  `MongolTextSelectionHandleControls` and `mongolTextSelectionHandleControls`,
-  which only draw the handles and leave the menu to `contextMenuBuilder`.
-  `MongolTextField` uses them by default; passing the legacy
-  `mongolTextSelectionControls` still builds the old toolbar.
+- `MongolTextSelectionControls` now only draws the selection handles and
+  leaves the menu to `contextMenuBuilder`; its internal `buildToolbar`
+  implementation is removed. It was never exported, so this is not a public
+  API change. Passing a third-party `TextSelectionControls` that still
+  implements the deprecated `buildToolbar` keeps working.
 - Export `MongolTextSelectionControls`, `MongolTextSelectionToolbar`,
   `MongolTextSelectionToolbarButton` and `MongolAdaptiveTextSelectionToolbar`
   from the package.

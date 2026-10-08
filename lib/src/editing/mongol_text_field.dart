@@ -1563,7 +1563,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.iOS:
         final cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = true;
-        textSelectionControls ??= mongolTextSelectionHandleControls;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
         cursorColor =
             widget.cursorColor ??
@@ -1582,7 +1582,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.macOS:
         final cupertinoTheme = CupertinoTheme.of(context);
         forcePressEnabled = false;
-        textSelectionControls ??= mongolTextSelectionHandleControls;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = true;
         cursorColor =
             widget.cursorColor ??
@@ -1601,7 +1601,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.android:
       case TargetPlatform.fuchsia:
         forcePressEnabled = false;
-        textSelectionControls ??= mongolTextSelectionHandleControls;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
         cursorColor =
             widget.cursorColor ??
@@ -1615,7 +1615,7 @@ class _TextFieldState extends State<MongolTextField>
       case TargetPlatform.linux:
       case TargetPlatform.windows:
         forcePressEnabled = false;
-        textSelectionControls ??= mongolTextSelectionHandleControls;
+        textSelectionControls ??= mongolTextSelectionControls;
         cursorOpacityAnimates = false;
         cursorColor =
             widget.cursorColor ??
