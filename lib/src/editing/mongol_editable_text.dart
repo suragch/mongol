@@ -116,6 +116,7 @@ import 'package:flutter/widgets.dart'
         TextStyle,
         TickerMode,
         TickerProviderStateMixin,
+        // ignore: deprecated_member_use
         ToolbarOptions,
         TransposeCharactersIntent,
         UndoTextIntent,
@@ -424,19 +425,24 @@ class MongolEditableText extends StatefulWidget {
        toolbarOptions =
            selectionControls is TextSelectionHandleControls &&
                toolbarOptions == null
+           // ignore: deprecated_member_use
            ? ToolbarOptions.empty
            : toolbarOptions ??
                  (obscureText
                      ? (readOnly
                            // No point in even offering "Select All" in a read-only obscured
                            // field.
+                           // ignore: deprecated_member_use
                            ? ToolbarOptions.empty
                            // Writable, but obscured.
+                           // ignore: deprecated_member_use
                            : const ToolbarOptions(selectAll: true, paste: true))
                      : (readOnly
                            // Read-only, not obscured.
+                           // ignore: deprecated_member_use
                            ? const ToolbarOptions(selectAll: true, copy: true)
                            // Writable, not obscured.
+                           // ignore: deprecated_member_use
                            : const ToolbarOptions(
                                copy: true,
                                cut: true,
@@ -498,6 +504,7 @@ class MongolEditableText extends StatefulWidget {
   ///
   /// By default, all options are enabled. If [readOnly] is true,
   /// paste and cut will be disabled regardless.
+  // ignore: deprecated_member_use
   final ToolbarOptions toolbarOptions;
 
   /// Whether to show selection handles.
@@ -2050,6 +2057,7 @@ class MongolEditableTextState extends State<MongolEditableText>
     final bool canPaste =
         widget.selectionControls is TextSelectionHandleControls
         ? pasteEnabled
+        // ignore: deprecated_member_use
         : widget.selectionControls?.canPaste(this) ?? false;
     if (widget.selectionEnabled &&
         pasteEnabled &&
@@ -3244,8 +3252,10 @@ class MongolEditableTextState extends State<MongolEditableText>
             (widget.selectionControls is TextSelectionHandleControls
                 ? copyEnabled
                 : copyEnabled &&
+                      // ignore: deprecated_member_use
                       (widget.selectionControls?.canCopy(this) ?? false))
         ? () {
+            // ignore: deprecated_member_use
             controls?.handleCopy(this);
             copySelection(SelectionChangedCause.toolbar);
           }
@@ -3258,8 +3268,10 @@ class MongolEditableTextState extends State<MongolEditableText>
             (widget.selectionControls is TextSelectionHandleControls
                 ? cutEnabled
                 : cutEnabled &&
+                      // ignore: deprecated_member_use
                       (widget.selectionControls?.canCut(this) ?? false))
         ? () {
+            // ignore: deprecated_member_use
             controls?.handleCut(this);
             cutSelection(SelectionChangedCause.toolbar);
           }
@@ -3272,10 +3284,12 @@ class MongolEditableTextState extends State<MongolEditableText>
             (widget.selectionControls is TextSelectionHandleControls
                 ? pasteEnabled
                 : pasteEnabled &&
+                      // ignore: deprecated_member_use
                       (widget.selectionControls?.canPaste(this) ?? false)) &&
             (clipboardStatus == null ||
                 clipboardStatus!.value == ClipboardStatus.pasteable)
         ? () {
+            // ignore: deprecated_member_use
             controls?.handlePaste(this);
             pasteText(SelectionChangedCause.toolbar);
           }

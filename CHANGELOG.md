@@ -19,8 +19,8 @@
 - Show the context menu from `contextMenuBuilder` even when
   `selectionControls` is null, and refresh the clipboard state before the
   toolbar is shown, as Flutter does.
-- Silence the remaining legacy-toolbar deprecation warnings in
-  `analysis_options.yaml`, the way Flutter does, instead of per-file ignores.
+- Replace the file-level deprecation ignores with line-level ignores on the
+  remaining legacy-toolbar call sites.
 
 ## [11.0.0] - 2026.10.06
 
