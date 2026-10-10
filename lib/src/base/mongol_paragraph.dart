@@ -163,15 +163,26 @@ class MongolParagraph {
   ///
   /// To create a [MongolParagraph] object, use a [MongolParagraphBuilder].
   MongolParagraph._(
-    this._runs,
+    this._wordRuns,
     this._text,
     this._maxLines,
     this._ellipsis,
     this._textAlign,
-  );
+    this._paragraphStyle,
+  ) : _runs = _wordRuns;
 
   final String _text;
-  final List<_TextRun> _runs;
+
+  /// The runs as the builder made them, one per word, CJK character or emoji.
+  final List<_TextRun> _wordRuns;
+
+  /// The runs of the current layout. These are the [_wordRuns], except that a
+  /// word too long for a line is replaced by the pieces it was broken into.
+  List<_TextRun> _runs;
+
+  /// The pieces in [_runs] that are not in [_wordRuns].
+  final List<_TextRun> _brokenRuns = [];
+  final ui.ParagraphStyle _paragraphStyle;
   final int? _maxLines;
   final _TextRun? _ellipsis;
   final MongolTextAlign _textAlign;
@@ -259,60 +270,212 @@ class MongolParagraph {
   // Internally this method uses "width" and "height" naming with regard
   // to a horizontal line of text. Rotation doesn't happen until drawing.
   void _calculateLineBreaks(double maxLineLength) {
-    if (_runs.isEmpty) {
+    if (_wordRuns.isEmpty) {
       return;
     }
     if (_lines.isNotEmpty) {
       _lines.clear();
       _didExceedMaxLines = false;
     }
+    for (final run in _brokenRuns) {
+      run.paragraph.dispose();
+    }
+    _brokenRuns.clear();
+    final runs = <_TextRun>[];
+    _runs = runs;
 
     // add run lengths until exceeds length
     var start = 0;
-    var end = 0;
     var lineWidth = 0.0;
     var lineHeight = 0.0;
+    // The line width without its trailing whitespace. Trailing whitespace is
+    // allowed to hang past the end of the line, as it does in ui.Paragraph, so
+    // only this part has to fit and only this part is aligned.
+    var lineVisibleWidth = 0.0;
     var runEndsWithNewLine = false;
-    for (var i = 0; i < _runs.length; i++) {
-      end = i;
-      final run = _runs[i];
-      final runWidth = run.width;
-      final runHeight = run.height;
 
-      if (lineWidth + runWidth > maxLineLength) {
-        _addLine(start, end, lineWidth, lineHeight);
-        lineWidth = runWidth;
-        lineHeight = runHeight;
-        start = end;
+    void addRun(_TextRun run) {
+      final i = runs.length;
+      runs.add(run);
+      if (_didExceedMaxLines) {
+        return;
+      }
+
+      // A run that does not fit starts a new line, unless it is the first run
+      // on the line. Then there is nowhere better for it to go.
+      if (!run.isWhitespace &&
+          i > start &&
+          lineWidth + run.visibleWidth > maxLineLength) {
+        _addLine(start, i, lineWidth, lineHeight, lineVisibleWidth);
+        lineWidth = run.width;
+        lineHeight = run.height;
+        lineVisibleWidth = run.visibleWidth;
+        start = i;
       } else {
-        lineWidth += runWidth;
+        if (!run.isWhitespace) {
+          lineVisibleWidth = lineWidth + run.visibleWidth;
+        }
+        lineWidth += run.width;
         lineHeight = math.max(lineHeight, run.height);
       }
 
       runEndsWithNewLine = _runEndsWithNewLine(run);
       if (runEndsWithNewLine) {
-        end = i + 1;
-        _addLine(start, end, lineWidth, lineHeight);
+        _addLine(start, i + 1, lineWidth, lineHeight, lineVisibleWidth);
         lineWidth = 0;
         lineHeight = 0;
-        start = end;
-      }
-
-      if (_didExceedMaxLines) {
-        break;
+        lineVisibleWidth = 0;
+        start = i + 1;
       }
     }
 
-    end = _runs.length;
-    if (start < end) {
-      _addLine(start, end, lineWidth, lineHeight);
+    final canBreakWords = maxLineLength.isFinite && maxLineLength > 0;
+    for (final word in _wordRuns) {
+      if (canBreakWords &&
+          !_didExceedMaxLines &&
+          !word.isRotated &&
+          word.visibleWidth > maxLineLength) {
+        final lineStart = runs.length > start ? lineWidth : 0.0;
+        final pieces = _breakWord(word, maxLineLength, lineStart);
+        _brokenRuns.addAll(pieces);
+        pieces.forEach(addRun);
+      } else {
+        addRun(word);
+      }
+    }
+
+    if (start < runs.length) {
+      _addLine(start, runs.length, lineWidth, lineHeight, lineVisibleWidth);
     }
 
     // add empty line with invalid run indexes for final newline char
     if (runEndsWithNewLine) {
       final height = _lines.last.bounds.height;
-      _addLine(-1, -1, 0, height);
+      _addLine(-1, -1, 0, height, 0);
     }
+  }
+
+  // Breaks a word that is too long for any line into pieces, at the places
+  // that ui.Paragraph would break it. That prefers breaking after characters
+  // like '/' and '-' and never splits a grapheme cluster. As in ui.Paragraph,
+  // the first piece fills what is left of the current line, which already has
+  // [lineStart] of it taken.
+  List<_TextRun> _breakWord(
+    _TextRun word,
+    double maxLineLength,
+    double lineStart,
+  ) {
+    final pieces = <_TextRun>[];
+    var start = 0;
+    var indent = lineStart;
+    while (start < word.textLength) {
+      for (final end in _lineEnds(word, start, maxLineLength, indent)) {
+        pieces.add(_runPiece(word, start, end));
+        start = end;
+      }
+      indent = 0;
+    }
+    return pieces;
+  }
+
+  // Where the lines end when the text of [word] from [start] is laid out in
+  // ui.Paragraph at [maxLineLength], after [indent] of other content. The
+  // whole word is laid out at once because where it may break depends on the
+  // characters around the break. The maxLines of the paragraph style can stop
+  // the layout early, in which case the caller lays out the rest.
+  List<int> _lineEnds(
+    _TextRun word,
+    int start,
+    double maxLineLength,
+    double indent,
+  ) {
+    final length = word.textLength;
+    final builder = ui.ParagraphBuilder(_paragraphStyle);
+    final prefix = indent > 0 ? 1 : 0;
+    if (indent > 0) {
+      builder.addPlaceholder(indent, 0, ui.PlaceholderAlignment.bottom);
+    }
+    for (final part in _sliceParts(word.parts, start, length)) {
+      builder.pushStyle(part.style);
+      builder.addText(part.text);
+      builder.pop();
+    }
+    final wrapped = builder.build()
+      ..layout(ui.ParagraphConstraints(width: maxLineLength));
+
+    final ends = <int>[];
+    var lineStart = 0;
+    for (var line = 0; line < wrapped.numberOfLines; line++) {
+      final range = wrapped.getLineBoundary(
+        TextPosition(offset: math.max(lineStart, prefix)),
+      );
+      var end = start + range.end - prefix;
+      // ui.Paragraph leaves trailing spaces out of the line boundary, but
+      // they belong to the piece they follow.
+      while (end < length && word.textAt(end) == ' ') {
+        end++;
+      }
+      if (end <= (ends.isEmpty ? start : ends.last)) break;
+      ends.add(end);
+      lineStart = end - start + prefix;
+      if (end >= length) break;
+    }
+    // An ellipsis can shorten the last line that maxLines lets through.
+    if (wrapped.didExceedMaxLines && ends.length > 1) {
+      ends.removeLast();
+    }
+    wrapped.dispose();
+
+    if (ends.isEmpty && indent == 0) {
+      // Not even one grapheme fits, so the line takes one anyway.
+      ends.add(start + word.text.substring(start).characters.first.length);
+    }
+    return ends;
+  }
+
+  // The [start] and [end] are relative to the run's paragraph text, which has
+  // no newline. A trailing newline stays with the last piece.
+  _TextRun _runPiece(_TextRun run, int start, int end) {
+    final isLast = end == run.textLength;
+    final paragraph = _buildRunParagraph(run.parts, start, end)
+      ..layout(const ui.ParagraphConstraints(width: double.infinity));
+    return _TextRun(
+      run.start + start,
+      isLast ? run.end : run.start + end,
+      false,
+      paragraph,
+      isWhitespace: run.text.substring(start, end).trim().isEmpty,
+      parts: _sliceParts(run.parts, start, end),
+    );
+  }
+
+  ui.Paragraph _buildRunParagraph(List<_StyledText> parts, int start, int end) {
+    final builder = ui.ParagraphBuilder(_paragraphStyle);
+    for (final part in _sliceParts(parts, start, end)) {
+      builder.pushStyle(part.style);
+      builder.addText(part.text);
+      builder.pop();
+    }
+    return builder.build();
+  }
+
+  List<_StyledText> _sliceParts(List<_StyledText> parts, int start, int end) {
+    final sliced = <_StyledText>[];
+    var offset = 0;
+    for (final part in parts) {
+      final partStart = math.max(start, offset);
+      final partEnd = math.min(end, offset + part.text.length);
+      if (partStart < partEnd) {
+        sliced.add(
+          _StyledText(
+            part.style,
+            part.text.substring(partStart - offset, partEnd - offset),
+          ),
+        );
+      }
+      offset += part.text.length;
+    }
+    return sliced;
   }
 
   bool _runEndsWithNewLine(_TextRun run) {
@@ -320,16 +483,22 @@ class MongolParagraph {
     return _text[index] == '\n';
   }
 
-  void _addLine(int start, int end, double width, double height) {
+  void _addLine(
+    int start,
+    int end,
+    double width,
+    double height,
+    double visibleWidth,
+  ) {
     if (_maxLines != null && _maxLines <= _lines.length) {
       _didExceedMaxLines = true;
       return;
     }
     _didExceedMaxLines = false;
     final bounds = Rect.fromLTRB(0, 0, width, height);
-    final lineInfo = _LineInfo(start, end, bounds);
+    final lineInfo = _LineInfo(start, end, bounds, visibleWidth);
     _lines.add(lineInfo);
-    _longestLine = math.max(longestLine, lineInfo.bounds.width);
+    _longestLine = math.max(longestLine, visibleWidth);
   }
 
   void _calculateWidth() {
@@ -356,7 +525,7 @@ class MongolParagraph {
     // segment and segments are maximised over rather than summed.
     var segmentExtent = 0.0;
     var maxSegmentExtent = 0.0;
-    for (final run in _runs) {
+    for (final run in _wordRuns) {
       maxRunWidth = math.max(run.width, maxRunWidth);
       segmentExtent += run.width;
       if (_runEndsWithNewLine(run)) {
@@ -482,17 +651,24 @@ class MongolParagraph {
       case MongolTextAlign.top:
         break;
       case MongolTextAlign.center:
-        final offset = (_height! - line.bounds.width) / 2;
+        final offset = (_height! - line.visibleWidth) / 2;
         canvas.translate(offset, 0);
         break;
       case MongolTextAlign.bottom:
-        final offset = _height! - line.bounds.width;
+        final offset = _height! - line.visibleWidth;
         canvas.translate(offset, 0);
         break;
       case MongolTextAlign.justify:
         if (isLastLine) break;
-        final extraSpace = _height! - line.bounds.width;
-        final runsInLine = line.textRunEnd - line.textRunStart;
+        final extraSpace = _height! - line.visibleWidth;
+        // Trailing whitespace runs take no part in the spacing, or the last
+        // visible run would stop short of the bottom edge.
+        var lastVisibleRun = line.textRunEnd - 1;
+        while (lastVisibleRun > line.textRunStart &&
+            _runs[lastVisibleRun].isWhitespace) {
+          lastVisibleRun--;
+        }
+        final runsInLine = lastVisibleRun + 1 - line.textRunStart;
         if (runsInLine <= 1) break;
         runSpacing = extraSpace / (runsInLine - 1);
         break;
@@ -686,7 +862,7 @@ class MongolParagraph {
     if (offset >= _text.length) {
       return TextRange(start: _text.length, end: offset);
     }
-    final run = _getRunFromOffset(offset);
+    final run = _getRunFromOffset(_wordRuns, offset);
     if (run == null) {
       return TextRange.empty;
     }
@@ -709,23 +885,23 @@ class MongolParagraph {
     return TextRange(start: start, end: end);
   }
 
-  _TextRun? _getRunFromOffset(int offset) {
+  _TextRun? _getRunFromOffset(List<_TextRun> runs, int offset) {
     if (offset >= _text.length) {
       return null;
     }
     var min = 0;
-    var max = _runs.length - 1;
+    var max = runs.length - 1;
     // do a binary search
     while (min <= max) {
       final guess = (max + min) ~/ 2;
-      if (offset >= _runs[guess].end) {
+      if (offset >= runs[guess].end) {
         min = guess + 1;
         continue;
-      } else if (offset < _runs[guess].start) {
+      } else if (offset < runs[guess].start) {
         max = guess - 1;
         continue;
       } else {
-        return _runs[guess];
+        return runs[guess];
       }
     }
     return null;
@@ -825,11 +1001,12 @@ class MongolParagraph {
         baseline = previousMetrics.baseline + previousMetrics.ascent + descent;
       }
 
+      // Match where draw() places the line, which ignores trailing whitespace.
       double top = 0;
       if (_textAlign == MongolTextAlign.center) {
-        top = (this.height - height) / 2;
+        top = (this.height - line.visibleWidth) / 2;
       } else if (_textAlign == MongolTextAlign.bottom) {
-        top = this.height - height;
+        top = this.height - line.visibleWidth;
       }
 
       final lineMetrics = MongolLineMetrics(
@@ -859,10 +1036,12 @@ class MongolParagraph {
 
     // Is this slow? Is it necessary?
     // Do we need to dispose anything else?
-    for (final run in _runs) {
+    for (final run in [..._wordRuns, ..._brokenRuns]) {
       run.paragraph.dispose();
     }
-    _runs.clear();
+    _wordRuns.clear();
+    _brokenRuns.clear();
+    _runs = _wordRuns;
   }
 
   bool _disposed = false;
@@ -1007,11 +1186,13 @@ class MongolParagraphBuilder {
     _paragraphStyle ??= _defaultParagraphStyle;
     final runs = <_TextRun>[];
 
+    final plainText = _plainText.toString();
     final length = _rawStyledTextRuns.length;
     var startIndex = 0;
     var endIndex = 0;
     ui.ParagraphBuilder? builder;
     ui.TextStyle? style;
+    var parts = <_StyledText>[];
     for (var i = 0; i < length; i++) {
       style = _uiStyleForRun(i);
       final segment = _rawStyledTextRuns[i].text;
@@ -1021,6 +1202,7 @@ class MongolParagraphBuilder {
       final text = _stripNewLineChar(segment.text);
       builder.addText(text);
       builder.pop();
+      parts.add(_StyledText(style, text));
 
       if (_isNonBreakingSegment(i)) {
         continue;
@@ -1039,18 +1221,27 @@ class MongolParagraphBuilder {
         }
       }
 
-      final run = _TextRun(startIndex, endIndex, isRotated, paragraph);
+      final run = _TextRun(
+        startIndex,
+        endIndex,
+        isRotated,
+        paragraph,
+        isWhitespace: _isAllBreakChars(plainText, startIndex, endIndex),
+        parts: parts,
+      );
       runs.add(run);
+      parts = <_StyledText>[];
       builder = null;
       startIndex = endIndex;
     }
 
     return MongolParagraph._(
       runs,
-      _plainText.toString(),
+      plainText,
       _maxLines,
       _ellipsisRun(style),
       _textAlign,
+      _paragraphStyle!,
     );
   }
 
@@ -1063,6 +1254,13 @@ class MongolParagraphBuilder {
     final nextSegment = _rawStyledTextRuns[i + 1].text;
     if (nextSegment.isRotatable) return false;
     if (_startsWithBreak(nextSegment.text)) return false;
+    return true;
+  }
+
+  bool _isAllBreakChars(String text, int start, int end) {
+    for (var i = start; i < end; i++) {
+      if (!LineBreaker.isBreakChar(text[i])) return false;
+    }
     return true;
   }
 
@@ -1285,7 +1483,14 @@ class _RawStyledTextRun {
 /// forms the run. The [paragraph] is the precomputed Paragraph object that
 /// contains the text run.
 class _TextRun {
-  _TextRun(this.start, this.end, this.isRotated, this.paragraph);
+  _TextRun(
+    this.start,
+    this.end,
+    this.isRotated,
+    this.paragraph, {
+    this.isWhitespace = false,
+    this.parts = const [],
+  });
 
   /// The UTF-16 code unit index where this run starts within the entire text
   /// range. The value in inclusive (that is, this is the actual start index).
@@ -1308,9 +1513,46 @@ class _TextRun {
   /// It includes the size but should never be more than one line.
   final ui.Paragraph paragraph;
 
+  /// Whether the run is made up only of spaces and newlines.
+  final bool isWhitespace;
+
+  /// The styled text that [paragraph] was built from, without any newline.
+  ///
+  /// This is kept so that a run that is too long for a line can be rebuilt in
+  /// pieces.
+  final List<_StyledText> parts;
+
+  /// The text of [paragraph].
+  String get text => parts.map((part) => part.text).join();
+
+  /// The length of [text].
+  int get textLength =>
+      parts.fold(0, (length, part) => length + part.text.length);
+
+  /// The UTF-16 code unit at [index] of [text].
+  String textAt(int index) {
+    var offset = 0;
+    for (final part in parts) {
+      if (index < offset + part.text.length) {
+        return part.text[index - offset];
+      }
+      offset += part.text.length;
+    }
+    throw RangeError.index(index, this);
+  }
+
   /// Returns the width of the run (in horizontal orientation).
   double get width {
     return paragraph.maxIntrinsicWidth;
+  }
+
+  /// Returns the width of the run without its trailing whitespace (in
+  /// horizontal orientation).
+  ///
+  /// [ui.Paragraph.longestLine] already leaves trailing spaces out, except
+  /// when the paragraph has nothing but spaces.
+  double get visibleWidth {
+    return isWhitespace ? 0 : paragraph.longestLine;
   }
 
   /// Returns the height of the run (in horizontal orientation).
@@ -1332,6 +1574,14 @@ class _TextRun {
   }
 }
 
+/// A piece of text with the style it is drawn in.
+class _StyledText {
+  _StyledText(this.style, this.text);
+
+  final ui.TextStyle style;
+  final String text;
+}
+
 /// LineInfo stores information about each line in the paragraph.
 ///
 /// [textRunStart] is the index of the first text run in the line (out of all the
@@ -1339,7 +1589,7 @@ class _TextRun {
 ///
 /// The [bounds] is the size of the unrotated text line.
 class _LineInfo {
-  _LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
+  _LineInfo(this.textRunStart, this.textRunEnd, this.bounds, this.visibleWidth);
 
   /// The index of the run in [_runs] where this line starts
   final int textRunStart;
@@ -1352,6 +1602,11 @@ class _LineInfo {
   /// There is no offset so [left] and [top] are `0`. Just use [width] and
   /// [height].
   final Rect bounds;
+
+  /// The width of [bounds] without the trailing whitespace of the line.
+  ///
+  /// This is the part of the line that is aligned.
+  final double visibleWidth;
 }
 
 // This is for keeping track of the text style stack.
