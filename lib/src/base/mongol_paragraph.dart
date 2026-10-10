@@ -857,12 +857,11 @@ class MongolParagraph {
       return true;
     }());
 
-    // Is this slow? Is it necessary?
-    // Do we need to dispose anything else?
     for (final run in _runs) {
       run.paragraph.dispose();
     }
     _runs.clear();
+    _ellipsis?.paragraph.dispose();
   }
 
   bool _disposed = false;
