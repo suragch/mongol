@@ -272,6 +272,10 @@ class MongolParagraph {
     var end = 0;
     var lineWidth = 0.0;
     var lineHeight = 0.0;
+    // The line width without its trailing whitespace. Trailing whitespace is
+    // allowed to hang past the end of the line, as it does in ui.Paragraph, so
+    // only this part has to fit and only this part is aligned.
+    var lineVisibleWidth = 0.0;
     var runEndsWithNewLine = false;
     for (var i = 0; i < _runs.length; i++) {
       end = i;
@@ -279,12 +283,16 @@ class MongolParagraph {
       final runWidth = run.width;
       final runHeight = run.height;
 
-      if (lineWidth + runWidth > maxLineLength) {
-        _addLine(start, end, lineWidth, lineHeight);
+      if (!run.isWhitespace && lineWidth + run.visibleWidth > maxLineLength) {
+        _addLine(start, end, lineWidth, lineHeight, lineVisibleWidth);
         lineWidth = runWidth;
         lineHeight = runHeight;
+        lineVisibleWidth = run.visibleWidth;
         start = end;
       } else {
+        if (!run.isWhitespace) {
+          lineVisibleWidth = lineWidth + run.visibleWidth;
+        }
         lineWidth += runWidth;
         lineHeight = math.max(lineHeight, run.height);
       }
@@ -292,9 +300,10 @@ class MongolParagraph {
       runEndsWithNewLine = _runEndsWithNewLine(run);
       if (runEndsWithNewLine) {
         end = i + 1;
-        _addLine(start, end, lineWidth, lineHeight);
+        _addLine(start, end, lineWidth, lineHeight, lineVisibleWidth);
         lineWidth = 0;
         lineHeight = 0;
+        lineVisibleWidth = 0;
         start = end;
       }
 
@@ -305,13 +314,13 @@ class MongolParagraph {
 
     end = _runs.length;
     if (start < end) {
-      _addLine(start, end, lineWidth, lineHeight);
+      _addLine(start, end, lineWidth, lineHeight, lineVisibleWidth);
     }
 
     // add empty line with invalid run indexes for final newline char
     if (runEndsWithNewLine) {
       final height = _lines.last.bounds.height;
-      _addLine(-1, -1, 0, height);
+      _addLine(-1, -1, 0, height, 0);
     }
   }
 
@@ -320,16 +329,22 @@ class MongolParagraph {
     return _text[index] == '\n';
   }
 
-  void _addLine(int start, int end, double width, double height) {
+  void _addLine(
+    int start,
+    int end,
+    double width,
+    double height,
+    double visibleWidth,
+  ) {
     if (_maxLines != null && _maxLines <= _lines.length) {
       _didExceedMaxLines = true;
       return;
     }
     _didExceedMaxLines = false;
     final bounds = Rect.fromLTRB(0, 0, width, height);
-    final lineInfo = _LineInfo(start, end, bounds);
+    final lineInfo = _LineInfo(start, end, bounds, visibleWidth);
     _lines.add(lineInfo);
-    _longestLine = math.max(longestLine, lineInfo.bounds.width);
+    _longestLine = math.max(longestLine, visibleWidth);
   }
 
   void _calculateWidth() {
@@ -482,17 +497,24 @@ class MongolParagraph {
       case MongolTextAlign.top:
         break;
       case MongolTextAlign.center:
-        final offset = (_height! - line.bounds.width) / 2;
+        final offset = (_height! - line.visibleWidth) / 2;
         canvas.translate(offset, 0);
         break;
       case MongolTextAlign.bottom:
-        final offset = _height! - line.bounds.width;
+        final offset = _height! - line.visibleWidth;
         canvas.translate(offset, 0);
         break;
       case MongolTextAlign.justify:
         if (isLastLine) break;
-        final extraSpace = _height! - line.bounds.width;
-        final runsInLine = line.textRunEnd - line.textRunStart;
+        final extraSpace = _height! - line.visibleWidth;
+        // Trailing whitespace runs take no part in the spacing, or the last
+        // visible run would stop short of the bottom edge.
+        var lastVisibleRun = line.textRunEnd - 1;
+        while (lastVisibleRun > line.textRunStart &&
+            _runs[lastVisibleRun].isWhitespace) {
+          lastVisibleRun--;
+        }
+        final runsInLine = lastVisibleRun + 1 - line.textRunStart;
         if (runsInLine <= 1) break;
         runSpacing = extraSpace / (runsInLine - 1);
         break;
@@ -825,11 +847,12 @@ class MongolParagraph {
         baseline = previousMetrics.baseline + previousMetrics.ascent + descent;
       }
 
+      // Match where draw() places the line, which ignores trailing whitespace.
       double top = 0;
       if (_textAlign == MongolTextAlign.center) {
-        top = (this.height - height) / 2;
+        top = (this.height - line.visibleWidth) / 2;
       } else if (_textAlign == MongolTextAlign.bottom) {
-        top = this.height - height;
+        top = this.height - line.visibleWidth;
       }
 
       final lineMetrics = MongolLineMetrics(
@@ -1007,6 +1030,7 @@ class MongolParagraphBuilder {
     _paragraphStyle ??= _defaultParagraphStyle;
     final runs = <_TextRun>[];
 
+    final plainText = _plainText.toString();
     final length = _rawStyledTextRuns.length;
     var startIndex = 0;
     var endIndex = 0;
@@ -1039,7 +1063,13 @@ class MongolParagraphBuilder {
         }
       }
 
-      final run = _TextRun(startIndex, endIndex, isRotated, paragraph);
+      final run = _TextRun(
+        startIndex,
+        endIndex,
+        isRotated,
+        paragraph,
+        isWhitespace: _isAllBreakChars(plainText, startIndex, endIndex),
+      );
       runs.add(run);
       builder = null;
       startIndex = endIndex;
@@ -1047,7 +1077,7 @@ class MongolParagraphBuilder {
 
     return MongolParagraph._(
       runs,
-      _plainText.toString(),
+      plainText,
       _maxLines,
       _ellipsisRun(style),
       _textAlign,
@@ -1063,6 +1093,13 @@ class MongolParagraphBuilder {
     final nextSegment = _rawStyledTextRuns[i + 1].text;
     if (nextSegment.isRotatable) return false;
     if (_startsWithBreak(nextSegment.text)) return false;
+    return true;
+  }
+
+  bool _isAllBreakChars(String text, int start, int end) {
+    for (var i = start; i < end; i++) {
+      if (!LineBreaker.isBreakChar(text[i])) return false;
+    }
     return true;
   }
 
@@ -1285,7 +1322,13 @@ class _RawStyledTextRun {
 /// forms the run. The [paragraph] is the precomputed Paragraph object that
 /// contains the text run.
 class _TextRun {
-  _TextRun(this.start, this.end, this.isRotated, this.paragraph);
+  _TextRun(
+    this.start,
+    this.end,
+    this.isRotated,
+    this.paragraph, {
+    this.isWhitespace = false,
+  });
 
   /// The UTF-16 code unit index where this run starts within the entire text
   /// range. The value in inclusive (that is, this is the actual start index).
@@ -1308,9 +1351,21 @@ class _TextRun {
   /// It includes the size but should never be more than one line.
   final ui.Paragraph paragraph;
 
+  /// Whether the run is made up only of spaces and newlines.
+  final bool isWhitespace;
+
   /// Returns the width of the run (in horizontal orientation).
   double get width {
     return paragraph.maxIntrinsicWidth;
+  }
+
+  /// Returns the width of the run without its trailing whitespace (in
+  /// horizontal orientation).
+  ///
+  /// [ui.Paragraph.longestLine] already leaves trailing spaces out, except
+  /// when the paragraph has nothing but spaces.
+  double get visibleWidth {
+    return isWhitespace ? 0 : paragraph.longestLine;
   }
 
   /// Returns the height of the run (in horizontal orientation).
@@ -1339,7 +1394,7 @@ class _TextRun {
 ///
 /// The [bounds] is the size of the unrotated text line.
 class _LineInfo {
-  _LineInfo(this.textRunStart, this.textRunEnd, this.bounds);
+  _LineInfo(this.textRunStart, this.textRunEnd, this.bounds, this.visibleWidth);
 
   /// The index of the run in [_runs] where this line starts
   final int textRunStart;
@@ -1352,6 +1407,11 @@ class _LineInfo {
   /// There is no offset so [left] and [top] are `0`. Just use [width] and
   /// [height].
   final Rect bounds;
+
+  /// The width of [bounds] without the trailing whitespace of the line.
+  ///
+  /// This is the part of the line that is aligned.
+  final double visibleWidth;
 }
 
 // This is for keeping track of the text style stack.
