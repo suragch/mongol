@@ -69,6 +69,16 @@ class MongolRenderParagraph extends RenderBox
 
   final MongolTextPainter _textPainter;
 
+  // On the web, glyphs that no loaded font has are drawn once fallback fonts
+  // finish downloading, which is reported as a system font change. The painter
+  // keeps its layout across a relayout of this render object, so it has to be
+  // told to lay the text out again, as RenderParagraph does.
+  @override
+  void systemFontsDidChange() {
+    super.systemFontsDidChange();
+    _textPainter.markNeedsLayout();
+  }
+
   /// The text to display
   TextSpan get text => _textPainter.text!;
   set text(TextSpan value) {
