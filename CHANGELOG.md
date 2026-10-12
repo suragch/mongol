@@ -2,6 +2,8 @@
 
 - Leave trailing spaces out of line alignment (#78) (@AltangerelG)
 - Break words that are too long for a line (#79) (@AltangerelG)
+- Fix emoji and CJK not rendering on web (#80) (@AltangerelG)
+- Dispose ellipsis paragraph in `MongolParagraph` (#81) (@AltangerelG)
 
 ## [11.1.0 - 2026.10.08]
 
