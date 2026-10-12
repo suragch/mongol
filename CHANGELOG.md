@@ -1,6 +1,7 @@
 ## [Unpublished]
 
 - Leave trailing spaces out of line alignment (#78) (@AltangerelG)
+- Break words that are too long for a line (#79) (@AltangerelG)
 
 ## [11.1.0 - 2026.10.08]
 
