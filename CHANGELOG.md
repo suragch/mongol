@@ -1,3 +1,7 @@
+## [Unpublished]
+
+- Leave trailing spaces out of line alignment (#78) (@AltangerelG)
+
 ## [11.1.0 - 2026.10.08]
 
 PR (#77) from @Satsrag:

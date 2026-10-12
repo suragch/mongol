@@ -51,7 +51,7 @@ Future<(int, int)> paintedRows(
   for (var y = 0; y < height; y++) {
     for (var x = 0; x < width; x++) {
       final alpha = bytes.getUint8((y * width + x) * 4 + 3);
-      if (alpha != 0) {
+      if (alpha > 128) {
         if (first < 0) first = y;
         last = y;
         break;
